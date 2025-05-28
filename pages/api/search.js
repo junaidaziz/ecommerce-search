@@ -1,14 +1,23 @@
-import { loadAndIndexProducts, searchProducts, getAllProducts } from '../../lib/products';
+import { loadAndIndexProducts } from '../../lib/products';
 
+// Module-level variables to store the loaded products and index
+// These will persist across requests within the same serverless function instance.
+let productsCache = [];
+let productIndexCache = null;
 let isInitialized = false;
 
 export default async function handler(req, res) {
+    // Initialize products and index only once per serverless function instance
     if (!isInitialized) {
         try {
-            await loadAndIndexProducts();
+            console.log("API: Initializing product data...");
+            const { products, productIndex } = await loadAndIndexProducts();
+            productsCache = products;
+            productIndexCache = productIndex;
             isInitialized = true;
+            console.log("API: Product data initialized.");
         } catch (error) {
-            console.error("Failed to initialize product data:", error);
+            console.error("API: Failed to initialize product data:", error);
             return res.status(500).json({ error: 'Failed to load product data' });
         }
     }
@@ -21,10 +30,25 @@ export default async function handler(req, res) {
 
     let results = [];
 
+    // Perform search using the cached index
     if (q) {
-        results = searchProducts(q);
+        // FlexSearch.Document.search returns an array of { field: ..., result: [...] }
+        // We need to flatten this into a unique list of product objects.
+        const searchResults = productIndexCache.search(q.trim(), {
+            enrich: true,
+            suggest: true
+        });
+
+        const uniqueResults = new Map();
+        searchResults.forEach(fieldResult => {
+            fieldResult.result.forEach(item => {
+                uniqueResults.set(item.doc.ID, item.doc);
+            });
+        });
+        results = Array.from(uniqueResults.values());
+
     } else {
-        results = getAllProducts();
+        results = [...productsCache]; // Return a copy of all products
     }
 
     if (filterByVendor && filterByVendor !== 'All') {
@@ -65,9 +89,9 @@ export default async function handler(req, res) {
     const pageSizeInt = parseInt(pageSize, 10);
     const paginated = results.slice((pageInt - 1) * pageSizeInt, pageInt * pageSizeInt);
 
-    const allProducts = getAllProducts();
-    const vendors = [...new Set(allProducts.map(p => p.VENDOR).filter(Boolean))].sort();
-    const productTypes = [...new Set(allProducts.map(p => p.PRODUCT_TYPE).filter(Boolean))].sort();
+    // Get all vendors and product types from the full cached list
+    const vendors = [...new Set(productsCache.map(p => p.VENDOR).filter(Boolean))].sort();
+    const productTypes = [...new Set(productsCache.map(p => p.PRODUCT_TYPE).filter(Boolean))].sort();
 
     res.status(200).json({
         results: paginated,

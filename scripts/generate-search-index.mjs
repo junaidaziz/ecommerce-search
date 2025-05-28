@@ -1,9 +1,9 @@
-const { loadAndIndexProducts } = require('../lib/products');
+import { forceBuildAndSaveIndexToBlob } from '../lib/products.js'; // Import the new function
 
 async function generateIndex() {
     console.log("Starting index generation script...");
     try {
-        await loadAndIndexProducts();
+        await forceBuildAndSaveIndexToBlob(); // Call the function that only builds and uploads
         console.log("Index generation complete.");
     } catch (error) {
         console.error("Error during index generation:", error);
@@ -12,4 +12,3 @@ async function generateIndex() {
 }
 
 generateIndex();
-
