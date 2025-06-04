@@ -14,6 +14,7 @@ A fast, scalable product search web app built with **Next.js**, **FlexSearch**, 
 - Optional `SKIP_INDEX_BUILD` flag to avoid rebuilding during deployment
 - Fully deployable on **Vercel** with CI/CD
 - Modern responsive UI built with **Tailwind CSS** and **DaisyUI**
+- User-selectable light or dark mode with automatic theme persistence
 
 ---
 
