@@ -13,6 +13,7 @@ A fast, scalable product search web app built with **Next.js**, **FlexSearch**, 
 - Caches search index using **Vercel Blob Storage**
 - Optional `SKIP_INDEX_BUILD` flag to avoid rebuilding during deployment
 - Fully deployable on **Vercel** with CI/CD
+- Modern responsive UI built with **Tailwind CSS** and **DaisyUI**
 
 ---
 
@@ -30,6 +31,7 @@ cd product-search-app
 ```bash
 npm install
 ```
+This will also install **DaisyUI**, a Tailwind CSS component library used throughout the app.
 
 3. **Create `.env.local`**
 
