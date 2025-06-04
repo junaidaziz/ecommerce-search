@@ -41,7 +41,8 @@ SKIP_INDEX_BUILD=false
 
 4. **Place your product data**
 
-Put your `products.csv` inside the `/data/` directory.
+Either put your `products.csv` inside the `/data/` directory **or** specify a
+remote file via the `PRODUCTS_URL` environment variable.
 
 5. **Run the project**
 
@@ -63,9 +64,9 @@ npm run generate-index
 
 This script will:
 
-- Parse `products.csv`
+- Load product data from your CSV file or `PRODUCTS_URL`
 - Build a FlexSearch index
-- Upload index to Vercel Blob with exact filename
+- Upload the index to Vercel Blob with the exact filename
 
 ---
 
@@ -113,7 +114,7 @@ Returns matching products in enriched format.
 ## 📂 Project Structure
 
 ```
-├── data/
+├── data/                # optional if using PRODUCTS_URL
 │   └── products.csv
 ├── lib/
 │   └── products.js
