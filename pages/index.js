@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Head from 'next/head';
 
-export default function Home() {
+export default function Home({ theme, setTheme }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -109,11 +109,22 @@ export default function Home() {
             </Head>
 
             <main className="w-full max-w-6xl bg-base-100 p-8 rounded-box shadow-xl">
-                <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Product Search</h1>
+                <h1 className="text-4xl font-bold text-center text-base-content mb-8">Product Search</h1>
+                <div className="flex justify-end mb-6">
+                    <label className="flex items-center cursor-pointer gap-2">
+                        <span className="text-sm">Dark Mode</span>
+                        <input
+                            type="checkbox"
+                            className="toggle"
+                            checked={theme === 'dark'}
+                            onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        />
+                    </label>
+                </div>
 
                 <form onSubmit={handleSearch} className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                     <div className="md:col-span-2">
-                        <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="search" className="block text-sm font-medium text-base-content mb-1">
                             Search Products
                         </label>
                         <input
@@ -127,7 +138,7 @@ export default function Home() {
                     </div>
 
                     <div>
-                        <label htmlFor="filterVendor" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="filterVendor" className="block text-sm font-medium text-base-content mb-1">
                             Filter by Vendor
                         </label>
                         <select
@@ -143,7 +154,7 @@ export default function Home() {
                     </div>
 
                     <div>
-                        <label htmlFor="filterType" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="filterType" className="block text-sm font-medium text-base-content mb-1">
                             Filter by Type
                         </label>
                         <select
@@ -159,7 +170,7 @@ export default function Home() {
                     </div>
 
                     <div className="md:col-span-2">
-                        <label htmlFor="sortBy" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="sortBy" className="block text-sm font-medium text-base-content mb-1">
                             Sort By
                         </label>
                         <select
@@ -187,7 +198,7 @@ export default function Home() {
                             checked={inStock}
                             onChange={(e) => { setInStock(e.target.checked); setCurrentPage(1); }}
                         />
-                        <label htmlFor="inStock" className="ml-2 block text-sm text-gray-900">
+                        <label htmlFor="inStock" className="ml-2 block text-sm text-base-content">
                             Show In Stock Only
                         </label>
                     </div>
@@ -240,23 +251,23 @@ export default function Home() {
                             </div>
 
                             <div className="card-body flex flex-col">
-                                <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2" title={product.TITLE}>
+                                <h2 className="text-xl font-semibold text-base-content mb-2 line-clamp-2" title={product.TITLE}>
                                     {product.TITLE || 'Untitled Product'}
                                 </h2>
-                                <p className="text-sm text-gray-600 mb-1">
+                                <p className="text-sm text-base-content mb-1">
                                     <span className="font-medium">Vendor:</span> {product.VENDOR || 'N/A'}
                                 </p>
-                                <p className="text-sm text-gray-600 mb-1">
+                                <p className="text-sm text-base-content mb-1">
                                     <span className="font-medium">Type:</span> {product.PRODUCT_TYPE || 'N/A'}
                                 </p>
-                                <p className="text-md font-bold text-gray-800 mb-2">
+                                <p className="text-md font-bold text-base-content mb-2">
                                     {product.CURRENCY} {product.MIN_PRICE.toFixed(2)}
                                     {product.MAX_PRICE > product.MIN_PRICE && ` - ${product.MAX_PRICE.toFixed(2)}`}
                                 </p>
-                                <p className="text-sm text-gray-700 mb-4 line-clamp-3">
+                                <p className="text-sm text-base-content mb-4 line-clamp-3">
                                     {product.DESCRIPTION_TEXT || product.BODY_HTML_TEXT || 'No description available.'}
                                 </p>
-                                <div className="mt-auto flex justify-between items-center text-sm text-gray-500">
+                                <div className="mt-auto flex justify-between items-center text-sm text-base-content">
                                     {product.SOLD_COUNT > 0 && (
                                         <span>Sold: {product.SOLD_COUNT}</span>
                                     )}
@@ -278,7 +289,7 @@ export default function Home() {
                         >
                             Previous
                         </button>
-                        <span className="text-gray-700">
+                        <span className="text-base-content">
                             Page {currentPage} of {totalPages}
                         </span>
                         <button
