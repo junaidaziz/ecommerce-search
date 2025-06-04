@@ -100,16 +100,15 @@ export default function Home() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8 font-inter">
+        <div className="min-h-screen bg-base-200 flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8 font-inter">
             <Head>
                 <title>Product Search App</title>
                 <meta name="description" content="Search products from CSV data" />
                 <link rel="icon" href="/favicon.ico" />
-                <script src="https://cdn.tailwindcss.com"></script>
                 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
             </Head>
 
-            <main className="w-full max-w-6xl bg-white p-8 rounded-lg shadow-xl">
+            <main className="w-full max-w-6xl bg-base-100 p-8 rounded-box shadow-xl">
                 <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Product Search</h1>
 
                 <form onSubmit={handleSearch} className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -120,7 +119,7 @@ export default function Home() {
                         <input
                             type="text"
                             id="search"
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="input input-bordered w-full"
                             placeholder="Search by title, vendor, description..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -133,7 +132,7 @@ export default function Home() {
                         </label>
                         <select
                             id="filterVendor"
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="select select-bordered w-full"
                             value={filterByVendor}
                             onChange={(e) => { setFilterByVendor(e.target.value); setCurrentPage(1); }}
                         >
@@ -149,7 +148,7 @@ export default function Home() {
                         </label>
                         <select
                             id="filterType"
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="select select-bordered w-full"
                             value={filterByType}
                             onChange={(e) => { setFilterByType(e.target.value); setCurrentPage(1); }}
                         >
@@ -165,7 +164,7 @@ export default function Home() {
                         </label>
                         <select
                             id="sortBy"
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="select select-bordered w-full"
                             value={sortBy}
                             onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
                         >
@@ -184,7 +183,7 @@ export default function Home() {
                             id="inStock"
                             name="inStock"
                             type="checkbox"
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            className="checkbox checkbox-primary"
                             checked={inStock}
                             onChange={(e) => { setInStock(e.target.checked); setCurrentPage(1); }}
                         />
@@ -196,7 +195,7 @@ export default function Home() {
                     <div className="md:col-span-1 flex justify-end">
                         <button
                             type="submit"
-                            className="w-full md:w-auto px-6 py-2 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                            className="btn btn-primary w-full md:w-auto"
                             disabled={loading}
                         >
                             {loading ? 'Searching...' : 'Search'}
@@ -205,23 +204,24 @@ export default function Home() {
                 </form>
 
                 {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <strong className="font-bold">Error!</strong>
-                        <span className="block sm:inline"> {error}</span>
+                    <div className="alert alert-error mb-4" role="alert">
+                        <span>{error}</span>
                     </div>
                 )}
 
                 {loading && products.length === 0 && (
-                    <p className="text-center text-gray-600 text-lg">Loading products...</p>
+                    <div className="flex justify-center my-4">
+                        <span className="loading loading-spinner"></span>
+                    </div>
                 )}
 
                 {!loading && products.length === 0 && !error && (
-                    <p className="text-center text-gray-600 text-lg">No products found. Try a different search or clear filters.</p>
+                    <div className="alert shadow-sm">No products found. Try a different search or clear filters.</div>
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {products.map((product) => (
-                        <div key={product.ID} className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200 ease-in-out flex flex-col">
+                        <div key={product.ID} className="card bg-base-100 border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out">
                             <div className="w-full h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
                                 {product.FEATURED_IMAGE?.url ? (
                                     <img
@@ -239,7 +239,7 @@ export default function Home() {
                                 )}
                             </div>
 
-                            <div className="p-4 flex-grow flex flex-col">
+                            <div className="card-body flex flex-col">
                                 <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2" title={product.TITLE}>
                                     {product.TITLE || 'Untitled Product'}
                                 </h2>
@@ -274,7 +274,7 @@ export default function Home() {
                         <button
                             onClick={() => handlePageChange(currentPage - 1)}
                             disabled={currentPage === 1 || loading}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="btn btn-secondary"
                         >
                             Previous
                         </button>
@@ -284,7 +284,7 @@ export default function Home() {
                         <button
                             onClick={() => handlePageChange(currentPage + 1)}
                             disabled={currentPage === totalPages || loading}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="btn btn-secondary"
                         >
                             Next
                         </button>
