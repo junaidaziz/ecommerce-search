@@ -233,7 +233,7 @@ export default function Home({ theme, setTheme }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {products.map((product) => (
                         <div key={product.ID} className="card bg-base-100 border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out">
-                            <div className="w-full h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
+                            <div className="w-full h-40 bg-gray-200 flex items-center justify-center overflow-hidden">
                                 {product.FEATURED_IMAGE?.url ? (
                                     <img
                                         src={product.FEATURED_IMAGE.url}
@@ -250,21 +250,19 @@ export default function Home({ theme, setTheme }) {
                                 )}
                             </div>
 
-                            <div className="card-body flex flex-col">
-                                <h2 className="text-xl font-semibold text-base-content mb-2 line-clamp-2" title={product.TITLE}>
+                            <div className="card-body flex flex-col gap-1">
+                                <h2 className="text-lg font-semibold text-base-content line-clamp-2" title={product.TITLE}>
                                     {product.TITLE || 'Untitled Product'}
                                 </h2>
-                                <p className="text-sm text-base-content mb-1">
-                                    <span className="font-medium">Vendor:</span> {product.VENDOR || 'N/A'}
-                                </p>
-                                <p className="text-sm text-base-content mb-1">
-                                    <span className="font-medium">Type:</span> {product.PRODUCT_TYPE || 'N/A'}
-                                </p>
-                                <p className="text-md font-bold text-base-content mb-2">
+                                <div className="flex flex-wrap gap-1 text-xs text-base-content">
+                                    {product.VENDOR && <span className="badge badge-ghost">{product.VENDOR}</span>}
+                                    {product.PRODUCT_TYPE && <span className="badge badge-ghost">{product.PRODUCT_TYPE}</span>}
+                                </div>
+                                <p className="text-md font-bold text-base-content">
                                     {product.CURRENCY} {product.MIN_PRICE.toFixed(2)}
                                     {product.MAX_PRICE > product.MIN_PRICE && ` - ${product.MAX_PRICE.toFixed(2)}`}
                                 </p>
-                                <p className="text-sm text-base-content mb-4 line-clamp-3">
+                                <p className="text-sm text-base-content line-clamp-2">
                                     {product.DESCRIPTION_TEXT || product.BODY_HTML_TEXT || 'No description available.'}
                                 </p>
                                 <div className="mt-auto flex justify-between items-center text-sm text-base-content">
