@@ -1,18 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AppContext } from '../../contexts/AppContext';
 
 export default function Admin() {
+  const { user } = useContext(AppContext);
   const [form, setForm] = useState({ id: '', title: '', vendor: '', description: '', product_type: '', tags: '', quantity: 0, min_price: 0, max_price: 0, currency: 'USD' });
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState('');
 
   const fetchProducts = async () => {
-    const res = await fetch('/api/admin/products');
+    if (!user) return;
+    const res = await fetch(`/api/admin/products?vendor=${encodeURIComponent(user.brandName || '')}`);
     if (res.ok) {
       setProducts(await res.json());
     }
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => { fetchProducts(); }, [user]);
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -34,6 +37,10 @@ export default function Admin() {
       setMessage(data.message || 'Error');
     }
   };
+
+  if (!user) {
+    return <div className="p-4">Please log in to view your products.</div>;
+  }
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
