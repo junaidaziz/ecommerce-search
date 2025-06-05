@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import '../styles/globals.css';
 import { AppProvider } from '../contexts/AppContext';
+import Header from '../components/Header';
 
 export default function App({ Component, pageProps }) {
   const [theme, setTheme] = useState('light');
@@ -21,6 +22,7 @@ export default function App({ Component, pageProps }) {
 
   return (
     <AppProvider>
+      <Header />
       <Component {...pageProps} theme={theme} setTheme={setTheme} />
     </AppProvider>
   );
