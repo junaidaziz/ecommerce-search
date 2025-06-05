@@ -291,6 +291,7 @@ export default function Home({ theme, setTheme }) {
                             </button>
                         </div>
                     </form>
+                </div>
                     <div className="flex-1">
                         {activeFilters.length > 0 && (
                             <div className="mb-4 flex flex-wrap gap-2">
