@@ -2,12 +2,26 @@ import { useState, useContext } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function Login() {
   const { login } = useContext(AppContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
+
+  const handleEmailBlur = () => {
+    setErrors(prev => {
+      const next = { ...prev };
+      if (email && !emailRegex.test(email)) {
+        next.email = 'Invalid email format';
+      } else if (next.email === 'Invalid email format') {
+        delete next.email;
+      }
+      return next;
+    });
+  };
 
   const submit = async e => {
     e.preventDefault();
@@ -41,6 +55,7 @@ export default function Login() {
             className={`input input-bordered w-full ${errors.email ? 'border-red-500' : ''}`}
             value={email}
             onChange={e => setEmail(e.target.value)}
+            onBlur={handleEmailBlur}
             placeholder="Email"
           />
           {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}

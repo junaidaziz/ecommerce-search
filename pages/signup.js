@@ -2,6 +2,9 @@ import { useState, useContext } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
 export default function Signup() {
   const { signup } = useContext(AppContext);
   const [firstName, setFirstName] = useState('');
@@ -13,6 +16,48 @@ export default function Signup() {
   const [gender, setGender] = useState('');
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
+
+  const handleEmailBlur = () => {
+    setErrors(prev => {
+      const next = { ...prev };
+      if (email && !emailRegex.test(email)) {
+        next.email = 'Invalid email format';
+      } else if (next.email === 'Invalid email format') {
+        delete next.email;
+      }
+      return next;
+    });
+  };
+
+  const handlePasswordBlur = () => {
+    setErrors(prev => {
+      const next = { ...prev };
+      if (password && !passwordRegex.test(password)) {
+        next.password =
+          'Password must be at least 8 characters and include uppercase, lowercase, number and special character';
+      } else if (next.password && next.password.startsWith('Password must')) {
+        delete next.password;
+      }
+      if (confirm && password !== confirm) {
+        next.confirm = 'Passwords do not match';
+      } else if (next.confirm === 'Passwords do not match') {
+        delete next.confirm;
+      }
+      return next;
+    });
+  };
+
+  const handleConfirmBlur = () => {
+    setErrors(prev => {
+      const next = { ...prev };
+      if (password && confirm && password !== confirm) {
+        next.confirm = 'Passwords do not match';
+      } else if (next.confirm === 'Passwords do not match') {
+        delete next.confirm;
+      }
+      return next;
+    });
+  };
 
   const submit = async e => {
     e.preventDefault();
@@ -78,6 +123,7 @@ export default function Signup() {
             className={`input input-bordered w-full ${errors.email ? 'border-red-500' : ''}`}
             value={email}
             onChange={e => setEmail(e.target.value)}
+            onBlur={handleEmailBlur}
             placeholder="Email"
           />
           {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
@@ -88,8 +134,13 @@ export default function Signup() {
             className={`input input-bordered w-full ${errors.password ? 'border-red-500' : ''}`}
             value={password}
             onChange={e => setPassword(e.target.value)}
+            onBlur={handlePasswordBlur}
             placeholder="Password"
           />
+          <p className="text-sm text-gray-500">
+            Password must be at least 8 characters and include uppercase,
+            lowercase, number and special character
+          </p>
           {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
         </div>
         <div>
@@ -98,6 +149,7 @@ export default function Signup() {
             className={`input input-bordered w-full ${errors.confirm ? 'border-red-500' : ''}`}
             value={confirm}
             onChange={e => setConfirm(e.target.value)}
+            onBlur={handleConfirmBlur}
             placeholder="Confirm Password"
           />
           {errors.confirm && <p className="text-red-500 text-sm">{errors.confirm}</p>}
