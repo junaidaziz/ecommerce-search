@@ -26,7 +26,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    const { q, filterByVendor, filterByType, inStock, sortBy, page = 1, pageSize = 20 } = req.query;
+    const { q, filterByVendor, filterByType, inStock, sortBy, page = 1, pageSize = 20, minPrice, maxPrice } = req.query;
 
     let results = [];
 
@@ -59,6 +59,18 @@ export default async function handler(req, res) {
     }
     if (inStock === 'true') {
         results = results.filter(product => product.TOTAL_INVENTORY > 0);
+    }
+    if (typeof minPrice !== 'undefined') {
+        const min = parseFloat(minPrice);
+        if (!isNaN(min)) {
+            results = results.filter(product => parseFloat(product.MIN_PRICE) >= min);
+        }
+    }
+    if (typeof maxPrice !== 'undefined') {
+        const max = parseFloat(maxPrice);
+        if (!isNaN(max)) {
+            results = results.filter(product => parseFloat(product.MIN_PRICE) <= max);
+        }
     }
 
     if (sortBy) {
