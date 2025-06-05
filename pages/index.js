@@ -171,21 +171,26 @@ export default function Home({ theme, setTheme }) {
                     ))}
                 </div>
 
+                <form onSubmit={handleSearch} className="mb-8 flex gap-2">
+                    <input
+                        type="text"
+                        id="search"
+                        className="input input-bordered flex-grow"
+                        placeholder="Search by title, vendor, description..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={loading}
+                    >
+                        {loading ? 'Searching...' : 'Search'}
+                    </button>
+                </form>
+
                 <div className="md:flex">
                     <form onSubmit={handleSearch} className="md:w-60 md:mr-8 mb-8 flex flex-col gap-4">
-                        <div>
-                            <label htmlFor="search" className="block text-sm font-medium text-base-content mb-1">
-                                Search Products
-                            </label>
-                            <input
-                                type="text"
-                                id="search"
-                                className="input input-bordered w-full"
-                                placeholder="Search by title, vendor, description..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
 
                         <div>
                             <label htmlFor="filterVendor" className="block text-sm font-medium text-base-content mb-1">
@@ -282,7 +287,7 @@ export default function Home({ theme, setTheme }) {
                                 className="btn btn-primary w-full"
                                 disabled={loading}
                             >
-                                {loading ? 'Searching...' : 'Search'}
+                                {loading ? 'Applying...' : 'Apply Filters'}
                             </button>
                         </div>
                     </form>
