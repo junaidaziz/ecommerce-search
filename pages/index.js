@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useContext } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import Head from 'next/head';
 import { AppContext } from '../contexts/AppContext';
 
@@ -27,6 +28,15 @@ export default function Home({ theme, setTheme }) {
 
     // useRef to store the AbortController instance
     const abortControllerRef = useRef(null);
+
+    useEffect(() => {
+        if (router.query.q) {
+            const q = Array.isArray(router.query.q) ? router.query.q[0] : router.query.q;
+            setSearchTerm(q);
+        } else {
+            setSearchTerm('');
+        }
+    }, [router.query.q]);
 
     // Sync filter with query parameter
     useEffect(() => {
@@ -170,25 +180,6 @@ export default function Home({ theme, setTheme }) {
                         </button>
                     ))}
                 </div>
-
-                <form onSubmit={handleSearch} className="mb-8 flex gap-2">
-                    <input
-                        type="text"
-                        id="search"
-                        className="input input-bordered flex-grow"
-                        placeholder="Search by title, vendor, description..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={loading}
-                    >
-                        {loading ? 'Searching...' : 'Search'}
-                    </button>
-                </form>
-
                 <div className="md:flex">
                     <form onSubmit={handleSearch} className="md:w-60 md:mr-8 mb-8 flex flex-col gap-4">
 
@@ -323,27 +314,31 @@ export default function Home({ theme, setTheme }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {products.map((product) => (
                         <div key={product.ID} className="card bg-base-100 border border-gray-200 shadow-md transform hover:shadow-xl hover:scale-105 transition duration-200 ease-in-out">
-                            <div className="w-full h-40 bg-gray-200 flex items-center justify-center overflow-hidden">
-                                {product.FEATURED_IMAGE?.url ? (
-                                    <img
-                                        src={product.FEATURED_IMAGE.url}
-                                        alt={product.TITLE || 'Product Image'}
-                                        className="object-cover w-full h-full"
-                                        onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x300/e0e0e0/555555?text=No+Image`; }}
-                                    />
-                                ) : (
-                                    <img
-                                        src={`https://placehold.co/400x300/e0e0e0/555555?text=No+Image`}
-                                        alt="No Image Available"
-                                        className="object-cover w-full h-full"
-                                    />
-                                )}
-                            </div>
+                            <Link href={`/products/${product.ID}`}> 
+                                <div className="w-full h-40 bg-gray-200 flex items-center justify-center overflow-hidden">
+                                    {product.FEATURED_IMAGE?.url ? (
+                                        <img
+                                            src={product.FEATURED_IMAGE.url}
+                                            alt={product.TITLE || 'Product Image'}
+                                            className="object-cover w-full h-full"
+                                            onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x300/e0e0e0/555555?text=No+Image`; }}
+                                        />
+                                    ) : (
+                                        <img
+                                            src={`https://placehold.co/400x300/e0e0e0/555555?text=No+Image`}
+                                            alt="No Image Available"
+                                            className="object-cover w-full h-full"
+                                        />
+                                    )}
+                                </div>
+                            </Link>
 
                             <div className="card-body flex flex-col gap-1">
-                                <h2 className="text-lg font-semibold text-base-content line-clamp-2" title={product.TITLE}>
-                                    {product.TITLE || 'Untitled Product'}
-                                </h2>
+                                <Link href={`/products/${product.ID}`} className="hover:underline">
+                                    <h2 className="text-lg font-semibold text-base-content line-clamp-2" title={product.TITLE}>
+                                        {product.TITLE || 'Untitled Product'}
+                                    </h2>
+                                </Link>
                                 <div className="flex flex-wrap gap-1 text-xs text-base-content">
                                     {product.VENDOR && <span className="badge badge-ghost">{product.VENDOR}</span>}
                                     {product.PRODUCT_TYPE && <span className="badge badge-ghost">{product.PRODUCT_TYPE}</span>}
