@@ -1,4 +1,5 @@
 import { useState, useContext } from 'react';
+import { useRouter } from 'next/router';
 import { AppContext } from '../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 
@@ -6,6 +7,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
 export default function Signup() {
+  const router = useRouter();
   const { signup } = useContext(AppContext);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -14,6 +16,7 @@ export default function Signup() {
   const [confirm, setConfirm] = useState('');
   const [brand, setBrand] = useState('');
   const [gender, setGender] = useState('');
+  const [role, setRole] = useState('user');
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
 
@@ -68,6 +71,7 @@ export default function Signup() {
     if (!password) newErrors.password = 'Password is required';
     if (!confirm) newErrors.confirm = 'Confirm password is required';
     if (!gender) newErrors.gender = 'Gender is required';
+    if (role === 'brand' && !brand) newErrors.brand = 'Brand name is required';
     if (password && confirm && password !== confirm) {
       newErrors.confirm = 'Passwords do not match';
     }
@@ -81,8 +85,10 @@ export default function Signup() {
         email,
         password,
         brandName: brand,
-        gender
+        gender,
+        role: role === 'brand' ? 'admin' : 'user'
       });
+      router.push('/');
     } catch (e) {
       setFormError('Signup failed');
     }
@@ -162,13 +168,26 @@ export default function Signup() {
           {errors.confirm && <p className="text-red-500 text-sm">{errors.confirm}</p>}
         </div>
         <div>
-          <input
-            className="input input-bordered w-full"
-            value={brand}
-            onChange={e => setBrand(e.target.value)}
-            placeholder="Brand Name (optional)"
-          />
+          <select
+            className="select select-bordered w-full"
+            value={role}
+            onChange={e => setRole(e.target.value)}
+          >
+            <option value="user">User</option>
+            <option value="brand">Brand</option>
+          </select>
         </div>
+        {role === 'brand' && (
+          <div>
+            <input
+              className={`input input-bordered w-full ${errors.brand ? 'border-red-500' : ''}`}
+              value={brand}
+              onChange={e => setBrand(e.target.value)}
+              placeholder="Brand Name"
+            />
+            {errors.brand && <p className="text-red-500 text-sm">{errors.brand}</p>}
+          </div>
+        )}
         <div>
           <select
             className={`select select-bordered w-full ${errors.gender ? 'border-red-500' : ''}`}
