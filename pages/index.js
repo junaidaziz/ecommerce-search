@@ -122,6 +122,18 @@ export default function Home({ theme, setTheme }) {
                     </label>
                 </div>
 
+                <div className="flex flex-wrap justify-center mb-6">
+                    {['All', ...allProductTypes.filter(t => t !== 'All')].map(type => (
+                        <button
+                            key={type}
+                            className={`btn btn-sm m-1 ${filterByType === type ? 'btn-primary' : 'btn-secondary'}`}
+                            onClick={() => { setFilterByType(type); setCurrentPage(1); }}
+                        >
+                            {type}
+                        </button>
+                    ))}
+                </div>
+
                 <form onSubmit={handleSearch} className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                     <div className="md:col-span-2">
                         <label htmlFor="search" className="block text-sm font-medium text-base-content mb-1">

@@ -1,6 +1,6 @@
 # 🛍️ Product Search App (Next.js + FlexSearch)
 
-A fast, scalable product search web app built with **Next.js**, **FlexSearch**, and **Vercel Blob Storage**. It loads product data from a CSV file, builds an efficient in-memory search index, and exposes an API endpoint for frontend consumption or integrations.
+A fast, scalable product search web app built with **Next.js**, **FlexSearch**, and **Vercel Blob Storage**. Product information is stored in a lightweight **SQLite** database instead of loading from CSV, and the data is indexed for fast searching.
 
 ---
 
@@ -8,7 +8,7 @@ A fast, scalable product search web app built with **Next.js**, **FlexSearch**, 
 
 - Full-text search on product fields (title, vendor, tags, etc.)
 - Extremely fast indexing via **FlexSearch.Document**
-- Parses large CSV datasets efficiently
+- Manage products via a simple admin panel with a SQLite backend
 - Public search API: `/api/search?q=...`
 - Caches search index using **Vercel Blob Storage**
 - Optional `SKIP_INDEX_BUILD` flag to avoid rebuilding during deployment
@@ -59,7 +59,7 @@ Navigate to `http://localhost:3000` to access the UI.
 
 ## ⚙️ Manual Index Generation (Before Production Deploy)
 
-Only needed once (or if your CSV changes):
+Only needed once (or if your product data changes):
 
 ```bash
 npm run generate-index
@@ -67,7 +67,7 @@ npm run generate-index
 
 This script will:
 
-- Load product data from your CSV file or `PRODUCTS_URL`
+- Load product data from the SQLite database
 - Build a FlexSearch index
 - Upload the index to Vercel Blob with the exact filename
 
