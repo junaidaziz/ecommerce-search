@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { AppContext } from '../contexts/AppContext';
 
 export default function Cart() {
-  const { cart, changeQty, removeFromCart } = useContext(AppContext);
+  const { cart, changeQty, removeFromCart, placeOrder } = useContext(AppContext);
   const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.qty * parseFloat(item.MIN_PRICE || 0),
@@ -40,7 +40,7 @@ export default function Cart() {
             <p className="font-semibold">Total Items: {itemCount}</p>
             <p className="font-semibold">Total Price: £{totalPrice.toFixed(2)}</p>
           </div>
-          <button className="btn btn-primary">Checkout</button>
+          <button className="btn btn-primary" onClick={placeOrder}>Checkout</button>
         </div>
       )}
     </div>
