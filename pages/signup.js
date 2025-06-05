@@ -99,14 +99,14 @@ export default function Signup() {
       <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
       <button
         type="button"
-        className="btn w-full mb-2"
+        className="btn w-full mb-2 hover:bg-red-600"
         onClick={() => signIn('google')}
       >
         Sign up with Google
       </button>
       <button
         type="button"
-        className="btn w-full mb-2"
+        className="btn w-full mb-2 hover:bg-gray-800 hover:text-white"
         onClick={() => signIn('github')}
       >
         Sign up with GitHub
