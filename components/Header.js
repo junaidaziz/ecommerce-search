@@ -62,20 +62,8 @@ export default function Header() {
   };
   return (
     <header className="navbar bg-base-300 mb-6">
-      <div className="flex-1">
+      <div className="flex-1 flex items-center gap-2">
         <Link href="/" className="btn btn-ghost normal-case text-xl">Home</Link>
-      </div>
-      <div className="flex-none gap-2">
-        <div className="dropdown dropdown-hover">
-          <label tabIndex={0} className="btn btn-outline">Categories</label>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            {categories.map(cat => (
-              <li key={cat}>
-                <Link href={`/?type=${encodeURIComponent(cat)}`}>{cat}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
         <form onSubmit={submitSearch} className="relative">
           <input
             className="input input-bordered w-40 md:w-64"
@@ -95,6 +83,18 @@ export default function Header() {
             </ul>
           )}
         </form>
+      </div>
+      <div className="flex-none gap-2">
+        <div className="dropdown dropdown-hover">
+          <label tabIndex={0} className="btn btn-outline">Categories</label>
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+            {categories.map(cat => (
+              <li key={cat}>
+                <Link href={`/?type=${encodeURIComponent(cat)}`}>{cat}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
         <Link href="/cart" className="btn btn-ghost mr-2">
           Cart
           {itemCount > 0 && (
