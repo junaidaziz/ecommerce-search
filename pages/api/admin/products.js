@@ -24,7 +24,11 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     const { products } = await loadAndIndexProducts();
-    return res.status(200).json(products);
+    let filtered = products;
+    if (req.query.vendor) {
+      filtered = products.filter(p => p.VENDOR === req.query.vendor);
+    }
+    return res.status(200).json(filtered);
   }
 
   return res.status(405).json({ message: 'Method Not Allowed' });
