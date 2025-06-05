@@ -1,7 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useContext } from 'react';
 import Head from 'next/head';
+import { AppContext } from '../contexts/AppContext';
 
 export default function Home({ theme, setTheme }) {
+    const { addToCart } = useContext(AppContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -285,6 +287,12 @@ export default function Home({ theme, setTheme }) {
                                         <span>Reviews: {product.REVIEW_COUNT} ({product.AVERAGE_RATING.toFixed(1)} avg)</span>
                                     )}
                                 </div>
+                                <button
+                                    className="btn btn-sm btn-primary mt-2"
+                                    onClick={() => addToCart(product)}
+                                >
+                                    Add to Cart
+                                </button>
                             </div>
                         </div>
                     ))}
