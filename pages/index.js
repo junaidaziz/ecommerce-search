@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useRef, useContext } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { AppContext } from '../contexts/AppContext';
 
 export default function Home({ theme, setTheme }) {
+    const router = useRouter();
     const { addToCart } = useContext(AppContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [products, setProducts] = useState([]);
@@ -23,6 +25,16 @@ export default function Home({ theme, setTheme }) {
 
     // useRef to store the AbortController instance
     const abortControllerRef = useRef(null);
+
+    // Sync filter with query parameter
+    useEffect(() => {
+        if (router.query.type) {
+            const t = Array.isArray(router.query.type) ? router.query.type[0] : router.query.type;
+            setFilterByType(t);
+        } else {
+            setFilterByType('All');
+        }
+    }, [router.query.type]);
 
     const fetchProducts = useCallback(async () => {
         // Abort any ongoing request before starting a new one
@@ -95,6 +107,18 @@ export default function Home({ theme, setTheme }) {
         }
     };
 
+    const handleTypeClick = (type) => {
+        setFilterByType(type);
+        setCurrentPage(1);
+        const query = { ...router.query };
+        if (type && type !== 'All') {
+            query.type = type;
+        } else {
+            delete query.type;
+        }
+        router.replace({ pathname: '/', query }, undefined, { shallow: true });
+    };
+
     const handleSearch = (e) => {
         e.preventDefault();
         setCurrentPage(1);
@@ -128,8 +152,8 @@ export default function Home({ theme, setTheme }) {
                     {['All', ...allProductTypes.filter(t => t !== 'All')].map(type => (
                         <button
                             key={type}
-                            className={`btn btn-sm m-1 ${filterByType === type ? 'btn-primary' : 'btn-secondary'}`}
-                            onClick={() => { setFilterByType(type); setCurrentPage(1); }}
+                            className={`btn btn-sm m-1 ${filterByType === type ? 'btn-primary' : 'btn-outline'}`}
+                            onClick={() => handleTypeClick(type)}
                         >
                             {type}
                         </button>
@@ -175,7 +199,7 @@ export default function Home({ theme, setTheme }) {
                             id="filterType"
                             className="select select-bordered w-full"
                             value={filterByType}
-                            onChange={(e) => { setFilterByType(e.target.value); setCurrentPage(1); }}
+                            onChange={(e) => handleTypeClick(e.target.value)}
                         >
                             {allProductTypes.map(type => (
                                 <option key={type} value={type}>{type}</option>
