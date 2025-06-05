@@ -41,6 +41,10 @@ export function AppProvider({ children }) {
     setUser(data.user);
   };
 
+  const logout = () => {
+    setUser(null);
+  };
+
   const addToCart = (product) => {
     setCart(prev => {
       const existing = prev.find(p => p.ID === product.ID);
@@ -66,7 +70,7 @@ export function AppProvider({ children }) {
   };
 
   return (
-    <AppContext.Provider value={{ user, cart, login, signup, addToCart, changeQty, removeFromCart }}>
+    <AppContext.Provider value={{ user, cart, login, signup, logout, addToCart, changeQty, removeFromCart }}>
       {children}
     </AppContext.Provider>
   );
