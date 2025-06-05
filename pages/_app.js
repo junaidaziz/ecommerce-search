@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import '../styles/globals.css';
 import { AppProvider } from '../contexts/AppContext';
 import Header from '../components/Header';
+import { SessionProvider } from 'next-auth/react';
 
-export default function App({ Component, pageProps }) {
+export default function App({ Component, pageProps: { session, ...pageProps } }) {
   const [theme, setTheme] = useState('light');
 
   useEffect(() => {
@@ -21,9 +22,11 @@ export default function App({ Component, pageProps }) {
   }, [theme]);
 
   return (
-    <AppProvider>
-      <Header />
-      <Component {...pageProps} theme={theme} setTheme={setTheme} />
-    </AppProvider>
+    <SessionProvider session={session}>
+      <AppProvider>
+        <Header />
+        <Component {...pageProps} theme={theme} setTheme={setTheme} />
+      </AppProvider>
+    </SessionProvider>
   );
 }

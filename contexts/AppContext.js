@@ -45,6 +45,16 @@ export function AppProvider({ children }) {
     setUser(null);
   };
 
+  const placeOrder = async () => {
+    if (!user || cart.length === 0) return;
+    await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email, items: cart, total: cart.reduce((s,i)=>s+i.qty*parseFloat(i.MIN_PRICE||0),0) })
+    });
+    setCart([]);
+  };
+
   const addToCart = (product) => {
     setCart(prev => {
       const existing = prev.find(p => p.ID === product.ID);
@@ -70,8 +80,9 @@ export function AppProvider({ children }) {
   };
 
   return (
-    <AppContext.Provider value={{ user, cart, login, signup, logout, addToCart, changeQty, removeFromCart }}>
+    <AppContext.Provider value={{ user, cart, login, signup, logout, addToCart, changeQty, removeFromCart, placeOrder }}>
       {children}
     </AppContext.Provider>
   );
 }
+

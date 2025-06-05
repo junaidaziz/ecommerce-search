@@ -12,7 +12,7 @@ export default function handler(req, res) {
   if (!user || user.password !== password) {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
-  const { first_name, last_name, brand_name, gender } = user;
+  const { first_name, last_name, brand_name, gender, role } = user;
   return res.status(200).json({
     message: 'Login successful',
     user: {
@@ -20,7 +20,9 @@ export default function handler(req, res) {
       firstName: first_name,
       lastName: last_name,
       brandName: brand_name,
-      gender
+      gender,
+      role
     }
   });
 }
+
