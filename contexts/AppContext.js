@@ -20,15 +20,25 @@ export function AppProvider({ children }) {
   }, [user, cart]);
 
   const login = async (email, password) => {
-    const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
     if (!res.ok) throw new Error('Login failed');
-    setUser({ email });
+    const data = await res.json();
+    setUser(data.user);
   };
 
-  const signup = async (email, password) => {
-    const res = await fetch('/api/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+  const signup = async (payload) => {
+    const res = await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
     if (!res.ok) throw new Error('Signup failed');
-    setUser({ email });
+    const data = await res.json();
+    setUser(data.user);
   };
 
   const addToCart = (product) => {
@@ -41,8 +51,22 @@ export function AppProvider({ children }) {
     });
   };
 
+  const changeQty = (id, delta) => {
+    setCart(prev => {
+      return prev
+        .map(item =>
+          item.ID === id ? { ...item, qty: item.qty + delta } : item
+        )
+        .filter(item => item.qty > 0);
+    });
+  };
+
+  const removeFromCart = (id) => {
+    setCart(prev => prev.filter(item => item.ID !== id));
+  };
+
   return (
-    <AppContext.Provider value={{ user, cart, login, signup, addToCart }}>
+    <AppContext.Provider value={{ user, cart, login, signup, addToCart, changeQty, removeFromCart }}>
       {children}
     </AppContext.Provider>
   );
