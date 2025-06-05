@@ -53,6 +53,13 @@ export default function Signup() {
       >
         Sign up with Google
       </button>
+      <button
+        type="button"
+        className="btn w-full mb-2"
+        onClick={() => signIn('github')}
+      >
+        Sign up with GitHub
+      </button>
       {formError && <div className="text-red-500 mb-2">{formError}</div>}
       <form onSubmit={submit} className="space-y-2">
         <div>
