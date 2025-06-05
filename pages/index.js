@@ -15,6 +15,8 @@ export default function Home({ theme, setTheme }) {
     const [filterByVendor, setFilterByVendor] = useState('All');
     const [filterByType, setFilterByType] = useState('All');
     const [inStock, setInStock] = useState(false);
+    const [minPrice, setMinPrice] = useState('');
+    const [maxPrice, setMaxPrice] = useState('');
 
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -54,6 +56,8 @@ export default function Home({ theme, setTheme }) {
             if (filterByVendor && filterByVendor !== 'All') params.append('filterByVendor', filterByVendor);
             if (filterByType && filterByType !== 'All') params.append('filterByType', filterByType);
             if (inStock) params.append('inStock', 'true');
+            if (minPrice) params.append('minPrice', minPrice);
+            if (maxPrice) params.append('maxPrice', maxPrice);
             params.append('page', currentPage);
             params.append('pageSize', pageSize);
 
@@ -89,7 +93,7 @@ export default function Home({ theme, setTheme }) {
                 setLoading(false);
             }
         }
-    }, [searchTerm, sortBy, filterByVendor, filterByType, inStock, currentPage, pageSize, allVendors.length, allProductTypes.length]);
+    }, [searchTerm, sortBy, filterByVendor, filterByType, inStock, minPrice, maxPrice, currentPage, pageSize, allVendors.length, allProductTypes.length]);
 
     useEffect(() => {
         fetchProducts();
@@ -124,6 +128,13 @@ export default function Home({ theme, setTheme }) {
         setCurrentPage(1);
         fetchProducts();
     };
+
+    const activeFilters = [];
+    if (filterByVendor !== 'All') activeFilters.push({ label: filterByVendor, clear: () => { setFilterByVendor('All'); setCurrentPage(1); } });
+    if (filterByType !== 'All') activeFilters.push({ label: filterByType, clear: () => handleTypeClick('All') });
+    if (inStock) activeFilters.push({ label: 'In Stock', clear: () => { setInStock(false); setCurrentPage(1); } });
+    if (minPrice) activeFilters.push({ label: `Min £${minPrice}`, clear: () => { setMinPrice(''); setCurrentPage(1); } });
+    if (maxPrice) activeFilters.push({ label: `Max £${maxPrice}`, clear: () => { setMaxPrice(''); setCurrentPage(1); } });
 
     return (
         <div className="min-h-screen bg-base-200 flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8 font-inter">
@@ -160,97 +171,132 @@ export default function Home({ theme, setTheme }) {
                     ))}
                 </div>
 
-                <form onSubmit={handleSearch} className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    <div className="md:col-span-2">
-                        <label htmlFor="search" className="block text-sm font-medium text-base-content mb-1">
-                            Search Products
-                        </label>
-                        <input
-                            type="text"
-                            id="search"
-                            className="input input-bordered w-full"
-                            placeholder="Search by title, vendor, description..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
+                <div className="md:flex">
+                    <form onSubmit={handleSearch} className="md:w-60 md:mr-8 mb-8 flex flex-col gap-4">
+                        <div>
+                            <label htmlFor="search" className="block text-sm font-medium text-base-content mb-1">
+                                Search Products
+                            </label>
+                            <input
+                                type="text"
+                                id="search"
+                                className="input input-bordered w-full"
+                                placeholder="Search by title, vendor, description..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
 
-                    <div>
-                        <label htmlFor="filterVendor" className="block text-sm font-medium text-base-content mb-1">
-                            Filter by Vendor
-                        </label>
-                        <select
-                            id="filterVendor"
-                            className="select select-bordered w-full"
-                            value={filterByVendor}
-                            onChange={(e) => { setFilterByVendor(e.target.value); setCurrentPage(1); }}
-                        >
-                            {allVendors.map(vendor => (
-                                <option key={vendor} value={vendor}>{vendor}</option>
-                            ))}
-                        </select>
-                    </div>
+                        <div>
+                            <label htmlFor="filterVendor" className="block text-sm font-medium text-base-content mb-1">
+                                Filter by Vendor
+                            </label>
+                            <select
+                                id="filterVendor"
+                                className="select select-bordered w-full"
+                                value={filterByVendor}
+                                onChange={(e) => { setFilterByVendor(e.target.value); setCurrentPage(1); }}
+                            >
+                                {allVendors.map(vendor => (
+                                    <option key={vendor} value={vendor}>{vendor}</option>
+                                ))}
+                            </select>
+                        </div>
 
-                    <div>
-                        <label htmlFor="filterType" className="block text-sm font-medium text-base-content mb-1">
-                            Filter by Type
-                        </label>
-                        <select
-                            id="filterType"
-                            className="select select-bordered w-full"
-                            value={filterByType}
-                            onChange={(e) => handleTypeClick(e.target.value)}
-                        >
-                            {allProductTypes.map(type => (
-                                <option key={type} value={type}>{type}</option>
-                            ))}
-                        </select>
-                    </div>
+                        <div>
+                            <label htmlFor="filterType" className="block text-sm font-medium text-base-content mb-1">
+                                Filter by Type
+                            </label>
+                            <select
+                                id="filterType"
+                                className="select select-bordered w-full"
+                                value={filterByType}
+                                onChange={(e) => handleTypeClick(e.target.value)}
+                            >
+                                {allProductTypes.map(type => (
+                                    <option key={type} value={type}>{type}</option>
+                                ))}
+                            </select>
+                        </div>
 
-                    <div className="md:col-span-2">
-                        <label htmlFor="sortBy" className="block text-sm font-medium text-base-content mb-1">
-                            Sort By
-                        </label>
-                        <select
-                            id="sortBy"
-                            className="select select-bordered w-full"
-                            value={sortBy}
-                            onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
-                        >
-                            <option value="sold_count_desc">Popularity (Sold Count)</option>
-                            <option value="review_count_desc">Review Count</option>
-                            <option value="average_rating_desc">Average Rating</option>
-                            <option value="price_asc">Price: Low to High</option>
-                            <option value="price_desc">Price: High to Low</option>
-                            <option value="title_asc">Title: A-Z</option>
-                            <option value="title_desc">Title: Z-A</option>
-                        </select>
-                    </div>
+                        <div className="flex gap-2">
+                            <div className="w-1/2">
+                                <label htmlFor="minPrice" className="block text-sm font-medium text-base-content mb-1">Min Price</label>
+                                <input
+                                    type="number"
+                                    id="minPrice"
+                                    className="input input-bordered w-full"
+                                    value={minPrice}
+                                    onChange={(e) => setMinPrice(e.target.value)}
+                                />
+                            </div>
+                            <div className="w-1/2">
+                                <label htmlFor="maxPrice" className="block text-sm font-medium text-base-content mb-1">Max Price</label>
+                                <input
+                                    type="number"
+                                    id="maxPrice"
+                                    className="input input-bordered w-full"
+                                    value={maxPrice}
+                                    onChange={(e) => setMaxPrice(e.target.value)}
+                                />
+                            </div>
+                        </div>
 
-                    <div className="flex items-center">
-                        <input
-                            id="inStock"
-                            name="inStock"
-                            type="checkbox"
-                            className="checkbox checkbox-primary"
-                            checked={inStock}
-                            onChange={(e) => { setInStock(e.target.checked); setCurrentPage(1); }}
-                        />
-                        <label htmlFor="inStock" className="ml-2 block text-sm text-base-content">
-                            Show In Stock Only
-                        </label>
-                    </div>
+                        <div>
+                            <label htmlFor="sortBy" className="block text-sm font-medium text-base-content mb-1">
+                                Sort By
+                            </label>
+                            <select
+                                id="sortBy"
+                                className="select select-bordered w-full"
+                                value={sortBy}
+                                onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
+                            >
+                                <option value="sold_count_desc">Popularity (Sold Count)</option>
+                                <option value="review_count_desc">Review Count</option>
+                                <option value="average_rating_desc">Average Rating</option>
+                                <option value="price_asc">Price: Low to High</option>
+                                <option value="price_desc">Price: High to Low</option>
+                                <option value="title_asc">Title: A-Z</option>
+                                <option value="title_desc">Title: Z-A</option>
+                            </select>
+                        </div>
 
-                    <div className="md:col-span-1 flex justify-end">
-                        <button
-                            type="submit"
-                            className="btn btn-primary w-full md:w-auto"
-                            disabled={loading}
-                        >
-                            {loading ? 'Searching...' : 'Search'}
-                        </button>
-                    </div>
-                </form>
+                        <div className="flex items-center">
+                            <input
+                                id="inStock"
+                                name="inStock"
+                                type="checkbox"
+                                className="checkbox checkbox-primary"
+                                checked={inStock}
+                                onChange={(e) => { setInStock(e.target.checked); setCurrentPage(1); }}
+                            />
+                            <label htmlFor="inStock" className="ml-2 block text-sm text-base-content">
+                                Show In Stock Only
+                            </label>
+                        </div>
+
+                        <div className="flex justify-end">
+                            <button
+                                type="submit"
+                                className="btn btn-primary w-full"
+                                disabled={loading}
+                            >
+                                {loading ? 'Searching...' : 'Search'}
+                            </button>
+                        </div>
+                    </form>
+                    <div className="flex-1">
+                        {activeFilters.length > 0 && (
+                            <div className="mb-4 flex flex-wrap gap-2">
+                                {activeFilters.map((f, i) => (
+                                    <span key={i} className="badge badge-outline gap-1">
+                                        {f.label}
+                                        <button type="button" onClick={f.clear} className="ml-1">✕</button>
+                                    </span>
+                                ))}
+                            </div>
+                        )}
 
                 {error && (
                     <div className="alert alert-error mb-4" role="alert">
@@ -270,7 +316,7 @@ export default function Home({ theme, setTheme }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {products.map((product) => (
-                        <div key={product.ID} className="card bg-base-100 border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out">
+                        <div key={product.ID} className="card bg-base-100 border border-gray-200 shadow-md transform hover:shadow-xl hover:scale-105 transition duration-200 ease-in-out">
                             <div className="w-full h-40 bg-gray-200 flex items-center justify-center overflow-hidden">
                                 {product.FEATURED_IMAGE?.url ? (
                                     <img
@@ -327,7 +373,7 @@ export default function Home({ theme, setTheme }) {
                         <button
                             onClick={() => handlePageChange(currentPage - 1)}
                             disabled={currentPage === 1 || loading}
-                            className="btn btn-secondary"
+                            className="btn btn-primary"
                         >
                             Previous
                         </button>
@@ -337,12 +383,13 @@ export default function Home({ theme, setTheme }) {
                         <button
                             onClick={() => handlePageChange(currentPage + 1)}
                             disabled={currentPage === totalPages || loading}
-                            className="btn btn-secondary"
+                            className="btn btn-primary"
                         >
                             Next
                         </button>
                     </div>
                 )}
+                </div>
             </main>
         </div>
     );
