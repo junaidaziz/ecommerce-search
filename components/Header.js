@@ -39,7 +39,9 @@ export default function Header() {
         </div>
         <Link href="/cart" className="btn btn-ghost mr-2">
           Cart
-          <span className="badge badge-sm badge-primary ml-2">{itemCount}</span>
+          {itemCount > 0 && (
+            <span className="badge badge-sm badge-primary ml-2">{itemCount}</span>
+          )}
         </Link>
         {user ? (
           <span className="px-4">Hello, {user.firstName || user.email}</span>
