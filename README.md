@@ -40,14 +40,23 @@ This will also install **DaisyUI**, a Tailwind CSS component library used throug
 BLOB_READ_WRITE_TOKEN=your-vercel-blob-token
 BLOB_BASE_URL=https://your-vercel-blob-url
 SKIP_INDEX_BUILD=false
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+NEXTAUTH_SECRET=random-secret
 ```
 
-4. **Place your product data**
+4. **Initialize the database**
+
+```bash
+npm run migrate
+```
+
+5. **Place your product data**
 
 Either put your `products.csv` inside the `/data/` directory **or** specify a
 remote file via the `PRODUCTS_URL` environment variable.
 
-5. **Run the project**
+6. **Run the project**
 
 ```bash
 npm run dev

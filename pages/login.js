@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react';
 import { AppContext } from '../contexts/AppContext';
+import { signIn } from 'next-auth/react';
 
 export default function Login() {
   const { login } = useContext(AppContext);
@@ -26,6 +27,13 @@ export default function Login() {
   return (
     <div className="p-4 max-w-sm mx-auto">
       <h1 className="text-2xl font-bold mb-4">Login</h1>
+      <button
+        type="button"
+        className="btn w-full mb-2"
+        onClick={() => signIn('google')}
+      >
+        Login with Google
+      </button>
       {formError && <div className="text-red-500 mb-2">{formError}</div>}
       <form onSubmit={submit} className="space-y-2">
         <div>
@@ -52,3 +60,4 @@ export default function Login() {
     </div>
   );
 }
+

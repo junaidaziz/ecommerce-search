@@ -4,7 +4,7 @@ export default function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
-  const { email, password, firstName, lastName, brandName, gender } = req.body;
+  const { email, password, firstName, lastName, brandName, gender, role } = req.body;
   if (!email || !password || !firstName || !lastName || !gender) {
     return res.status(400).json({ message: 'missing required fields' });
   }
@@ -18,13 +18,15 @@ export default function handler(req, res) {
       first_name: firstName,
       last_name: lastName,
       brand_name: brandName,
-      gender
+      gender,
+      role: role || 'user'
     });
     return res.status(201).json({
       message: 'User created',
-      user: { email, firstName, lastName, brandName, gender }
+      user: { email, firstName, lastName, brandName, gender, role: role || 'user' }
     });
   } catch (e) {
     return res.status(500).json({ message: 'Error creating user' });
   }
 }
+
