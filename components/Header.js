@@ -5,7 +5,7 @@ import { AppContext } from '../contexts/AppContext';
 
 export default function Header() {
   const router = useRouter();
-  const { user, cart } = useContext(AppContext);
+  const { user, cart, logout } = useContext(AppContext);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -102,7 +102,15 @@ export default function Header() {
           )}
         </Link>
         {user ? (
-          <span className="px-4">Hello, {user.firstName || user.email}</span>
+          <>
+            {user.role === 'admin' ? (
+              <Link href="/admin" className="btn btn-ghost mr-2">Admin</Link>
+            ) : (
+              <Link href="/orders" className="btn btn-ghost mr-2">Orders</Link>
+            )}
+            <span className="px-2">Hello, {user.firstName || user.email}</span>
+            <button onClick={logout} className="btn btn-outline ml-2">Logout</button>
+          </>
         ) : (
           <>
             <Link href="/login" className="btn btn-ghost">Login</Link>
