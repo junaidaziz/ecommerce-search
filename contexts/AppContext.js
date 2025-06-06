@@ -1,33 +1,41 @@
 import { createContext, useState, useEffect } from 'react';
+import { useSession, signIn as nextSignIn, signOut as nextSignOut } from 'next-auth/react';
 
 export const AppContext = createContext();
 
 export function AppProvider({ children }) {
+  const { data: session } = useSession();
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem('app-state');
+    const stored = localStorage.getItem('app-cart');
     if (stored) {
-      const parsed = JSON.parse(stored);
-      setUser(parsed.user || null);
-      setCart(parsed.cart || []);
+      setCart(JSON.parse(stored));
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('app-state', JSON.stringify({ user, cart }));
-  }, [user, cart]);
+    if (session?.user) {
+      const { email, name, role, brandName, gender } = session.user;
+      const [firstName = '', lastName = ''] = (name || '').split(' ');
+      setUser({ email, firstName, lastName, brandName, gender, role });
+    } else {
+      setUser(null);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    localStorage.setItem('app-cart', JSON.stringify(cart));
+  }, [cart]);
 
   const login = async (email, password) => {
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+    const res = await nextSignIn('credentials', {
+      redirect: false,
+      email,
+      password
     });
-    if (!res.ok) throw new Error('Login failed');
-    const data = await res.json();
-    setUser(data.user);
+    if (res?.error) throw new Error('Login failed');
   };
 
   const signup = async (payload) => {
@@ -38,12 +46,11 @@ export function AppProvider({ children }) {
     });
     if (!res.ok) throw new Error('Signup failed');
     const data = await res.json();
-    setUser(data.user);
     return data;
   };
 
   const logout = () => {
-    setUser(null);
+    nextSignOut({ redirect: false });
   };
 
   const placeOrder = async () => {

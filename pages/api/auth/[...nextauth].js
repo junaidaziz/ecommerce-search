@@ -50,16 +50,24 @@ export const authOptions = {
             last_name: profile?.family_name || nameParts.slice(1).join(' ') || '',
             brand_name: null,
             gender: profile?.gender || '',
-            role: 'user'
+            role: 'customer'
           });
         }
       }
       return true;
     },
-    session({ session }) {
-      const dbUser = findUser(session.user.email);
-      if (dbUser) {
-        session.user.role = dbUser.role;
+    jwt({ token, user }) {
+      if (user) {
+        token.role = user.role;
+      } else if (!token.role) {
+        const dbUser = findUser(token.email);
+        if (dbUser) token.role = dbUser.role;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      if (token && session.user) {
+        session.user.role = token.role;
       }
       return session;
     }
