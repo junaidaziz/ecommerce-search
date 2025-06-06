@@ -169,51 +169,57 @@ export default function Home({ theme, setTheme }) {
                     </label>
                 </div>
 
-                <div className="flex flex-wrap justify-center mb-6">
-                    {['All', ...allProductTypes.filter(t => t !== 'All')].map(type => (
-                        <button
-                            key={type}
-                            className={`btn btn-sm m-1 ${filterByType === type ? 'btn-primary' : 'btn-outline'}`}
-                            onClick={() => handleTypeClick(type)}
-                        >
-                            {type}
-                        </button>
-                    ))}
-                </div>
+                {allProductTypes.length > 0 && (
+                    <div className="flex flex-wrap justify-center mb-6">
+                        {['All', ...allProductTypes.filter(t => t !== 'All')].map(type => (
+                            <button
+                                key={type}
+                                className={`btn btn-sm m-1 ${filterByType === type ? 'btn-primary' : 'btn-outline'}`}
+                                onClick={() => handleTypeClick(type)}
+                            >
+                                {type}
+                            </button>
+                        ))}
+                    </div>
+                )}
                 <div className="md:flex">
                     <form onSubmit={handleSearch} className="md:w-60 md:mr-8 mb-8 flex flex-col gap-4">
 
-                        <div>
-                            <label htmlFor="filterVendor" className="block text-sm font-medium text-base-content mb-1">
-                                Filter by Vendor
-                            </label>
-                            <select
-                                id="filterVendor"
-                                className="select select-bordered w-full"
-                                value={filterByVendor}
-                                onChange={(e) => { setFilterByVendor(e.target.value); setCurrentPage(1); }}
-                            >
-                                {allVendors.map(vendor => (
-                                    <option key={vendor} value={vendor}>{vendor}</option>
-                                ))}
-                            </select>
-                        </div>
+                        {allVendors.length > 0 && (
+                            <div>
+                                <label htmlFor="filterVendor" className="block text-sm font-medium text-base-content mb-1">
+                                    Filter by Vendor
+                                </label>
+                                <select
+                                    id="filterVendor"
+                                    className="select select-bordered w-full"
+                                    value={filterByVendor}
+                                    onChange={(e) => { setFilterByVendor(e.target.value); setCurrentPage(1); }}
+                                >
+                                    {allVendors.map(vendor => (
+                                        <option key={vendor} value={vendor}>{vendor}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
 
-                        <div>
-                            <label htmlFor="filterType" className="block text-sm font-medium text-base-content mb-1">
-                                Filter by Type
-                            </label>
-                            <select
-                                id="filterType"
-                                className="select select-bordered w-full"
-                                value={filterByType}
-                                onChange={(e) => handleTypeClick(e.target.value)}
-                            >
-                                {allProductTypes.map(type => (
-                                    <option key={type} value={type}>{type}</option>
-                                ))}
-                            </select>
-                        </div>
+                        {allProductTypes.length > 0 && (
+                            <div>
+                                <label htmlFor="filterType" className="block text-sm font-medium text-base-content mb-1">
+                                    Filter by Type
+                                </label>
+                                <select
+                                    id="filterType"
+                                    className="select select-bordered w-full"
+                                    value={filterByType}
+                                    onChange={(e) => handleTypeClick(e.target.value)}
+                                >
+                                    {allProductTypes.map(type => (
+                                        <option key={type} value={type}>{type}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
 
                         <div className="flex gap-2">
                             <div className="w-1/2">
