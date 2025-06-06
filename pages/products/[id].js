@@ -29,7 +29,7 @@ export default function ProductDetail() {
   if (!product) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto bg-base-100 rounded-box shadow-md">
+    <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md">
       <h1 className="text-2xl font-bold mb-4">{product.TITLE}</h1>
       <div className="mb-4 w-full flex justify-center">
         {product.FEATURED_IMAGE?.url ? (
