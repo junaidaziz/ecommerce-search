@@ -22,16 +22,29 @@ export default function Signup() {
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
 
-  const handleEmailBlur = () => {
+  const handleEmailBlur = async () => {
     setErrors(prev => {
       const next = { ...prev };
       if (email && !emailRegex.test(email)) {
         next.email = 'Invalid email format';
-      } else if (next.email === 'Invalid email format') {
+      } else if (next.email === 'Invalid email format' || next.email === 'Email already registered') {
         delete next.email;
       }
       return next;
     });
+    if (email && emailRegex.test(email)) {
+      try {
+        const res = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.exists) {
+            setErrors(prev => ({ ...prev, email: 'Email already registered' }));
+          }
+        }
+      } catch (_) {
+        // ignore network errors
+      }
+    }
   };
 
   const handlePasswordBlur = () => {
