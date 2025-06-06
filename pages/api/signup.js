@@ -25,7 +25,9 @@ export default function handler(req, res) {
     });
     return res.status(201).json({
       message: 'User created',
-      user: { email, firstName, lastName, brandName, gender, role: role || 'customer' }
+      user: { email, firstName, lastName, brandName, gender, role: role || 'customer' },
+      verification_token: token,
+      role: role || 'user',
       verification_token: token
     });
   } catch (e) {
