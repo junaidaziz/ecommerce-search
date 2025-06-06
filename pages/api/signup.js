@@ -19,11 +19,11 @@ export default function handler(req, res) {
       last_name: lastName,
       brand_name: brandName,
       gender,
-      role: role || 'user'
+      role: role || 'customer'
     });
     return res.status(201).json({
       message: 'User created',
-      user: { email, firstName, lastName, brandName, gender, role: role || 'user' }
+      user: { email, firstName, lastName, brandName, gender, role: role || 'customer' }
     });
   } catch (e) {
     return res.status(500).json({ message: 'Error creating user' });

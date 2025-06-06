@@ -1,11 +1,9 @@
-import { useState, useContext } from 'react';
-import { AppContext } from '../contexts/AppContext';
+import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login() {
-  const { login } = useContext(AppContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -32,9 +30,12 @@ export default function Login() {
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
-    try {
-      await login(email, password);
-    } catch (e) {
+    const res = await signIn('credentials', {
+      redirect: false,
+      email,
+      password
+    });
+    if (res?.error) {
       setFormError('Invalid credentials');
     }
   };

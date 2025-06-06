@@ -103,7 +103,7 @@ export default function Header() {
         </Link>
         {user ? (
           <>
-            {user.role === 'admin' ? (
+            {user.role === 'admin' || user.role === 'vendor' ? (
               <Link href="/admin" className="btn btn-ghost mr-2">Admin</Link>
             ) : (
               <Link href="/orders" className="btn btn-ghost mr-2">Orders</Link>

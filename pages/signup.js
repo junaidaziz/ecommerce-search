@@ -18,7 +18,7 @@ export default function Signup() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [brand, setBrand] = useState('');
   const [gender, setGender] = useState('');
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState('customer');
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
 
@@ -73,7 +73,7 @@ export default function Signup() {
     if (!password) newErrors.password = 'Password is required';
     if (!confirm) newErrors.confirm = 'Confirm password is required';
     if (!gender) newErrors.gender = 'Gender is required';
-    if (role === 'brand' && !brand) newErrors.brand = 'Brand name is required';
+    if (role === 'vendor' && !brand) newErrors.brand = 'Brand name is required';
     if (password && confirm && password !== confirm) {
       newErrors.confirm = 'Passwords do not match';
     }
@@ -88,8 +88,9 @@ export default function Signup() {
         password,
         brandName: brand,
         gender,
-        role: role === 'brand' ? 'admin' : 'user'
+        role: role === 'vendor' ? 'vendor' : 'customer'
       });
+      await signIn('credentials', { redirect: false, email, password });
       router.push('/');
     } catch (e) {
       setFormError('Signup failed');
@@ -223,11 +224,11 @@ export default function Signup() {
             value={role}
             onChange={e => setRole(e.target.value)}
           >
-            <option value="user">User</option>
-            <option value="brand">Brand</option>
+            <option value="customer">Customer</option>
+            <option value="vendor">Vendor</option>
           </select>
         </div>
-        {role === 'brand' && (
+        {role === 'vendor' && (
           <div>
             <input
               className={`input input-bordered w-full ${errors.brand ? 'border-red-500' : ''}`}

@@ -16,7 +16,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS users (
   password TEXT,
   brand_name TEXT,
   gender TEXT,
-  role TEXT DEFAULT 'user'
+  role TEXT DEFAULT 'customer'
 )`);
 
 // Products table

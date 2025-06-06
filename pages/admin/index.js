@@ -65,7 +65,7 @@ export default function Admin() {
   if (!user) {
     return <div className="p-4">Please log in to view your products.</div>;
   }
-  if (user.role !== 'admin') {
+  if (user.role !== 'admin' && user.role !== 'vendor') {
     return <div className="p-4">Admin access required.</div>;
   }
 
