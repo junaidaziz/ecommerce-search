@@ -9,6 +9,7 @@ export default function Admin() {
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState('');
   const [editingId, setEditingId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const fetchProducts = async () => {
     if (!user) return;
@@ -56,6 +57,7 @@ export default function Admin() {
       currency: p.CURRENCY || 'USD'
     });
     setEditingId(p.ID);
+    setShowModal(true);
   };
 
   const cancelEdit = () => {
@@ -79,20 +81,30 @@ export default function Admin() {
         <Link href="/admin/approvals" className="btn btn-sm">Approvals</Link>
       </div>
       {message && <div className="mb-4 text-green-600">{message}</div>}
-      <form onSubmit={submit} className="space-y-2 mb-6">
-        {['id','title','vendor','description','product_type','tags','quantity','min_price','max_price','currency'].map(field => (
-          <div key={field}>
-            <label className="label capitalize">
-              <span className="label-text">{field.replace('_',' ')}</span>
-            </label>
-            <input name={field} value={form[field]} onChange={handleChange} placeholder={field} className="input input-bordered w-full" />
+      <button className="btn mb-4" onClick={() => { setEditingId(null); setForm(emptyForm); setShowModal(true); }}>Add Product</button>
+      {showModal && (
+        <dialog open className="modal">
+          <div className="modal-box">
+            <form onSubmit={submit} className="space-y-2">
+              {['id','title','vendor','description','product_type','tags','quantity','min_price','max_price','currency'].map(field => (
+                <div key={field}>
+                  <label className="label capitalize">
+                    <span className="label-text">{field.replace('_',' ')}</span>
+                  </label>
+                  <input name={field} value={form[field]} onChange={handleChange} placeholder={field} className="input input-bordered w-full" />
+                </div>
+              ))}
+              <div className="flex gap-2">
+                {editingId && <button type="button" onClick={cancelEdit} className="btn">Cancel</button>}
+                <button type="submit" className="btn btn-primary">{editingId ? 'Update Product' : 'Add Product'}</button>
+              </div>
+            </form>
+            <form method="dialog" className="modal-backdrop">
+              <button onClick={() => { setShowModal(false); cancelEdit(); }}>close</button>
+            </form>
           </div>
-        ))}
-        <div className="flex gap-2">
-          {editingId && <button type="button" onClick={cancelEdit} className="btn">Cancel</button>}
-          <button type="submit" className="btn btn-primary">{editingId ? 'Update Product' : 'Add Product'}</button>
-        </div>
-      </form>
+        </dialog>
+      )}
       <h2 className="text-xl font-semibold mb-2">Existing Products</h2>
       <ul className="space-y-1">
         {products.map(p => (
