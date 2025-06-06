@@ -8,8 +8,8 @@ export default function Orders() {
   useEffect(() => {
     if (!user) return;
     fetch(`/api/orders?email=${encodeURIComponent(user.email)}`)
-      .then(res => res.ok ? res.json() : [])
-      .then(data => setOrders(data));
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setOrders(data));
   }, [user]);
 
   if (!user) {
@@ -20,14 +20,16 @@ export default function Orders() {
     <div className="p-4 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Orders</h1>
       <ul className="space-y-2">
-        {orders.map(o => (
+        {orders.map((o) => (
           <li key={o.id} className="border p-2">
-            <p>Order #{o.id} - {o.status}</p>
+            <p>
+              Order #{o.id} - {o.status}
+            </p>
             {(user.role === 'admin' || user.role === 'brand') && (
               <p className="text-sm text-gray-600">Customer: {o.user_email}</p>
             )}
             <ul className="list-disc pl-4 text-sm mb-1">
-              {o.items.map(item => (
+              {o.items.map((item) => (
                 <li key={item.ID}>
                   {item.TITLE} x {item.qty}
                 </li>
@@ -41,4 +43,3 @@ export default function Orders() {
     </div>
   );
 }
-

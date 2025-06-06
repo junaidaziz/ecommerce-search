@@ -7,9 +7,11 @@ export default function VendorOrders() {
 
   useEffect(() => {
     if (!user) return;
-    fetch(`/api/vendor/orders?vendor=${encodeURIComponent(user.brandName || '')}`)
-      .then(res => res.ok ? res.json() : [])
-      .then(data => setOrders(data));
+    fetch(
+      `/api/vendor/orders?vendor=${encodeURIComponent(user.brandName || '')}`
+    )
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setOrders(data));
   }, [user]);
 
   if (!user) {
@@ -23,9 +25,11 @@ export default function VendorOrders() {
     <div className="p-4 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Order History</h1>
       <ul className="space-y-2">
-        {orders.map(o => (
+        {orders.map((o) => (
           <li key={o.id} className="border p-2">
-            <p>Order #{o.id} - {o.status}</p>
+            <p>
+              Order #{o.id} - {o.status}
+            </p>
             <p>Total: £{o.total}</p>
           </li>
         ))}
