@@ -34,7 +34,9 @@ db.exec(`CREATE TABLE IF NOT EXISTS products (
   currency TEXT,
   status TEXT DEFAULT 'approved'
 )`);
-db.exec('CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE)');
+db.exec(
+  'CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE)'
+);
 
 // Categories table for grouping products
 db.exec(`CREATE TABLE IF NOT EXISTS categories (
@@ -54,4 +56,3 @@ db.exec(`CREATE TABLE IF NOT EXISTS orders (
 )`);
 
 console.log('Database migrated');
-
