@@ -23,6 +23,16 @@ export default function Orders() {
         {orders.map(o => (
           <li key={o.id} className="border p-2">
             <p>Order #{o.id} - {o.status}</p>
+            {(user.role === 'admin' || user.role === 'brand') && (
+              <p className="text-sm text-gray-600">Customer: {o.user_email}</p>
+            )}
+            <ul className="list-disc pl-4 text-sm mb-1">
+              {o.items.map(item => (
+                <li key={item.ID}>
+                  {item.TITLE} x {item.qty}
+                </li>
+              ))}
+            </ul>
             <p>Total: £{o.total}</p>
           </li>
         ))}
