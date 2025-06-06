@@ -1,4 +1,4 @@
-import { addOrder, getOrdersForUser, getAllOrders } from '../../lib/orders.js';
+import { addOrder, getOrdersForUser, getAllOrders, getOrdersForVendor } from '../../lib/orders.js';
 import { findUser } from '../../lib/users.js';
 
 export default function handler(req, res) {
@@ -18,6 +18,9 @@ export default function handler(req, res) {
     if (!user) return res.status(404).json({ message: 'user not found' });
     if (user.role === 'admin') {
       return res.status(200).json(getAllOrders());
+    }
+    if (user.role === 'brand') {
+      return res.status(200).json(getOrdersForVendor(user.brand_name));
     }
     return res.status(200).json(getOrdersForUser(email));
   }
