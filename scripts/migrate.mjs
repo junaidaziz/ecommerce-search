@@ -30,8 +30,10 @@ db.exec(`CREATE TABLE IF NOT EXISTS products (
   quantity INTEGER,
   min_price REAL,
   max_price REAL,
-  currency TEXT
+  currency TEXT,
+  status TEXT DEFAULT 'approved'
 )`);
+db.exec('CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE)');
 
 // Orders table
 db.exec(`CREATE TABLE IF NOT EXISTS orders (

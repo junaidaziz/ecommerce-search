@@ -16,7 +16,8 @@ export default async function handler(req, res) {
       quantity: quantity ? parseInt(quantity, 10) : 0,
       min_price: parseFloat(min_price || 0),
       max_price: parseFloat(max_price || 0),
-      currency: currency || 'USD'
+      currency: currency || 'USD',
+      status: 'approved'
     });
     await loadAndIndexProducts();
     return res.status(201).json({ message: 'Product added' });
@@ -37,7 +38,8 @@ export default async function handler(req, res) {
       quantity: quantity ? parseInt(quantity, 10) : 0,
       min_price: parseFloat(min_price || 0),
       max_price: parseFloat(max_price || 0),
-      currency: currency || 'USD'
+      currency: currency || 'USD',
+      status: 'approved'
     });
     await loadAndIndexProducts();
     return res.status(200).json({ message: 'Product updated' });
