@@ -1,4 +1,5 @@
 import { addUser, findUser } from '../../lib/users';
+import crypto from 'crypto';
 
 export default function handler(req, res) {
   if (req.method !== 'POST') {
@@ -12,6 +13,7 @@ export default function handler(req, res) {
     if (findUser(email)) {
       return res.status(409).json({ message: 'User exists' });
     }
+    const token = crypto.randomBytes(20).toString('hex');
     addUser({
       email,
       password,
@@ -19,11 +21,13 @@ export default function handler(req, res) {
       last_name: lastName,
       brand_name: brandName,
       gender,
-      role: role || 'user'
+      role: role || 'user',
+      verification_token: token
     });
     return res.status(201).json({
       message: 'User created',
-      user: { email, firstName, lastName, brandName, gender, role: role || 'user' }
+      user: { email, firstName, lastName, brandName, gender, role: role || 'user' },
+      token
     });
   } catch (e) {
     return res.status(500).json({ message: 'Error creating user' });
