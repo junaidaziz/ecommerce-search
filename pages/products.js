@@ -31,7 +31,7 @@ export default function Products() {
   });
 
   return (
-    <div className="p-4 max-w-screen-2xl mx-auto">
+    <div className="p-6 w-full bg-gradient-to-br from-base-200 to-base-100 min-h-screen">
       {loading ? (
         <div className="flex justify-center my-4">
           <span className="loading loading-spinner"></span>
@@ -71,13 +71,16 @@ export default function Products() {
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts.map((p) => (
-              <div key={p.ID} className="border rounded p-4 flex flex-col">
-                <h2 className="font-semibold mb-2">{p.TITLE}</h2>
-                <p className="mb-2">{p.VENDOR}</p>
+              <div
+                key={p.ID}
+                className="bg-base-100 rounded-lg shadow-md p-4 flex flex-col hover:shadow-xl transition"
+              >
+                <h2 className="font-semibold text-primary mb-1">{p.TITLE}</h2>
+                <p className="mb-2 text-sm text-base-content/60">{p.VENDOR}</p>
                 <button
-                  className="btn btn-sm btn-primary mt-auto"
+                  className="btn btn-sm btn-secondary mt-auto"
                   onClick={() => addToCart(p)}
                 >
                   Add to Cart
