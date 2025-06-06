@@ -21,7 +21,7 @@ export default function handler(req, res) {
     if (!email || !password || !firstName || !lastName || !gender) {
       return res.status(400).json({ message: 'missing required fields' });
     }
-    addUser({ email, password, first_name: firstName, last_name: lastName, brand_name: brandName, gender, role: role || 'user' });
+    addUser({ email, password, first_name: firstName, last_name: lastName, brand_name: brandName, gender, role: role || 'customer' });
     return res.status(201).json({ message: 'user created' });
   }
   return res.status(405).json({ message: 'Method Not Allowed' });

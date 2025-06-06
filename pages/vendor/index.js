@@ -74,7 +74,7 @@ export default function VendorDashboard() {
   if (!user) {
     return <div className="p-4">Please log in to manage products.</div>;
   }
-  if (user.role !== 'admin') {
+  if (user.role !== 'vendor') {
     return <div className="p-4">Vendor access required.</div>;
   }
 
