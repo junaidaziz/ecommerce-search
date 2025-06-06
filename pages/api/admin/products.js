@@ -4,9 +4,30 @@ import {
   deleteProduct,
   loadAndIndexProducts,
 } from '../../../lib/products';
+import { getProductById } from '../../../lib/db.js';
+import formidable from 'formidable';
+import fs from 'fs';
+import path from 'path';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+function parseForm(req) {
+  return new Promise((resolve, reject) => {
+    const form = formidable({ multiples: true });
+    form.parse(req, (err, fields, files) => {
+      if (err) reject(err);
+      else resolve({ fields, files });
+    });
+  });
+}
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
+  if (req.method === 'POST' || req.method === 'PUT') {
+    const { fields, files } = await parseForm(req);
     const {
       id,
       title,
@@ -19,11 +40,32 @@ export default async function handler(req, res) {
       min_price,
       max_price,
       currency,
-    } = req.body;
+    } = fields;
     if (!id || !title) {
       return res.status(400).json({ message: 'id and title are required' });
     }
-    addProduct({
+    const photos = files.photos
+      ? Array.isArray(files.photos)
+        ? files.photos
+        : [files.photos]
+      : [];
+    const destDir = path.join(process.cwd(), 'public', 'uploads', String(id));
+    fs.mkdirSync(destDir, { recursive: true });
+    const imagePaths = [];
+    for (const file of photos) {
+      const name = Date.now() + '-' + file.originalFilename;
+      const destPath = path.join(destDir, name);
+      fs.renameSync(file.filepath, destPath);
+      imagePaths.push(`/uploads/${id}/${name}`);
+    }
+    if (req.method === 'PUT') {
+      const existing = getProductById(String(id));
+      const existingImages = existing?.images
+        ? JSON.parse(existing.images)
+        : [];
+      imagePaths.push(...existingImages);
+    }
+    const productData = {
       id: String(id),
       title,
       vendor,
@@ -36,44 +78,20 @@ export default async function handler(req, res) {
       max_price: parseFloat(max_price || 0),
       currency: currency || 'USD',
       status: 'approved',
-    });
-    await loadAndIndexProducts();
-    return res.status(201).json({ message: 'Product added' });
-  }
+      images: JSON.stringify(imagePaths),
+    };
 
-  if (req.method === 'PUT') {
-    const {
-      id,
-      title,
-      vendor,
-      description,
-      product_type,
-      tags,
-      category,
-      quantity,
-      min_price,
-      max_price,
-      currency,
-    } = req.body;
-    if (!id || !title) {
-      return res.status(400).json({ message: 'id and title are required' });
+    if (req.method === 'POST') {
+      addProduct(productData);
+    } else {
+      updateProduct(productData);
     }
-    updateProduct({
-      id: String(id),
-      title,
-      vendor,
-      description,
-      product_type,
-      tags,
-      category,
-      quantity: quantity ? parseInt(quantity, 10) : 0,
-      min_price: parseFloat(min_price || 0),
-      max_price: parseFloat(max_price || 0),
-      currency: currency || 'USD',
-      status: 'approved',
-    });
     await loadAndIndexProducts();
-    return res.status(200).json({ message: 'Product updated' });
+    return res
+      .status(req.method === 'POST' ? 201 : 200)
+      .json({
+        message: req.method === 'POST' ? 'Product added' : 'Product updated',
+      });
   }
 
   if (req.method === 'DELETE') {

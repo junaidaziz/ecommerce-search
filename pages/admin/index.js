@@ -21,6 +21,7 @@ export default function Admin() {
   const [message, setMessage] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [photos, setPhotos] = useState([]);
 
   const fetchProducts = async () => {
     if (!user) return;
@@ -42,15 +43,19 @@ export default function Admin() {
 
   const submit = async (e) => {
     e.preventDefault();
+    const fd = new FormData();
+    const payload = editingId ? { ...form, id: editingId } : form;
+    Object.entries(payload).forEach(([k, v]) => fd.append(k, v));
+    photos.forEach((file) => fd.append('photos', file));
     const res = await fetch('/api/admin/products', {
       method: editingId ? 'PUT' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editingId ? { ...form, id: editingId } : form),
+      body: fd,
     });
     if (res.ok) {
       setMessage(editingId ? 'Product updated' : 'Product added');
       setForm(emptyForm);
       setEditingId(null);
+      setPhotos([]);
       fetchProducts();
     } else {
       const data = await res.json();
@@ -71,6 +76,7 @@ export default function Admin() {
       max_price: p.MAX_PRICE || 0,
       currency: p.CURRENCY || 'USD',
     });
+    setPhotos([]);
     setEditingId(p.ID);
     setShowModal(true);
   };
@@ -78,6 +84,7 @@ export default function Admin() {
   const cancelEdit = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setPhotos([]);
   };
 
   if (!user) {
@@ -107,6 +114,7 @@ export default function Admin() {
         onClick={() => {
           setEditingId(null);
           setForm(emptyForm);
+          setPhotos([]);
           setShowModal(true);
         }}
       >
@@ -143,6 +151,17 @@ export default function Admin() {
                   />
                 </div>
               ))}
+              <div>
+                <label className="label">
+                  <span className="label-text">Photos</span>
+                </label>
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => setPhotos(Array.from(e.target.files))}
+                  className="file-input file-input-bordered w-full"
+                />
+              </div>
               <div className="flex gap-2">
                 {editingId && (
                   <button type="button" onClick={cancelEdit} className="btn">
