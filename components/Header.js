@@ -37,7 +37,10 @@ export default function Header() {
     const controller = new AbortController();
     const t = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(search)}&pageSize=5`, { signal: controller.signal });
+        const res = await fetch(
+          `/api/search?q=${encodeURIComponent(search)}&pageSize=5`,
+          { signal: controller.signal }
+        );
         if (res.ok) {
           const data = await res.json();
           setSuggestions(data.results || []);
@@ -52,7 +55,7 @@ export default function Header() {
     };
   }, [search]);
   const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
-  const submitSearch = e => {
+  const submitSearch = (e) => {
     e.preventDefault();
     if (!search.trim()) return;
     router.push(`/?q=${encodeURIComponent(search)}`);
@@ -67,19 +70,25 @@ export default function Header() {
   return (
     <header className="navbar bg-base-300 mb-6">
       <div className="flex-1 flex items-center gap-2">
-        <Link href="/" className="btn btn-ghost normal-case text-xl">Home</Link>
+        <Link href="/" className="btn btn-ghost normal-case text-xl">
+          Home
+        </Link>
         <form onSubmit={submitSearch} className="relative">
           <input
             className="input input-bordered w-40 md:w-64"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search"
           />
           {suggestions.length > 0 && (
             <ul className="absolute z-10 bg-base-100 border rounded-box mt-1 w-full max-h-60 overflow-auto">
-              {suggestions.map(s => (
+              {suggestions.map((s) => (
                 <li key={s.ID}>
-                  <button type="button" className="block w-full text-left px-2 py-1 hover:bg-base-200" onClick={() => selectSuggestion(s)}>
+                  <button
+                    type="button"
+                    className="block w-full text-left px-2 py-1 hover:bg-base-200"
+                    onClick={() => selectSuggestion(s)}
+                  >
                     {s.TITLE}
                   </button>
                 </li>
@@ -90,9 +99,14 @@ export default function Header() {
       </div>
       <div className="hidden md:flex flex-none gap-2">
         <div className="dropdown dropdown-hover">
-          <label tabIndex={0} className="btn btn-outline">Categories</label>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            {categories.map(cat => (
+          <label tabIndex={0} className="btn btn-outline">
+            Categories
+          </label>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+          >
+            {categories.map((cat) => (
               <li key={cat}>
                 <Link href={`/?type=${encodeURIComponent(cat)}`}>{cat}</Link>
               </li>
@@ -102,23 +116,35 @@ export default function Header() {
         <Link href="/cart" className="btn btn-ghost mr-2">
           Cart
           {itemCount > 0 && (
-            <span className="badge badge-sm badge-primary ml-2">{itemCount}</span>
+            <span className="badge badge-sm badge-primary ml-2">
+              {itemCount}
+            </span>
           )}
         </Link>
         {user ? (
           <>
             {user.role === 'admin' ? (
-              <Link href="/admin" className="btn btn-ghost mr-2">Admin</Link>
+              <Link href="/admin" className="btn btn-ghost mr-2">
+                Admin
+              </Link>
             ) : (
-              <Link href="/orders" className="btn btn-ghost mr-2">Orders</Link>
+              <Link href="/orders" className="btn btn-ghost mr-2">
+                Orders
+              </Link>
             )}
             <span className="px-2">Hello, {user.firstName || user.email}</span>
-            <button onClick={logout} className="btn btn-outline ml-2">Logout</button>
+            <button onClick={logout} className="btn btn-outline ml-2">
+              Logout
+            </button>
           </>
         ) : (
           <>
-            <Link href="/login" className="btn btn-ghost">Login</Link>
-            <Link href="/signup" className="btn btn-primary ml-2">Signup</Link>
+            <Link href="/login" className="btn btn-ghost">
+              Login
+            </Link>
+            <Link href="/signup" className="btn btn-primary ml-2">
+              Signup
+            </Link>
           </>
         )}
       </div>

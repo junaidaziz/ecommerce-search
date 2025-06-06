@@ -1,4 +1,9 @@
-import { addOrder, getOrdersForUser, getAllOrders, getOrdersForVendor } from '../../lib/orders.js';
+import {
+  addOrder,
+  getOrdersForUser,
+  getAllOrders,
+  getOrdersForVendor,
+} from '../../lib/orders.js';
 import { findUser } from '../../lib/users.js';
 
 export default function handler(req, res) {
@@ -27,4 +32,3 @@ export default function handler(req, res) {
 
   return res.status(405).json({ message: 'Method Not Allowed' });
 }
-

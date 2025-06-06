@@ -21,8 +21,7 @@ export default function handler(req, res) {
       lastName: last_name,
       brandName: brand_name,
       gender,
-      role
-    }
+      role,
+    },
   });
 }
-
