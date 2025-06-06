@@ -1,11 +1,15 @@
 import Link from 'next/link';
 import { useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useSession, signOut } from 'next-auth/react';
 import { AppContext } from '../contexts/AppContext';
 
 export default function Header() {
   const router = useRouter();
-  const { user, cart, logout } = useContext(AppContext);
+  const { data: session } = useSession();
+  const { cart } = useContext(AppContext);
+  const user = session?.user;
+  const logout = () => signOut({ redirect: false });
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
   const [suggestions, setSuggestions] = useState([]);

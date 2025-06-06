@@ -21,12 +21,12 @@ export default function handler(req, res) {
       last_name: lastName,
       brand_name: brandName,
       gender,
-      role: role || 'user',
+      role: role || 'customer',
       verification_token: token
     });
     return res.status(201).json({
       message: 'User created',
-      user: { email, firstName, lastName, brandName, gender, role: role || 'user' },
+      user: { email, firstName, lastName, brandName, gender, role: role || 'customer' },
       token
     });
   } catch (e) {
