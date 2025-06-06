@@ -6,13 +6,18 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const res = await fetch('/api/search');
-      if (res.ok) {
-        const data = await res.json();
-        setProducts(data.results);
+      try {
+        const res = await fetch('/api/search');
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data.results);
+        }
+      } finally {
+        setLoading(false);
       }
     }
     load();
@@ -26,7 +31,7 @@ export default function Products() {
   });
 
   return (
-    <div className="p-4 max-w-7xl mx-auto">
+    <div className="p-4 max-w-screen-xl mx-auto">
       <h1 className="text-3xl font-bold mb-4">Products</h1>
       <div className="mb-4 flex gap-4">
         <div>
@@ -50,15 +55,22 @@ export default function Products() {
           />
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map(p => (
-          <div key={p.ID} className="border rounded p-4 flex flex-col">
-            <h2 className="font-semibold mb-2">{p.TITLE}</h2>
-            <p className="mb-2">{p.VENDOR}</p>
-            <button className="btn btn-sm btn-primary mt-auto" onClick={() => addToCart(p)}>Add to Cart</button>
-          </div>
-        ))}
-      </div>
+      {loading && (
+        <div className="flex justify-center my-4">
+          <span className="loading loading-spinner"></span>
+        </div>
+      )}
+      {!loading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredProducts.map(p => (
+            <div key={p.ID} className="border rounded p-4 flex flex-col">
+              <h2 className="font-semibold mb-2">{p.TITLE}</h2>
+              <p className="mb-2">{p.VENDOR}</p>
+              <button className="btn btn-sm btn-primary mt-auto" onClick={() => addToCart(p)}>Add to Cart</button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
