@@ -81,7 +81,7 @@ export default function Signup() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      await signup({
+      const data = await signup({
         firstName,
         lastName,
         email,
@@ -90,8 +90,7 @@ export default function Signup() {
         gender,
         role: role === 'vendor' ? 'vendor' : 'customer'
       });
-      await signIn('credentials', { redirect: false, email, password });
-      router.push('/');
+      router.push(`/confirm/${data.token}`);
     } catch (e) {
       setFormError('Signup failed');
     }

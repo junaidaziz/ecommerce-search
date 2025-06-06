@@ -47,6 +47,7 @@ export function AppProvider({ children }) {
     if (!res.ok) throw new Error('Signup failed');
     const data = await res.json();
     setUser(data.user);
+    return data;
   };
 
   const logout = () => {
