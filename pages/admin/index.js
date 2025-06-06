@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
+import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function Admin() {
@@ -74,6 +75,11 @@ export default function Admin() {
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
+      <div className="mb-4 space-x-2">
+        <Link href="/admin/users" className="btn btn-sm">Users</Link>
+        <Link href="/admin/categories" className="btn btn-sm">Categories</Link>
+        <Link href="/admin/approvals" className="btn btn-sm">Approvals</Link>
+      </div>
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <button className="btn mb-4" onClick={() => { setEditingId(null); setForm(emptyForm); setShowModal(true); }}>Add Product</button>
       {showModal && (
