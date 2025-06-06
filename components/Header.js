@@ -113,14 +113,16 @@ export default function Header() {
             ))}
           </ul>
         </div>
-        <Link href="/cart" className="btn btn-ghost mr-2">
-          Cart
+        <div className="indicator mr-2">
+          <Link href="/cart" className="btn btn-ghost">
+            Cart
+          </Link>
           {itemCount > 0 && (
-            <span className="badge badge-sm badge-primary ml-2">
+            <span className="indicator-item badge badge-sm badge-primary">
               {itemCount}
             </span>
           )}
-        </Link>
+        </div>
         {user ? (
           <>
             {user.role === 'admin' ? (
@@ -158,12 +160,12 @@ export default function Header() {
           </label>
           <ul tabIndex={0} className="menu dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
             <li>
-              <Link href="/cart" className="justify-between">
-                Cart
+              <div className="indicator">
+                <Link href="/cart">Cart</Link>
                 {itemCount > 0 && (
-                  <span className="badge badge-sm badge-primary ml-2">{itemCount}</span>
+                  <span className="indicator-item badge badge-sm badge-primary">{itemCount}</span>
                 )}
-              </Link>
+              </div>
             </li>
             {categories.length > 0 && (
               <li>
