@@ -133,7 +133,7 @@ export default function Header() {
             Cart
           </Link>
           {itemCount > 0 && (
-            <span className="badge badge-sm badge-primary absolute -top-2 -right-2">
+            <span className="badge badge-sm badge-secondary absolute top-0 -right-2">
               {itemCount}
             </span>
           )}
@@ -195,7 +195,7 @@ export default function Header() {
                   Cart
                 </Link>
                 {itemCount > 0 && (
-                  <span className="badge badge-sm badge-primary absolute -top-2 -right-2">
+                  <span className="badge badge-sm badge-secondary absolute top-0 -right-2">
                     {itemCount}
                   </span>
                 )}
