@@ -33,16 +33,32 @@ export default function ProductDetail() {
       <h1 className="text-2xl font-bold mb-4">{product.TITLE}</h1>
       <div className="mb-4 w-full flex justify-center">
         {product.FEATURED_IMAGE?.url ? (
-          <img src={product.FEATURED_IMAGE.url} alt={product.TITLE} className="object-cover max-h-96" />
+          <img
+            src={product.FEATURED_IMAGE.url}
+            alt={product.TITLE}
+            className="object-cover max-h-96"
+          />
         ) : (
-          <img src="https://placehold.co/600x400?text=No+Image" alt="No image" className="object-cover max-h-96" />
+          <img
+            src="https://placehold.co/600x400?text=No+Image"
+            alt="No image"
+            className="object-cover max-h-96"
+          />
         )}
       </div>
       <p className="mb-2">Vendor: {product.VENDOR}</p>
       <p className="mb-2">Type: {product.PRODUCT_TYPE}</p>
-      <p className="mb-4">{product.DESCRIPTION_TEXT || product.BODY_HTML_TEXT || 'No description available.'}</p>
-      <p className="text-lg font-bold mb-4">{product.CURRENCY} {parseFloat(product.MIN_PRICE).toFixed(2)}</p>
-      <button className="btn btn-primary" onClick={() => addToCart(product)}>Add to Cart</button>
+      <p className="mb-4">
+        {product.DESCRIPTION_TEXT ||
+          product.BODY_HTML_TEXT ||
+          'No description available.'}
+      </p>
+      <p className="text-lg font-bold mb-4">
+        {product.CURRENCY} {parseFloat(product.MIN_PRICE).toFixed(2)}
+      </p>
+      <button className="btn btn-primary" onClick={() => addToCart(product)}>
+        Add to Cart
+      </button>
       <div className="mt-4">
         <Link href="/">&larr; Back to products</Link>
       </div>

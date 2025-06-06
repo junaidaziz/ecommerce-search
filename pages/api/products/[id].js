@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   }
   try {
     const { products } = await loadAndIndexProducts();
-    const product = products.find(p => p.ID === String(id));
+    const product = products.find((p) => p.ID === String(id));
     if (!product) {
       return res.status(404).json({ message: 'Not found' });
     }

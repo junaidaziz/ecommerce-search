@@ -2,7 +2,8 @@ import { findUser, setResetToken } from '../../lib/users';
 import crypto from 'crypto';
 
 export default function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ message: 'Method Not Allowed' });
+  if (req.method !== 'POST')
+    return res.status(405).json({ message: 'Method Not Allowed' });
   const { email } = req.body;
   if (!email) return res.status(400).json({ message: 'email required' });
   const user = findUser(email);

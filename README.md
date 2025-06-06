@@ -32,6 +32,7 @@ cd product-search-app
 ```bash
 npm install
 ```
+
 This will also install **DaisyUI**, a Tailwind CSS component library used throughout the app.
 
 3. **Create `.env.local`**
@@ -103,11 +104,11 @@ Link your GitHub project.
 
 In the Vercel dashboard:
 
-| Key                   | Value                                |
-|------------------------|----------------------------------------|
-| `BLOB_READ_WRITE_TOKEN` | your blob RW token                    |
-| `BLOB_BASE_URL`         | https://your-vercel-blob-url          |
-| `SKIP_INDEX_BUILD`      | `true` (to skip rebuild at deploy)    |
+| Key                     | Value                              |
+| ----------------------- | ---------------------------------- |
+| `BLOB_READ_WRITE_TOKEN` | your blob RW token                 |
+| `BLOB_BASE_URL`         | https://your-vercel-blob-url       |
+| `SKIP_INDEX_BUILD`      | `true` (to skip rebuild at deploy) |
 
 4. **Deploy**
 
@@ -162,7 +163,7 @@ Returns matching products in enriched format.
 📧 junaidaziz8@gmail.com  
 📞 +92 333 0433797  
 🧠 Skype: junaidaziz8  
-🌍 Based in Lahore, Pakistan  
+🌍 Based in Lahore, Pakistan
 
 ---
 
