@@ -9,6 +9,8 @@ A fast, scalable product search web app built with **Next.js**, **FlexSearch**, 
 - Full-text search on product fields (title, vendor, tags, etc.)
 - Extremely fast indexing via **FlexSearch.Document**
 - Manage products via a simple admin panel with a SQLite backend
+- Authentication via **NextAuth.js** (Google, GitHub and Credentials) with
+  role-based access (`admin`, `vendor`, `customer`)
 - Public search API: `/api/search?q=...`
 - Caches search index using **Vercel Blob Storage**
 - Optional `SKIP_INDEX_BUILD` flag to avoid rebuilding during deployment
