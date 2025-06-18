@@ -5,8 +5,9 @@ import {
   getOrdersForVendor,
 } from '../../lib/orders.js';
 import { findUser } from '../../lib/users.js';
+import { withRole } from '../../lib/withRole';
 
-export default function handler(req, res) {
+function handler(req, res) {
   if (req.method === 'POST') {
     const { email, items, total } = req.body;
     if (!email || !items) {
@@ -21,7 +22,7 @@ export default function handler(req, res) {
     if (!email) return res.status(400).json({ message: 'email required' });
     const user = findUser(email);
     if (!user) return res.status(404).json({ message: 'user not found' });
-    if (user.role === 'admin') {
+    if (user.role === 'super-admin') {
       return res.status(200).json(getAllOrders());
     }
     if (user.role === 'brand') {
@@ -32,3 +33,6 @@ export default function handler(req, res) {
 
   return res.status(405).json({ message: 'Method Not Allowed' });
 }
+
+
+export default withRole(['user','brand','super-admin'])(handler);

@@ -3,8 +3,9 @@ import {
   approveProduct,
   rejectProduct,
 } from '../../../lib/products';
+import { withRole } from '../../../lib/withRole';
 
-export default function handler(req, res) {
+function handler(req, res) {
   if (req.method === 'GET') {
     return res.status(200).json(getPendingProducts());
   }
@@ -24,3 +25,6 @@ export default function handler(req, res) {
   }
   return res.status(405).json({ message: 'Method Not Allowed' });
 }
+
+
+export default withRole(['super-admin'])(handler);
