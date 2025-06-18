@@ -17,10 +17,10 @@ export default function Header() {
   useEffect(() => {
     async function loadCategories() {
       try {
-        const res = await fetch('/api/search');
+        const res = await fetch('/api/categories');
         if (res.ok) {
           const data = await res.json();
-          setCategories(data.productTypes || []);
+          setCategories(data || []);
         }
       } catch (err) {
         console.error('Failed to load categories', err);
@@ -108,7 +108,9 @@ export default function Header() {
           >
             {categories.map((cat) => (
               <li key={cat}>
-                <Link href={`/?type=${encodeURIComponent(cat)}`}>{cat}</Link>
+                <Link href={`/categories/${encodeURIComponent(cat)}`}>
+                  {cat}
+                </Link>
               </li>
             ))}
           </ul>
@@ -132,7 +134,7 @@ export default function Header() {
             </svg>
             Cart
           </Link>
-            {itemCount > 0 && (
+          {itemCount > 0 && (
             <span className="badge badge-primary absolute top-0 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white text-xs">
               {itemCount}
             </span>
@@ -145,7 +147,7 @@ export default function Header() {
                 Admin
               </Link>
             ) : (
-              <Link href="/orders" className="btn btn-ghost mr-2">
+              <Link href="/user/orders" className="btn btn-ghost mr-2">
                 Orders
               </Link>
             )}
@@ -169,11 +171,25 @@ export default function Header() {
       <div className="md:hidden flex-none">
         <div className="dropdown dropdown-end">
           <label tabIndex={0} className="btn btn-square btn-ghost">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </label>
-          <ul tabIndex={0} className="menu dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+          <ul
+            tabIndex={0}
+            className="menu dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+          >
             <li>
               <div className="relative flex items-center">
                 <Link href="/cart" className="flex items-center gap-1">
@@ -206,9 +222,11 @@ export default function Header() {
                 <details>
                   <summary>Categories</summary>
                   <ul>
-                    {categories.map(cat => (
+                    {categories.map((cat) => (
                       <li key={cat}>
-                        <Link href={`/?type=${encodeURIComponent(cat)}`}>{cat}</Link>
+                        <Link href={`/categories/${encodeURIComponent(cat)}`}>
+                          {cat}
+                        </Link>
                       </li>
                     ))}
                   </ul>
@@ -218,16 +236,28 @@ export default function Header() {
             {user ? (
               <>
                 {user.role === 'admin' ? (
-                  <li><Link href="/admin">Admin</Link></li>
+                  <li>
+                    <Link href="/admin">Admin</Link>
+                  </li>
                 ) : (
-                  <li><Link href="/orders">Orders</Link></li>
+                  <li>
+                    <Link href="/user/orders">Orders</Link>
+                  </li>
                 )}
-                <li><button type="button" onClick={logout}>Logout</button></li>
+                <li>
+                  <button type="button" onClick={logout}>
+                    Logout
+                  </button>
+                </li>
               </>
             ) : (
               <>
-                <li><Link href="/login">Login</Link></li>
-                <li><Link href="/signup">Signup</Link></li>
+                <li>
+                  <Link href="/login">Login</Link>
+                </li>
+                <li>
+                  <Link href="/signup">Signup</Link>
+                </li>
               </>
             )}
           </ul>
