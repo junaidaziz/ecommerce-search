@@ -38,7 +38,7 @@ test('shows login and signup when unauthenticated', () => {
 });
 
 test('shows admin and cart count when authenticated as admin', () => {
-  const user = { role: 'admin', firstName: 'Alice', email: 'a@a.com' };
+  const user = { role: 'super-admin', firstName: 'Alice', email: 'a@a.com' };
   const cart = [{ ID: 1, qty: 2 }];
   mockUseSession.mockReturnValue({ data: { user } });
   renderWithContext(<Header />, { cart });

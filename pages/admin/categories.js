@@ -59,7 +59,7 @@ export default function Categories() {
 
   if (!user)
     return <div className="p-4">Please log in to view categories.</div>;
-  if (user.role !== 'admin')
+  if (user.role !== 'super-admin')
     return <div className="p-4">Admin access required.</div>;
 
   return (

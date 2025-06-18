@@ -22,7 +22,7 @@ export default function handler(req, res) {
       last_name: lastName,
       brand_name: brandName,
       gender,
-      role: role || 'customer',
+      role: role || 'user',
       verification_token: token,
     });
     return res.status(201).json({
@@ -33,7 +33,7 @@ export default function handler(req, res) {
         lastName,
         brandName,
         gender,
-        role: role || 'customer',
+        role: role || 'user',
       },
       token,
     });

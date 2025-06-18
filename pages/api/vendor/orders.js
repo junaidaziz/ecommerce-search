@@ -1,6 +1,7 @@
 import { getOrdersForVendor } from '../../../lib/orders';
+import { withRole } from '../../../lib/withRole';
 
-export default function handler(req, res) {
+function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
@@ -11,3 +12,6 @@ export default function handler(req, res) {
   const orders = getOrdersForVendor(vendor);
   return res.status(200).json(orders);
 }
+
+
+export default withRole(['brand'])(handler);
