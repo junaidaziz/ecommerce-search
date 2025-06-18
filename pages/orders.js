@@ -25,7 +25,7 @@ export default function Orders() {
             <p>
               Order #{o.id} - {o.status}
             </p>
-            {(user.role === 'admin' || user.role === 'brand') && (
+            {(user.role === 'super-admin' || user.role === 'brand') && (
               <p className="text-sm text-gray-600">Customer: {o.user_email}</p>
             )}
             <ul className="list-disc pl-4 text-sm mb-1">

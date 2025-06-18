@@ -55,4 +55,23 @@ db.exec(`CREATE TABLE IF NOT EXISTS orders (
   FOREIGN KEY(user_email) REFERENCES users(email)
 )`);
 
+const adminExists = db
+  .prepare("SELECT email FROM users WHERE role = 'super-admin'")
+  .get();
+if (!adminExists) {
+  db.prepare(
+    `INSERT INTO users (email, first_name, last_name, password, brand_name, gender, role)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`
+  ).run(
+    'admin@example.com',
+    'Super',
+    'Admin',
+    'password',
+    null,
+    '',
+    'super-admin'
+  );
+  console.log('Seeded super-admin user: admin@example.com / password');
+}
+
 console.log('Database migrated');

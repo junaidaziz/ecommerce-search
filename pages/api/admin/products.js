@@ -8,6 +8,7 @@ import { getProductById } from '../../../lib/db.js';
 import formidable from 'formidable';
 import fs from 'fs';
 import path from 'path';
+import { withRole } from '../../../lib/withRole';
 
 export const config = {
   api: {
@@ -25,7 +26,7 @@ function parseForm(req) {
   });
 }
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method === 'POST' || req.method === 'PUT') {
     const { fields, files } = await parseForm(req);
     const {
@@ -115,3 +116,6 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ message: 'Method Not Allowed' });
 }
+
+
+export default withRole(['brand','super-admin'])(handler);
