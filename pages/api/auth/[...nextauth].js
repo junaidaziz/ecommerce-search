@@ -51,7 +51,7 @@ export const authOptions = {
               profile?.family_name || nameParts.slice(1).join(' ') || '',
             brand_name: null,
             gender: profile?.gender || '',
-            role: 'customer',
+            role: 'user',
           });
         }
       }
