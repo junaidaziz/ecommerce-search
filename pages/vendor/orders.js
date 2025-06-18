@@ -17,8 +17,8 @@ export default function VendorOrders() {
   if (!user) {
     return <div className="p-4">Please log in to view orders.</div>;
   }
-  if (user.role !== 'vendor') {
-    return <div className="p-4">Vendor access required.</div>;
+  if (user.role !== 'brand') {
+    return <div className="p-4">Brand access required.</div>;
   }
 
   return (
