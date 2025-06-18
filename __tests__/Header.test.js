@@ -4,19 +4,19 @@ import Header from '../components/Header';
 import { AppContext } from '../contexts/AppContext';
 
 jest.mock('next/router', () => ({
-  useRouter: () => ({ push: jest.fn() })
+  useRouter: () => ({ push: jest.fn() }),
 }));
 
 const mockUseSession = jest.fn();
 jest.mock('next-auth/react', () => ({
   __esModule: true,
   useSession: (...args) => mockUseSession(...args),
-  signOut: jest.fn()
+  signOut: jest.fn(),
 }));
 
 jest.mock('next/link', () => ({
   __esModule: true,
-  default: ({ href, children }) => <a href={href}>{children}</a>
+  default: ({ href, children }) => <a href={href}>{children}</a>,
 }));
 
 beforeEach(() => {
@@ -25,9 +25,7 @@ beforeEach(() => {
 });
 const renderWithContext = (ui, { cart = [], user = null } = {}) => {
   const value = { cart, user };
-  return render(
-    <AppContext.Provider value={value}>{ui}</AppContext.Provider>
-  );
+  return render(<AppContext.Provider value={value}>{ui}</AppContext.Provider>);
 };
 
 test('shows login and signup when unauthenticated', () => {
@@ -44,4 +42,11 @@ test('shows admin and cart count when authenticated as admin', () => {
   renderWithContext(<Header />, { cart });
   expect(screen.getAllByText('Admin').length).toBeGreaterThan(0);
   expect(screen.getAllByText('2').length).toBeGreaterThan(0);
+});
+
+test('shows orders link when authenticated as customer', () => {
+  const user = { role: 'customer', firstName: 'Bob', email: 'b@b.com' };
+  mockUseSession.mockReturnValue({ data: { user } });
+  renderWithContext(<Header />);
+  expect(screen.getAllByText('Orders').length).toBeGreaterThan(0);
 });

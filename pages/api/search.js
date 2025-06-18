@@ -30,6 +30,7 @@ export default async function handler(req, res) {
     q,
     filterByVendor,
     filterByType,
+    filterByCategory,
     inStock,
     sortBy,
     page = 1,
@@ -66,6 +67,11 @@ export default async function handler(req, res) {
   if (filterByType && filterByType !== 'All') {
     results = results.filter(
       (product) => product.PRODUCT_TYPE === filterByType
+    );
+  }
+  if (filterByCategory && filterByCategory !== 'All') {
+    results = results.filter(
+      (product) => product.CATEGORY === filterByCategory
     );
   }
   if (inStock === 'true') {
@@ -126,6 +132,9 @@ export default async function handler(req, res) {
   const productTypes = [
     ...new Set(productsCache.map((p) => p.PRODUCT_TYPE).filter(Boolean)),
   ].sort();
+  const categories = [
+    ...new Set(productsCache.map((p) => p.CATEGORY).filter(Boolean)),
+  ].sort();
 
   res.status(200).json({
     results: paginated,
@@ -135,5 +144,6 @@ export default async function handler(req, res) {
     totalPages: Math.ceil(total / pageSizeInt),
     vendors,
     productTypes,
+    categories,
   });
 }
