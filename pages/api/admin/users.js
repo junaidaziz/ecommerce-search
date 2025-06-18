@@ -4,8 +4,9 @@ import {
   deleteUser,
   addUser,
 } from '../../../lib/users';
+import { withRole } from '../../../lib/withRole';
 
-export default function handler(req, res) {
+function handler(req, res) {
   if (req.method === 'GET') {
     return res.status(200).json(getAllUsers());
   }
@@ -35,9 +36,12 @@ export default function handler(req, res) {
       last_name: lastName,
       brand_name: brandName,
       gender,
-      role: role || 'customer',
+      role: role || 'user',
     });
     return res.status(201).json({ message: 'user created' });
   }
   return res.status(405).json({ message: 'Method Not Allowed' });
 }
+
+
+export default withRole(['super-admin'])(handler);

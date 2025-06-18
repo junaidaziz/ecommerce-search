@@ -40,7 +40,7 @@ export default function ManageUsers() {
   };
 
   if (!user) return <div className="p-4">Please log in to view users.</div>;
-  if (user.role !== 'admin')
+  if (user.role !== 'super-admin')
     return <div className="p-4">Admin access required.</div>;
 
   return (
@@ -57,8 +57,8 @@ export default function ManageUsers() {
               onChange={(e) => changeRole(u.email, e.target.value)}
             >
               <option value="user">user</option>
-              <option value="vendor">vendor</option>
-              <option value="admin">admin</option>
+              <option value="brand">brand</option>
+              <option value="super-admin">super-admin</option>
             </select>
             <button onClick={() => remove(u.email)} className="btn btn-sm">
               Delete

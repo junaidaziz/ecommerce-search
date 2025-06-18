@@ -142,7 +142,7 @@ export default function Header() {
         </div>
         {user ? (
           <>
-            {user.role === 'admin' ? (
+            {user.role === 'super-admin' ? (
               <Link href="/admin" className="btn btn-ghost mr-2">
                 Admin
               </Link>
@@ -235,10 +235,8 @@ export default function Header() {
             )}
             {user ? (
               <>
-                {user.role === 'admin' ? (
-                  <li>
-                    <Link href="/admin">Admin</Link>
-                  </li>
+                {user.role === 'super-admin' ? (
+                  <li><Link href="/admin">Admin</Link></li>
                 ) : (
                   <li>
                     <Link href="/user/orders">Orders</Link>
