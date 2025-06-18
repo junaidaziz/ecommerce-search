@@ -132,8 +132,8 @@ export default function Header() {
             </svg>
             Cart
           </Link>
-          {itemCount > 0 && (
-            <span className="badge badge-sm badge-secondary absolute top-0 -right-2">
+            {itemCount > 0 && (
+            <span className="badge badge-primary absolute top-0 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white text-xs">
               {itemCount}
             </span>
           )}
@@ -195,7 +195,7 @@ export default function Header() {
                   Cart
                 </Link>
                 {itemCount > 0 && (
-                  <span className="badge badge-sm badge-secondary absolute top-0 -right-2">
+                  <span className="badge badge-primary absolute top-0 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white text-xs">
                     {itemCount}
                   </span>
                 )}
