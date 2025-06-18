@@ -5,6 +5,7 @@ import {
   loadAndIndexProducts,
 } from '../../../lib/products';
 import { getProductById } from '../../../lib/db.js';
+import { hasOrdersForProduct } from '../../../lib/orders';
 import formidable from 'formidable';
 import fs from 'fs';
 import path from 'path';
@@ -99,6 +100,15 @@ async function handler(req, res) {
     const { id } = req.query;
     if (!id) {
       return res.status(400).json({ message: 'id required' });
+    }
+    const existing = getProductById(String(id));
+    if (!existing) {
+      return res.status(404).json({ message: 'Not found' });
+    }
+    if (existing.quantity > 0 || hasOrdersForProduct(String(id))) {
+      return res
+        .status(400)
+        .json({ message: 'cannot delete product with stock or orders' });
     }
     deleteProduct(String(id));
     await loadAndIndexProducts();
