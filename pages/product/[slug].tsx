@@ -3,8 +3,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
 import ProductImageSlider from '../../components/ProductImageSlider';
-import { getProductBySlug, getReviewsForProduct, getAverageRating } from '../../lib/db.js';
-import { mapDbRowToProduct } from '../../lib/products.js';
+import { getProductBySlug, getReviewsForProduct, getAverageRating } from '../../lib/db';
+import { mapDbRowToProduct } from '../../lib/products';
 
 export async function getServerSideProps({ params }) {
   const row = getProductBySlug(params.slug);

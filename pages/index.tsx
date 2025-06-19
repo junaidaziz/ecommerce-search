@@ -7,8 +7,7 @@ import ProductImageSlider from '../components/ProductImageSlider';
 import Hero from '../components/Hero';
 import { Product } from "../types/product";
 
-interface HomeProps { theme?: string; setTheme?: (t: string) => void; }
-export default function Home({ theme, setTheme }: HomeProps) {
+export default function Home() {
   const router = useRouter();
   const { addToCart, addToWishlist, removeFromWishlist, wishlist } =
     useContext(AppContext);

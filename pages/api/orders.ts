@@ -3,15 +3,15 @@ import {
   getOrdersForUser,
   getAllOrders,
   getOrdersForVendor,
-} from '../../lib/orders.js';
-import { findUser } from '../../lib/users.js';
+} from '../../lib/orders';
+import { findUser } from '../../lib/users';
 import {
   getProductById,
   decreaseProductQuantity,
   clearCart,
-} from '../../lib/db.js';
+} from '../../lib/db';
 import { withRole } from '../../lib/withRole';
-import { sendOrderConfirmation } from '../../lib/email.js';
+import { sendOrderConfirmation } from '../../lib/email';
 
 async function handler(req, res) {
   if (req.method === 'POST') {
