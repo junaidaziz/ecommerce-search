@@ -129,10 +129,10 @@ export default function UserSignup() {
   return (
     <div className="p-4 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4">User Sign Up</h1>
-      <div className="flex gap-4 mb-4 justify-center">
+      <div className="flex gap-4 mb-4 justify-center flex-wrap">
         <button
           type="button"
-          className="btn btn-lg px-6 flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white"
+          className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white"
           onClick={() => signIn('google')}
         >
           <svg
@@ -149,7 +149,7 @@ export default function UserSignup() {
         </button>
         <button
           type="button"
-          className="btn btn-lg px-6 flex items-center justify-center gap-2 hover:bg-gray-800 hover:text-white"
+          className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-gray-800 hover:text-white"
           onClick={() => signIn('github')}
         >
           <svg
