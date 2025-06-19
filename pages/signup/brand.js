@@ -187,10 +187,10 @@ export default function BrandSignup() {
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold">Brand Sign Up</h1>
       </div>
-      <div className="flex flex-row gap-6 mb-6 justify-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <button
           type="button"
-          className="btn btn-lg px-6 flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white rounded-lg"
+          className="btn btn-lg w-full flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white rounded-lg"
           onClick={() => signIn('google')}
         >
           <svg
@@ -207,7 +207,7 @@ export default function BrandSignup() {
         </button>
         <button
           type="button"
-          className="btn btn-lg px-6 flex items-center justify-center gap-2 hover:bg-gray-800 hover:text-white rounded-lg"
+          className="btn btn-lg w-full flex items-center justify-center gap-2 hover:bg-gray-800 hover:text-white rounded-lg"
           onClick={() => signIn('github')}
         >
           <svg
@@ -226,7 +226,7 @@ export default function BrandSignup() {
       {formError && <div className="text-red-500 mb-2">{formError}</div>}
       <form id="brand-signup-form" onSubmit={submit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
+          <div className="space-y-5">
             <h2 className="text-xl font-semibold">Account Info</h2>
             <input
               name="firstName"
@@ -392,7 +392,7 @@ export default function BrandSignup() {
               </div>
             </div>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-5">
             <h2 className="text-xl font-semibold">Business Info</h2>
             <input
               name="brandName"
@@ -453,7 +453,7 @@ export default function BrandSignup() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
+          <div className="space-y-5">
             <input
               name="website"
               className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500"
@@ -469,7 +469,7 @@ export default function BrandSignup() {
               placeholder="Tax ID"
             />
           </div>
-          <div className="space-y-4">
+          <div className="space-y-5">
             <textarea
               name="businessDescription"
               className="textarea textarea-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500"
@@ -495,7 +495,7 @@ export default function BrandSignup() {
                 type="file"
                 accept="image/png,image/jpeg"
                 onChange={handleLogoChange}
-                className="file-input file-input-bordered w-full rounded-lg"
+                className="file-input file-input-bordered w-full rounded-lg mt-2"
               />
               {errors.logo && (
                 <p className="text-red-500 text-sm">{errors.logo}</p>
@@ -504,7 +504,7 @@ export default function BrandSignup() {
           </div>
         </div>
         <button
-          className="btn btn-primary w-full mt-6 rounded-lg hover:opacity-90"
+          className="btn btn-primary w-full mt-8 rounded-lg hover:opacity-90"
           type="submit"
           disabled={loading}
         >
