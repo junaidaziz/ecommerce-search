@@ -32,6 +32,7 @@ model User {
   taxId             String?
   role              Role     @default(USER)
   verified          Boolean  @default(false)
+  disabled          Boolean  @default(false)
   verificationToken String?
   resetToken        String?
   resetExpires      DateTime?

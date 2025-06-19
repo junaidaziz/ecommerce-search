@@ -23,7 +23,11 @@ export const authOptions = {
       },
       async authorize(credentials) {
         const user = await findUser(credentials.email);
-        if (user && (await bcrypt.compare(credentials.password, user.password))) {
+        if (
+          user &&
+          !user.disabled &&
+          (await bcrypt.compare(credentials.password, user.password))
+        ) {
           const { firstName, lastName, brandName, gender, role } = user;
           return {
             id: user.email,
@@ -42,6 +46,9 @@ export const authOptions = {
     async signIn({ user, account, profile }) {
       if (account.provider === 'google' || account.provider === 'github') {
         const existing = await findUser(user.email);
+        if (existing && existing.disabled) {
+          return false;
+        }
         if (!existing) {
           const nameParts = (profile?.name || '').split(' ');
           await addUser({
@@ -54,6 +61,9 @@ export const authOptions = {
             role: 'USER',
           });
         }
+      }
+      if (user && user.disabled) {
+        return false;
       }
       return true;
     },

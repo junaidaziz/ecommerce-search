@@ -28,6 +28,18 @@ export default function ManageUsers() {
     }
   };
 
+  const toggleDisabled = async (email, disabled) => {
+    const res = await fetch('/api/admin/users', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, disabled }),
+    });
+    if (res.ok) {
+      setMessage('Status updated');
+      fetchUsers();
+    }
+  };
+
   const remove = async (email) => {
     const res = await fetch(
       `/api/admin/users?email=${encodeURIComponent(email)}`,
@@ -60,6 +72,15 @@ export default function ManageUsers() {
               <option value="brand">brand</option>
               <option value="super-admin">super-admin</option>
             </select>
+            <label className="label cursor-pointer gap-1">
+              <span className="label-text">Disabled</span>
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={u.disabled}
+                onChange={(e) => toggleDisabled(u.email, e.target.checked)}
+              />
+            </label>
             <button onClick={() => remove(u.email)} className="btn btn-sm">
               Delete
             </button>
