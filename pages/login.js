@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -174,6 +175,12 @@ export default function Login() {
           Login
         </button>
       </form>
+      <p className="text-center mt-4">
+        Don’t have an account?{' '}
+        <Link href="/signup" className="link">
+          Signup
+        </Link>
+      </p>
     </div>
   );
 }
