@@ -17,7 +17,7 @@ export default function Header() {
   useEffect(() => {
     async function loadCategories() {
       try {
-        const res = await fetch('/api/categories');
+        const res = await fetch('/api/category-tree');
         if (res.ok) {
           const data = await res.json();
           setCategories(data || []);
@@ -99,7 +99,7 @@ export default function Header() {
       </div>
       <div className="hidden md:flex flex-none gap-2">
         <div className="dropdown dropdown-hover">
-          <label tabIndex={0} className="btn btn-outline">
+          <label tabIndex={0} className="btn btn-ghost">
             Categories
           </label>
           <ul
@@ -107,10 +107,29 @@ export default function Header() {
             className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
           >
             {categories.map((cat) => (
-              <li key={cat}>
-                <Link href={`/categories/${encodeURIComponent(cat)}`}>
-                  {cat}
-                </Link>
+              <li key={cat.name}>
+                {cat.subcategories && cat.subcategories.length > 0 ? (
+                  <details>
+                    <summary>{cat.name}</summary>
+                    <ul>
+                      {cat.subcategories.map((sub) => (
+                        <li key={sub}>
+                          <Link
+                            href={`/categories/${encodeURIComponent(
+                              cat.name
+                            )}?type=${encodeURIComponent(sub)}`}
+                          >
+                            {sub}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : (
+                  <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
+                    {cat.name}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
@@ -223,10 +242,29 @@ export default function Header() {
                   <summary>Categories</summary>
                   <ul>
                     {categories.map((cat) => (
-                      <li key={cat}>
-                        <Link href={`/categories/${encodeURIComponent(cat)}`}>
-                          {cat}
-                        </Link>
+                      <li key={cat.name}>
+                        {cat.subcategories && cat.subcategories.length > 0 ? (
+                          <details>
+                            <summary>{cat.name}</summary>
+                            <ul>
+                              {cat.subcategories.map((sub) => (
+                                <li key={sub}>
+                                  <Link
+                                    href={`/categories/${encodeURIComponent(
+                                      cat.name
+                                    )}?type=${encodeURIComponent(sub)}`}
+                                  >
+                                    {sub}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </details>
+                        ) : (
+                          <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
+                            {cat.name}
+                          </Link>
+                        )}
                       </li>
                     ))}
                   </ul>
