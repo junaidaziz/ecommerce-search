@@ -1,5 +1,6 @@
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { AppContext } from '../contexts/AppContext';
 
 export default function Checkout() {
@@ -20,7 +21,15 @@ export default function Checkout() {
   );
   const discountedTotal = totalPrice * (1 - discount / 100);
 
-  if (!user) return <div className="p-4">Please log in to checkout.</div>;
+  if (!user)
+    return (
+      <div className="h-64 flex flex-col items-center justify-center space-y-4">
+        <p className="text-lg">Please log in to checkout.</p>
+        <Link href="/login" className="btn btn-primary">
+          Login
+        </Link>
+      </div>
+    );
   if (cart.length === 0) return <div className="p-4">Your cart is empty.</div>;
 
   const submit = async (e) => {
