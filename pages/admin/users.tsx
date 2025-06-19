@@ -56,7 +56,7 @@ export default function ManageUsers() {
     return <div className="p-4">Admin access required.</div>;
 
   return (
-    <div className="w-full p-4 sm:p-6 lg:p-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8">
       <h1 className="text-2xl font-bold mb-4">Manage Users</h1>
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <ul className="space-y-2">

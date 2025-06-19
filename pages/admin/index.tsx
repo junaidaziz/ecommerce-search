@@ -95,7 +95,7 @@ export default function Admin() {
   }
 
   return (
-    <div className="w-full p-4 sm:p-6 lg:p-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8">
       <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
       <div className="mb-4 space-x-2">
         <Link href="/admin/users" className="btn btn-sm">

@@ -17,7 +17,7 @@ export default function RequestReset() {
   };
 
   return (
-    <div className="p-4 max-w-sm mx-auto">
+    <div className="max-w-sm mx-auto">
       <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
       <form onSubmit={submit} className="space-y-2">
         <input
