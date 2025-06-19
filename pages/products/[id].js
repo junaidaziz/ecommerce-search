@@ -23,8 +23,16 @@ export default function ProductDetail() {
     async function load() {
       try {
         const res = await fetch(`/api/products/${id}`);
+        if (res.status === 404) {
+          setError('Product not found');
+          return;
+        }
         if (!res.ok) throw new Error('Failed');
         const data = await res.json();
+        if (!data) {
+          setError('Product not found');
+          return;
+        }
         setProduct(data);
         const revRes = await fetch(`/api/products/${id}/reviews`);
         if (revRes.ok) {
@@ -46,7 +54,7 @@ export default function ProductDetail() {
   return (
     <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md">
       <Head>
-        <title>{product.TITLE} - Product</title>
+        <title>{(product.TITLE || 'Product') + ' - Product'}</title>
         <meta
           name="description"
           content={product.DESCRIPTION_TEXT?.slice(0, 150)}
@@ -73,13 +81,13 @@ export default function ProductDetail() {
           }}
         />
       </Head>
-      <h1 className="text-2xl font-bold mb-4">{product.TITLE}</h1>
+      <h1 className="text-2xl font-bold mb-4">{product.TITLE || 'Product'}</h1>
       <div className="mb-4 w-full flex flex-col items-center">
         <ProductImageSlider
           images={
             product.IMAGES && product.IMAGES.length > 0
               ? product.IMAGES
-              : [product.FEATURED_IMAGE?.url]
+              : [product.FEATURED_IMAGE?.url || '/placeholder.png']
           }
           imgClass="max-h-96 hover:scale-110 transition w-full"
         />
@@ -92,7 +100,8 @@ export default function ProductDetail() {
           'No description available.'}
       </p>
       <p className="text-lg font-bold mb-4">
-        {product.CURRENCY} {parseFloat(product.MIN_PRICE).toFixed(2)}
+        {product.CURRENCY || ''}{' '}
+        {product.MIN_PRICE ? parseFloat(product.MIN_PRICE).toFixed(2) : 'N/A'}
       </p>
       <p className="mb-2">
         Rating: {averageRating.toFixed(1)} ({reviewCount})
