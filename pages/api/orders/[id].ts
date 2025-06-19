@@ -1,9 +1,10 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { getOrderById } from '../../../lib/orders';
 import { updateOrderStatus } from '../../../lib/orders';
 import { sendOrderStatusUpdate } from '../../../lib/email';
 import { withRole } from '../../../lib/withRole';
 
-async function handler(req, res) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
   if (!id) {
     return res.status(400).json({ message: 'id required' });
