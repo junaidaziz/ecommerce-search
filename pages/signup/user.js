@@ -127,12 +127,12 @@ export default function UserSignup() {
   };
 
   return (
-    <div className="p-4 max-w-sm mx-auto">
+    <div className="p-4 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4">User Sign Up</h1>
-      <div className="flex gap-2 mb-2">
+      <div className="flex gap-4 mb-4 justify-center">
         <button
           type="button"
-          className="btn btn-lg flex-1 hover:bg-red-600 hover:text-white flex items-center justify-center gap-2"
+          className="btn btn-lg px-6 flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white"
           onClick={() => signIn('google')}
         >
           <svg
@@ -149,7 +149,7 @@ export default function UserSignup() {
         </button>
         <button
           type="button"
-          className="btn btn-lg flex-1 hover:bg-gray-800 hover:text-white flex items-center justify-center gap-2"
+          className="btn btn-lg px-6 flex items-center justify-center gap-2 hover:bg-gray-800 hover:text-white"
           onClick={() => signIn('github')}
         >
           <svg
@@ -201,7 +201,7 @@ export default function UserSignup() {
             <p className="text-red-500 text-sm">{errors.email}</p>
           )}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -359,7 +359,7 @@ export default function UserSignup() {
             placeholder="Address"
           />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <div>
             <input
               className="input input-bordered w-full"
