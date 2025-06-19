@@ -7,7 +7,7 @@ export default function Signup() {
       <Link href="/signup/user" className="btn btn-primary w-full">
         User Signup
       </Link>
-      <Link href="/signup/brand" className="btn btn-secondary w-full">
+      <Link href="/signup/brand" className="btn btn-secondary">
         Brand Signup
       </Link>
     </div>

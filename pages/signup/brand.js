@@ -187,10 +187,10 @@ export default function BrandSignup() {
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold">Brand Sign Up</h1>
       </div>
-      <div className="flex flex-row gap-4 mb-4 justify-center">
+      <div className="flex flex-row gap-6 mb-6 justify-center">
         <button
           type="button"
-          className="btn btn-lg flex-1 hover:bg-red-600 hover:text-white flex items-center justify-center gap-2 rounded-lg"
+          className="btn btn-lg px-6 flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white rounded-lg"
           onClick={() => signIn('google')}
         >
           <svg
@@ -207,7 +207,7 @@ export default function BrandSignup() {
         </button>
         <button
           type="button"
-          className="btn btn-lg flex-1 hover:bg-gray-800 hover:text-white flex items-center justify-center gap-2 rounded-lg"
+          className="btn btn-lg px-6 flex items-center justify-center gap-2 hover:bg-gray-800 hover:text-white rounded-lg"
           onClick={() => signIn('github')}
         >
           <svg
@@ -259,7 +259,7 @@ export default function BrandSignup() {
             {errors.email && (
               <p className="text-red-500 text-sm">{errors.email}</p>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="relative">
                 <input
                   name="password"
@@ -424,7 +424,7 @@ export default function BrandSignup() {
             {errors.businessAddress && (
               <p className="text-red-500 text-sm">{errors.businessAddress}</p>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <input
                   name="city"
