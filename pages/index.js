@@ -209,19 +209,9 @@ export default function Home({ theme, setTheme }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="w-full max-w-screen-2xl bg-base-100 p-8 rounded-box shadow-xl">
+      <main className="w-full max-w-screen-2xl bg-base-100 p-8 rounded-box shadow-xl space-y-6">
         <HeroSlider />
-        <div className="flex justify-end mb-6">
-          <label className="flex items-center cursor-pointer gap-2">
-            <span className="text-sm">Dark Mode</span>
-            <input
-              type="checkbox"
-              className="toggle"
-              checked={theme === 'dark'}
-              onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            />
-          </label>
-        </div>
+        {/* Theme toggle moved to header */}
 
         {allProductTypes.length > 0 && (
           <div className="flex flex-wrap justify-center mb-6">
@@ -424,8 +414,11 @@ export default function Home({ theme, setTheme }) {
                       images={
                         product.IMAGES && product.IMAGES.length > 0
                           ? product.IMAGES
-                          : [product.FEATURED_IMAGE?.url]
+                          : product.FEATURED_IMAGE?.url
+                            ? [product.FEATURED_IMAGE.url]
+                            : []
                       }
+                      placeholderSeed={product.ID}
                       className="w-full h-40 bg-gray-200 overflow-hidden flex items-center justify-center"
                       imgClass="w-full h-full"
                     />

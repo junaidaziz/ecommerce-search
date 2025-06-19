@@ -40,7 +40,7 @@ const renderWithContext = (
 
 test('shows login and signup when unauthenticated', () => {
   mockUseSession.mockReturnValue({ data: null });
-  renderWithContext(<Header />);
+  renderWithContext(<Header theme="light" setTheme={() => {}} />);
   expect(screen.getAllByText('Login').length).toBeGreaterThan(0);
   expect(screen.getAllByText('Signup').length).toBeGreaterThan(0);
 });
@@ -49,7 +49,7 @@ test('shows admin and cart count when authenticated as admin', () => {
   const user = { role: 'super-admin', firstName: 'Alice', email: 'a@a.com' };
   const cart = [{ ID: 1, qty: 2 }];
   mockUseSession.mockReturnValue({ data: { user } });
-  renderWithContext(<Header />, { cart });
+  renderWithContext(<Header theme="light" setTheme={() => {}} />, { cart });
   expect(screen.getAllByText('Admin').length).toBeGreaterThan(0);
   expect(screen.getAllByText('2').length).toBeGreaterThan(0);
 });
@@ -57,7 +57,7 @@ test('shows admin and cart count when authenticated as admin', () => {
 test('shows orders link when authenticated as customer', () => {
   const user = { role: 'customer', firstName: 'Bob', email: 'b@b.com' };
   mockUseSession.mockReturnValue({ data: { user } });
-  renderWithContext(<Header />);
+  renderWithContext(<Header theme="light" setTheme={() => {}} />);
   expect(screen.getAllByText('Orders').length).toBeGreaterThan(0);
   expect(screen.getAllByText('Wishlist').length).toBeGreaterThan(0);
 });
@@ -66,10 +66,11 @@ test('renders categories from API', async () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
       ok: true,
-      json: () => Promise.resolve([{ name: 'Electronics', subcategories: ['Phones'] }]),
+      json: () =>
+        Promise.resolve([{ name: 'Electronics', subcategories: ['Phones'] }]),
     })
   );
-  renderWithContext(<Header />);
+  renderWithContext(<Header theme="light" setTheme={() => {}} />);
   // open the menu to render categories
   const button = screen.getByRole('button', { name: /categories/i });
   button.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
@@ -81,7 +82,7 @@ test('shows fallback when no categories are available', async () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({ ok: true, json: () => Promise.resolve([]) })
   );
-  renderWithContext(<Header />);
+  renderWithContext(<Header theme="light" setTheme={() => {}} />);
   const button = screen.getByRole('button', { name: /categories/i });
   button.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
   expect(await screen.findByText('No categories found')).toBeInTheDocument();
