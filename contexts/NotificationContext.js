@@ -24,7 +24,7 @@ export function NotificationProvider({ children }) {
     <NotificationContext.Provider value={{ addNotification }}>
       {children}
       <div className="fixed inset-0 pointer-events-none z-50">
-        <div className="absolute left-1/2 top-5 -translate-x-1/2 space-y-2">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 space-y-2">
           {notifs
             .filter((n) => n.position === 'center')
             .map((n) => (

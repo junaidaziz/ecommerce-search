@@ -23,7 +23,7 @@ export default function Checkout() {
 
   if (!user)
     return (
-      <div className="h-64 flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
         <p className="text-lg">Please log in to checkout.</p>
         <Link href="/login" className="btn btn-primary">
           Login
