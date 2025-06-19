@@ -38,6 +38,7 @@ model User {
   resetExpires      DateTime?
   products          Product[]
   orders            Order[]
+  searchLogs        SearchLog[]
   deletionRequests  DeletionRequest[] @relation("UserDeletionRequests")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -105,7 +106,6 @@ model SearchLog {
   user      User?    @relation(fields: [userId], references: [id])
   userId    Int?
   query     String
-  noResults Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 
