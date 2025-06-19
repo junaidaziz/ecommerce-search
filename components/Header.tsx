@@ -17,7 +17,7 @@ export default function Header({ theme = 'light', setTheme }) {
   const [categories, setCategories] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [activeIdx, setActiveIdx] = useState(-1);
   const searchRef = useRef(null);
   const iconMap = {
@@ -101,12 +101,12 @@ export default function Header({ theme = 'light', setTheme }) {
     const t = setTimeout(async () => {
       try {
         const res = await fetch(
-          `/api/search?q=${encodeURIComponent(search)}&perPage=5`,
+          `/api/suggest?q=${encodeURIComponent(search)}`,
           { signal: controller.signal }
         );
         if (res.ok) {
           const data = await res.json();
-          setSuggestions(data.results || []);
+          setSuggestions(data.suggestions || []);
           setActiveIdx(-1);
         }
       } catch (_) {
@@ -126,10 +126,10 @@ export default function Header({ theme = 'light', setTheme }) {
     setSuggestions([]);
   };
 
-  const selectSuggestion = (p) => {
-    router.push(`/products/${p.ID}`);
+  const selectSuggestion = (text) => {
+    router.push(`/?q=${encodeURIComponent(text)}`);
     setSuggestions([]);
-    setSearch('');
+    setSearch(text);
   };
 
   const renderCat = (cat) => (
@@ -290,7 +290,7 @@ export default function Header({ theme = 'light', setTheme }) {
                 className="absolute z-10 bg-white shadow rounded mt-1 w-full max-h-60 overflow-auto"
               >
                 {suggestions.map((s, idx) => (
-                  <li key={s.ID}>
+                  <li key={s}>
                     <button
                       type="button"
                       role="option"
@@ -299,7 +299,7 @@ export default function Header({ theme = 'light', setTheme }) {
                       onMouseEnter={() => setActiveIdx(idx)}
                       onClick={() => selectSuggestion(s)}
                     >
-                      {s.TITLE}
+                      {s}
                     </button>
                   </li>
                 ))}
