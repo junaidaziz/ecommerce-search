@@ -60,7 +60,7 @@ export default function UserSignup() {
             }));
           }
         }
-      } catch (_) {}
+      } catch (_) { }
     }
   };
 
@@ -129,7 +129,7 @@ export default function UserSignup() {
   return (
     <div className="p-4 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4">User Sign Up</h1>
-      <div className="flex gap-4 mb-4 justify-center flex-wrap">
+      <div className="flex flex-col gap-6 mb-4">
         <button
           type="button"
           className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white"
