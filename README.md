@@ -64,22 +64,6 @@ Navigate to `http://localhost:3000` to access the UI.
 
 ---
 
-## ⚙️ Manual Index Generation (Before Production Deploy)
-
-Only needed once (or if your product data changes):
-
-```bash
-npm run generate-index
-```
-
-This script will:
-
-- Load product data from the SQLite database
-- Build a FlexSearch index
-- Save the index to `public/index.json`
-
----
-
 ## 🚀 Deploy to Vercel
 
 1. **Push code to GitHub**
@@ -127,7 +111,7 @@ Returns matching products in enriched format.
 ├── lib/
 │   └── products.js
 ├── scripts/
-│   └── generate-search-index.mjs
+│   └── migrate.ts
 ├── pages/
 │   ├── index.tsx
 │   └── api/
