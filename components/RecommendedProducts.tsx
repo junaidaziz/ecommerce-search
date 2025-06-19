@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import ProductImageSlider from './ProductImageSlider';
+import ProductCard from './ProductCard';
 import { Product } from '../types/product';
 
 interface RecommendedProductsProps {
@@ -32,15 +31,7 @@ export default function RecommendedProducts({ category, excludeId, title = 'You 
       <h3 className="font-semibold mb-4">{title}</h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {products.map((p) => (
-          <Link href={`/product/${p.SLUG}`} key={p.ID} className="card bg-base-100 border border-base-300 rounded-xl shadow hover:shadow-lg transition-all duration-200">
-            <ProductImageSlider
-              images={p.IMAGES && p.IMAGES.length > 0 ? p.IMAGES : [p.FEATURED_IMAGE?.url]}
-              placeholderSeed={Number(p.ID)}
-              className="w-full h-32 bg-gray-200 overflow-hidden flex items-center justify-center"
-              imgClass="w-full h-full object-cover"
-            />
-            <div className="p-2 text-sm line-clamp-2">{p.TITLE}</div>
-          </Link>
+          <ProductCard key={p.ID} product={p} />
         ))}
       </div>
     </div>
