@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getBestSellingProducts } from '../../lib/orders';
-import { prisma } from '../../lib/prisma';
+import { getDb } from '../../lib/db';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import client from '../../lib/typesenseClient';
@@ -28,10 +28,11 @@ export default async function handler(
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
+  const db = getDb();
   const session = await getServerSession(req, res, authOptions);
   let userId: number | null = null;
   if (session?.user?.email) {
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { email: session.user.email },
       select: { id: true },
     });
@@ -96,7 +97,7 @@ export default async function handler(
     }
     const fallback = result.found === 0 ? getBestSellingProducts(8) : [];
     try {
-      await prisma.searchLog.create({
+      await db.searchLog.create({
         data: {
           query: String(q),
           userId,

@@ -1,4 +1,6 @@
-import { prisma } from './prisma';
+import { getDb } from './db';
+
+const prisma = getDb();
 
 export async function addUser({
   email,
