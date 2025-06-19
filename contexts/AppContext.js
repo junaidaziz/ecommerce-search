@@ -11,11 +11,16 @@ export function AppProvider({ children }) {
   const { data: session } = useSession();
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
 
   useEffect(() => {
     const stored = localStorage.getItem('app-cart');
     if (stored) {
       setCart(JSON.parse(stored));
+    }
+    const storedWish = localStorage.getItem('app-wishlist');
+    if (storedWish) {
+      setWishlist(JSON.parse(storedWish));
     }
   }, []);
 
@@ -25,6 +30,12 @@ export function AppProvider({ children }) {
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
         if (Array.isArray(data)) setCart(data);
+      })
+      .catch(() => {});
+    fetch('/api/wishlist')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (Array.isArray(data)) setWishlist(data);
       })
       .catch(() => {});
   }, [user]);
@@ -41,14 +52,20 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     localStorage.setItem('app-cart', JSON.stringify(cart));
+    localStorage.setItem('app-wishlist', JSON.stringify(wishlist));
     if (user) {
       fetch('/api/cart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items: cart }),
       }).catch(() => {});
+      fetch('/api/wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: wishlist }),
+      }).catch(() => {});
     }
-  }, [cart, user]);
+  }, [cart, wishlist, user]);
 
   const login = async (email, password) => {
     const res = await nextSignIn('credentials', {
@@ -124,17 +141,31 @@ export function AppProvider({ children }) {
     setCart((prev) => prev.filter((item) => item.ID !== id));
   };
 
+  const addToWishlist = (product) => {
+    setWishlist((prev) => {
+      if (prev.find((p) => p.ID === product.ID)) return prev;
+      return [...prev, product];
+    });
+  };
+
+  const removeFromWishlist = (id) => {
+    setWishlist((prev) => prev.filter((item) => item.ID !== id));
+  };
+
   return (
     <AppContext.Provider
       value={{
         user,
         cart,
+        wishlist,
         login,
         signup,
         logout,
         addToCart,
         changeQty,
         removeFromCart,
+        addToWishlist,
+        removeFromWishlist,
         placeOrder,
       }}
     >
