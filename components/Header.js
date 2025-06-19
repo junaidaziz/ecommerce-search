@@ -54,7 +54,7 @@ export default function Header() {
   useEffect(() => {
     async function loadCategories() {
       try {
-        const res = await fetch('/api/category-tree');
+        const res = await fetch('/api/categories');
         if (res.ok) {
           const data = await res.json();
           setCategories(data || []);
@@ -175,7 +175,7 @@ export default function Header() {
               {menuOpen && (
                 <div
                   id="mega-menu"
-                  className="absolute left-0 mt-2 p-4 bg-white shadow rounded w-screen max-w-3xl"
+                  className="absolute left-0 mt-2 p-4 bg-base-100 shadow-lg rounded w-screen max-w-3xl"
                 >
                   <div
                     className="grid grid-cols-2 md:grid-cols-3 gap-4"
@@ -190,16 +190,16 @@ export default function Header() {
                         >
                           <Link
                             href={`/categories/${encodeURIComponent(cat.name)}`}
-                            className="flex items-center text-indigo-600 font-medium mb-1"
+                            className="flex items-center font-semibold mb-1 hover:text-indigo-600"
                           >
                             {iconMap[cat.name] || null}
                             {cat.name}
                           </Link>
                           {cat.subcategories &&
                             cat.subcategories.length > 0 && (
-                              <ul className="ml-6 space-y-1">
+                              <ul className="ml-4 space-y-1">
                                 {cat.subcategories.slice(0, 5).map((sub) => (
-                                  <li key={sub}>
+                                  <li key={sub} className="text-sm">
                                     <Link
                                       href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub)}`}
                                       className="hover:text-indigo-600"
