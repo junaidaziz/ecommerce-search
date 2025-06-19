@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function BrandDashboard() {
@@ -22,7 +22,7 @@ export default function BrandDashboard() {
   const [message, setMessage] = useState('');
   const [editingId, setEditingId] = useState(null);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     if (!user) return;
     const res = await fetch(
       `/api/brand/products?vendor=${encodeURIComponent(user.brandName || '')}`
@@ -36,11 +36,11 @@ export default function BrandDashboard() {
     if (lowRes.ok) {
       setLowStock(await lowRes.json());
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts, user]);
+  }, [fetchProducts]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

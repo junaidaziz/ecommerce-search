@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { AppContext } from '../../contexts/AppContext';
 
@@ -13,15 +13,15 @@ export default function Categories() {
   const [editName, setEditName] = useState('');
   const [editImage, setEditImage] = useState('');
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!user) return;
     const res = await fetch('/api/admin/categories');
     if (res.ok) setCategories(await res.json());
-  };
+  }, [user]);
 
   useEffect(() => {
     load();
-  }, [load, user]);
+  }, [load]);
 
   const add = async () => {
     if (!newCat.trim()) return;
