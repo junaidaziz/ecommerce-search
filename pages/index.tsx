@@ -14,12 +14,16 @@ import Hero from '../components/Hero';
 import { Product } from '../types/product';
 import RecommendedProducts from '../components/RecommendedProducts';
 
+interface SearchResult extends Product {
+  highlights?: { field: string; snippet: string }[];
+}
+
 export default function Home() {
   const router = useRouter();
   const { addToCart, addToWishlist, removeFromWishlist, wishlist } =
     useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<SearchResult[]>([]);
   const [fallbackProducts, setFallbackProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -147,7 +151,7 @@ export default function Home() {
       }
 
       const data: any = await response.json();
-      setProducts(data.results);
+      setProducts(data.results as SearchResult[]);
       setFallbackProducts(data.fallback || []);
       setTotalPages(data.totalPages || 1);
       if (allVendors.length === 0 && Array.isArray(data.brands)) {
@@ -618,39 +622,56 @@ export default function Home() {
                   </Link>
 
                   <div className="card-body flex flex-col gap-1">
-                    <Link
-                      href={`/product/${product.SLUG}`}
-                      className="hover:underline transition-colors duration-200"
-                    >
-                      <h2
-                        className="text-lg font-semibold text-base-content line-clamp-2"
-                        title={product.TITLE}
-                      >
-                        {product.TITLE || 'Untitled Product'}
-                      </h2>
-                    </Link>
-                    <div className="flex flex-wrap gap-1 text-xs text-base-content">
-                      {product.VENDOR && (
-                        <span className="badge badge-ghost">
-                          {product.VENDOR}
-                        </span>
-                      )}
-                      {product.PRODUCT_TYPE && (
-                        <span className="badge badge-ghost">
-                          {product.PRODUCT_TYPE}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-md font-bold text-base-content">
-                      {product.CURRENCY} {product.MIN_PRICE.toFixed(2)}
-                      {product.MAX_PRICE > product.MIN_PRICE &&
-                        ` - ${product.MAX_PRICE.toFixed(2)}`}
-                    </p>
-                    <p className="text-sm text-base-content line-clamp-2">
-                      {product.DESCRIPTION_TEXT ||
-                        product.BODY_HTML_TEXT ||
-                        'No description available.'}
-                    </p>
+                    {(() => {
+                      const titleHighlight = product.highlights?.find(
+                        (h) => h.field === 'title'
+                      )?.snippet;
+                      const descHighlight = product.highlights?.find(
+                        (h) => h.field === 'description'
+                      )?.snippet;
+                      return (
+                        <>
+                          <Link
+                            href={`/product/${product.SLUG}`}
+                            className="hover:underline transition-colors duration-200"
+                          >
+                            <h2
+                              className="text-lg font-semibold text-base-content line-clamp-2"
+                              title={product.TITLE}
+                            >
+                              <span
+                                dangerouslySetInnerHTML={{
+                                  __html: titleHighlight || product.TITLE || 'Untitled Product',
+                                }}
+                              />
+                            </h2>
+                          </Link>
+                          <div className="flex flex-wrap gap-1 text-xs text-base-content">
+                            {product.VENDOR && (
+                              <span className="badge badge-ghost">{product.VENDOR}</span>
+                            )}
+                            {product.PRODUCT_TYPE && (
+                              <span className="badge badge-ghost">{product.PRODUCT_TYPE}</span>
+                            )}
+                          </div>
+                          <p className="text-md font-bold text-base-content">
+                            {product.CURRENCY} {product.MIN_PRICE.toFixed(2)}
+                            {product.MAX_PRICE > product.MIN_PRICE && ` - ${product.MAX_PRICE.toFixed(2)}`}
+                          </p>
+                          <p className="text-sm text-base-content line-clamp-2">
+                            <span
+                              dangerouslySetInnerHTML={{
+                                __html:
+                                  descHighlight ||
+                                  product.DESCRIPTION_TEXT ||
+                                  product.BODY_HTML_TEXT ||
+                                  'No description available.',
+                              }}
+                            />
+                          </p>
+                        </>
+                      );
+                    })()}
                     <div className="mt-auto flex justify-between items-center text-sm text-base-content">
                       {product.SOLD_COUNT > 0 && (
                         <span>Sold: {product.SOLD_COUNT}</span>
