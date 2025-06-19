@@ -271,7 +271,7 @@ export default function Home() {
     });
 
   return (
-    <div className="min-h-screen bg-base-200 flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8 font-inter">
+    <div className="min-h-screen bg-base-200 flex flex-col items-center py-10 font-inter">
       <Head>
         <title>Product Search App</title>
         <meta name="description" content="Search products from CSV data" />

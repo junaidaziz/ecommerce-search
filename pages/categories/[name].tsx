@@ -43,7 +43,7 @@ export default function CategoryPage() {
   if (!name) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="p-4 max-w-screen-2xl mx-auto">
+    <div className="max-w-screen-2xl mx-auto">
       <Head>
         <title>Category: {name}</title>
         <meta name="description" content={`Products for ${name}`} />

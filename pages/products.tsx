@@ -31,7 +31,7 @@ export default function Products() {
   });
 
   return (
-    <div className="p-6 w-full bg-gradient-to-br from-base-200 to-base-100 min-h-screen">
+    <div className="w-full bg-gradient-to-br from-base-200 to-base-100 min-h-screen">
       {loading ? (
         <div className="flex justify-center my-4">
           <span className="loading loading-spinner"></span>
