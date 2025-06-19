@@ -1,11 +1,17 @@
-import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useContext,
+} from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
 import { AppContext } from '../contexts/AppContext';
 import ProductImageSlider from '../components/ProductImageSlider';
 import Hero from '../components/Hero';
-import { Product } from "../types/product";
+import { Product } from '../types/product';
 
 export default function Home() {
   const router = useRouter();
@@ -18,6 +24,7 @@ export default function Home() {
 
   const [sortBy, setSortBy] = useState('sold_count_desc');
   const [filterByVendor, setFilterByVendor] = useState('All');
+  const [filterByCategory, setFilterByCategory] = useState('All');
   const [filterByType, setFilterByType] = useState('All');
   const [inStock, setInStock] = useState(false);
   const [minPrice, setMinPrice] = useState('');
@@ -29,6 +36,7 @@ export default function Home() {
 
   const [allVendors, setAllVendors] = useState<string[]>([]);
   const [allProductTypes, setAllProductTypes] = useState<string[]>([]);
+  const [allCategories, setAllCategories] = useState<string[]>([]);
 
   // useRef to store the AbortController instance
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -36,9 +44,7 @@ export default function Home() {
   useEffect(() => {
     const qParam = router.query.q;
     if (qParam) {
-      const q = Array.isArray(qParam)
-        ? qParam[0]
-        : (qParam as string);
+      const q = Array.isArray(qParam) ? qParam[0] : (qParam as string);
       setSearchTerm(q);
     } else {
       setSearchTerm('');
@@ -49,14 +55,37 @@ export default function Home() {
   useEffect(() => {
     const typeParam = router.query.type;
     if (typeParam) {
-      const t = Array.isArray(typeParam)
-        ? typeParam[0]
-        : (typeParam as string);
+      const t = Array.isArray(typeParam) ? typeParam[0] : (typeParam as string);
       setFilterByType(t);
     } else {
       setFilterByType('All');
     }
   }, [router.query.type]);
+
+  useEffect(() => {
+    const catParam = router.query.category;
+    if (catParam) {
+      const c = Array.isArray(catParam) ? catParam[0] : (catParam as string);
+      setFilterByCategory(c);
+    } else {
+      setFilterByCategory('All');
+    }
+  }, [router.query.category]);
+
+  useEffect(() => {
+    async function loadCats() {
+      try {
+        const res = await fetch('/api/categories');
+        if (res.ok) {
+          const data = await res.json();
+          setAllCategories(['All', ...data.map((c: any) => c.name)]);
+        }
+      } catch (err) {
+        console.error('Failed to load categories', err);
+      }
+    }
+    loadCats();
+  }, []);
 
   const fetchProducts = useCallback(async (): Promise<void> => {
     // Abort any ongoing request before starting a new one
@@ -72,16 +101,18 @@ export default function Home() {
     try {
       const params = new URLSearchParams();
       if (searchTerm) params.append('q', searchTerm);
-      if (sortBy) params.append('sortBy', sortBy);
+      if (sortBy) params.append('sort', sortBy);
       if (filterByVendor && filterByVendor !== 'All')
-        params.append('filterByVendor', filterByVendor);
+        params.append('brand', filterByVendor);
+      if (filterByCategory && filterByCategory !== 'All')
+        params.append('category', filterByCategory);
       if (filterByType && filterByType !== 'All')
         params.append('filterByType', filterByType);
       if (inStock) params.append('inStock', 'true');
       if (minPrice) params.append('minPrice', minPrice);
       if (maxPrice) params.append('maxPrice', maxPrice);
       params.append('page', String(currentPage));
-      params.append('pageSize', String(pageSize));
+      params.append('perPage', String(pageSize));
 
       const queryString = params.toString();
       const response = await fetch(
@@ -93,13 +124,14 @@ export default function Home() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: { results: Product[]; totalPages: number; vendors: string[]; productTypes: string[]; } = await response.json();
+      const data: any = await response.json();
       setProducts(data.results);
-      setTotalPages(data.totalPages);
-
-      if (allVendors.length === 0 || allProductTypes.length === 0) {
-        setAllVendors(['All', ...data.vendors]);
-        setAllProductTypes(['All', ...data.productTypes]);
+      setTotalPages(data.totalPages || 1);
+      if (allVendors.length === 0 && Array.isArray(data.brands)) {
+        setAllVendors(['All', ...data.brands]);
+      }
+      if (allCategories.length === 0 && Array.isArray(data.categories)) {
+        setAllCategories(['All', ...data.categories]);
       }
     } catch (e: any) {
       // Check if the error is due to an aborted request
@@ -121,6 +153,7 @@ export default function Home() {
     searchTerm,
     sortBy,
     filterByVendor,
+    filterByCategory,
     filterByType,
     inStock,
     minPrice,
@@ -129,6 +162,7 @@ export default function Home() {
     pageSize,
     allVendors.length,
     allProductTypes.length,
+    allCategories.length,
   ]);
 
   useEffect(() => {
@@ -178,6 +212,14 @@ export default function Home() {
     activeFilters.push({
       label: filterByType,
       clear: () => handleTypeClick('All'),
+    });
+  if (filterByCategory !== 'All')
+    activeFilters.push({
+      label: filterByCategory,
+      clear: () => {
+        setFilterByCategory('All');
+        setCurrentPage(1);
+      },
     });
   if (inStock)
     activeFilters.push({
@@ -256,6 +298,32 @@ export default function Home() {
                   {allVendors.map((vendor) => (
                     <option key={vendor} value={vendor}>
                       {vendor}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {allCategories.length > 0 && (
+              <div>
+                <label
+                  htmlFor="filterCategory"
+                  className="block text-sm font-medium text-base-content mb-1"
+                >
+                  Filter by Category
+                </label>
+                <select
+                  id="filterCategory"
+                  className="select select-bordered w-full"
+                  value={filterByCategory}
+                  onChange={(e) => {
+                    setFilterByCategory(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  {allCategories.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
                     </option>
                   ))}
                 </select>
