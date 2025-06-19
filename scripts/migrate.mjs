@@ -43,6 +43,16 @@ db.exec(`CREATE TABLE IF NOT EXISTS categories (
   FOREIGN KEY(parent_id) REFERENCES categories(id)
 )`);
 
+// Ensure parent_id and image columns exist for older databases
+const catColumns = db.prepare('PRAGMA table_info(categories)').all();
+const catColumnNames = catColumns.map((c) => c.name);
+if (!catColumnNames.includes('parent_id')) {
+  db.exec('ALTER TABLE categories ADD COLUMN parent_id INTEGER');
+}
+if (!catColumnNames.includes('image')) {
+  db.exec('ALTER TABLE categories ADD COLUMN image TEXT');
+}
+
 // Seed base categories if none exist
 const existingCount = db.prepare('SELECT COUNT(*) as c FROM categories').get();
 if (existingCount.c === 0) {
