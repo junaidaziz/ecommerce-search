@@ -17,24 +17,24 @@ export default function ProductImageSlider({
   const [idx, setIdx] = useState(0);
   if (!images || images.length === 0) {
     return (
-      <Image
-        src={`https://source.unsplash.com/400x400/?product&sig=${placeholderSeed}`}
-        alt="Placeholder product"
-        width={400}
-        height={400}
-        className={imgClass}
-      />
+      <div className={`relative aspect-[4/5] ${className}`}>
+        <Image
+          src={`https://source.unsplash.com/400x400/?product&sig=${placeholderSeed}`}
+          alt="Placeholder product"
+          fill
+          className={`object-cover ${imgClass}`}
+        />
+      </div>
     );
   }
   const next = () => setIdx((i) => (i + 1) % images.length);
   const prev = () => setIdx((i) => (i - 1 + images.length) % images.length);
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative aspect-[4/5] ${className}`}>
       <Image
         src={images[idx]}
         alt={`Image ${idx + 1}`}
-        width={400}
-        height={400}
+        fill
         className={`object-cover ${imgClass}`}
       />
       {images.length > 1 && (
