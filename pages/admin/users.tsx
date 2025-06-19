@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function ManageUsers() {
@@ -6,15 +6,15 @@ export default function ManageUsers() {
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState('');
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     if (!user) return;
     const res = await fetch('/api/admin/users');
     if (res.ok) setUsers(await res.json());
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers, user]);
+  }, [fetchUsers]);
 
   const changeRole = async (email, role) => {
     const res = await fetch('/api/admin/users', {
