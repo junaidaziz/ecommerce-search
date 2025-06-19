@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import { NotificationContext } from '../../contexts/NotificationContext';
 
@@ -9,7 +9,7 @@ export default function VendorOrders() {
   const [error, setError] = useState(null);
   const { addNotification } = useContext(NotificationContext);
 
-  const fetchOrders = () => {
+  const fetchOrders = useCallback(() => {
     if (!user) return;
     setLoading(true);
     fetch(
@@ -22,11 +22,11 @@ export default function VendorOrders() {
       })
       .catch(() => setError('Failed to load orders'))
       .finally(() => setLoading(false));
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchOrders();
-  }, [fetchOrders, user]);
+  }, [fetchOrders]);
 
   const updateStatus = async (id, status) => {
     const res = await fetch(`/api/orders/${id}`, {

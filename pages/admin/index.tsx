@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
 
@@ -23,7 +23,7 @@ export default function Admin() {
   const [showModal, setShowModal] = useState(false);
   const [photos, setPhotos] = useState([]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     if (!user) return;
     const res = await fetch(
       `/api/admin/products?vendor=${encodeURIComponent(user.brandName || '')}`
@@ -31,11 +31,11 @@ export default function Admin() {
     if (res.ok) {
       setProducts(await res.json());
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts, user]);
+  }, [fetchProducts]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
