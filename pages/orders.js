@@ -4,12 +4,20 @@ import { AppContext } from '../contexts/AppContext';
 export default function Orders() {
   const { user } = useContext(AppContext);
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!user) return;
+    setLoading(true);
     fetch(`/api/orders?email=${encodeURIComponent(user.email)}`)
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => setOrders(data));
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data) => {
+        setOrders(data);
+        setError(null);
+      })
+      .catch(() => setError('Failed to load orders'))
+      .finally(() => setLoading(false));
   }, [user]);
 
   if (!user) {
@@ -19,6 +27,12 @@ export default function Orders() {
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Orders</h1>
+      {error && <div className="alert alert-error mb-2">{error}</div>}
+      {loading && (
+        <div className="flex justify-center my-4">
+          <span className="loading loading-spinner"></span>
+        </div>
+      )}
       <ul className="space-y-2">
         {orders.map((o) => (
           <li key={o.id} className="border p-2">
@@ -44,7 +58,7 @@ export default function Orders() {
             <p>Total: £{o.total}</p>
           </li>
         ))}
-        {orders.length === 0 && <li>No orders found.</li>}
+        {!loading && orders.length === 0 && <li>No orders found.</li>}
       </ul>
     </div>
   );

@@ -3,6 +3,7 @@ import '../styles/globals.css';
 import { AppProvider } from '../contexts/AppContext';
 import Header from '../components/Header';
 import { SessionProvider } from 'next-auth/react';
+import { NotificationProvider } from '../contexts/NotificationContext';
 
 export default function App({
   Component,
@@ -27,10 +28,12 @@ export default function App({
 
   return (
     <SessionProvider session={session}>
-      <AppProvider>
-        <Header />
-        <Component {...pageProps} theme={theme} setTheme={setTheme} />
-      </AppProvider>
+      <NotificationProvider>
+        <AppProvider>
+          <Header />
+          <Component {...pageProps} theme={theme} setTheme={setTheme} />
+        </AppProvider>
+      </NotificationProvider>
     </SessionProvider>
   );
 }

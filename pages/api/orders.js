@@ -11,6 +11,7 @@ import {
   clearCart,
 } from '../../lib/db.js';
 import { withRole } from '../../lib/withRole';
+import { sendOrderConfirmation } from '../../lib/email.js';
 
 async function handler(req, res) {
   if (req.method === 'POST') {
@@ -43,6 +44,7 @@ async function handler(req, res) {
       shipping_address: shippingAddress,
     });
     clearCart(email);
+    await sendOrderConfirmation(email, { id: orderId });
     return res.status(201).json({ message: 'order placed', id: orderId });
   }
 
