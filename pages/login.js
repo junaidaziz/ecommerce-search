@@ -13,6 +13,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -43,9 +44,12 @@ export default function Login() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
+      setLoading(true);
       await login(email, password);
     } catch (e) {
       setFormError('Invalid credentials');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -161,7 +165,12 @@ export default function Login() {
             <p className="text-red-500 text-sm">{errors.password}</p>
           )}
         </div>
-        <button className="btn btn-primary w-full" type="submit">
+        <button
+          className="btn btn-primary w-full"
+          type="submit"
+          disabled={loading}
+        >
+          {loading && <span className="loading loading-spinner mr-2"></span>}
           Login
         </button>
       </form>

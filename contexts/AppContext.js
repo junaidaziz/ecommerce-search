@@ -1,9 +1,10 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
 import {
   useSession,
   signIn as nextSignIn,
   signOut as nextSignOut,
 } from 'next-auth/react';
+import { NotificationContext } from './NotificationContext';
 
 export const AppContext = createContext();
 
@@ -12,6 +13,7 @@ export function AppProvider({ children }) {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const { addNotification } = useContext(NotificationContext);
 
   useEffect(() => {
     const stored = localStorage.getItem('app-cart');
@@ -73,7 +75,11 @@ export function AppProvider({ children }) {
       email,
       password,
     });
-    if (res?.error) throw new Error('Login failed');
+    if (res?.error) {
+      addNotification('Login failed', 'error');
+      throw new Error('Login failed');
+    }
+    addNotification('Logged in', 'success');
   };
 
   const signup = async (url, payload) => {
@@ -82,13 +88,18 @@ export function AppProvider({ children }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error('Signup failed');
+    if (!res.ok) {
+      addNotification('Signup failed', 'error');
+      throw new Error('Signup failed');
+    }
     const data = await res.json();
+    addNotification('Signup successful', 'success');
     return data;
   };
 
   const logout = () => {
     nextSignOut({ redirect: false });
+    addNotification('Logged out', 'info');
   };
 
   const placeOrder = async ({ shippingName, shippingAddress }) => {
@@ -109,9 +120,11 @@ export function AppProvider({ children }) {
     });
     if (!res.ok) {
       const data = await res.json().catch(() => null);
+      addNotification(data?.message || 'Order failed', 'error');
       throw new Error(data?.message || 'Order failed');
     }
     setCart([]);
+    addNotification('Order placed', 'success');
     return true;
   };
 
@@ -125,6 +138,7 @@ export function AppProvider({ children }) {
       }
       return [...prev, { ...product, qty: 1 }];
     });
+    addNotification('Added to cart', 'success');
   };
 
   const changeQty = (id, delta) => {
@@ -139,6 +153,7 @@ export function AppProvider({ children }) {
 
   const removeFromCart = (id) => {
     setCart((prev) => prev.filter((item) => item.ID !== id));
+    addNotification('Removed from cart', 'info');
   };
 
   const addToWishlist = (product) => {
@@ -146,10 +161,12 @@ export function AppProvider({ children }) {
       if (prev.find((p) => p.ID === product.ID)) return prev;
       return [...prev, product];
     });
+    addNotification('Added to wishlist', 'success');
   };
 
   const removeFromWishlist = (id) => {
     setWishlist((prev) => prev.filter((item) => item.ID !== id));
+    addNotification('Removed from wishlist', 'info');
   };
 
   return (
