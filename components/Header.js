@@ -86,6 +86,50 @@ export default function Header() {
         <Link href="/" className="btn btn-ghost normal-case text-xl">
           Home
         </Link>
+        <nav className="hidden md:flex">
+          <ul className="menu menu-horizontal gap-2">
+            <li className="dropdown dropdown-hover">
+              <span tabIndex={0} className="cursor-pointer">
+                Categories
+              </span>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                {categories.length > 0 ? (
+                  categories.map((cat) => (
+                    <li key={cat.name}>
+                      {cat.subcategories && cat.subcategories.length > 0 ? (
+                        <details>
+                          <summary>{cat.name}</summary>
+                          <ul>
+                            {cat.subcategories.map((sub) => (
+                              <li key={sub}>
+                                <Link
+                                  href={`/categories/${encodeURIComponent(
+                                    cat.name
+                                  )}?type=${encodeURIComponent(sub)}`}
+                                >
+                                  {sub}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </details>
+                      ) : (
+                        <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
+                          {cat.name}
+                        </Link>
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-gray-500 px-2 py-1">No categories</li>
+                )}
+              </ul>
+            </li>
+          </ul>
+        </nav>
         <form onSubmit={submitSearch} className="relative">
           <input
             className="input input-bordered w-40 md:w-64"
@@ -112,42 +156,6 @@ export default function Header() {
       </div>
       <nav className="hidden md:flex flex-none ml-auto">
         <ul className="menu menu-horizontal gap-2">
-          <li className="dropdown dropdown-hover">
-            <span tabIndex={0} className="cursor-pointer">
-              Categories
-            </span>
-            <ul
-              tabIndex={0}
-              className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
-            >
-              {categories.map((cat) => (
-                <li key={cat.name}>
-                  {cat.subcategories && cat.subcategories.length > 0 ? (
-                    <details>
-                      <summary>{cat.name}</summary>
-                      <ul>
-                        {cat.subcategories.map((sub) => (
-                          <li key={sub}>
-                            <Link
-                              href={`/categories/${encodeURIComponent(
-                                cat.name
-                              )}?type=${encodeURIComponent(sub)}`}
-                            >
-                              {sub}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
-                  ) : (
-                    <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
-                      {cat.name}
-                    </Link>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </li>
           <li>
             <div className="relative mr-2">
               <Link href="/cart" className="btn btn-ghost flex items-center gap-1">
@@ -265,12 +273,12 @@ export default function Header() {
                 )}
               </div>
             </li>
-            {categories.length > 0 && (
-              <li>
-                <details>
-                  <summary>Categories</summary>
-                  <ul>
-                    {categories.map((cat) => (
+            <li>
+              <details>
+                <summary>Categories</summary>
+                <ul>
+                  {categories.length > 0 ? (
+                    categories.map((cat) => (
                       <li key={cat.name}>
                         {cat.subcategories && cat.subcategories.length > 0 ? (
                           <details>
@@ -290,18 +298,18 @@ export default function Header() {
                             </ul>
                           </details>
                         ) : (
-                          <Link
-                            href={`/categories/${encodeURIComponent(cat.name)}`}
-                          >
+                          <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
                             {cat.name}
                           </Link>
                         )}
                       </li>
-                    ))}
-                  </ul>
-                </details>
-              </li>
-            )}
+                    ))
+                  ) : (
+                    <li className="text-gray-500 px-2 py-1">No categories</li>
+                  )}
+                </ul>
+              </details>
+            </li>
             {user ? (
               <>
                 {user.role === 'super-admin' ? (
