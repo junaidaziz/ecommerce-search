@@ -107,6 +107,9 @@ export default function Admin() {
         <Link href="/admin/approvals" className="btn btn-sm">
           Approvals
         </Link>
+        <Link href="/admin/analytics" className="btn btn-sm">
+          Analytics
+        </Link>
       </div>
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <button
