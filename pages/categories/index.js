@@ -4,7 +4,7 @@ import Link from 'next/link';
 export default function Categories() {
   const [categories, setCategories] = useState([]);
   useEffect(() => {
-    fetch('/api/category-tree')
+    fetch('/api/categories')
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setCategories(data));
   }, []);
