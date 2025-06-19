@@ -17,8 +17,11 @@ export default function Header({ theme = 'light', setTheme }) {
   const [categories, setCategories] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [activeIdx, setActiveIdx] = useState(-1);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [trendingKeywords, setTrendingKeywords] = useState<string[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
   const searchRef = useRef(null);
   const iconMap = {
     Electronics: (
@@ -71,6 +74,32 @@ export default function Header({ theme = 'light', setTheme }) {
   }, []);
 
   useEffect(() => {
+    const stored = localStorage.getItem('recentSearches');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setRecentSearches(parsed.slice(0, 5));
+        }
+      } catch {
+        // ignore
+      }
+    }
+    async function loadTrending() {
+      try {
+        const res = await fetch('/api/trending');
+        if (res.ok) {
+          const data = await res.json();
+          setTrendingKeywords(data.keywords || []);
+        }
+      } catch {
+        // ignore
+      }
+    }
+    loadTrending();
+  }, []);
+
+  useEffect(() => {
     function handleKey(e) {
       if (e.key === 'Escape') setMenuOpen(false);
     }
@@ -81,6 +110,7 @@ export default function Header({ theme = 'light', setTheme }) {
         !(e.target.closest && e.target.closest('#mega-menu'))
       ) {
         setMenuOpen(false);
+        setShowHistory(false);
       }
     }
     document.addEventListener('keydown', handleKey);
@@ -101,12 +131,12 @@ export default function Header({ theme = 'light', setTheme }) {
     const t = setTimeout(async () => {
       try {
         const res = await fetch(
-          `/api/search?q=${encodeURIComponent(search)}&perPage=5`,
+          `/api/suggest?q=${encodeURIComponent(search)}`,
           { signal: controller.signal }
         );
         if (res.ok) {
           const data = await res.json();
-          setSuggestions(data.results || []);
+          setSuggestions(data.suggestions || []);
           setActiveIdx(-1);
         }
       } catch (_) {
@@ -118,18 +148,51 @@ export default function Header({ theme = 'light', setTheme }) {
       controller.abort();
     };
   }, [search]);
+
+  useEffect(() => {
+    if (search.trim()) {
+      setShowHistory(false);
+    }
+  }, [search]);
+
+  const storeSearch = (term: string) => {
+    const stored = localStorage.getItem('recentSearches');
+    let arr: string[] = [];
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) arr = parsed;
+      } catch {
+        // ignore parse errors
+      }
+    }
+    const updated = [term, ...arr.filter((t) => t !== term)].slice(0, 5);
+    localStorage.setItem('recentSearches', JSON.stringify(updated));
+    setRecentSearches(updated);
+  };
+
+  const runSearch = (term: string) => {
+    router.push(`/?q=${encodeURIComponent(term)}`);
+    storeSearch(term);
+    setSuggestions([]);
+    setShowHistory(false);
+  };
+
+  const chooseTerm = (term: string) => {
+    setSearch(term);
+    runSearch(term);
+  };
   const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
   const submitSearch = (e) => {
     e.preventDefault();
     if (!search.trim()) return;
-    router.push(`/?q=${encodeURIComponent(search)}`);
-    setSuggestions([]);
+    runSearch(search.trim());
   };
 
-  const selectSuggestion = (p) => {
-    router.push(`/products/${p.ID}`);
+  const selectSuggestion = (text) => {
+    router.push(`/?q=${encodeURIComponent(text)}`);
     setSuggestions([]);
-    setSearch('');
+    setSearch(text);
   };
 
   const renderCat = (cat) => (
@@ -265,9 +328,10 @@ export default function Header({ theme = 'light', setTheme }) {
               }}
               placeholder="Search for products, brands..."
               role="combobox"
-              aria-expanded={suggestions.length > 0}
+              aria-expanded={suggestions.length > 0 || showHistory}
               aria-haspopup="listbox"
               aria-controls="search-suggestions"
+              onFocus={() => setShowHistory(true)}
             />
             <svg
               className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
@@ -290,7 +354,7 @@ export default function Header({ theme = 'light', setTheme }) {
                 className="absolute z-10 bg-white shadow rounded mt-1 w-full max-h-60 overflow-auto"
               >
                 {suggestions.map((s, idx) => (
-                  <li key={s.ID}>
+                  <li key={s}>
                     <button
                       type="button"
                       role="option"
@@ -299,10 +363,54 @@ export default function Header({ theme = 'light', setTheme }) {
                       onMouseEnter={() => setActiveIdx(idx)}
                       onClick={() => selectSuggestion(s)}
                     >
-                      {s.TITLE}
+                      {s}
                     </button>
                   </li>
                 ))}
+              </ul>
+            )}
+            {showHistory && suggestions.length === 0 && (
+              <ul
+                id="search-suggestions"
+                role="listbox"
+                className="absolute z-10 bg-white shadow rounded mt-1 w-full max-h-60 overflow-auto"
+              >
+                {recentSearches.length > 0 && (
+                  <>
+                    <li className="px-2 py-1 text-xs text-gray-500">
+                      Recent Searches
+                    </li>
+                    {recentSearches.map((term) => (
+                      <li key={`recent-${term}`}>
+                        <button
+                          type="button"
+                          className="block w-full text-left px-2 py-1 hover:bg-base-200"
+                          onClick={() => chooseTerm(term)}
+                        >
+                          {term}
+                        </button>
+                      </li>
+                    ))}
+                  </>
+                )}
+                {trendingKeywords.length > 0 && (
+                  <>
+                    <li className="px-2 py-1 text-xs text-gray-500">
+                      Trending
+                    </li>
+                    {trendingKeywords.map((term) => (
+                      <li key={`trend-${term}`}>
+                        <button
+                          type="button"
+                          className="block w-full text-left px-2 py-1 hover:bg-base-200"
+                          onClick={() => chooseTerm(term)}
+                        >
+                          {term}
+                        </button>
+                      </li>
+                    ))}
+                  </>
+                )}
               </ul>
             )}
           </form>

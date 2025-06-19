@@ -1,8 +1,9 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
 import ProductImageSlider from '../../components/ProductImageSlider';
+import RecommendedProducts from '../../components/RecommendedProducts';
 import { getProductBySlug, getReviewsForProduct, getAverageRating } from '../../lib/db';
 import { mapDbRowToProduct } from '../../lib/products';
 
@@ -32,6 +33,16 @@ export default function ProductDetail({ product, initialReviews, initialAverage,
   const [myRating, setMyRating] = useState(5);
   const [comment, setComment] = useState('');
   const id = product.ID;
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('browse-history') || '[]');
+      const updated = [id, ...stored.filter((v: string) => v !== id)];
+      localStorage.setItem('browse-history', JSON.stringify(updated.slice(0, 20)));
+    } catch {
+      // ignore
+    }
+  }, [id]);
 
   return (
     <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md">
@@ -109,6 +120,7 @@ export default function ProductDetail({ product, initialReviews, initialAverage,
           </form>
         )}
       </div>
+      <RecommendedProducts category={product.CATEGORY} excludeId={product.ID} />
       <div className="mt-4">
         <Link href="/">&larr; Back to products</Link>
       </div>
