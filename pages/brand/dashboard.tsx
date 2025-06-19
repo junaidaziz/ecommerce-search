@@ -109,7 +109,7 @@ export default function BrandDashboard() {
   }
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
+    <div className="w-full p-4 sm:p-6 lg:p-8">
       <h1 className="text-2xl font-bold mb-4">Brand Dashboard</h1>
       {lowStock.length > 0 && (
         <div className="alert alert-warning mb-4">
