@@ -1,5 +1,5 @@
 import {
-  getCategories,
+  getCategoriesFlat,
   createCategory,
   renameCategory,
   removeCategory,
@@ -9,27 +9,34 @@ import { logAudit } from '../../../lib/audit';
 
 function handler(req, res) {
   if (req.method === 'GET') {
-    return res.status(200).json(getCategories());
+    return res.status(200).json(getCategoriesFlat());
   }
   if (req.method === 'POST') {
-    const { name } = req.body || {};
+    const { name, parentId } = req.body || {};
     if (!name) return res.status(400).json({ message: 'name required' });
-    const exists = getCategories().find(
+    const exists = getCategoriesFlat().find(
       (c) => c.name.toLowerCase() === name.toLowerCase()
     );
     if (exists) {
       return res.status(409).json({ message: 'category exists' });
     }
-    createCategory(name);
-    logAudit('create_category', { name });
+    try {
+      createCategory(name, parentId || null);
+    } catch (e) {
+      if (e.message === 'depth') {
+        return res.status(400).json({ message: 'max depth exceeded' });
+      }
+      throw e;
+    }
+    logAudit('create_category', { name, parentId });
     return res.status(201).json({ message: 'category created' });
   }
   if (req.method === 'PUT') {
-    const { id, name } = req.body || {};
+    const { id, name, parentId } = req.body || {};
     if (!id || !name)
       return res.status(400).json({ message: 'id and name required' });
-    renameCategory(id, name);
-    logAudit('rename_category', { id, name });
+    renameCategory(id, name, parentId || null);
+    logAudit('rename_category', { id, name, parentId });
     return res.status(200).json({ message: 'category updated' });
   }
   if (req.method === 'DELETE') {
@@ -50,6 +57,5 @@ function handler(req, res) {
   }
   return res.status(405).json({ message: 'Method Not Allowed' });
 }
-
 
 export default withRole(['SUPER_ADMIN'])(handler);
