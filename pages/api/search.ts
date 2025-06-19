@@ -1,21 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import Typesense from 'typesense';
 import { getBestSellingProducts } from '../../lib/orders';
 import { prisma } from '../../lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
-
-const client = new Typesense.Client({
-  nodes: [
-    {
-      host: process.env.TYPESENSE_HOST || 'localhost',
-      port: Number(process.env.TYPESENSE_PORT || 8108),
-      protocol: process.env.TYPESENSE_PROTOCOL || 'http',
-    },
-  ],
-  apiKey: process.env.TYPESENSE_API_KEY || '',
-  connectionTimeoutSeconds: 5,
-});
+import client from '../../lib/typesenseClient';
 
 function buildSort(sort?: string) {
   switch (sort) {

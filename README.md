@@ -55,6 +55,29 @@ NEXTAUTH_SECRET=random-secret
 npm run migrate
 ```
 
+5. **Run Typesense**
+
+```bash
+docker run -d \
+  -p 8108:8108 \
+  -v/tmp/typesense-data:/data \
+  typesense/typesense:0.25.1 \
+  --data-dir /data \
+  --api-key=xyz \
+  --enable-cors
+```
+
+Ensure `.env` contains:
+
+```env
+TYPESENSE_HOST=localhost
+TYPESENSE_PORT=8108
+TYPESENSE_PROTOCOL=http
+TYPESENSE_API_KEY=xyz
+```
+
+Visit [http://localhost:8108/health](http://localhost:8108/health) to verify the server is running.
+
 6. **Place your product data**
 
 Either put your `products.csv` inside the `/data/` directory **or** specify a
