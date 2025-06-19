@@ -1,5 +1,5 @@
-import { getProductById, getAverageRating } from '../../../lib/db.js';
-import { mapDbRowToProduct } from '../../../lib/products.js';
+import { getProductById, getAverageRating } from '../../../lib/db';
+import { mapDbRowToProduct } from '../../../lib/products';
 
 export default async function handler(req, res) {
   const { id } = req.query;
