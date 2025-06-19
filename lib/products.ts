@@ -17,7 +17,7 @@ import {
   getCategoryByName,
   getCategoryById,
   countProductsForCategory,
-} from './db.js';
+} from './db';
 
 let products = [];
 let productIndex = null;

@@ -3,7 +3,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import { findUser, addUser } from '../../../lib/users.js';
+import { findUser, addUser } from '../../../lib/users';
 
 if (!process.env.NEXTAUTH_SECRET) {
   console.error('NEXTAUTH_SECRET environment variable is not set');
