@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
 import { AppContext } from '../contexts/AppContext';
+import ProductImageSlider from '../components/ProductImageSlider';
 
 export default function Home({ theme, setTheme }) {
   const router = useRouter();
@@ -424,25 +425,15 @@ export default function Home({ theme, setTheme }) {
                   className="card bg-base-100 border border-gray-200 shadow-md transform hover:shadow-xl hover:scale-105 transition duration-200 ease-in-out"
                 >
                   <Link href={`/products/${product.ID}`}>
-                    <div className="w-full h-40 bg-gray-200 flex items-center justify-center overflow-hidden">
-                      {product.FEATURED_IMAGE?.url ? (
-                        <img
-                          src={product.FEATURED_IMAGE.url}
-                          alt={product.TITLE || 'Product Image'}
-                          className="object-cover w-full h-full"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = `https://placehold.co/400x300/e0e0e0/555555?text=No+Image`;
-                          }}
-                        />
-                      ) : (
-                        <img
-                          src={`https://placehold.co/400x300/e0e0e0/555555?text=No+Image`}
-                          alt="No Image Available"
-                          className="object-cover w-full h-full"
-                        />
-                      )}
-                    </div>
+                    <ProductImageSlider
+                      images={
+                        product.IMAGES && product.IMAGES.length > 0
+                          ? product.IMAGES
+                          : [product.FEATURED_IMAGE?.url]
+                      }
+                      className="w-full h-40 bg-gray-200 overflow-hidden flex items-center justify-center"
+                      imgClass="w-full h-full"
+                    />
                   </Link>
 
                   <div className="card-body flex flex-col gap-1">

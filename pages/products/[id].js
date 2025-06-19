@@ -3,6 +3,7 @@ import { useEffect, useState, useContext } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
 import Head from 'next/head';
+import ProductImageSlider from '../../components/ProductImageSlider';
 
 export default function ProductDetail() {
   const router = useRouter();
@@ -11,7 +12,6 @@ export default function ProductDetail() {
     useContext(AppContext);
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
-  const [currentImage, setCurrentImage] = useState(0);
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
@@ -75,40 +75,14 @@ export default function ProductDetail() {
       </Head>
       <h1 className="text-2xl font-bold mb-4">{product.TITLE}</h1>
       <div className="mb-4 w-full flex flex-col items-center">
-        <div className="relative">
-          <img
-            src={
-              product.IMAGES?.[currentImage] ||
-              product.FEATURED_IMAGE?.url ||
-              'https://placehold.co/600x400?text=No+Image'
-            }
-            alt={product.TITLE}
-            className="object-cover max-h-96 hover:scale-110 transition"
-          />
-        </div>
-        {product.IMAGES && product.IMAGES.length > 1 && (
-          <div className="flex gap-2 mt-2">
-            <button
-              className="btn btn-xs"
-              onClick={() =>
-                setCurrentImage(
-                  (currentImage - 1 + product.IMAGES.length) %
-                    product.IMAGES.length
-                )
-              }
-            >
-              Prev
-            </button>
-            <button
-              className="btn btn-xs"
-              onClick={() =>
-                setCurrentImage((currentImage + 1) % product.IMAGES.length)
-              }
-            >
-              Next
-            </button>
-          </div>
-        )}
+        <ProductImageSlider
+          images={
+            product.IMAGES && product.IMAGES.length > 0
+              ? product.IMAGES
+              : [product.FEATURED_IMAGE?.url]
+          }
+          imgClass="max-h-96 hover:scale-110 transition w-full"
+        />
       </div>
       <p className="mb-2">Vendor: {product.VENDOR}</p>
       <p className="mb-2">Type: {product.PRODUCT_TYPE}</p>

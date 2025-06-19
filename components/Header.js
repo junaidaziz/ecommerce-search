@@ -195,8 +195,12 @@ export default function Header() {
                             href={`/categories/${encodeURIComponent(cat.name)}`}
                             className="flex items-center font-semibold mb-1 hover:text-indigo-600"
                           >
-                            {iconMap[cat.name] || null}
-                            {cat.name}
+                          {cat.image ? (
+                            <img src={cat.image} alt="" className="w-4 h-4 mr-1 object-cover" />
+                          ) : (
+                            iconMap[cat.name] || null
+                          )}
+                          {cat.name}
                           </Link>
                           {cat.subcategories &&
                             cat.subcategories.length > 0 && (
@@ -437,7 +441,11 @@ export default function Header() {
                     categories.map((cat) => (
                       <li key={cat.name}>
                         <div className="flex items-center gap-1">
-                          {iconMap[cat.name] || null}
+                          {cat.image ? (
+                            <img src={cat.image} alt="" className="w-4 h-4 object-cover" />
+                          ) : (
+                            iconMap[cat.name] || null
+                          )}
                           <Link
                             href={`/categories/${encodeURIComponent(cat.name)}`}
                           >

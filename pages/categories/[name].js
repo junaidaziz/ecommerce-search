@@ -10,6 +10,7 @@ export default function CategoryPage() {
   const { addToCart } = useContext(AppContext);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [catImage, setCatImage] = useState('');
 
   useEffect(() => {
     if (!name) return;
@@ -25,7 +26,16 @@ export default function CategoryPage() {
       }
       setLoading(false);
     }
+    async function loadCat() {
+      const res = await fetch('/api/categories');
+      if (res.ok) {
+        const cats = await res.json();
+        const found = cats.find((c) => c.name.toLowerCase() === name.toLowerCase());
+        if (found && found.image) setCatImage(found.image);
+      }
+    }
     load();
+    loadCat();
   }, [name, type]);
 
   if (!name) return <div className="p-4">Loading...</div>;
@@ -46,9 +56,12 @@ export default function CategoryPage() {
           }}
         />
       </Head>
-      <h1 className="text-2xl font-bold mb-4">
-        Category: {name}
-        {type && ` - ${type}`}
+      <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
+        {catImage && <img src={catImage} alt="" className="w-8 h-8 object-cover" />}
+        <span>
+          Category: {name}
+          {type && ` - ${type}`}
+        </span>
       </h1>
       {loading && <div>Loading...</div>}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
