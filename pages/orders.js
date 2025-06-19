@@ -25,6 +25,12 @@ export default function Orders() {
             <p>
               Order #{o.id} - {o.status}
             </p>
+            {o.shipping_name && (
+              <p className="text-sm">Ship To: {o.shipping_name}</p>
+            )}
+            {o.shipping_address && (
+              <p className="text-sm">Address: {o.shipping_address}</p>
+            )}
             {(user.role === 'super-admin' || user.role === 'brand') && (
               <p className="text-sm text-gray-600">Customer: {o.user_email}</p>
             )}
