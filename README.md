@@ -1,6 +1,6 @@
 # 🛍️ Product Search App (Next.js + FlexSearch)
 
-A fast, scalable product search web app built with **Next.js** and **FlexSearch**. Product information is stored in a lightweight **SQLite** database and indexed for fast searching.
+A fast, scalable product search web app built with **Next.js** and **FlexSearch**. Product data is stored in **PostgreSQL** using **Prisma** and indexed for fast searching.
 
 ---
 
@@ -8,7 +8,7 @@ A fast, scalable product search web app built with **Next.js** and **FlexSearch*
 
 - Full-text search on product fields (title, vendor, tags, etc.)
 - Extremely fast indexing via **FlexSearch.Document**
-- Manage products via a simple admin panel with a SQLite backend
+- Manage products via a simple admin panel with a PostgreSQL backend using Prisma
 - Public search API: `/api/search?q=...`
 - Optional `SKIP_INDEX_BUILD` flag to avoid rebuilding during deployment
 - Fully deployable on **Vercel** with CI/CD
