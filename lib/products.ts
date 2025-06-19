@@ -4,7 +4,6 @@ const { Document } = FlexSearch;
 import path from 'path';
 import fs from 'fs';
 import {
-  getAllFromDb,
   addProduct as dbAddProduct,
   updateProduct as dbUpdateProduct,
   deleteProduct as dbDeleteProduct,
@@ -18,6 +17,7 @@ import {
   getCategoryById,
   countProductsForCategory,
 } from './db';
+import { prisma } from './prisma';
 
 let products = [];
 let productIndex = null;
@@ -91,31 +91,40 @@ function processProductRow(row) {
 }
 
 async function loadProductsData() {
-  const rows = getAllFromDb('approved');
-  return rows.map((row) =>
-    processProductRow({
-      ID: row.id,
-      SLUG: row.slug,
-      TITLE: row.title,
-      VENDOR: row.vendor,
-      DESCRIPTION: row.description,
-      PRODUCT_TYPE: row.product_type,
-      TAGS: row.tags,
-      CATEGORY: row.category,
-      IMAGES: row.images ? JSON.parse(row.images) : [],
-      TOTAL_INVENTORY: row.quantity,
-      PRICE_RANGE_V2: {
-        min_variant_price: {
-          amount: row.min_price,
-          currency_code: row.currency,
+  try {
+    const rows = await prisma.product.findMany({
+      where: { status: 'approved' },
+      include: { category: true, vendor: true },
+    });
+
+    return rows.map((row) =>
+      processProductRow({
+        ID: row.id,
+        SLUG: row.slug,
+        TITLE: row.title,
+        VENDOR: row.vendor?.brandName ?? String(row.vendorId),
+        DESCRIPTION: row.description,
+        PRODUCT_TYPE: row.productType,
+        TAGS: row.tags,
+        CATEGORY: row.category?.name,
+        IMAGES: row.images ? JSON.parse(row.images) : [],
+        TOTAL_INVENTORY: row.quantity,
+        PRICE_RANGE_V2: {
+          min_variant_price: {
+            amount: row.minPrice,
+            currency_code: row.currency,
+          },
+          max_variant_price: {
+            amount: row.maxPrice,
+            currency_code: row.currency,
+          },
         },
-        max_variant_price: {
-          amount: row.max_price,
-          currency_code: row.currency,
-        },
-      },
-    })
-  );
+      })
+    );
+  } catch (error) {
+    console.error('Failed to load products from database:', error);
+    throw error;
+  }
 }
 
 export function mapDbRowToProduct(row) {
@@ -330,12 +339,13 @@ export async function getCategoryTree() {
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  const rows = getAllFromDb();
-  const map = {};
+  const rows = await prisma.product.findMany({ include: { category: true } });
+  const map = {} as Record<string, Set<string>>;
   for (const row of rows) {
-    if (!row.category) continue;
-    if (!map[row.category]) map[row.category] = new Set();
-    if (row.product_type) map[row.category].add(row.product_type);
+    const categoryName = row.category?.name;
+    if (!categoryName) continue;
+    if (!map[categoryName]) map[categoryName] = new Set();
+    if (row.productType) map[categoryName].add(row.productType);
   }
   return Object.entries(map)
     .map(([name, set]) => ({ name, subcategories: Array.from(set).sort() }))
