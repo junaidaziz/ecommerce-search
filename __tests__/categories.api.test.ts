@@ -7,7 +7,7 @@ jest.mock('../lib/products', () => ({
 
 test('returns categories with subcategories', async () => {
   const data = [{ name: 'Electronics', subcategories: ['Phones'] }];
-  getCategoryTree.mockReturnValue(data);
+  getCategoryTree.mockResolvedValue(data);
   const json = jest.fn();
   const status = jest.fn(() => ({ json }));
   const req = { method: 'GET' };
