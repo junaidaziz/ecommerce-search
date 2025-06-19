@@ -3,13 +3,11 @@ import React, {
   useEffect,
   useCallback,
   useRef,
-  useContext,
 } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
-import { AppContext } from '../contexts/AppContext';
-import ProductImageSlider from '../components/ProductImageSlider';
+import ProductCard from '../components/ProductCard';
 import Hero from '../components/Hero';
 import { Product } from '../types/product';
 import RecommendedProducts from '../components/RecommendedProducts';
@@ -20,8 +18,6 @@ interface SearchResult extends Product {
 
 export default function Home() {
   const router = useRouter();
-  const { addToCart, addToWishlist, removeFromWishlist, wishlist } =
-    useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [products, setProducts] = useState<SearchResult[]>([]);
   const [fallbackProducts, setFallbackProducts] = useState<Product[]>([]);
@@ -504,95 +500,7 @@ export default function Home() {
                     <h3 className="font-semibold mb-2">Popular Products</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-4">
                       {fallbackProducts.map((product) => (
-                        <div
-                          key={product.ID}
-                          className="card bg-base-100 border border-base-300 rounded-xl shadow hover:shadow-lg transition-all duration-200"
-                        >
-                          <Link href={`/product/${product.SLUG}`}>
-                            <ProductImageSlider
-                              images={
-                                product.IMAGES && product.IMAGES.length > 0
-                                  ? product.IMAGES
-                                  : product.FEATURED_IMAGE?.url
-                                    ? [product.FEATURED_IMAGE.url]
-                                    : []
-                              }
-                              placeholderSeed={Number(product.ID)}
-                              className="w-full h-40 bg-gray-200 overflow-hidden flex items-center justify-center"
-                              imgClass="w-full h-full"
-                            />
-                          </Link>
-
-                          <div className="card-body flex flex-col gap-1">
-                            <Link
-                              href={`/product/${product.SLUG}`}
-                              className="hover:underline transition-colors duration-200"
-                            >
-                              <h2
-                                className="text-lg font-semibold text-base-content line-clamp-2"
-                                title={product.TITLE}
-                              >
-                                {product.TITLE || 'Untitled Product'}
-                              </h2>
-                            </Link>
-                            <div className="flex flex-wrap gap-1 text-xs text-base-content">
-                              {product.VENDOR && (
-                                <span className="badge badge-ghost">
-                                  {product.VENDOR}
-                                </span>
-                              )}
-                              {product.PRODUCT_TYPE && (
-                                <span className="badge badge-ghost">
-                                  {product.PRODUCT_TYPE}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-md font-bold text-base-content">
-                              {product.CURRENCY} {product.MIN_PRICE.toFixed(2)}
-                              {product.MAX_PRICE > product.MIN_PRICE &&
-                                ` - ${product.MAX_PRICE.toFixed(2)}`}
-                            </p>
-                            <p className="text-sm text-base-content line-clamp-2">
-                              {product.DESCRIPTION_TEXT ||
-                                product.BODY_HTML_TEXT ||
-                                'No description available.'}
-                            </p>
-                            <div className="mt-auto flex justify-between items-center text-sm text-base-content">
-                              {product.SOLD_COUNT > 0 && (
-                                <span>Sold: {product.SOLD_COUNT}</span>
-                              )}
-                              {product.REVIEW_COUNT > 0 && (
-                                <span>
-                                  Reviews: {product.REVIEW_COUNT} (
-                                  {product.AVERAGE_RATING.toFixed(1)} avg)
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex gap-2 mt-2">
-                              <button
-                                className="btn btn-sm btn-primary transition-all duration-200"
-                                onClick={() => addToCart(product)}
-                              >
-                                Add to Cart
-                              </button>
-                              {wishlist.some((w) => w.ID === product.ID) ? (
-                                <button
-                                  className="btn btn-sm transition-all duration-200"
-                                  onClick={() => removeFromWishlist(product.ID)}
-                                >
-                                  Remove Wishlist
-                                </button>
-                              ) : (
-                                <button
-                                  className="btn btn-sm transition-all duration-200"
-                                  onClick={() => addToWishlist(product)}
-                                >
-                                  Add Wishlist
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
+                        <ProductCard key={product.ID} product={product} />
                       ))}
                     </div>
                   </>
@@ -602,112 +510,12 @@ export default function Home() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {products.map((product) => (
-                <div
+                <ProductCard
                   key={product.ID}
-                  className="card bg-base-100 border border-base-300 rounded-xl shadow hover:shadow-lg transition-all duration-200"
-                >
-                  <Link href={`/product/${product.SLUG}`}>
-                    <ProductImageSlider
-                      images={
-                        product.IMAGES && product.IMAGES.length > 0
-                          ? product.IMAGES
-                          : product.FEATURED_IMAGE?.url
-                            ? [product.FEATURED_IMAGE.url]
-                            : []
-                      }
-                      placeholderSeed={Number(product.ID)}
-                      className="w-full h-40 bg-gray-200 overflow-hidden flex items-center justify-center"
-                      imgClass="w-full h-full"
-                    />
-                  </Link>
-
-                  <div className="card-body flex flex-col gap-1">
-                    {(() => {
-                      const titleHighlight = product.highlights?.find(
-                        (h) => h.field === 'title'
-                      )?.snippet;
-                      const descHighlight = product.highlights?.find(
-                        (h) => h.field === 'description'
-                      )?.snippet;
-                      return (
-                        <>
-                          <Link
-                            href={`/product/${product.SLUG}`}
-                            className="hover:underline transition-colors duration-200"
-                          >
-                            <h2
-                              className="text-lg font-semibold text-base-content line-clamp-2"
-                              title={product.TITLE}
-                            >
-                              <span
-                                dangerouslySetInnerHTML={{
-                                  __html: titleHighlight || product.TITLE || 'Untitled Product',
-                                }}
-                              />
-                            </h2>
-                          </Link>
-                          <div className="flex flex-wrap gap-1 text-xs text-base-content">
-                            {product.VENDOR && (
-                              <span className="badge badge-ghost">{product.VENDOR}</span>
-                            )}
-                            {product.PRODUCT_TYPE && (
-                              <span className="badge badge-ghost">{product.PRODUCT_TYPE}</span>
-                            )}
-                          </div>
-                          <p className="text-md font-bold text-base-content">
-                            {product.CURRENCY} {product.MIN_PRICE.toFixed(2)}
-                            {product.MAX_PRICE > product.MIN_PRICE && ` - ${product.MAX_PRICE.toFixed(2)}`}
-                          </p>
-                          <p className="text-sm text-base-content line-clamp-2">
-                            <span
-                              dangerouslySetInnerHTML={{
-                                __html:
-                                  descHighlight ||
-                                  product.DESCRIPTION_TEXT ||
-                                  product.BODY_HTML_TEXT ||
-                                  'No description available.',
-                              }}
-                            />
-                          </p>
-                        </>
-                      );
-                    })()}
-                    <div className="mt-auto flex justify-between items-center text-sm text-base-content">
-                      {product.SOLD_COUNT > 0 && (
-                        <span>Sold: {product.SOLD_COUNT}</span>
-                      )}
-                      {product.REVIEW_COUNT > 0 && (
-                        <span>
-                          Reviews: {product.REVIEW_COUNT} (
-                          {product.AVERAGE_RATING.toFixed(1)} avg)
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        className="btn btn-sm btn-primary transition-all duration-200"
-                        onClick={() => addToCart(product)}
-                      >
-                        Add to Cart
-                      </button>
-                      {wishlist.some((w) => w.ID === product.ID) ? (
-                        <button
-                          className="btn btn-sm transition-all duration-200"
-                          onClick={() => removeFromWishlist(product.ID)}
-                        >
-                          Remove Wishlist
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-sm transition-all duration-200"
-                          onClick={() => addToWishlist(product)}
-                        >
-                          Add Wishlist
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  product={product}
+                  highlightTitle={product.highlights?.find((h) => h.field === 'title')?.snippet}
+                  highlightDescription={product.highlights?.find((h) => h.field === 'description')?.snippet}
+                />
               ))}
             </div>
 
