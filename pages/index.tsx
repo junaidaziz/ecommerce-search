@@ -31,6 +31,7 @@ export default function Home() {
   const [inStock, setInStock] = useState(false);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -298,10 +299,18 @@ export default function Home() {
           </div>
         )}
         <div className="md:flex">
-          <form
-            onSubmit={handleSearch}
-            className="md:w-60 md:mr-8 mb-8 flex flex-col gap-4"
-          >
+          <div className="md:w-60 md:mr-8 mb-8">
+            <button
+              type="button"
+              className="btn btn-outline w-full mb-4 md:hidden"
+              onClick={() => setFiltersOpen((o) => !o)}
+            >
+              {filtersOpen ? 'Hide Filters' : 'Show Filters'}
+            </button>
+            <form
+              onSubmit={handleSearch}
+              className={`flex flex-col gap-4 ${filtersOpen ? '' : 'hidden'} md:flex`}
+            >
             {allVendors.length > 0 && (
               <div>
                 <label
@@ -466,6 +475,7 @@ export default function Home() {
               </button>
             </div>
           </form>
+          </div>
           <div className="flex-1">
             {activeFilters.length > 0 && (
               <div className="mb-4 flex flex-wrap gap-2">
