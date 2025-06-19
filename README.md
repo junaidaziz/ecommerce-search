@@ -34,7 +34,11 @@ npm install
 
 This will also install **DaisyUI**, a Tailwind CSS component library used throughout the app, and run `prisma generate` to build the Prisma client.
 
-3. **Create `.env.local`**
+3. **Configure environment variables**
+
+`npm install` will copy `.env.example` to `.env` if it does not exist. Edit this file and set `DATABASE_URL` to point to your local PostgreSQL instance.
+
+Next.js runtime variables go in `.env.local`:
 
 ```env
 SKIP_INDEX_BUILD=false

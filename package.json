@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "test": "jest",
     "type-check": "tsc --noEmit",
-    "postinstall": "prisma generate"
+    "setup-env": "node scripts/setupEnv.js",
+    "postinstall": "npm run setup-env && prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
