@@ -12,7 +12,7 @@
     "test": "jest",
     "type-check": "tsc --noEmit",
     "setup-env": "node scripts/setupEnv.js",
-    "postinstall": "npm run setup-env && prisma generate"
+    "postinstall": "node scripts/setupEnv.js && prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",

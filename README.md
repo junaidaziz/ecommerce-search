@@ -32,7 +32,9 @@ cd product-search-app
 npm install
 ```
 
-This will also install **DaisyUI**, a Tailwind CSS component library used throughout the app, and run `prisma generate` to build the Prisma client.
+This will also install **DaisyUI**, load your `.env` file and run `prisma generate` to build the Prisma client.
+
+During postinstall your environment variables are read automatically so the database and Prisma client are ready without additional steps.
 
 3. **Configure environment variables**
 
