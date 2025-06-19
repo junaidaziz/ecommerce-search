@@ -67,6 +67,19 @@ export default function Header() {
     setSuggestions([]);
     setSearch('');
   };
+
+  const renderCat = (cat) => (
+    <li key={cat.id} className={cat.parentId ? 'ml-4' : ''}>
+      <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
+        {cat.name}
+      </Link>
+      {cat.children && cat.children.length > 0 && (
+        <ul className="ml-4">
+          {cat.children.map((child) => renderCat(child))}
+        </ul>
+      )}
+    </li>
+  );
   return (
     <header className="navbar bg-base-300 mb-6">
       <div className="flex-1 flex items-center gap-2">
@@ -106,13 +119,7 @@ export default function Header() {
             tabIndex={0}
             className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
           >
-            {categories.map((cat) => (
-              <li key={cat}>
-                <Link href={`/categories/${encodeURIComponent(cat)}`}>
-                  {cat}
-                </Link>
-              </li>
-            ))}
+            {categories.map((cat) => renderCat(cat))}
           </ul>
         </div>
         <div className="relative mr-2">
@@ -221,22 +228,16 @@ export default function Header() {
               <li>
                 <details>
                   <summary>Categories</summary>
-                  <ul>
-                    {categories.map((cat) => (
-                      <li key={cat}>
-                        <Link href={`/categories/${encodeURIComponent(cat)}`}>
-                          {cat}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+                  <ul>{categories.map((cat) => renderCat(cat))}</ul>
                 </details>
               </li>
             )}
             {user ? (
               <>
                 {user.role === 'super-admin' ? (
-                  <li><Link href="/admin">Admin</Link></li>
+                  <li>
+                    <Link href="/admin">Admin</Link>
+                  </li>
                 ) : (
                   <li>
                     <Link href="/user/orders">Orders</Link>

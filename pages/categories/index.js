@@ -13,13 +13,24 @@ export default function Categories() {
     <div className="p-4 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Categories</h1>
       <ul className="list-disc pl-4 space-y-1">
-        {categories.map((c) => (
-          <li key={c}>
-            <Link href={`/categories/${encodeURIComponent(c)}`}>{c}</Link>
-          </li>
-        ))}
+        {categories.map((c) => renderCat(c))}
         {categories.length === 0 && <li>No categories found.</li>}
       </ul>
     </div>
   );
+
+  function renderCat(cat) {
+    return (
+      <li key={cat.id} className={cat.parentId ? 'ml-4 list-disc' : ''}>
+        <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
+          {cat.name}
+        </Link>
+        {cat.children && cat.children.length > 0 && (
+          <ul className="ml-4 space-y-1 list-disc">
+            {cat.children.map((child) => renderCat(child))}
+          </ul>
+        )}
+      </li>
+    );
+  }
 }
