@@ -314,7 +314,6 @@ export default function Header() {
                     {itemCount}
                   </span>
                 )}
-
               </Link>
             </div>
           </li>
@@ -327,11 +326,18 @@ export default function Header() {
                   </Link>
                 </li>
               ) : (
-                <li>
-                  <Link href="/user/orders" className="btn btn-ghost mr-2">
-                    Orders
-                  </Link>
-                </li>
+                <>
+                  <li>
+                    <Link href="/user/orders" className="btn btn-ghost mr-2">
+                      Orders
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/user/wishlist" className="btn btn-ghost mr-2">
+                      Wishlist
+                    </Link>
+                  </li>
+                </>
               )}
               <li className="px-2 flex items-center">
                 Hello, {user.firstName || user.email}
@@ -383,7 +389,10 @@ export default function Header() {
           >
             <li>
               <div className="relative flex items-center">
-                <Link href="/cart" className="p-2 rounded-full shadow hover:bg-base-200 relative">
+                <Link
+                  href="/cart"
+                  className="p-2 rounded-full shadow hover:bg-base-200 relative"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -454,9 +463,14 @@ export default function Header() {
                     <Link href="/brand/profile">Profile</Link>
                   </li>
                 ) : (
-                  <li>
-                    <Link href="/user/orders">Orders</Link>
-                  </li>
+                  <>
+                    <li>
+                      <Link href="/user/orders">Orders</Link>
+                    </li>
+                    <li>
+                      <Link href="/user/wishlist">Wishlist</Link>
+                    </li>
+                  </>
                 )}
                 <li>
                   <button type="button" onClick={logout}>

@@ -6,7 +6,8 @@ import { AppContext } from '../contexts/AppContext';
 
 export default function Home({ theme, setTheme }) {
   const router = useRouter();
-  const { addToCart } = useContext(AppContext);
+  const { addToCart, addToWishlist, removeFromWishlist, wishlist } =
+    useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -489,12 +490,29 @@ export default function Home({ theme, setTheme }) {
                         </span>
                       )}
                     </div>
-                    <button
-                      className="btn btn-sm btn-primary mt-2"
-                      onClick={() => addToCart(product)}
-                    >
-                      Add to Cart
-                    </button>
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => addToCart(product)}
+                      >
+                        Add to Cart
+                      </button>
+                      {wishlist.some((w) => w.ID === product.ID) ? (
+                        <button
+                          className="btn btn-sm"
+                          onClick={() => removeFromWishlist(product.ID)}
+                        >
+                          Remove Wishlist
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-sm"
+                          onClick={() => addToWishlist(product)}
+                        >
+                          Add Wishlist
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
