@@ -19,7 +19,7 @@ export default function BrandAnalytics() {
   if (!data) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Sales Summary</h1>
       <p>Total Orders: {data.totalOrders}</p>
       <p>Total Revenue: £{data.totalRevenue.toFixed(2)}</p>
