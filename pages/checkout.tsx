@@ -23,7 +23,7 @@ export default function Checkout() {
 
   if (!user)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
+      <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center space-y-4 py-10">
         <p className="text-lg">Please log in to checkout.</p>
         <Link href="/login" className="btn btn-primary">
           Login
@@ -58,23 +58,25 @@ export default function Checkout() {
   return (
     <div className="max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold mb-4">Checkout</h1>
-      <ul className="space-y-2 mb-4">
-        {cart.map((item) => {
-          const price = parseFloat(item.MIN_PRICE || 0);
-          const subtotal = price * item.qty;
-          return (
-            <li key={item.ID} className="border p-2 flex justify-between">
-              <div>
-                <p className="font-medium">{item.TITLE}</p>
-                <p className="text-sm">
-                  £{price.toFixed(2)} x {item.qty}
-                </p>
-              </div>
-              <span>£{subtotal.toFixed(2)}</span>
-            </li>
+      <div className="mb-4 max-h-64 overflow-y-auto">
+        <ul className="space-y-2">
+          {cart.map((item) => {
+            const price = parseFloat(item.MIN_PRICE || 0);
+            const subtotal = price * item.qty;
+            return (
+              <li key={item.ID} className="border p-2 flex justify-between">
+                <div>
+                  <p className="font-medium">{item.TITLE}</p>
+                  <p className="text-sm">
+                    £{price.toFixed(2)} x {item.qty}
+                  </p>
+                </div>
+                <span>£{subtotal.toFixed(2)}</span>
+              </li>
           );
         })}
-      </ul>
+        </ul>
+      </div>
       <div className="border-t pt-4 mb-4 flex justify-between">
         <p className="font-semibold">Items: {itemCount}</p>
         <p className="font-semibold">Total: £{discountedTotal.toFixed(2)}</p>
