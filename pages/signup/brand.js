@@ -22,6 +22,9 @@ export default function BrandSignup() {
   const [website, setWebsite] = useState('');
   const [businessDescription, setBusinessDescription] = useState('');
   const [taxId, setTaxId] = useState('');
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState({});
@@ -96,6 +99,32 @@ export default function BrandSignup() {
     });
   };
 
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      setLogoFile(null);
+      setLogoPreview(null);
+      return;
+    }
+    if (
+      !['image/png', 'image/jpeg'].includes(file.type) ||
+      file.size > 2 * 1024 * 1024
+    ) {
+      setErrors((prev) => ({
+        ...prev,
+        logo: 'Logo must be PNG/JPG and under 2MB',
+      }));
+      return;
+    }
+    setErrors((prev) => {
+      const next = { ...prev };
+      if (next.logo) delete next.logo;
+      return next;
+    });
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
+  };
+
   const submit = async (e) => {
     e.preventDefault();
     const newErrors = {};
@@ -113,8 +142,20 @@ export default function BrandSignup() {
     if (password && confirm && password !== confirm) {
       newErrors.confirm = 'Passwords do not match';
     }
+    if (logoFile && !['image/png', 'image/jpeg'].includes(logoFile.type)) {
+      newErrors.logo = 'Logo must be PNG or JPG';
+    }
     setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
+    if (Object.keys(newErrors).length > 0) {
+      const firstKey = Object.keys(newErrors)[0];
+      document.querySelector(`[name="${firstKey}"]`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const data = await signup('/api/signup/brand', {
@@ -130,19 +171,24 @@ export default function BrandSignup() {
         website,
         businessDescription,
         taxId,
+        logo: logoFile,
       });
       router.push(`/confirm/${data.token}`);
     } catch (e) {
       setFormError('Signup failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-4 max-w-sm mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Brand Sign Up</h1>
+    <div className="p-6 max-w-3xl mx-auto bg-slate-100 shadow-lg rounded-lg fade-in">
+      <div className="text-center mb-6">
+        <h1 className="text-2xl font-bold">Brand Sign Up</h1>
+      </div>
       <button
         type="button"
-        className="btn w-full mb-2 hover:bg-red-600 hover:text-white flex items-center justify-center gap-2"
+        className="btn w-full mb-2 hover:bg-red-600 hover:text-white flex items-center justify-center gap-2 rounded-lg"
         onClick={() => signIn('google')}
       >
         <svg
@@ -159,7 +205,7 @@ export default function BrandSignup() {
       </button>
       <button
         type="button"
-        className="btn w-full mb-2 hover:bg-gray-800 hover:text-white flex items-center justify-center gap-2"
+        className="btn w-full mb-4 hover:bg-gray-800 hover:text-white flex items-center justify-center gap-2 rounded-lg"
         onClick={() => signIn('github')}
       >
         <svg
@@ -175,248 +221,277 @@ export default function BrandSignup() {
         Sign up with GitHub
       </button>
       {formError && <div className="text-red-500 mb-2">{formError}</div>}
-      <form onSubmit={submit} className="space-y-2">
-        <div>
-          <input
-            className={`input input-bordered w-full ${errors.brandName ? 'border-red-500' : ''}`}
-            value={brandName}
-            onChange={(e) => setBrandName(e.target.value)}
-            placeholder="Brand Name"
-          />
-          {errors.brandName && (
-            <p className="text-red-500 text-sm">{errors.brandName}</p>
-          )}
-        </div>
-        <div>
-          <input
-            className={`input input-bordered w-full ${errors.firstName ? 'border-red-500' : ''}`}
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            placeholder="First Name"
-          />
-          {errors.firstName && (
-            <p className="text-red-500 text-sm">{errors.firstName}</p>
-          )}
-        </div>
-        <div>
-          <input
-            className={`input input-bordered w-full ${errors.lastName ? 'border-red-500' : ''}`}
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            placeholder="Last Name"
-          />
-          {errors.lastName && (
-            <p className="text-red-500 text-sm">{errors.lastName}</p>
-          )}
-        </div>
-        <div>
-          <input
-            className={`input input-bordered w-full ${errors.email ? 'border-red-500' : ''}`}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onBlur={handleEmailBlur}
-            placeholder="Email"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email}</p>
-          )}
-        </div>
-        <div className="relative">
-          <input
-            type={showPassword ? 'text' : 'password'}
-            className={`input input-bordered w-full pr-10 ${errors.password ? 'border-red-500' : ''}`}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onBlur={handlePasswordBlur}
-            placeholder="Password"
-          />
-          <button
-            type="button"
-            className="absolute right-2 top-2"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="h-5 w-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.269-2.943-9.543-7a9.965 9.965 0 012.652-4.304m3.821-2.338A9.953 9.953 0 0112 5c4.478 0 8.269 2.943 9.543 7a9.952 9.952 0 01-.46 1.08M15 12a3 3 0 11-6 0 3 3 0 016 0zm-1.259 4.75L5.21 5.21"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 3l18 18"
-                />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="h-5 w-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                />
-              </svg>
+      <form id="brand-signup-form" onSubmit={submit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Account Info</h2>
+            <input
+              name="firstName"
+              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.firstName ? 'border-red-500' : ''}`}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="First Name"
+            />
+            {errors.firstName && (
+              <p className="text-red-500 text-sm">{errors.firstName}</p>
             )}
-          </button>
-          <p className="text-sm text-gray-500">
-            Password must be at least 8 characters and include uppercase,
-            lowercase, number and special character
-          </p>
-          {errors.password && (
-            <p className="text-red-500 text-sm">{errors.password}</p>
-          )}
-        </div>
-        <div className="relative">
-          <input
-            type={showConfirm ? 'text' : 'password'}
-            className={`input input-bordered w-full pr-10 ${errors.confirm ? 'border-red-500' : ''}`}
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            onBlur={handleConfirmBlur}
-            placeholder="Confirm Password"
-          />
-          <button
-            type="button"
-            className="absolute right-2 top-2"
-            onClick={() => setShowConfirm(!showConfirm)}
-          >
-            {showConfirm ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="h-5 w-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.269-2.943-9.543-7a9.965 9.965 0 012.652-4.304m3.821-2.338A9.953 9.953 0 0112 5c4.478 0 8.269 2.943 9.543 7a9.952 9.952 0 01-.46 1.08M15 12a3 3 0 11-6 0 3 3 0 016 0zm-1.259 4.75L5.21 5.21"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 3l18 18"
-                />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="h-5 w-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                />
-              </svg>
+            <input
+              name="lastName"
+              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.lastName ? 'border-red-500' : ''}`}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Last Name"
+            />
+            {errors.lastName && (
+              <p className="text-red-500 text-sm">{errors.lastName}</p>
             )}
-          </button>
-          {errors.confirm && (
-            <p className="text-red-500 text-sm">{errors.confirm}</p>
-          )}
+            <input
+              name="email"
+              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.email ? 'border-red-500' : ''}`}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={handleEmailBlur}
+              placeholder="Email"
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email}</p>
+            )}
+            <div className="relative">
+              <input
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                className={`input input-bordered w-full pr-10 rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.password ? 'border-red-500' : ''}`}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onBlur={handlePasswordBlur}
+                placeholder="Password"
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-2"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.269-2.943-9.543-7a9.965 9.965 0 012.652-4.304m3.821-2.338A9.953 9.953 0 0112 5c4.478 0 8.269 2.943 9.543 7a9.952 9.952 0 01-.46 1.08M15 12a3 3 0 11-6 0 3 3 0 016 0zm-1.259 4.75L5.21 5.21"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 3l18 18"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                )}
+              </button>
+              <p className="text-sm text-gray-500">
+                Password must be at least 8 characters and include uppercase,
+                lowercase, number and special character
+              </p>
+              {errors.password && (
+                <p className="text-red-500 text-sm">{errors.password}</p>
+              )}
+            </div>
+            <div className="relative">
+              <input
+                name="confirm"
+                type={showConfirm ? 'text' : 'password'}
+                className={`input input-bordered w-full pr-10 rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.confirm ? 'border-red-500' : ''}`}
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                onBlur={handleConfirmBlur}
+                placeholder="Confirm Password"
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-2"
+                onClick={() => setShowConfirm(!showConfirm)}
+              >
+                {showConfirm ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.269-2.943-9.543-7a9.965 9.965 0 012.652-4.304m3.821-2.338A9.953 9.953 0 0112 5c4.478 0 8.269 2.943 9.543 7a9.952 9.952 0 01-.46 1.08M15 12a3 3 0 11-6 0 3 3 0 016 0zm-1.259 4.75L5.21 5.21"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 3l18 18"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                )}
+              </button>
+              {errors.confirm && (
+                <p className="text-red-500 text-sm">{errors.confirm}</p>
+              )}
+            </div>
+          </div>
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Business Info</h2>
+            <input
+              name="brandName"
+              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.brandName ? 'border-red-500' : ''}`}
+              value={brandName}
+              onChange={(e) => setBrandName(e.target.value)}
+              placeholder="Brand Name"
+            />
+            {errors.brandName && (
+              <p className="text-red-500 text-sm">{errors.brandName}</p>
+            )}
+            <input
+              name="phoneNumber"
+              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.phoneNumber ? 'border-red-500' : ''}`}
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="Phone Number"
+            />
+            {errors.phoneNumber && (
+              <p className="text-red-500 text-sm">{errors.phoneNumber}</p>
+            )}
+            <input
+              name="businessAddress"
+              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.businessAddress ? 'border-red-500' : ''}`}
+              value={businessAddress}
+              onChange={(e) => setBusinessAddress(e.target.value)}
+              placeholder="Business Address"
+            />
+            {errors.businessAddress && (
+              <p className="text-red-500 text-sm">{errors.businessAddress}</p>
+            )}
+            <input
+              name="city"
+              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.city ? 'border-red-500' : ''}`}
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="City"
+            />
+            {errors.city && (
+              <p className="text-red-500 text-sm">{errors.city}</p>
+            )}
+            <input
+              name="country"
+              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.country ? 'border-red-500' : ''}`}
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              placeholder="Country"
+            />
+            {errors.country && (
+              <p className="text-red-500 text-sm">{errors.country}</p>
+            )}
+            <input
+              name="website"
+              className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder="Website"
+            />
+            <textarea
+              name="businessDescription"
+              className="textarea textarea-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500"
+              value={businessDescription}
+              onChange={(e) => setBusinessDescription(e.target.value)}
+              placeholder="Business Description"
+            />
+            <input
+              name="taxId"
+              className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500"
+              value={taxId}
+              onChange={(e) => setTaxId(e.target.value)}
+              placeholder="Tax ID"
+            />
+            <div>
+              <label className="block text-sm mb-1">Logo</label>
+              {logoPreview ? (
+                <img
+                  src={logoPreview}
+                  alt="Preview"
+                  className="h-24 w-24 object-cover mb-2 rounded"
+                />
+              ) : (
+                <div className="h-24 w-24 border border-dashed flex items-center justify-center text-gray-400 mb-2 rounded">
+                  No logo
+                </div>
+              )}
+              <input
+                name="logo"
+                type="file"
+                accept="image/png,image/jpeg"
+                onChange={handleLogoChange}
+                className="file-input file-input-bordered w-full rounded-lg"
+              />
+              {errors.logo && (
+                <p className="text-red-500 text-sm">{errors.logo}</p>
+              )}
+            </div>
+          </div>
         </div>
-        <div>
-          <input
-            className={`input input-bordered w-full ${errors.phoneNumber ? 'border-red-500' : ''}`}
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            placeholder="Phone Number"
-          />
-          {errors.phoneNumber && (
-            <p className="text-red-500 text-sm">{errors.phoneNumber}</p>
-          )}
-        </div>
-        <div>
-          <input
-            className={`input input-bordered w-full ${errors.businessAddress ? 'border-red-500' : ''}`}
-            value={businessAddress}
-            onChange={(e) => setBusinessAddress(e.target.value)}
-            placeholder="Business Address"
-          />
-          {errors.businessAddress && (
-            <p className="text-red-500 text-sm">{errors.businessAddress}</p>
-          )}
-        </div>
-        <div>
-          <input
-            className={`input input-bordered w-full ${errors.city ? 'border-red-500' : ''}`}
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="City"
-          />
-          {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
-        </div>
-        <div>
-          <input
-            className={`input input-bordered w-full ${errors.country ? 'border-red-500' : ''}`}
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            placeholder="Country"
-          />
-          {errors.country && (
-            <p className="text-red-500 text-sm">{errors.country}</p>
-          )}
-        </div>
-        <div>
-          <input
-            className="input input-bordered w-full"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
-            placeholder="Website"
-          />
-        </div>
-        <div>
-          <textarea
-            className="textarea textarea-bordered w-full"
-            value={businessDescription}
-            onChange={(e) => setBusinessDescription(e.target.value)}
-            placeholder="Business Description"
-          />
-        </div>
-        <div>
-          <input
-            className="input input-bordered w-full"
-            value={taxId}
-            onChange={(e) => setTaxId(e.target.value)}
-            placeholder="Tax ID"
-          />
-        </div>
-        <button className="btn btn-primary w-full" type="submit">
-          Sign Up
+        <button
+          className="btn btn-primary w-full mt-6 rounded-lg hover:opacity-90"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? 'Creating...' : 'Create Brand Account'}
         </button>
       </form>
     </div>
