@@ -100,3 +100,12 @@ model DeletionRequest {
   updatedAt DateTime @updatedAt
 }
 
+model SearchLog {
+  id        Int      @id @default(autoincrement())
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
+  query     String
+  noResults Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
