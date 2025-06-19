@@ -35,3 +35,4 @@ coverage/
 
 # Search index
 public/index.json
+tsconfig.tsbuildinfo
