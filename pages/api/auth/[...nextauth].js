@@ -5,6 +5,13 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { findUser, addUser } from '../../../lib/users.js';
 
+if (!process.env.NEXTAUTH_SECRET) {
+  console.error('NEXTAUTH_SECRET environment variable is not set');
+}
+if (!process.env.NEXTAUTH_URL) {
+  console.error('NEXTAUTH_URL environment variable is not set');
+}
+
 export const authOptions = {
   providers: [
     GoogleProvider({
