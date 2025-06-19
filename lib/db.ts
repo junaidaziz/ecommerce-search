@@ -56,6 +56,22 @@ export function getDb() {
     if (!hasImage) {
       db.exec('ALTER TABLE categories ADD COLUMN image TEXT');
     }
+
+    const count = db.prepare('SELECT COUNT(*) as c FROM categories').get().c;
+    if (count === 0) {
+      const sample = [
+        { name: 'Electronics', subs: ['Mobiles', 'Laptops'] },
+        { name: 'Fashion', subs: ['Men', 'Women'] },
+      ];
+      const insert = db.prepare(
+        'INSERT INTO categories (name, parent_id, image) VALUES (?, ?, ?)'
+      );
+      sample.forEach((cat) => {
+        const info = insert.run(cat.name, null, null);
+        const parentId = info.lastInsertRowid as number;
+        cat.subs.forEach((sub) => insert.run(sub, parentId, null));
+      });
+    }
     db.exec(`CREATE TABLE IF NOT EXISTS users (
       email TEXT PRIMARY KEY,
       first_name TEXT,
