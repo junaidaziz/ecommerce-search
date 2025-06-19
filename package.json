@@ -12,7 +12,8 @@
     "test": "jest",
     "type-check": "tsc --noEmit",
     "setup-env": "node scripts/setupEnv.js",
-    "postinstall": "npm run setup-env && node scripts/setupPrisma.js && prisma generate"
+    "postinstall": "npm run setup-env && node scripts/setupPrisma.js && prisma generate",
+    "init:typesense": "ts-node scripts/initTypesense.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
