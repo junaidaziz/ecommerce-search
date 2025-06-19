@@ -86,12 +86,13 @@ export default function ProductDetail() {
       <h1 className="text-2xl font-bold mb-4">{product.TITLE || 'Product'}</h1>
       <div className="mb-4 w-full flex flex-col items-center">
         <ProductImageSlider
+          className="w-full max-w-md aspect-[4/5]"
           images={
             product.IMAGES && product.IMAGES.length > 0
               ? product.IMAGES
               : [product.FEATURED_IMAGE?.url || '/placeholder.png']
           }
-          imgClass="max-h-96 hover:scale-110 transition w-full"
+          imgClass="hover:scale-110 transition"
         />
       </div>
       <p className="mb-2">Vendor: {product.VENDOR}</p>
