@@ -33,8 +33,8 @@ export default function ProductCard({
               : []
           }
           placeholderSeed={Number(product.ID)}
-          className="w-full h-48 bg-gray-200 flex items-center justify-center"
-          imgClass="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+          className="w-full bg-gray-200 flex items-center justify-center aspect-[4/5]"
+          imgClass="transition-transform duration-200 group-hover:scale-105"
         />
       </Link>
       {(isNew || onSale || isOut) && (
