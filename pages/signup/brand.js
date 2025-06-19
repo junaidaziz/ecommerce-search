@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import Image from 'next/image';
 import { AppContext } from '../../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 
@@ -480,9 +481,11 @@ export default function BrandSignup() {
             <div>
               <label className="block text-sm mb-1">Logo</label>
               {logoPreview ? (
-                <img
+                <Image
                   src={logoPreview}
                   alt="Preview"
+                  width={96}
+                  height={96}
                   className="h-24 w-24 object-cover mb-2 rounded"
                 />
               ) : (

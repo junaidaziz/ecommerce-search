@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
+import Image from 'next/image';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function Categories() {
@@ -20,7 +21,7 @@ export default function Categories() {
 
   useEffect(() => {
     load();
-  }, [user]);
+  }, [load, user]);
 
   const add = async () => {
     if (!newCat.trim()) return;
@@ -155,7 +156,13 @@ export default function Categories() {
             <>
               <span className="flex-1 flex items-center gap-2">
                 {cat.image && (
-                  <img src={cat.image} alt="" className="w-6 h-6 object-cover" />
+                  <Image
+                    src={cat.image}
+                    alt=""
+                    width={24}
+                    height={24}
+                    className="w-6 h-6 object-cover"
+                  />
                 )}
                 {cat.name}
               </span>
