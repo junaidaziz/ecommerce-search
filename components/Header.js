@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import { AppContext } from '../contexts/AppContext';
 
-export default function Header() {
+export default function Header({ theme = 'light', setTheme }) {
   const router = useRouter();
   const { data: session } = useSession();
   const { cart } = useContext(AppContext);
@@ -195,12 +195,16 @@ export default function Header() {
                             href={`/categories/${encodeURIComponent(cat.name)}`}
                             className="flex items-center font-semibold mb-1 hover:text-indigo-600"
                           >
-                          {cat.image ? (
-                            <img src={cat.image} alt="" className="w-4 h-4 mr-1 object-cover" />
-                          ) : (
-                            iconMap[cat.name] || null
-                          )}
-                          {cat.name}
+                            {cat.image ? (
+                              <img
+                                src={cat.image}
+                                alt=""
+                                className="w-4 h-4 mr-1 object-cover"
+                              />
+                            ) : (
+                              iconMap[cat.name] || null
+                            )}
+                            {cat.name}
                           </Link>
                           {cat.subcategories &&
                             cat.subcategories.length > 0 && (
@@ -293,8 +297,8 @@ export default function Header() {
           )}
         </form>
       </div>
-      <nav className="hidden md:flex flex-none ml-auto">
-        <ul className="menu menu-horizontal gap-2">
+      <nav className="hidden md:flex flex-none ml-auto items-center">
+        <ul className="menu menu-horizontal gap-2 items-center">
           <li className="relative mr-1">
             <Link
               href="/cart"
@@ -321,6 +325,15 @@ export default function Header() {
                 </span>
               )}
             </Link>
+          </li>
+          <li className="flex items-center">
+            <input
+              type="checkbox"
+              className="toggle toggle-sm"
+              checked={theme === 'dark'}
+              onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              aria-label="Toggle Dark Mode"
+            />
           </li>
           {user ? (
             <>
@@ -433,6 +446,15 @@ export default function Header() {
                 </span>
               )}
             </li>
+            <li className="flex items-center px-2">
+              <input
+                type="checkbox"
+                className="toggle toggle-sm"
+                checked={theme === 'dark'}
+                onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                aria-label="Toggle Dark Mode"
+              />
+            </li>
             <li>
               <details>
                 <summary>Categories</summary>
@@ -442,7 +464,11 @@ export default function Header() {
                       <li key={cat.name}>
                         <div className="flex items-center gap-1">
                           {cat.image ? (
-                            <img src={cat.image} alt="" className="w-4 h-4 object-cover" />
+                            <img
+                              src={cat.image}
+                              alt=""
+                              className="w-4 h-4 object-cover"
+                            />
                           ) : (
                             iconMap[cat.name] || null
                           )}
@@ -468,7 +494,9 @@ export default function Header() {
                       </li>
                     ))
                   ) : (
-                    <li className="text-gray-500 px-2 py-1">No categories found</li>
+                    <li className="text-gray-500 px-2 py-1">
+                      No categories found
+                    </li>
                   )}
                 </ul>
               </details>

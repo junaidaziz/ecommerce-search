@@ -30,7 +30,7 @@ export default function App({
     <SessionProvider session={session}>
       <NotificationProvider>
         <AppProvider>
-          <Header />
+          <Header theme={theme} setTheme={setTheme} />
           <Component {...pageProps} theme={theme} setTheme={setTheme} />
         </AppProvider>
       </NotificationProvider>
