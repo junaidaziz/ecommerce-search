@@ -219,6 +219,7 @@ export default function Home({ theme, setTheme }) {
         <h1 className="text-4xl font-bold text-center text-base-content mb-8">
           Product Search
         </h1>
+        <HeroSlider />
         <div className="flex justify-end mb-6">
           <label className="flex items-center cursor-pointer gap-2">
             <span className="text-sm">Dark Mode</span>
