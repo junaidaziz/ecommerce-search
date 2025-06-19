@@ -212,7 +212,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="w-full max-w-screen-2xl bg-base-100 p-8 rounded-box shadow-xl space-y-6">
+      <main className="w-full bg-base-100 p-8 sm:p-10 lg:p-12 rounded-box shadow-xl space-y-6">
         <Hero />
         {/* Theme toggle moved to header */}
 
