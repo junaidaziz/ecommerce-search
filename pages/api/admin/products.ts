@@ -1,3 +1,4 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   addProduct,
   updateProduct,
@@ -36,7 +37,7 @@ function parseForm(req) {
   });
 }
 
-async function handler(req, res) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST' || req.method === 'PUT') {
     const { fields, files } = await parseForm(req);
     const {

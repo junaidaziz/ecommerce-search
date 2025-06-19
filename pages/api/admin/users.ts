@@ -1,3 +1,4 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   getAllUsers,
   updateUserRole,
@@ -7,7 +8,7 @@ import {
 } from '../../../lib/users';
 import { withRole } from '../../../lib/withRole';
 
-async function handler(req, res) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     return res.status(200).json(await getAllUsers());
   }

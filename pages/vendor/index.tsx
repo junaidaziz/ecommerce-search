@@ -1,9 +1,30 @@
-import { useState, useEffect, useContext, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  ChangeEvent,
+  FormEvent,
+} from 'react';
 import { AppContext } from '../../contexts/AppContext';
+import type { Product } from '../../types';
 
 export default function VendorDashboard() {
   const { user } = useContext(AppContext);
-  const emptyForm = {
+  interface FormState {
+    id: string;
+    title: string;
+    vendor: string;
+    description: string;
+    product_type: string;
+    tags: string;
+    category: string;
+    quantity: number;
+    min_price: number;
+    max_price: number;
+    currency: string;
+  }
+  const emptyForm: FormState = {
     id: '',
     title: '',
     vendor: '',
@@ -16,12 +37,12 @@ export default function VendorDashboard() {
     max_price: 0,
     currency: 'USD',
   };
-  const [form, setForm] = useState(emptyForm);
-  const [products, setProducts] = useState([]);
+  const [form, setForm] = useState<FormState>(emptyForm);
+  const [products, setProducts] = useState<Product[]>([]);
   const [message, setMessage] = useState('');
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = useCallback(async (): Promise<void> => {
     if (!user) return;
     const res = await fetch(
       `/api/admin/products?vendor=${encodeURIComponent(user.brandName || '')}`
@@ -35,11 +56,11 @@ export default function VendorDashboard() {
     fetchProducts();
   }, [fetchProducts]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const submit = async (e) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const res = await fetch('/api/admin/products', {
       method: editingId ? 'PUT' : 'POST',
@@ -57,7 +78,7 @@ export default function VendorDashboard() {
     }
   };
 
-  const handleEdit = (p) => {
+  const handleEdit = (p: Product) => {
     setForm({
       id: p.ID,
       title: p.TITLE || '',
@@ -79,7 +100,7 @@ export default function VendorDashboard() {
     setForm(emptyForm);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string): Promise<void> => {
     if (!confirm('Delete this product?')) return;
     const res = await fetch(
       `/api/admin/products?id=${encodeURIComponent(id)}`,
