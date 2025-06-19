@@ -3,7 +3,7 @@ import {
   addReview,
   getReviewsForProduct,
   getAverageRating,
-} from '../../../../lib/db.js';
+} from '../../../../lib/db';
 
 export default async function handler(req, res) {
   const {

@@ -23,3 +23,17 @@ export interface Product {
   DESCRIPTION_TEXT?: string;
   BODY_HTML_TEXT?: string;
 }
+
+export type ProductResponse = Product;
+
+export interface ProductInput {
+  title: string;
+  description?: string;
+  vendor?: string;
+  productType?: string;
+  tags?: string;
+  category?: string;
+  images?: string[];
+  quantity?: number;
+  price?: number;
+}
