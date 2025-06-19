@@ -12,6 +12,7 @@ import { AppContext } from '../contexts/AppContext';
 import ProductImageSlider from '../components/ProductImageSlider';
 import Hero from '../components/Hero';
 import { Product } from '../types/product';
+import RecommendedProducts from '../components/RecommendedProducts';
 
 export default function Home() {
   const router = useRouter();
@@ -37,6 +38,7 @@ export default function Home() {
   const [allVendors, setAllVendors] = useState<string[]>([]);
   const [allProductTypes, setAllProductTypes] = useState<string[]>([]);
   const [allCategories, setAllCategories] = useState<string[]>([]);
+  const [historyInfo, setHistoryInfo] = useState<{ category?: string; id?: string } | null>(null);
 
   // useRef to store the AbortController instance
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -85,6 +87,24 @@ export default function Home() {
       }
     }
     loadCats();
+  }, []);
+
+  useEffect(() => {
+    try {
+      const hist = JSON.parse(localStorage.getItem('browse-history') || '[]');
+      if (hist.length > 0) {
+        fetch(`/api/products/${hist[0]}`)
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data && data.CATEGORY) {
+              setHistoryInfo({ category: data.CATEGORY, id: hist[0] });
+            }
+          })
+          .catch(() => {});
+      }
+    } catch {
+      // ignore
+    }
   }, []);
 
   const fetchProducts = useCallback(async (): Promise<void> => {
@@ -591,6 +611,12 @@ export default function Home() {
             )}
           </div>
         </div>
+        {historyInfo?.category && (
+          <RecommendedProducts
+            category={historyInfo.category}
+            excludeId={historyInfo.id}
+          />
+        )}
       </main>
     </div>
   );
