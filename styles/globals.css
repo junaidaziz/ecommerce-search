@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: system-ui, sans-serif;
+  @apply font-sans bg-base-200 text-base-content;
 }
 /* Spinner styles */
 .loader {
