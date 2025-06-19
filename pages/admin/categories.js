@@ -6,9 +6,11 @@ export default function Categories() {
   const [categories, setCategories] = useState([]);
   const [newCat, setNewCat] = useState('');
   const [newParent, setNewParent] = useState('');
+  const [newImage, setNewImage] = useState('');
   const [message, setMessage] = useState('');
   const [editing, setEditing] = useState(null);
   const [editName, setEditName] = useState('');
+  const [editImage, setEditImage] = useState('');
 
   const load = async () => {
     if (!user) return;
@@ -25,10 +27,11 @@ export default function Categories() {
     const res = await fetch('/api/admin/categories', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newCat, parentId: newParent || null }),
+      body: JSON.stringify({ name: newCat, parentId: newParent || null, image: newImage || null }),
     });
     if (res.ok) {
       setNewCat('');
+      setNewImage('');
       setMessage('Category added');
       load();
     }
@@ -38,11 +41,12 @@ export default function Categories() {
     const res = await fetch('/api/admin/categories', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: editing, name: editName }),
+      body: JSON.stringify({ id: editing, name: editName, image: editImage || null }),
     });
     if (res.ok) {
       setEditing(null);
       setEditName('');
+      setEditImage('');
       setMessage('Category updated');
       load();
     }
@@ -72,6 +76,12 @@ export default function Categories() {
           value={newCat}
           onChange={(e) => setNewCat(e.target.value)}
           placeholder="New category"
+          className="input input-bordered flex-1"
+        />
+        <input
+          value={newImage}
+          onChange={(e) => setNewImage(e.target.value)}
+          placeholder="Image URL (optional)"
           className="input input-bordered flex-1"
         />
         <select
@@ -128,6 +138,12 @@ export default function Categories() {
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
               />
+              <input
+                className="input input-bordered flex-1"
+                value={editImage}
+                onChange={(e) => setEditImage(e.target.value)}
+                placeholder="Image URL (optional)"
+              />
               <button onClick={update} className="btn btn-sm">
                 Save
               </button>
@@ -137,11 +153,17 @@ export default function Categories() {
             </>
           ) : (
             <>
-              <span className="flex-1">{cat.name}</span>
+              <span className="flex-1 flex items-center gap-2">
+                {cat.image && (
+                  <img src={cat.image} alt="" className="w-6 h-6 object-cover" />
+                )}
+                {cat.name}
+              </span>
               <button
                 onClick={() => {
                   setEditing(cat.id);
                   setEditName(cat.name);
+                  setEditImage(cat.image || '');
                 }}
                 className="btn btn-sm"
               >

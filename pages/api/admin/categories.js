@@ -12,7 +12,7 @@ function handler(req, res) {
     return res.status(200).json(getCategoriesFlat());
   }
   if (req.method === 'POST') {
-    const { name, parentId } = req.body || {};
+    const { name, parentId, image } = req.body || {};
     if (!name) return res.status(400).json({ message: 'name required' });
     const exists = getCategoriesFlat().find(
       (c) => c.name.toLowerCase() === name.toLowerCase()
@@ -21,22 +21,22 @@ function handler(req, res) {
       return res.status(409).json({ message: 'category exists' });
     }
     try {
-      createCategory(name, parentId || null);
+      createCategory(name, parentId || null, image || null);
     } catch (e) {
       if (e.message === 'depth') {
         return res.status(400).json({ message: 'max depth exceeded' });
       }
       throw e;
     }
-    logAudit('create_category', { name, parentId });
+    logAudit('create_category', { name, parentId, image });
     return res.status(201).json({ message: 'category created' });
   }
   if (req.method === 'PUT') {
-    const { id, name, parentId } = req.body || {};
+    const { id, name, parentId, image } = req.body || {};
     if (!id || !name)
       return res.status(400).json({ message: 'id and name required' });
-    renameCategory(id, name, parentId || null);
-    logAudit('rename_category', { id, name, parentId });
+    renameCategory(id, name, parentId || null, image || null);
+    logAudit('rename_category', { id, name, parentId, image });
     return res.status(200).json({ message: 'category updated' });
   }
   if (req.method === 'DELETE') {
