@@ -35,7 +35,7 @@ export default function Admin() {
 
   useEffect(() => {
     fetchProducts();
-  }, [user]);
+  }, [fetchProducts, user]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

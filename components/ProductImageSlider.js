@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Image from 'next/image';
 
 export default function ProductImageSlider({
   images = [],
@@ -9,9 +10,11 @@ export default function ProductImageSlider({
   const [idx, setIdx] = useState(0);
   if (!images || images.length === 0) {
     return (
-      <img
+      <Image
         src={`https://source.unsplash.com/400x400/?product&sig=${placeholderSeed}`}
         alt="Placeholder product"
+        width={400}
+        height={400}
         className={imgClass}
       />
     );
@@ -20,9 +23,11 @@ export default function ProductImageSlider({
   const prev = () => setIdx((i) => (i - 1 + images.length) % images.length);
   return (
     <div className={`relative ${className}`}>
-      <img
+      <Image
         src={images[idx]}
         alt={`Image ${idx + 1}`}
+        width={400}
+        height={400}
         className={`object-cover ${imgClass}`}
       />
       {images.length > 1 && (

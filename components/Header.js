@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { useContext, useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import { AppContext } from '../contexts/AppContext';
@@ -196,9 +197,11 @@ export default function Header({ theme = 'light', setTheme }) {
                             className="flex items-center font-semibold mb-1 hover:text-indigo-600"
                           >
                             {cat.image ? (
-                              <img
+                              <Image
                                 src={cat.image}
                                 alt=""
+                                width={16}
+                                height={16}
                                 className="w-4 h-4 mr-1 object-cover"
                               />
                             ) : (
@@ -257,8 +260,10 @@ export default function Header({ theme = 'light', setTheme }) {
               }
             }}
             placeholder="Search for products, brands..."
+            role="combobox"
             aria-expanded={suggestions.length > 0}
             aria-haspopup="listbox"
+            aria-controls="search-suggestions"
           />
           <svg
             className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
@@ -285,6 +290,7 @@ export default function Header({ theme = 'light', setTheme }) {
                   <button
                     type="button"
                     role="option"
+                    aria-selected={idx === activeIdx}
                     className={`block w-full text-left px-2 py-1 ${idx === activeIdx ? 'bg-indigo-100 text-indigo-600' : 'hover:bg-base-200'}`}
                     onMouseEnter={() => setActiveIdx(idx)}
                     onClick={() => selectSuggestion(s)}
@@ -464,9 +470,11 @@ export default function Header({ theme = 'light', setTheme }) {
                       <li key={cat.name}>
                         <div className="flex items-center gap-1">
                           {cat.image ? (
-                            <img
+                            <Image
                               src={cat.image}
                               alt=""
+                              width={16}
+                              height={16}
                               className="w-4 h-4 object-cover"
                             />
                           ) : (
