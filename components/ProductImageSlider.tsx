@@ -1,12 +1,19 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
+
+export interface ProductImageSliderProps {
+  images?: string[];
+  className?: string;
+  imgClass?: string;
+  placeholderSeed?: number;
+}
 
 export default function ProductImageSlider({
   images = [],
   className = '',
   imgClass = '',
   placeholderSeed = 1,
-}) {
+}: ProductImageSliderProps) {
   const [idx, setIdx] = useState(0);
   if (!images || images.length === 0) {
     return (
