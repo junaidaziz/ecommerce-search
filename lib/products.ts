@@ -2,7 +2,7 @@ import { JSDOM } from 'jsdom';
 import FlexSearch from 'flexsearch';
 const { Document } = FlexSearch;
 import path from 'path';
-import { put, list } from '@vercel/blob';
+import fs from 'fs';
 import {
   getAllFromDb,
   addProduct as dbAddProduct,
@@ -23,7 +23,7 @@ let products = [];
 let productIndex = null;
 let isDataLoaded = false;
 
-const BLOB_FILE_NAME = 'flexsearch_index.json';
+const INDEX_FILE_PATH = path.join(process.cwd(), 'public', 'index.json');
 
 const stripHtml = (html) => {
   if (!html) return '';
@@ -171,92 +171,51 @@ export async function loadAndIndexProducts() {
     return { products, productIndex };
   }
 
-  console.log('Attempting to load pre-built index from Vercel Blob...');
+  console.log('Attempting to load pre-built index from file...');
 
-  productIndex = new Document({
-    document: {
-      id: 'ID',
-      index: [
-        'TITLE',
-        'VENDOR',
-        'DESCRIPTION_TEXT',
-        'BODY_HTML_TEXT',
-        'TAGS',
-        'PRODUCT_TYPE',
-        'CATEGORY',
-        'METAFIELDS.my_fields_ingredients.value',
-      ],
-      store: true,
-    },
-    preset: 'match',
-    tokenize: 'forward',
-    resolution: 9,
-  });
+  productIndex = createFlexDoc();
 
   try {
-    const { blobs } = await list();
-    const targetBlob = blobs.find((blob) => blob.pathname === BLOB_FILE_NAME);
-
-    if (targetBlob && targetBlob.downloadUrl) {
-      console.log(`Downloaded index from Blob URL: ${targetBlob.downloadUrl}`);
-      const response = await fetch(targetBlob.downloadUrl);
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch blob from URL: ${response.statusText}`
-        );
-      }
-      const indexData = await response.json();
-
+    if (fs.existsSync(INDEX_FILE_PATH)) {
+      const indexData = JSON.parse(fs.readFileSync(INDEX_FILE_PATH, 'utf8'));
       const { serializedIndex, loadedProducts } = indexData;
 
       if (loadedProducts && loadedProducts.length > 0) {
-        console.log(
-          'Loaded products from pre-built Blob data. Rebuilding index manually...'
-        );
         products = loadedProducts;
 
-        products.forEach((product) => {
-          productIndex.add(product);
+        Object.keys(serializedIndex).forEach((key) => {
+          productIndex.import(key, serializedIndex[key]);
         });
 
-        console.log('Index rebuilt from serialized product data from Blob.');
+        console.log('Index loaded from file.');
         isDataLoaded = true;
         return { products, productIndex };
       } else {
-        console.warn(
-          'Pre-built products data from Blob is empty or invalid. Building from CSV.'
-        );
-        products = [];
+        console.warn('Index file missing product data. Rebuilding from database.');
       }
     } else {
-      console.warn(
-        'No pre-built index found in Vercel Blob. Building from source data.'
-      );
-      products = [];
+      console.warn('No index file found. Building from database.');
     }
   } catch (e) {
-    console.error(
-      'Failed to load pre-built index from Vercel Blob, building from source:',
-      e
-    );
-    products = [];
+    console.error('Failed to load index file, rebuilding from database:', e);
   }
 
-  console.log('Building index from provided data source...');
+  console.log('Building index from database...');
   products = [];
-  await forceBuildAndSaveIndexToBlob();
+  await forceBuildAndSaveIndexToFile();
   return { products, productIndex };
 }
 
-export async function forceBuildAndSaveIndexToBlob() {
-  console.log('Building index from data source and uploading to Blob...');
+export async function forceBuildAndSaveIndexToFile() {
+  console.log('Building index from data source and writing to file...');
   try {
     products = await loadProductsData();
+    products = products.filter((p) => p.TOTAL_INVENTORY > 0);
     productIndex = createFlexDoc();
     products.forEach((p) => productIndex.add(p));
     console.log('Products indexed with FlexSearch.');
     isDataLoaded = true;
-    await saveIndexToBlob(productIndex, products);
+    await saveIndexToFile(productIndex, products);
   } catch (error) {
     console.error('Failed to load product data:', error);
     isDataLoaded = false;
@@ -264,9 +223,9 @@ export async function forceBuildAndSaveIndexToBlob() {
   }
 }
 
-async function saveIndexToBlob(indexToSave, productsToSave) {
+async function saveIndexToFile(indexToSave, productsToSave) {
   if (!indexToSave || productsToSave.length === 0) {
-    console.warn('No index or products to save to Blob.');
+    console.warn('No index or products to save.');
     return;
   }
 
@@ -280,18 +239,12 @@ async function saveIndexToBlob(indexToSave, productsToSave) {
     loadedProducts: productsToSave,
   };
 
-  console.log('Uploading FlexSearch index to Vercel Blob...');
+  console.log('Writing FlexSearch index to file...');
   try {
-    const blob = await put(BLOB_FILE_NAME, JSON.stringify(dataToSave), {
-      access: 'public',
-      contentType: 'application/json',
-      addRandomSuffix: false,
-    });
-    console.log(
-      `FlexSearch index saved successfully to Vercel Blob: ${blob.url}`
-    );
+    fs.writeFileSync(INDEX_FILE_PATH, JSON.stringify(dataToSave, null, 2));
+    console.log(`FlexSearch index saved to ${INDEX_FILE_PATH}`);
   } catch (e) {
-    console.error('Failed to save FlexSearch index to Vercel Blob:', e);
+    console.error('Failed to save FlexSearch index to file:', e);
     throw e;
   }
 }

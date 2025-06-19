@@ -1,6 +1,6 @@
 # 🛍️ Product Search App (Next.js + FlexSearch)
 
-A fast, scalable product search web app built with **Next.js**, **FlexSearch**, and **Vercel Blob Storage**. Product information is stored in a lightweight **SQLite** database instead of loading from CSV, and the data is indexed for fast searching.
+A fast, scalable product search web app built with **Next.js** and **FlexSearch**. Product information is stored in a lightweight **SQLite** database and indexed for fast searching.
 
 ---
 
@@ -10,7 +10,6 @@ A fast, scalable product search web app built with **Next.js**, **FlexSearch**, 
 - Extremely fast indexing via **FlexSearch.Document**
 - Manage products via a simple admin panel with a SQLite backend
 - Public search API: `/api/search?q=...`
-- Caches search index using **Vercel Blob Storage**
 - Optional `SKIP_INDEX_BUILD` flag to avoid rebuilding during deployment
 - Fully deployable on **Vercel** with CI/CD
 - Modern responsive UI built with **Tailwind CSS** and **DaisyUI**
@@ -38,8 +37,6 @@ This will also install **DaisyUI**, a Tailwind CSS component library used throug
 3. **Create `.env.local`**
 
 ```env
-BLOB_READ_WRITE_TOKEN=your-vercel-blob-token
-BLOB_BASE_URL=https://your-vercel-blob-url
 SKIP_INDEX_BUILD=false
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
@@ -50,12 +47,6 @@ NEXTAUTH_SECRET=random-secret
 
 ```bash
 npm run migrate
-```
-
-5. **Import products from Blob**
-
-```bash
-npm run migrate:blob
 ```
 
 6. **Place your product data**
@@ -85,7 +76,7 @@ This script will:
 
 - Load product data from the SQLite database
 - Build a FlexSearch index
-- Upload the index to Vercel Blob with the exact filename
+- Save the index to `public/index.json`
 
 ---
 
@@ -112,13 +103,11 @@ In the Vercel dashboard:
 
 | Key                     | Value                              |
 | ----------------------- | ---------------------------------- |
-| `BLOB_READ_WRITE_TOKEN` | your blob RW token                 |
-| `BLOB_BASE_URL`         | https://your-vercel-blob-url       |
 | `SKIP_INDEX_BUILD`      | `true` (to skip rebuild at deploy) |
 
 4. **Deploy**
 
-Vercel will auto-deploy. The frontend will fetch the search index from the uploaded blob.
+Vercel will auto-deploy. The frontend will fetch the search index from the generated index file.
 
 ---
 
@@ -158,8 +147,8 @@ Returns matching products in enriched format.
 - During CSV load:
   - HTML is stripped from body and description using `jsdom`
   - JSON fields are parsed safely
-- The index is serialized and uploaded as `flexsearch_index.json` to Blob
-- On next load, the app fetches and deserializes the pre-built index for faster boot
+- The index is serialized to `public/index.json`
+- on next load, the app reads and deserializes the pre-built index for faster boot
 
 ---
 
