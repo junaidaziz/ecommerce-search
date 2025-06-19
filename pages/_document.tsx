@@ -9,6 +9,24 @@ export default function Document() {
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
       </Head>
       <body className="font-sans">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(function() {
+  try {
+    var theme = localStorage.getItem('theme');
+    if (!theme) {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    var html = document.documentElement;
+    var isDark = theme === 'dark';
+    html.setAttribute('data-theme', isDark ? 'dark' : 'cupcake');
+    if (isDark) html.classList.add('dark');
+  } catch (e) {}
+})();
+            `,
+          }}
+        />
         <Main />
         <NextScript />
       </body>
