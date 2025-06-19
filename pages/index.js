@@ -207,18 +207,9 @@ export default function Home({ theme, setTheme }) {
         <title>Product Search App</title>
         <meta name="description" content="Search products from CSV data" />
         <link rel="icon" href="/favicon.ico" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
       </Head>
 
-      <HeroSlider />
-
       <main className="w-full max-w-screen-2xl bg-base-100 p-8 rounded-box shadow-xl">
-        <h1 className="text-4xl font-bold text-center text-base-content mb-8">
-          Product Search
-        </h1>
         <HeroSlider />
         <div className="flex justify-end mb-6">
           <label className="flex items-center cursor-pointer gap-2">
