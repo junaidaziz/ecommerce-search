@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Typesense from 'typesense';
+import { getBestSellingProducts } from '../../lib/orders';
 
 const client = new Typesense.Client({
   nodes: [
@@ -92,6 +93,7 @@ export default async function handler(
         }
       }
     }
+    const fallback = result.found === 0 ? getBestSellingProducts(8) : [];
     return res.status(200).json({
       results: hits,
       total: result.found,
@@ -99,6 +101,7 @@ export default async function handler(
       totalPages,
       brands,
       categories,
+      fallback,
     });
   } catch (err) {
     console.error('Typesense search error', err);

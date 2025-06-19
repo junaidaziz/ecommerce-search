@@ -40,7 +40,9 @@ export function getDb() {
     const hasSlug = productInfo.some((c) => c.name === 'slug');
     if (!hasSlug) {
       db.exec('ALTER TABLE products ADD COLUMN slug TEXT');
-      db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_products_slug ON products(slug)');
+      db.exec(
+        'CREATE UNIQUE INDEX IF NOT EXISTS idx_products_slug ON products(slug)'
+      );
     }
     db.exec(
       'CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, parent_id INTEGER, image TEXT, FOREIGN KEY(parent_id) REFERENCES categories(id))'
@@ -240,6 +242,16 @@ export function getProductBySlug(slug) {
   const db = getDb();
   const stmt = db.prepare('SELECT * FROM products WHERE slug = ?');
   return stmt.get(slug);
+}
+
+export function getProductsByIds(ids: string[]) {
+  if (!ids.length) return [];
+  const db = getDb();
+  const placeholders = ids.map(() => '?').join(',');
+  const stmt = db.prepare(
+    `SELECT * FROM products WHERE id IN (${placeholders})`
+  );
+  return stmt.all(...ids);
 }
 
 export function updateProductQuantity(id, quantity) {
