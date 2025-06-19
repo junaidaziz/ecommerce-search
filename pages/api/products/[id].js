@@ -1,4 +1,4 @@
-import { getProductById } from '../../../lib/db.js';
+import { getProductById, getAverageRating } from '../../../lib/db.js';
 import { mapDbRowToProduct } from '../../../lib/products.js';
 
 export default async function handler(req, res) {
@@ -12,7 +12,14 @@ export default async function handler(req, res) {
       return res.status(404).json({ message: 'Not found' });
     }
     const product = mapDbRowToProduct(row);
-    res.status(200).json(product);
+    const stats = getAverageRating(String(id));
+    res
+      .status(200)
+      .json({
+        ...product,
+        AVERAGE_RATING: stats.average,
+        REVIEW_COUNT: stats.count,
+      });
   } catch (e) {
     res.status(500).json({ message: 'Failed to load product' });
   }

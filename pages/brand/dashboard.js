@@ -18,6 +18,7 @@ export default function BrandDashboard() {
   };
   const [form, setForm] = useState(emptyForm);
   const [products, setProducts] = useState([]);
+  const [lowStock, setLowStock] = useState([]);
   const [message, setMessage] = useState('');
   const [editingId, setEditingId] = useState(null);
 
@@ -28,6 +29,12 @@ export default function BrandDashboard() {
     );
     if (res.ok) {
       setProducts(await res.json());
+    }
+    const lowRes = await fetch(
+      `/api/brand/low-stock?vendor=${encodeURIComponent(user.brandName || '')}`
+    );
+    if (lowRes.ok) {
+      setLowStock(await lowRes.json());
     }
   };
 
@@ -42,7 +49,9 @@ export default function BrandDashboard() {
   const submit = async (e) => {
     e.preventDefault();
     const payload = editingId ? { ...form, id: editingId } : form;
-    const url = editingId ? `/api/brand/products/${editingId}` : '/api/brand/products';
+    const url = editingId
+      ? `/api/brand/products/${editingId}`
+      : '/api/brand/products';
     const method = editingId ? 'PUT' : 'POST';
     const res = await fetch(url, {
       method,
@@ -102,6 +111,12 @@ export default function BrandDashboard() {
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Brand Dashboard</h1>
+      {lowStock.length > 0 && (
+        <div className="alert alert-warning mb-4">
+          Low stock on {lowStock.length} product{lowStock.length > 1 ? 's' : ''}
+          .
+        </div>
+      )}
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <form onSubmit={submit} className="space-y-2 mb-6">
         {[
