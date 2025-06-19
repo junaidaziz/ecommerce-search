@@ -6,21 +6,21 @@ import {
 } from '../../../lib/users';
 import { withRole } from '../../../lib/withRole';
 
-function handler(req, res) {
+async function handler(req, res) {
   if (req.method === 'GET') {
-    return res.status(200).json(getAllUsers());
+    return res.status(200).json(await getAllUsers());
   }
   if (req.method === 'PUT') {
     const { email, role } = req.body || {};
     if (!email || !role)
       return res.status(400).json({ message: 'email and role required' });
-    updateUserRole(email, role);
+    await updateUserRole(email, role);
     return res.status(200).json({ message: 'role updated' });
   }
   if (req.method === 'DELETE') {
     const { email } = req.query;
     if (!email) return res.status(400).json({ message: 'email required' });
-    deleteUser(email);
+    await deleteUser(email);
     return res.status(200).json({ message: 'user deleted' });
   }
   if (req.method === 'POST') {
@@ -29,19 +29,18 @@ function handler(req, res) {
     if (!email || !password || !firstName || !lastName || !gender) {
       return res.status(400).json({ message: 'missing required fields' });
     }
-    addUser({
+    await addUser({
       email,
       password,
       first_name: firstName,
       last_name: lastName,
       brand_name: brandName,
       gender,
-      role: role || 'user',
+      role: role || 'USER',
     });
     return res.status(201).json({ message: 'user created' });
   }
   return res.status(405).json({ message: 'Method Not Allowed' });
 }
 
-
-export default withRole(['super-admin'])(handler);
+export default withRole(['SUPER_ADMIN'])(handler);

@@ -128,4 +128,4 @@ async function handler(req, res) {
 }
 
 
-export default withRole(['brand','super-admin'])(handler);
+export default withRole(['BRAND','SUPER_ADMIN'])(handler);
