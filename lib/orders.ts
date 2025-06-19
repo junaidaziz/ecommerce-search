@@ -1,4 +1,5 @@
-import { getDb } from './db';
+import { getDb, getProductById, getProductsByIds } from './db';
+import { mapDbRowToProduct } from './products';
 
 export function addOrder({
   user_email,
@@ -83,4 +84,21 @@ export function updateOrderStatus(id, status) {
   const db = getDb();
   const stmt = db.prepare('UPDATE orders SET status = ? WHERE id = ?');
   stmt.run(status, id);
+}
+
+export function getBestSellingProducts(limit = 8) {
+  const orders = getAllOrders();
+  const counts: Record<string, number> = {};
+  orders.forEach((o) => {
+    o.items.forEach((i: any) => {
+      const id = String(i.ID);
+      counts[id] = (counts[id] || 0) + (i.qty || 0);
+    });
+  });
+  const topIds = Object.entries(counts)
+    .sort((a, b) => (b[1] as number) - (a[1] as number))
+    .slice(0, limit)
+    .map(([id]) => id);
+  const rows = getProductsByIds(topIds);
+  return rows.map((r) => mapDbRowToProduct(r));
 }
