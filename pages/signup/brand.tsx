@@ -184,7 +184,7 @@ export default function BrandSignup() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-slate-100 shadow-lg rounded-lg fade-in">
+    <div className="w-full p-6 sm:p-8 lg:p-10 bg-slate-100 shadow-lg rounded-lg fade-in">
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold">Brand Sign Up</h1>
       </div>
@@ -499,13 +499,15 @@ export default function BrandSignup() {
             </div>
           </div>
         </div>
-        <button
-          className="btn btn-primary mt-8 px-6 rounded-lg hover:opacity-90"
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? 'Creating...' : 'Create Brand Account'}
-        </button>
+        <div className="flex justify-end mt-8">
+          <button
+            className="btn bg-primary text-white px-6 rounded-lg hover:opacity-90"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? 'Creating...' : 'Create Brand Account'}
+          </button>
+        </div>
       </form>
       <p className="text-center mt-4">
         Already have an account?{' '}
