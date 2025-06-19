@@ -110,99 +110,111 @@ export default function Header() {
           )}
         </form>
       </div>
-      <div className="hidden md:flex flex-none gap-2">
-        <div className="dropdown dropdown-hover">
-          <label tabIndex={0} className="btn btn-ghost">
-            Categories
-          </label>
-          <ul
-            tabIndex={0}
-            className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
-          >
-            {categories.map((cat) => (
-              <li key={cat.name}>
-                {cat.subcategories && cat.subcategories.length > 0 ? (
-                  <details>
-                    <summary>{cat.name}</summary>
-                    <ul>
-                      {cat.subcategories.map((sub) => (
-                        <li key={sub}>
-                          <Link
-                            href={`/categories/${encodeURIComponent(
-                              cat.name
-                            )}?type=${encodeURIComponent(sub)}`}
-                          >
-                            {sub}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                ) : (
-                  <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
-                    {cat.name}
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="relative mr-2">
-          <Link href="/cart" className="btn btn-ghost flex items-center gap-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              className="w-5 h-5"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-              />
-            </svg>
-            Cart
-          </Link>
-          {itemCount > 0 && (
-            <span className="badge badge-primary absolute top-0 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white text-xs">
-              {itemCount}
+      <nav className="hidden md:flex flex-none ml-auto">
+        <ul className="menu menu-horizontal gap-2">
+          <li className="dropdown dropdown-hover">
+            <span tabIndex={0} className="cursor-pointer">
+              Categories
             </span>
+            <ul
+              tabIndex={0}
+              className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              {categories.map((cat) => (
+                <li key={cat.name}>
+                  {cat.subcategories && cat.subcategories.length > 0 ? (
+                    <details>
+                      <summary>{cat.name}</summary>
+                      <ul>
+                        {cat.subcategories.map((sub) => (
+                          <li key={sub}>
+                            <Link
+                              href={`/categories/${encodeURIComponent(
+                                cat.name
+                              )}?type=${encodeURIComponent(sub)}`}
+                            >
+                              {sub}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  ) : (
+                    <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
+                      {cat.name}
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </li>
+          <li>
+            <div className="relative mr-2">
+              <Link href="/cart" className="btn btn-ghost flex items-center gap-1">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="w-5 h-5"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                  />
+                </svg>
+                Cart
+              </Link>
+              {itemCount > 0 && (
+                <span className="badge badge-primary absolute top-0 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white text-xs">
+                  {itemCount}
+                </span>
+              )}
+            </div>
+          </li>
+          {user ? (
+            <>
+              {user.role === 'super-admin' ? (
+                <li>
+                  <Link href="/admin" className="btn btn-ghost mr-2">
+                    Admin
+                  </Link>
+                </li>
+              ) : (
+                <li>
+                  <Link href="/user/orders" className="btn btn-ghost mr-2">
+                    Orders
+                  </Link>
+                </li>
+              )}
+              <li className="px-2 flex items-center">
+                Hello, {user.firstName || user.email}
+              </li>
+              <li>
+                <button onClick={logout} className="btn btn-outline ml-2">
+                  Logout
+                </button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Link href="/login" className="btn btn-ghost">
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link href="/signup" className="btn btn-primary ml-2">
+                  Signup
+                </Link>
+              </li>
+            </>
           )}
-        </div>
-        {user ? (
-          <>
-            {user.role === 'super-admin' ? (
-              <Link href="/admin" className="btn btn-ghost mr-2">
-                Admin
-              </Link>
-            ) : user.role === 'brand' ? (
-              <Link href="/brand/profile" className="btn btn-ghost mr-2">
-                Profile
-              </Link>
-            ) : (
-              <Link href="/user/orders" className="btn btn-ghost mr-2">
-                Orders
-              </Link>
-            )}
-            <span className="px-2">Hello, {user.firstName || user.email}</span>
-            <button onClick={logout} className="btn btn-outline ml-2">
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link href="/login" className="btn btn-ghost">
-              Login
-            </Link>
-            <Link href="/signup" className="btn btn-primary ml-2">
-              Signup
-            </Link>
-          </>
-        )}
-      </div>
+        </ul>
+      </nav>
 
       <div className="md:hidden flex-none">
         <div className="dropdown dropdown-end">
