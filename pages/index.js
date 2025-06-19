@@ -213,6 +213,8 @@ export default function Home({ theme, setTheme }) {
         />
       </Head>
 
+      <HeroSlider />
+
       <main className="w-full max-w-screen-2xl bg-base-100 p-8 rounded-box shadow-xl">
         <h1 className="text-4xl font-bold text-center text-base-content mb-8">
           Product Search

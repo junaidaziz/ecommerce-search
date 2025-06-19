@@ -1,57 +1,58 @@
-import { useState } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay, A11y, EffectFade } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/effect-fade';
 
-/**
- * Sample hero slider using public domain Unsplash images.
- * Replace or remove these images before production launch.
- */
+const slides = [
+  {
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1350&q=80',
+    headline: 'Discover New Arrivals',
+    tagline: 'Fresh styles just landed',
+    href: '/products',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=1350&q=80',
+    headline: 'Upgrade Your Tech',
+    tagline: 'Latest gadgets at great prices',
+    href: '/products?type=Electronics',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1350&q=80',
+    headline: 'Step Up Your Style',
+    tagline: 'Trendy fashion for everyone',
+    href: '/products?type=Fashion',
+  },
+];
+
 export default function HeroSlider() {
-  const slides = [
-    {
-      url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1600&q=80',
-      alt: 'Modern tech gadgets on desk',
-    },
-    {
-      url: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=1600&q=80',
-      alt: 'Fashion accessories on table',
-    },
-    {
-      url: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1600&q=80',
-      alt: 'Lifestyle workspace with notebook',
-    },
-    {
-      url: 'https://images.unsplash.com/photo-1556741533-f6acd6471b89?auto=format&fit=crop&w=1600&q=80',
-      alt: 'Travel essentials and map',
-    },
-  ];
-
-  const [index, setIndex] = useState(0);
-
-  const next = () => setIndex((i) => (i + 1) % slides.length);
-  const prev = () => setIndex((i) => (i - 1 + slides.length) % slides.length);
-
   return (
-    <div className="relative w-full h-64 mb-8 rounded-box overflow-hidden">
-      <img
-        src={slides[index].url}
-        alt={slides[index].alt}
-        className="object-cover w-full h-full"
-      />
-      <button
-        type="button"
-        onClick={prev}
-        className="btn btn-circle absolute left-4 top-1/2 -translate-y-1/2"
-        aria-label="Previous slide"
+    <section className="w-full" role="banner">
+      <Swiper
+        modules={[Navigation, Pagination, Autoplay, A11y, EffectFade]}
+        navigation
+        pagination={{ clickable: true }}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        effect="fade"
+        loop
+        className="h-[60vh] md:h-[70vh]"
       >
-        ❮
-      </button>
-      <button
-        type="button"
-        onClick={next}
-        className="btn btn-circle absolute right-4 top-1/2 -translate-y-1/2"
-        aria-label="Next slide"
-      >
-        ❯
-      </button>
-    </div>
+        {slides.map((slide, i) => (
+          <SwiperSlide key={i} className="relative">
+            <img
+              src={slide.image}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="relative z-10 flex flex-col items-center justify-center h-full bg-black/40 text-center text-white px-4">
+              <h2 className="text-3xl md:text-5xl font-bold mb-2">{slide.headline}</h2>
+              <p className="mb-4 md:text-lg">{slide.tagline}</p>
+              <a href={slide.href} className="btn btn-primary">Shop Now</a>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </section>
   );
 }
