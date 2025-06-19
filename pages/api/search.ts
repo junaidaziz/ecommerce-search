@@ -1,154 +1,100 @@
-// @ts-nocheck
-import { NextApiRequest, NextApiResponse } from 'next';
-import { loadAndIndexProducts } from '../../lib/products';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import Typesense from 'typesense';
 
-// Module-level variables to store the loaded products and index
-// These will persist across requests within the same serverless function instance.
-let productsCache: any[] = [];
-let productIndexCache: any = null;
-let isInitialized = false;
+const client = new Typesense.Client({
+  nodes: [
+    {
+      host: process.env.TYPESENSE_HOST || 'localhost',
+      port: Number(process.env.TYPESENSE_PORT || 8108),
+      protocol: process.env.TYPESENSE_PROTOCOL || 'http',
+    },
+  ],
+  apiKey: process.env.TYPESENSE_API_KEY || '',
+  connectionTimeoutSeconds: 5,
+});
+
+function buildSort(sort?: string) {
+  switch (sort) {
+    case 'price_asc':
+      return 'price:asc';
+    case 'price_desc':
+      return 'price:desc';
+    case 'date_desc':
+      return 'createdAt:desc';
+    case 'date_asc':
+      return 'createdAt:asc';
+    default:
+      return undefined;
+  }
+}
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Initialize products and index only once per serverless function instance
-  if (!isInitialized) {
-    try {
-      console.log('API: Initializing product data...');
-      const { products, productIndex } = await loadAndIndexProducts();
-      productsCache = products;
-      productIndexCache = productIndex;
-      isInitialized = true;
-      console.log('API: Product data initialized.');
-    } catch (error) {
-      console.error('API: Failed to initialize product data:', error);
-      return res.status(500).json({ error: 'Failed to load product data' });
-    }
-  }
-
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
   const {
-    q,
-    filterByVendor,
-    filterByType,
-    filterByCategory,
-    inStock,
-    sortBy,
-    page = 1,
-    pageSize = 20,
+    q = '',
+    category,
+    brand,
     minPrice,
     maxPrice,
-  } = req.query;
+    sort,
+    page = '1',
+    perPage = '20',
+  } = req.query as { [key: string]: string };
 
-  let results = [];
+  const searchParams: Record<string, any> = {
+    q: q || '*',
+    query_by: 'title,description',
+    page: parseInt(page, 10),
+    per_page: parseInt(perPage, 10),
+    facet_by: 'brand,category',
+    max_facet_values: 250,
+  };
 
-  // Perform search using the cached index
-  if (q) {
-    // FlexSearch.Document.search returns an array of { field: ..., result: [...] }
-    // We need to flatten this into a unique list of product objects.
-    const searchResults = productIndexCache.search(q.trim(), {
-      enrich: true,
-      suggest: true,
-    });
+  const filters: string[] = [];
+  if (category && category !== 'All') filters.push(`category:=${category}`);
+  if (brand && brand !== 'All') filters.push(`brand:=${brand}`);
+  if (minPrice) filters.push(`price:>=${minPrice}`);
+  if (maxPrice) filters.push(`price:<=${maxPrice}`);
+  if (filters.length) searchParams.filter_by = filters.join(' && ');
 
-    const uniqueResults = new Map();
-    searchResults.forEach((fieldResult) => {
-      fieldResult.result.forEach((item) => {
-        uniqueResults.set(item.doc.ID, item.doc);
-      });
-    });
-    results = Array.from(uniqueResults.values());
-  } else {
-    results = [...productsCache]; // Return a copy of all products
-  }
+  const sortBy = buildSort(sort);
+  if (sortBy) searchParams.sort_by = sortBy;
 
-  if (filterByVendor && filterByVendor !== 'All') {
-    results = results.filter((product) => product.VENDOR === filterByVendor);
-  }
-  if (filterByType && filterByType !== 'All') {
-    results = results.filter(
-      (product) => product.PRODUCT_TYPE === filterByType
-    );
-  }
-  if (filterByCategory && filterByCategory !== 'All') {
-    results = results.filter(
-      (product) => product.CATEGORY === filterByCategory
-    );
-  }
-  if (inStock === 'true') {
-    results = results.filter((product) => product.TOTAL_INVENTORY > 0);
-  }
-  if (typeof minPrice !== 'undefined') {
-    const min = parseFloat(minPrice);
-    if (!isNaN(min)) {
-      results = results.filter(
-        (product) => parseFloat(product.MIN_PRICE) >= min
-      );
-    }
-  }
-  if (typeof maxPrice !== 'undefined') {
-    const max = parseFloat(maxPrice);
-    if (!isNaN(max)) {
-      results = results.filter(
-        (product) => parseFloat(product.MIN_PRICE) <= max
-      );
-    }
-  }
-
-  if (sortBy) {
-    results.sort((a, b) => {
-      switch (sortBy) {
-        case 'title_asc':
-          return a.TITLE.localeCompare(b.TITLE);
-        case 'title_desc':
-          return b.TITLE.localeCompare(a.TITLE);
-        case 'price_asc':
-          return a.MIN_PRICE - b.MIN_PRICE;
-        case 'price_desc':
-          return b.MIN_PRICE - a.MIN_PRICE;
-        case 'sold_count_desc':
-          return b.SOLD_COUNT - a.SOLD_COUNT;
-        case 'review_count_desc':
-          return b.REVIEW_COUNT - a.REVIEW_COUNT;
-        case 'average_rating_desc':
-          return b.AVERAGE_RATING - a.AVERAGE_RATING;
-        default:
-          return 0;
+  try {
+    const result = await client
+      .collections('products')
+      .documents()
+      .search(searchParams);
+    const hits = result.hits?.map((h: any) => h.document) || [];
+    const totalPages = Math.ceil(result.found / searchParams.per_page);
+    const brands: string[] = [];
+    const categories: string[] = [];
+    if (Array.isArray(result.facet_counts)) {
+      for (const facet of result.facet_counts) {
+        if (facet.field_name === 'brand') {
+          brands.push(...facet.counts.map((c: any) => c.value));
+        }
+        if (facet.field_name === 'category') {
+          categories.push(...facet.counts.map((c: any) => c.value));
+        }
       }
+    }
+    return res.status(200).json({
+      results: hits,
+      total: result.found,
+      page: searchParams.page,
+      totalPages,
+      brands,
+      categories,
     });
+  } catch (err) {
+    console.error('Typesense search error', err);
+    return res.status(500).json({ message: 'Search failed' });
   }
-
-  const total = results.length;
-  const pageInt = parseInt(page, 10);
-  const pageSizeInt = parseInt(pageSize, 10);
-  const paginated = results.slice(
-    (pageInt - 1) * pageSizeInt,
-    pageInt * pageSizeInt
-  );
-
-  // Get all vendors and product types from the full cached list
-  const vendors = [
-    ...new Set(productsCache.map((p) => p.VENDOR).filter(Boolean)),
-  ].sort();
-  const productTypes = [
-    ...new Set(productsCache.map((p) => p.PRODUCT_TYPE).filter(Boolean)),
-  ].sort();
-  const categories = [
-    ...new Set(productsCache.map((p) => p.CATEGORY).filter(Boolean)),
-  ].sort();
-
-  res.status(200).json({
-    results: paginated,
-    total,
-    page: pageInt,
-    pageSize: pageSizeInt,
-    totalPages: Math.ceil(total / pageSizeInt),
-    vendors,
-    productTypes,
-    categories,
-  });
 }
