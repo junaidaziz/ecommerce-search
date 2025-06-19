@@ -13,5 +13,4 @@ function handler(req, res) {
   return res.status(200).json(orders);
 }
 
-
-export default withRole(['brand'])(handler);
+export default withRole(['BRAND'])(handler);
