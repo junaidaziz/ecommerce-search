@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function VendorDashboard() {
@@ -21,7 +21,7 @@ export default function VendorDashboard() {
   const [message, setMessage] = useState('');
   const [editingId, setEditingId] = useState(null);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     if (!user) return;
     const res = await fetch(
       `/api/admin/products?vendor=${encodeURIComponent(user.brandName || '')}`
@@ -29,11 +29,11 @@ export default function VendorDashboard() {
     if (res.ok) {
       setProducts(await res.json());
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts, user]);
+  }, [fetchProducts]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
