@@ -11,6 +11,15 @@ import fs from 'fs';
 import path from 'path';
 import { withRole } from '../../../lib/withRole';
 
+function slugify(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
 export const config = {
   api: {
     bodyParser: false,
@@ -60,15 +69,15 @@ async function handler(req, res) {
       fs.renameSync(file.filepath, destPath);
       imagePaths.push(`/uploads/${id}/${name}`);
     }
+    let existing = null;
     if (req.method === 'PUT') {
-      const existing = getProductById(String(id));
-      const existingImages = existing?.images
-        ? JSON.parse(existing.images)
-        : [];
+      existing = getProductById(String(id));
+      const existingImages = existing?.images ? JSON.parse(existing.images) : [];
       imagePaths.push(...existingImages);
     }
     const productData = {
       id: String(id),
+      slug: slugify(title || existing?.title || String(id)),
       title,
       vendor,
       description,

@@ -419,7 +419,7 @@ export default function Home({ theme, setTheme }) {
                   key={product.ID}
                   className="card bg-base-100 border border-gray-200 shadow-md transform hover:shadow-xl hover:scale-105 transition duration-200 ease-in-out"
                 >
-                  <Link href={`/products/${product.ID}`}>
+                  <Link href={`/product/${product.SLUG}`}>
                     <ProductImageSlider
                       images={
                         product.IMAGES && product.IMAGES.length > 0
@@ -433,7 +433,7 @@ export default function Home({ theme, setTheme }) {
 
                   <div className="card-body flex flex-col gap-1">
                     <Link
-                      href={`/products/${product.ID}`}
+                      href={`/product/${product.SLUG}`}
                       className="hover:underline"
                     >
                       <h2
