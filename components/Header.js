@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import { AppContext } from '../contexts/AppContext';
@@ -11,8 +11,45 @@ export default function Header() {
   const user = session?.user;
   const logout = () => signOut({ redirect: false });
   const [categories, setCategories] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [suggestions, setSuggestions] = useState([]);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const searchRef = useRef(null);
+  const iconMap = {
+    Electronics: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5 mr-1"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M9 17v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2m-6 0V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0h6"
+        />
+      </svg>
+    ),
+    Fashion: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5 mr-1"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M4 7l8-4 8 4M4 7v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7M4 7l8 4 8-4"
+        />
+      </svg>
+    ),
+  };
 
   useEffect(() => {
     async function loadCategories() {
@@ -30,8 +67,30 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
+    function handleKey(e) {
+      if (e.key === 'Escape') setMenuOpen(false);
+    }
+    function handleClick(e) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(e.target) &&
+        !(e.target.closest && e.target.closest('#mega-menu'))
+      ) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener('keydown', handleKey);
+    document.addEventListener('click', handleClick);
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+      document.removeEventListener('click', handleClick);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!search.trim()) {
       setSuggestions([]);
+      setActiveIdx(-1);
       return;
     }
     const controller = new AbortController();
@@ -44,6 +103,7 @@ export default function Header() {
         if (res.ok) {
           const data = await res.json();
           setSuggestions(data.results || []);
+          setActiveIdx(-1);
         }
       } catch (_) {
         // ignore
@@ -86,64 +146,136 @@ export default function Header() {
         <Link href="/" className="btn btn-ghost normal-case text-xl">
           Home
         </Link>
-        <nav className="hidden md:flex">
+        <nav className="hidden md:flex" onMouseLeave={() => setMenuOpen(false)}>
           <ul className="menu menu-horizontal gap-2">
-            <li className="dropdown dropdown-hover">
-              <span tabIndex={0} className="cursor-pointer">
-                Categories
-              </span>
-              <ul
-                tabIndex={0}
-                className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+            <li className="relative">
+              <button
+                type="button"
+                className="flex items-center gap-1 font-semibold"
+                onMouseEnter={() => setMenuOpen(true)}
+                onClick={() => setMenuOpen((o) => !o)}
+                aria-expanded={menuOpen}
               >
-                {categories.length > 0 ? (
-                  categories.map((cat) => (
-                    <li key={cat.name}>
-                      {cat.subcategories && cat.subcategories.length > 0 ? (
-                        <details>
-                          <summary>{cat.name}</summary>
-                          <ul>
-                            {cat.subcategories.map((sub) => (
-                              <li key={sub}>
-                                <Link
-                                  href={`/categories/${encodeURIComponent(
-                                    cat.name
-                                  )}?type=${encodeURIComponent(sub)}`}
-                                >
-                                  {sub}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </details>
-                      ) : (
-                        <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
-                          {cat.name}
-                        </Link>
-                      )}
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-gray-500 px-2 py-1">No categories</li>
-                )}
-              </ul>
+                Categories
+                <svg
+                  className="w-4 h-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+              {menuOpen && (
+                <div
+                  id="mega-menu"
+                  className="absolute left-0 mt-2 p-4 bg-white shadow rounded w-screen max-w-3xl"
+                >
+                  <div
+                    className="grid grid-cols-2 md:grid-cols-3 gap-4"
+                    role="menu"
+                  >
+                    {categories.length > 0 ? (
+                      categories.map((cat) => (
+                        <div
+                          key={cat.name}
+                          className="pb-2 border-b last:border-b-0"
+                          role="none"
+                        >
+                          <Link
+                            href={`/categories/${encodeURIComponent(cat.name)}`}
+                            className="flex items-center text-indigo-600 font-medium mb-1"
+                          >
+                            {iconMap[cat.name] || null}
+                            {cat.name}
+                          </Link>
+                          {cat.subcategories &&
+                            cat.subcategories.length > 0 && (
+                              <ul className="ml-6 space-y-1">
+                                {cat.subcategories.slice(0, 5).map((sub) => (
+                                  <li key={sub}>
+                                    <Link
+                                      href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub)}`}
+                                      className="hover:text-indigo-600"
+                                    >
+                                      {sub}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500">No categories</p>
+                    )}
+                  </div>
+                </div>
+              )}
             </li>
           </ul>
         </nav>
-        <form onSubmit={submitSearch} className="relative">
+        <form
+          onSubmit={submitSearch}
+          ref={searchRef}
+          className="relative flex-1 max-w-lg"
+        >
           <input
-            className="input input-bordered w-40 md:w-64"
+            className="input input-bordered w-full pr-10"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search"
+            onKeyDown={(e) => {
+              if (suggestions.length === 0) return;
+              if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setActiveIdx((i) => (i + 1) % suggestions.length);
+              } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setActiveIdx(
+                  (i) => (i - 1 + suggestions.length) % suggestions.length
+                );
+              } else if (e.key === 'Enter' && activeIdx >= 0) {
+                e.preventDefault();
+                selectSuggestion(suggestions[activeIdx]);
+              }
+            }}
+            placeholder="Search for products, brands..."
+            aria-expanded={suggestions.length > 0}
+            aria-haspopup="listbox"
           />
+          <svg
+            className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1 0 3 10.5a7.5 7.5 0 0 0 13.65 6.15z"
+            />
+          </svg>
           {suggestions.length > 0 && (
-            <ul className="absolute z-10 bg-base-100 border rounded-box mt-1 w-full max-h-60 overflow-auto">
-              {suggestions.map((s) => (
+            <ul
+              id="search-suggestions"
+              role="listbox"
+              className="absolute z-10 bg-white shadow rounded mt-1 w-full max-h-60 overflow-auto"
+            >
+              {suggestions.map((s, idx) => (
                 <li key={s.ID}>
                   <button
                     type="button"
-                    className="block w-full text-left px-2 py-1 hover:bg-base-200"
+                    role="option"
+                    className={`block w-full text-left px-2 py-1 ${idx === activeIdx ? 'bg-indigo-100 text-indigo-600' : 'hover:bg-base-200'}`}
+                    onMouseEnter={() => setActiveIdx(idx)}
                     onClick={() => selectSuggestion(s)}
                   >
                     {s.TITLE}
@@ -158,7 +290,10 @@ export default function Header() {
         <ul className="menu menu-horizontal gap-2">
           <li>
             <div className="relative mr-2">
-              <Link href="/cart" className="btn btn-ghost flex items-center gap-1">
+              <Link
+                href="/cart"
+                className="btn btn-ghost flex items-center gap-1"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -280,27 +415,26 @@ export default function Header() {
                   {categories.length > 0 ? (
                     categories.map((cat) => (
                       <li key={cat.name}>
-                        {cat.subcategories && cat.subcategories.length > 0 ? (
-                          <details>
-                            <summary>{cat.name}</summary>
-                            <ul>
-                              {cat.subcategories.map((sub) => (
-                                <li key={sub}>
-                                  <Link
-                                    href={`/categories/${encodeURIComponent(
-                                      cat.name
-                                    )}?type=${encodeURIComponent(sub)}`}
-                                  >
-                                    {sub}
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
-                          </details>
-                        ) : (
-                          <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
+                        <div className="flex items-center gap-1">
+                          {iconMap[cat.name] || null}
+                          <Link
+                            href={`/categories/${encodeURIComponent(cat.name)}`}
+                          >
                             {cat.name}
                           </Link>
+                        </div>
+                        {cat.subcategories && cat.subcategories.length > 0 && (
+                          <ul className="ml-4">
+                            {cat.subcategories.slice(0, 5).map((sub) => (
+                              <li key={sub}>
+                                <Link
+                                  href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub)}`}
+                                >
+                                  {sub}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
                         )}
                       </li>
                     ))
