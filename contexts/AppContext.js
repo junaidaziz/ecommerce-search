@@ -20,6 +20,16 @@ export function AppProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    if (!user) return;
+    fetch('/api/cart')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (Array.isArray(data)) setCart(data);
+      })
+      .catch(() => {});
+  }, [user]);
+
+  useEffect(() => {
     if (session?.user) {
       const { email, name, role, brandName, gender } = session.user;
       const [firstName = '', lastName = ''] = (name || '').split(' ');
@@ -31,7 +41,14 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     localStorage.setItem('app-cart', JSON.stringify(cart));
-  }, [cart]);
+    if (user) {
+      fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cart }),
+      }).catch(() => {});
+    }
+  }, [cart, user]);
 
   const login = async (email, password) => {
     const res = await nextSignIn('credentials', {
@@ -57,9 +74,9 @@ export function AppProvider({ children }) {
     nextSignOut({ redirect: false });
   };
 
-  const placeOrder = async () => {
-    if (!user || cart.length === 0) return;
-    await fetch('/api/orders', {
+  const placeOrder = async ({ shippingName, shippingAddress }) => {
+    if (!user || cart.length === 0) return false;
+    const res = await fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -69,9 +86,16 @@ export function AppProvider({ children }) {
           (s, i) => s + i.qty * parseFloat(i.MIN_PRICE || 0),
           0
         ),
+        shippingName,
+        shippingAddress,
       }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      throw new Error(data?.message || 'Order failed');
+    }
     setCart([]);
+    return true;
   };
 
   const addToCart = (product) => {
