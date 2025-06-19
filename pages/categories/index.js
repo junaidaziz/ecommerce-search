@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Categories() {
   const [categories, setCategories] = useState([]);
@@ -16,7 +17,13 @@ export default function Categories() {
         {categories.map((c) => (
           <li key={c.name} className="flex items-center gap-2">
             {c.image && (
-              <img src={c.image} alt="" className="w-8 h-8 object-cover" />
+              <Image
+                src={c.image}
+                alt=""
+                width={32}
+                height={32}
+                className="w-8 h-8 object-cover"
+              />
             )}
             <Link href={`/categories/${encodeURIComponent(c.name)}`}>{c.name}</Link>
           </li>

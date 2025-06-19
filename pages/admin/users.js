@@ -14,7 +14,7 @@ export default function ManageUsers() {
 
   useEffect(() => {
     fetchUsers();
-  }, [user]);
+  }, [fetchUsers, user]);
 
   const changeRole = async (email, role) => {
     const res = await fetch('/api/admin/users', {

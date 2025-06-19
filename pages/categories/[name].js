@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
 import Head from 'next/head';
@@ -57,7 +58,15 @@ export default function CategoryPage() {
         />
       </Head>
       <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
-        {catImage && <img src={catImage} alt="" className="w-8 h-8 object-cover" />}
+        {catImage && (
+          <Image
+            src={catImage}
+            alt=""
+            width={32}
+            height={32}
+            className="w-8 h-8 object-cover"
+          />
+        )}
         <span>
           Category: {name}
           {type && ` - ${type}`}

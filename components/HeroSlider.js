@@ -1,4 +1,5 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
+import Image from 'next/image';
 import {
   Navigation,
   Pagination,
@@ -49,10 +50,11 @@ export default function HeroSlider() {
       >
         {slides.map((slide, i) => (
           <SwiperSlide key={i} className="relative">
-            <img
+            <Image
               src={slide.image}
               alt=""
-              className="absolute inset-0 w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
             <div className="relative z-10 flex flex-col items-center justify-center h-full bg-black/40 text-center text-white px-4">
               <h2 className="text-4xl md:text-6xl font-extrabold mb-2">

@@ -14,7 +14,7 @@ export default function Approvals() {
 
   useEffect(() => {
     load();
-  }, [user]);
+  }, [load, user]);
 
   const act = async (id, action) => {
     const res = await fetch('/api/admin/vendor-products', {
