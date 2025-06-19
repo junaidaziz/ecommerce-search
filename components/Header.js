@@ -290,7 +290,9 @@ export default function Header() {
                             </ul>
                           </details>
                         ) : (
-                          <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
+                          <Link
+                            href={`/categories/${encodeURIComponent(cat.name)}`}
+                          >
                             {cat.name}
                           </Link>
                         )}
@@ -305,6 +307,10 @@ export default function Header() {
                 {user.role === 'super-admin' ? (
                   <li>
                     <Link href="/admin">Admin</Link>
+                  </li>
+                ) : user.role === 'brand' ? (
+                  <li>
+                    <Link href="/brand/profile">Profile</Link>
                   </li>
                 ) : (
                   <li>
