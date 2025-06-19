@@ -178,7 +178,7 @@ export default function Header() {
               {menuOpen && (
                 <div
                   id="mega-menu"
-                  className="absolute left-0 top-full mt-2 z-20 p-4 bg-base-100 shadow-lg rounded w-screen max-w-3xl"
+                  className="absolute left-0 top-full mt-1 z-40 p-4 bg-base-100 shadow-lg rounded w-screen max-w-3xl"
                 >
                   <div
                     className="grid grid-cols-2 md:grid-cols-3 gap-4"
