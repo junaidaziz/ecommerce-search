@@ -5,6 +5,6 @@ export default {
     '^next/link$': '<rootDir>/test-utils/NextLink.js'
   },
   transform: {
-    '^.+\\.js$': 'babel-jest'
+    '^.+\\.[jt]sx?$': 'babel-jest'
   }
 };
