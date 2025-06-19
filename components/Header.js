@@ -145,17 +145,19 @@ export default function Header({ theme = 'light', setTheme }) {
     </li>
   );
   return (
-    <header className="navbar bg-base-300 mb-6">
-      <div className="flex-1 flex items-center gap-2">
-        <Link href="/" className="btn btn-ghost normal-case text-xl">
-          Home
-        </Link>
-        <nav className="hidden md:flex" onMouseLeave={() => setMenuOpen(false)}>
+    <header className="bg-base-300 mb-6">
+      <div className="max-w-screen-xl mx-auto px-4 flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <Link href="/" className="btn btn-ghost normal-case text-xl">
+            Home
+          </Link>
+        </div>
+        <div className="flex-1 hidden md:flex items-center justify-center gap-4" onMouseLeave={() => setMenuOpen(false)}>
           <ul className="menu menu-horizontal gap-2">
             <li className="relative">
               <button
                 type="button"
-                className="flex items-center gap-1 font-semibold"
+                className="flex items-center gap-1 font-semibold transition-colors duration-200 hover:text-primary"
                 onMouseEnter={() => setMenuOpen(true)}
                 onClick={() => setMenuOpen((o) => !o)}
                 aria-expanded={menuOpen}
@@ -194,7 +196,7 @@ export default function Header({ theme = 'light', setTheme }) {
                         >
                           <Link
                             href={`/categories/${encodeURIComponent(cat.name)}`}
-                            className="flex items-center font-semibold mb-1 hover:text-indigo-600"
+                            className="flex items-center font-semibold mb-1 transition-colors duration-200 hover:text-primary"
                           >
                             {cat.image ? (
                               <Image
@@ -216,7 +218,7 @@ export default function Header({ theme = 'light', setTheme }) {
                                   <li key={sub} className="text-sm">
                                     <Link
                                       href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub)}`}
-                                      className="hover:text-indigo-600"
+                                      className="transition-colors duration-200 hover:text-primary"
                                     >
                                       {sub}
                                     </Link>
@@ -234,11 +236,10 @@ export default function Header({ theme = 'light', setTheme }) {
               )}
             </li>
           </ul>
-        </nav>
-        <form
-          onSubmit={submitSearch}
-          ref={searchRef}
-          className="relative flex-1 max-w-lg"
+          <form
+            onSubmit={submitSearch}
+            ref={searchRef}
+            className="relative flex-1 max-w-lg"
         >
           <input
             className="input input-bordered w-full pr-10"
@@ -303,12 +304,12 @@ export default function Header({ theme = 'light', setTheme }) {
           )}
         </form>
       </div>
-      <nav className="hidden md:flex flex-none ml-auto items-center">
+      <nav className="hidden md:flex flex-none items-center gap-2">
         <ul className="menu menu-horizontal gap-2 items-center">
           <li className="relative mr-1">
             <Link
               href="/cart"
-              className="p-2 rounded-full shadow-sm hover:bg-base-200"
+              className="p-2 rounded-full shadow-sm transition-colors duration-200 hover:bg-base-200"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -428,7 +429,7 @@ export default function Header({ theme = 'light', setTheme }) {
             <li className="relative">
               <Link
                 href="/cart"
-                className="p-2 rounded-full shadow-sm hover:bg-base-200"
+                className="p-2 rounded-full shadow-sm transition-colors duration-200 hover:bg-base-200"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -561,6 +562,7 @@ export default function Header({ theme = 'light', setTheme }) {
             )}
           </ul>
         </div>
+      </div>
       </div>
     </header>
   );
