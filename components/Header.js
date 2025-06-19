@@ -119,7 +119,32 @@ export default function Header() {
             tabIndex={0}
             className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
           >
-            {categories.map((cat) => renderCat(cat))}
+            {categories.map((cat) => (
+              <li key={cat.name}>
+                {cat.subcategories && cat.subcategories.length > 0 ? (
+                  <details>
+                    <summary>{cat.name}</summary>
+                    <ul>
+                      {cat.subcategories.map((sub) => (
+                        <li key={sub}>
+                          <Link
+                            href={`/categories/${encodeURIComponent(
+                              cat.name
+                            )}?type=${encodeURIComponent(sub)}`}
+                          >
+                            {sub}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : (
+                  <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
+                    {cat.name}
+                  </Link>
+                )}
+              </li>
+            ))}
           </ul>
         </div>
         <div className="relative mr-2">
@@ -228,7 +253,34 @@ export default function Header() {
               <li>
                 <details>
                   <summary>Categories</summary>
-                  <ul>{categories.map((cat) => renderCat(cat))}</ul>
+                  <ul>
+                    {categories.map((cat) => (
+                      <li key={cat.name}>
+                        {cat.subcategories && cat.subcategories.length > 0 ? (
+                          <details>
+                            <summary>{cat.name}</summary>
+                            <ul>
+                              {cat.subcategories.map((sub) => (
+                                <li key={sub}>
+                                  <Link
+                                    href={`/categories/${encodeURIComponent(
+                                      cat.name
+                                    )}?type=${encodeURIComponent(sub)}`}
+                                  >
+                                    {sub}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </details>
+                        ) : (
+                          <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
+                            {cat.name}
+                          </Link>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                 </details>
               </li>
             )}
