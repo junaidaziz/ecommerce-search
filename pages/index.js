@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { AppContext } from '../contexts/AppContext';
 import ProductImageSlider from '../components/ProductImageSlider';
+import HeroSlider from '../components/HeroSlider';
 
 export default function Home({ theme, setTheme }) {
   const router = useRouter();
@@ -211,6 +212,8 @@ export default function Home({ theme, setTheme }) {
           rel="stylesheet"
         />
       </Head>
+
+      <HeroSlider />
 
       <main className="w-full max-w-screen-2xl bg-base-100 p-8 rounded-box shadow-xl">
         <h1 className="text-4xl font-bold text-center text-base-content mb-8">
