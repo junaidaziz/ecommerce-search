@@ -20,7 +20,7 @@ export default function UserWishlist() {
             className="border p-2 flex justify-between items-center"
           >
             <div>
-              <Link href={`/products/${item.ID}`} className="font-semibold">
+              <Link href={`/product/${item.SLUG}`} className="font-semibold">
                 {item.TITLE}
               </Link>
             </div>

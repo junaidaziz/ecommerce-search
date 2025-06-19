@@ -1,5 +1,14 @@
 import { addProduct, loadAndIndexProducts } from '../../../../lib/products';
 
+function slugify(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     const { vendor } = req.query;
@@ -28,6 +37,7 @@ export default async function handler(req, res) {
     }
     addProduct({
       id: String(id),
+      slug: slugify(title || String(id)),
       title,
       vendor,
       description,
