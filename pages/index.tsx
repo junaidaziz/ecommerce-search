@@ -1,19 +1,21 @@
-import { useState, useEffect, useCallback, useRef, useContext } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
 import { AppContext } from '../contexts/AppContext';
 import ProductImageSlider from '../components/ProductImageSlider';
 import HeroSlider from '../components/HeroSlider';
+import { Product } from "../types/product";
 
-export default function Home({ theme, setTheme }) {
+interface HomeProps { theme?: string; setTheme?: (t: string) => void; }
+export default function Home({ theme, setTheme }: HomeProps) {
   const router = useRouter();
   const { addToCart, addToWishlist, removeFromWishlist, wishlist } =
     useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [sortBy, setSortBy] = useState('sold_count_desc');
   const [filterByVendor, setFilterByVendor] = useState('All');
@@ -22,21 +24,22 @@ export default function Home({ theme, setTheme }) {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const pageSize = 20;
 
-  const [allVendors, setAllVendors] = useState([]);
-  const [allProductTypes, setAllProductTypes] = useState([]);
+  const [allVendors, setAllVendors] = useState<string[]>([]);
+  const [allProductTypes, setAllProductTypes] = useState<string[]>([]);
 
   // useRef to store the AbortController instance
-  const abortControllerRef = useRef(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    if (router.query.q) {
-      const q = Array.isArray(router.query.q)
-        ? router.query.q[0]
-        : router.query.q;
+    const qParam = router.query.q;
+    if (qParam) {
+      const q = Array.isArray(qParam)
+        ? qParam[0]
+        : (qParam as string);
       setSearchTerm(q);
     } else {
       setSearchTerm('');
@@ -45,17 +48,18 @@ export default function Home({ theme, setTheme }) {
 
   // Sync filter with query parameter
   useEffect(() => {
-    if (router.query.type) {
-      const t = Array.isArray(router.query.type)
-        ? router.query.type[0]
-        : router.query.type;
+    const typeParam = router.query.type;
+    if (typeParam) {
+      const t = Array.isArray(typeParam)
+        ? typeParam[0]
+        : (typeParam as string);
       setFilterByType(t);
     } else {
       setFilterByType('All');
     }
   }, [router.query.type]);
 
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = useCallback(async (): Promise<void> => {
     // Abort any ongoing request before starting a new one
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -77,8 +81,8 @@ export default function Home({ theme, setTheme }) {
       if (inStock) params.append('inStock', 'true');
       if (minPrice) params.append('minPrice', minPrice);
       if (maxPrice) params.append('maxPrice', maxPrice);
-      params.append('page', currentPage);
-      params.append('pageSize', pageSize);
+      params.append('page', String(currentPage));
+      params.append('pageSize', String(pageSize));
 
       const queryString = params.toString();
       const response = await fetch(
@@ -90,7 +94,7 @@ export default function Home({ theme, setTheme }) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data: { results: Product[]; totalPages: number; vendors: string[]; productTypes: string[]; } = await response.json();
       setProducts(data.results);
       setTotalPages(data.totalPages);
 
@@ -98,7 +102,7 @@ export default function Home({ theme, setTheme }) {
         setAllVendors(['All', ...data.vendors]);
         setAllProductTypes(['All', ...data.productTypes]);
       }
-    } catch (e) {
+    } catch (e: any) {
       // Check if the error is due to an aborted request
       if (e.name === 'AbortError') {
         console.log('Fetch aborted:', searchTerm);
@@ -138,13 +142,13 @@ export default function Home({ theme, setTheme }) {
     };
   }, [fetchProducts]);
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
 
-  const handleTypeClick = (type) => {
+  const handleTypeClick = (type: string) => {
     setFilterByType(type);
     setCurrentPage(1);
     const query = { ...router.query };
@@ -156,13 +160,13 @@ export default function Home({ theme, setTheme }) {
     router.replace({ pathname: '/', query }, undefined, { shallow: true });
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setCurrentPage(1);
     fetchProducts();
   };
 
-  const activeFilters = [];
+  const activeFilters: { label: string; clear: () => void }[] = [];
   if (filterByVendor !== 'All')
     activeFilters.push({
       label: filterByVendor,
@@ -418,7 +422,7 @@ export default function Home({ theme, setTheme }) {
                             ? [product.FEATURED_IMAGE.url]
                             : []
                       }
-                      placeholderSeed={product.ID}
+                      placeholderSeed={Number(product.ID)}
                       className="w-full h-40 bg-gray-200 overflow-hidden flex items-center justify-center"
                       imgClass="w-full h-full"
                     />
