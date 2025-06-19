@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { host, port, protocol, apiKey } from '../../lib/typesenseClient';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -12,10 +13,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ suggestions: [] });
   }
 
-  const host = process.env.TYPESENSE_HOST || 'localhost';
-  const port = process.env.TYPESENSE_PORT || '8108';
-  const protocol = process.env.TYPESENSE_PROTOCOL || 'http';
-  const apiKey = process.env.TYPESENSE_API_KEY || '';
   const url = `${protocol}://${host}:${port}/collections/products/documents/suggest?q=${encodeURIComponent(query)}&query_by=title,description&num_suggestions=5`;
 
   try {
