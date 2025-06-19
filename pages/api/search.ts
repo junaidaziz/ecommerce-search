@@ -1,12 +1,17 @@
+// @ts-nocheck
+import { NextApiRequest, NextApiResponse } from 'next';
 import { loadAndIndexProducts } from '../../lib/products';
 
 // Module-level variables to store the loaded products and index
 // These will persist across requests within the same serverless function instance.
-let productsCache = [];
-let productIndexCache = null;
+let productsCache: any[] = [];
+let productIndexCache: any = null;
 let isInitialized = false;
 
-export default async function handler(req, res) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   // Initialize products and index only once per serverless function instance
   if (!isInitialized) {
     try {
