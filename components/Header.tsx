@@ -101,7 +101,7 @@ export default function Header({ theme = 'light', setTheme }) {
     const t = setTimeout(async () => {
       try {
         const res = await fetch(
-          `/api/search?q=${encodeURIComponent(search)}&pageSize=5`,
+          `/api/search?q=${encodeURIComponent(search)}&perPage=5`,
           { signal: controller.signal }
         );
         if (res.ok) {
