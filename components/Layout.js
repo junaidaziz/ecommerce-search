@@ -3,14 +3,12 @@ import Header from './Header';
 import Footer from './Footer';
 
 export default function Layout({ children }) {
-  const [theme, setTheme] = useState('light');
-
-  useEffect(() => {
-    const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
-    if (storedTheme) {
-      setTheme(storedTheme);
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') || 'light';
     }
-  }, []);
+    return 'light';
+  });
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -30,4 +28,3 @@ export default function Layout({ children }) {
     </div>
   );
 }
-
