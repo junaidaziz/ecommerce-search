@@ -39,25 +39,29 @@ export default function ProductDetail({ product, initialReviews, initialAverage,
         <title>{product.TITLE} - Product</title>
         <meta name="description" content={product.DESCRIPTION_TEXT?.slice(0, 150)} />
       </Head>
-      <h1 className="text-2xl font-bold mb-4">{product.TITLE}</h1>
-      <div className="mb-4 w-full flex flex-col items-center">
-        <ProductImageSlider
-          images={product.IMAGES && product.IMAGES.length > 0 ? product.IMAGES : [product.FEATURED_IMAGE?.url]}
-          imgClass="max-h-96 hover:scale-110 transition w-full"
-        />
-      </div>
-      <p className="mb-2">Vendor: {product.VENDOR}</p>
-      <p className="mb-2">Type: {product.PRODUCT_TYPE}</p>
-      <p className="mb-4">{product.DESCRIPTION_TEXT || product.BODY_HTML_TEXT || 'No description available.'}</p>
-      <p className="text-lg font-bold mb-4">{product.CURRENCY} {parseFloat(product.MIN_PRICE).toFixed(2)}</p>
-      <p className="mb-2">Rating: {averageRating.toFixed(1)} ({reviewCount})</p>
-      <div className="flex gap-2">
-        <button className="btn btn-primary" onClick={() => addToCart(product)}>Add to Cart</button>
-        {wishlist.some((w) => w.ID === product.ID) ? (
-          <button className="btn" onClick={() => removeFromWishlist(product.ID)}>Remove Wishlist</button>
-        ) : (
-          <button className="btn" onClick={() => addToWishlist(product)}>Add Wishlist</button>
-        )}
+      <div className="flex flex-col md:flex-row gap-8">
+        <div className="md:w-1/2 flex justify-center">
+          <ProductImageSlider
+            images={product.IMAGES && product.IMAGES.length > 0 ? product.IMAGES : [product.FEATURED_IMAGE?.url]}
+            imgClass="max-h-96 hover:scale-110 transition w-full"
+          />
+        </div>
+        <div className="md:w-1/2">
+          <h1 className="text-2xl font-bold mb-4">{product.TITLE}</h1>
+          <p className="mb-2">Vendor: {product.VENDOR}</p>
+          <p className="mb-2">Type: {product.PRODUCT_TYPE}</p>
+          <p className="mb-4">{product.DESCRIPTION_TEXT || product.BODY_HTML_TEXT || 'No description available.'}</p>
+          <p className="text-lg font-bold mb-4">{product.CURRENCY} {parseFloat(product.MIN_PRICE).toFixed(2)}</p>
+          <p className="mb-2">Rating: {averageRating.toFixed(1)} ({reviewCount})</p>
+          <div className="flex gap-2">
+            <button className="btn btn-primary transition-all duration-200" onClick={() => addToCart(product)}>Add to Cart</button>
+            {wishlist.some((w) => w.ID === product.ID) ? (
+              <button className="btn transition-all duration-200" onClick={() => removeFromWishlist(product.ID)}>Remove Wishlist</button>
+            ) : (
+              <button className="btn transition-all duration-200" onClick={() => addToWishlist(product)}>Add Wishlist</button>
+            )}
+          </div>
+        </div>
       </div>
       <div className="mt-6 w-full">
         <h3 className="font-semibold mb-2">Reviews</h3>
@@ -101,7 +105,7 @@ export default function ProductDetail({ product, initialReviews, initialAverage,
               </select>
             </div>
             <textarea className="textarea textarea-bordered w-full" value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Write a review" />
-            <button className="btn btn-sm btn-primary" type="submit">Submit Review</button>
+            <button className="btn btn-sm btn-primary transition-all duration-200" type="submit">Submit Review</button>
           </form>
         )}
       </div>

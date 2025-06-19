@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { AppContext } from '../contexts/AppContext';
 import ProductImageSlider from '../components/ProductImageSlider';
-import HeroSlider from '../components/HeroSlider';
+import Hero from '../components/Hero';
 import { Product } from "../types/product";
 
 interface HomeProps { theme?: string; setTheme?: (t: string) => void; }
@@ -214,7 +214,7 @@ export default function Home({ theme, setTheme }: HomeProps) {
       </Head>
 
       <main className="w-full max-w-screen-2xl bg-base-100 p-8 rounded-box shadow-xl space-y-6">
-        <HeroSlider />
+        <Hero />
         {/* Theme toggle moved to header */}
 
         {allProductTypes.length > 0 && (
@@ -223,7 +223,7 @@ export default function Home({ theme, setTheme }: HomeProps) {
               (type) => (
                 <button
                   key={type}
-                  className={`btn btn-sm m-1 ${filterByType === type ? 'btn-primary' : 'btn-outline'}`}
+                  className={`btn btn-sm m-1 transition-all duration-200 ${filterByType === type ? 'btn-primary' : 'btn-outline'}`}
                   onClick={() => handleTypeClick(type)}
                 >
                   {type}
@@ -411,7 +411,7 @@ export default function Home({ theme, setTheme }: HomeProps) {
               {products.map((product) => (
                 <div
                   key={product.ID}
-                  className="card bg-base-100 border border-gray-200 shadow-md transform hover:shadow-xl hover:scale-105 transition duration-200 ease-in-out"
+                  className="card bg-base-100 border border-base-300 rounded-xl shadow hover:shadow-lg transition-all duration-200"
                 >
                   <Link href={`/product/${product.SLUG}`}>
                     <ProductImageSlider
@@ -431,7 +431,7 @@ export default function Home({ theme, setTheme }: HomeProps) {
                   <div className="card-body flex flex-col gap-1">
                     <Link
                       href={`/product/${product.SLUG}`}
-                      className="hover:underline"
+                      className="hover:underline transition-colors duration-200"
                     >
                       <h2
                         className="text-lg font-semibold text-base-content line-clamp-2"
@@ -475,21 +475,21 @@ export default function Home({ theme, setTheme }: HomeProps) {
                     </div>
                     <div className="flex gap-2 mt-2">
                       <button
-                        className="btn btn-sm btn-primary"
+                        className="btn btn-sm btn-primary transition-all duration-200"
                         onClick={() => addToCart(product)}
                       >
                         Add to Cart
                       </button>
                       {wishlist.some((w) => w.ID === product.ID) ? (
                         <button
-                          className="btn btn-sm"
+                          className="btn btn-sm transition-all duration-200"
                           onClick={() => removeFromWishlist(product.ID)}
                         >
                           Remove Wishlist
                         </button>
                       ) : (
                         <button
-                          className="btn btn-sm"
+                          className="btn btn-sm transition-all duration-200"
                           onClick={() => addToWishlist(product)}
                         >
                           Add Wishlist
