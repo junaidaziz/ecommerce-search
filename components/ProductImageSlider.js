@@ -4,13 +4,13 @@ export default function ProductImageSlider({
   images = [],
   className = '',
   imgClass = '',
+  placeholderSeed = 1,
 }) {
   const [idx, setIdx] = useState(0);
   if (!images || images.length === 0) {
-    // Placeholder photo from Unsplash, replace before production
     return (
       <img
-        src="https://images.unsplash.com/photo-1606813909275-63941d602ae2?auto=format&fit=crop&w=600&q=80"
+        src={`https://source.unsplash.com/400x400/?product&sig=${placeholderSeed}`}
         alt="Placeholder product"
         className={imgClass}
       />
