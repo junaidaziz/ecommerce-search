@@ -33,7 +33,7 @@ export default function VendorDashboard() {
 
   useEffect(() => {
     fetchProducts();
-  }, [user]);
+  }, [fetchProducts, user]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

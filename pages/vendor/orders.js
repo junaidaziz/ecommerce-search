@@ -26,7 +26,7 @@ export default function VendorOrders() {
 
   useEffect(() => {
     fetchOrders();
-  }, [user]);
+  }, [fetchOrders, user]);
 
   const updateStatus = async (id, status) => {
     const res = await fetch(`/api/orders/${id}`, {

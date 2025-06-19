@@ -40,7 +40,7 @@ export default function BrandDashboard() {
 
   useEffect(() => {
     fetchProducts();
-  }, [user]);
+  }, [fetchProducts, user]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
