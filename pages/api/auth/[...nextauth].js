@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import bcrypt from 'bcryptjs';
 import { findUser, addUser } from '../../../lib/users.js';
 
 export const authOptions = {
@@ -20,15 +21,15 @@ export const authOptions = {
         email: { label: 'Email', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      authorize(credentials) {
-        const user = findUser(credentials.email);
-        if (user && user.password === credentials.password) {
-          const { first_name, last_name, brand_name, gender, role } = user;
+      async authorize(credentials) {
+        const user = await findUser(credentials.email);
+        if (user && (await bcrypt.compare(credentials.password, user.password))) {
+          const { firstName, lastName, brandName, gender, role } = user;
           return {
             id: user.email,
             email: user.email,
-            name: `${first_name} ${last_name}`,
-            brandName: brand_name,
+            name: `${firstName} ${lastName}`,
+            brandName,
             gender,
             role,
           };
@@ -40,28 +41,27 @@ export const authOptions = {
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account.provider === 'google' || account.provider === 'github') {
-        const existing = findUser(user.email);
+        const existing = await findUser(user.email);
         if (!existing) {
           const nameParts = (profile?.name || '').split(' ');
-          addUser({
+          await addUser({
             email: user.email,
             password: '',
             first_name: profile?.given_name || nameParts[0] || '',
-            last_name:
-              profile?.family_name || nameParts.slice(1).join(' ') || '',
+            last_name: profile?.family_name || nameParts.slice(1).join(' ') || '',
             brand_name: null,
             gender: profile?.gender || '',
-            role: 'user',
+            role: 'USER',
           });
         }
       }
       return true;
     },
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
       } else if (!token.role) {
-        const dbUser = findUser(token.email);
+        const dbUser = await findUser(token.email);
         if (dbUser) token.role = dbUser.role;
       }
       return token;
