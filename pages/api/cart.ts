@@ -1,4 +1,4 @@
-import { getCart, setCart } from '../../lib/db.js';
+import { getCart, setCart } from '../../lib/db';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 

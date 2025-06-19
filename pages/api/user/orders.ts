@@ -1,4 +1,4 @@
-import { getOrdersForUser } from '../../../lib/orders.js';
+import { getOrdersForUser } from '../../../lib/orders';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 
