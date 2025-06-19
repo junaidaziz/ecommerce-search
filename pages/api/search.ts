@@ -1,6 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Typesense from 'typesense';
 import { getBestSellingProducts } from '../../lib/orders';
+import { prisma } from '../../lib/prisma';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from './auth/[...nextauth]';
 
 const client = new Typesense.Client({
   nodes: [
@@ -35,6 +38,16 @@ export default async function handler(
 ) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method Not Allowed' });
+  }
+
+  const session = await getServerSession(req, res, authOptions);
+  let userId: number | null = null;
+  if (session?.user?.email) {
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
+    if (user) userId = user.id;
   }
 
   const {
@@ -94,6 +107,17 @@ export default async function handler(
       }
     }
     const fallback = result.found === 0 ? getBestSellingProducts(8) : [];
+    try {
+      await prisma.searchLog.create({
+        data: {
+          query: String(q),
+          userId,
+          noResults: result.found === 0,
+        },
+      });
+    } catch (e) {
+      console.error('failed to log search', e);
+    }
     return res.status(200).json({
       results: hits,
       total: result.found,

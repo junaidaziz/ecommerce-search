@@ -32,6 +32,9 @@ export default function AdminAnalytics() {
         <Link href="/admin/approvals" className="btn btn-sm">
           Approvals
         </Link>
+        <Link href="/admin/search-analytics" className="btn btn-sm">
+          Search Logs
+        </Link>
       </div>
       <p>Total Orders: {data.totalOrders}</p>
       <p>Total Revenue: £{data.totalRevenue.toFixed(2)}</p>
@@ -47,4 +50,3 @@ export default function AdminAnalytics() {
     </div>
   );
 }
-
