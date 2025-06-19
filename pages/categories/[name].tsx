@@ -1,14 +1,13 @@
 import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { AppContext } from '../../contexts/AppContext';
+import ProductCard from '../../components/ProductCard';
 import Head from 'next/head';
 
 export default function CategoryPage() {
   const router = useRouter();
   const { name, type } = router.query;
-  const { addToCart } = useContext(AppContext);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [catImage, setCatImage] = useState('');
@@ -75,23 +74,7 @@ export default function CategoryPage() {
       {loading && <div>Loading...</div>}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((p) => (
-          <div
-            key={p.ID}
-            className="bg-base-100 rounded-lg shadow-md p-4 flex flex-col"
-          >
-            <Link
-              href={`/product/${p.SLUG}`}
-              className="font-semibold mb-2 hover:underline"
-            >
-              {p.TITLE}
-            </Link>
-            <button
-              className="btn btn-sm btn-primary mt-auto"
-              onClick={() => addToCart(p)}
-            >
-              Add to Cart
-            </button>
-          </div>
+          <ProductCard key={p.ID} product={p} />
         ))}
       </div>
       {products.length === 0 && !loading && (
