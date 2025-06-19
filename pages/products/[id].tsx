@@ -4,15 +4,17 @@ import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
 import Head from 'next/head';
 import ProductImageSlider from '../../components/ProductImageSlider';
+import type { Product } from '../../types/product';
+import type { Review, ReviewsResponse, ReviewAddedResponse } from '../../types/review';
 
 export default function ProductDetail() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id } = router.query as { id?: string };
   const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } =
     useContext(AppContext);
-  const [product, setProduct] = useState(null);
-  const [error, setError] = useState(null);
-  const [reviews, setReviews] = useState([]);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [myRating, setMyRating] = useState(5);
@@ -28,7 +30,7 @@ export default function ProductDetail() {
           return;
         }
         if (!res.ok) throw new Error('Failed');
-        const data = await res.json();
+        const data: Product = await res.json();
         if (!data) {
           setError('Product not found');
           return;
@@ -36,7 +38,7 @@ export default function ProductDetail() {
         setProduct(data);
         const revRes = await fetch(`/api/products/${id}/reviews`);
         if (revRes.ok) {
-          const rdata = await revRes.json();
+          const rdata: ReviewsResponse = await revRes.json();
           setReviews(rdata.reviews);
           setAverageRating(rdata.averageRating);
           setReviewCount(rdata.reviewCount);
@@ -73,7 +75,7 @@ export default function ProductDetail() {
                 priceCurrency: product.CURRENCY,
                 price: product.MIN_PRICE,
                 availability:
-                  product.TOTAL_INVENTORY > 0
+                  product.TOTAL_INVENTORY && product.TOTAL_INVENTORY > 0
                     ? 'https://schema.org/InStock'
                     : 'https://schema.org/OutOfStock',
               },
@@ -101,11 +103,9 @@ export default function ProductDetail() {
       </p>
       <p className="text-lg font-bold mb-4">
         {product.CURRENCY || ''}{' '}
-        {product.MIN_PRICE ? parseFloat(product.MIN_PRICE).toFixed(2) : 'N/A'}
+        {product.MIN_PRICE ? product.MIN_PRICE.toFixed(2) : 'N/A'}
       </p>
-      <p className="mb-2">
-        Rating: {averageRating.toFixed(1)} ({reviewCount})
-      </p>
+      <p className="mb-2">Rating: {averageRating.toFixed(1)} ({reviewCount})</p>
       <div className="flex gap-2">
         <button className="btn btn-primary" onClick={() => addToCart(product)}>
           Add to Cart
@@ -145,12 +145,12 @@ export default function ProductDetail() {
                 body: JSON.stringify({ rating: myRating, comment }),
               });
               if (res.ok) {
-                const data = await res.json();
+                const data: ReviewAddedResponse = await res.json();
                 setAverageRating(data.averageRating);
                 setReviewCount(data.reviewCount);
                 const rres = await fetch(`/api/products/${id}/reviews`);
                 if (rres.ok) {
-                  const rdata = await rres.json();
+                  const rdata: ReviewsResponse = await rres.json();
                   setReviews(rdata.reviews);
                 }
                 setComment('');
