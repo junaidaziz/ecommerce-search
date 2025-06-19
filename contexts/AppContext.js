@@ -129,16 +129,18 @@ export function AppProvider({ children }) {
   };
 
   const addToCart = (product) => {
+    let qty = 1;
     setCart((prev) => {
       const existing = prev.find((p) => p.ID === product.ID);
       if (existing) {
+        qty = existing.qty + 1;
         return prev.map((p) =>
-          p.ID === product.ID ? { ...p, qty: p.qty + 1 } : p
+          p.ID === product.ID ? { ...p, qty } : p
         );
       }
-      return [...prev, { ...product, qty: 1 }];
+      return [...prev, { ...product, qty }];
     });
-    addNotification('Added to cart', 'success');
+    addNotification(`Added ${product.TITLE} (x${qty}) to cart`, 'success', 'center');
   };
 
   const changeQty = (id, delta) => {
