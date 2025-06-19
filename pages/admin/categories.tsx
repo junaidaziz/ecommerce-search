@@ -69,7 +69,7 @@ export default function Categories() {
     return <div className="p-4">Admin access required.</div>;
 
   return (
-    <div className="w-full p-4 sm:p-6 lg:p-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8">
       <h1 className="text-2xl font-bold mb-4">Categories</h1>
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <div className="flex gap-2 mb-4">

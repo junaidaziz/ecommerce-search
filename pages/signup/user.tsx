@@ -127,7 +127,7 @@ export default function UserSignup() {
   };
 
   return (
-    <div className="w-full p-4 sm:p-6 lg:p-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8">
       <h1 className="text-2xl font-bold mb-4">User Sign Up</h1>
       <div className="flex flex-col gap-6 mb-4">
         <button

@@ -54,7 +54,7 @@ export default function ProductDetail() {
   if (!product) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md">
+    <div className="max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md">
       <Head>
         <title>{(product.TITLE || 'Product') + ' - Product'}</title>
         <meta
