@@ -25,6 +25,12 @@ export default function UserOrders() {
             <p>
               Order #{o.id} - {o.status}
             </p>
+            {o.shipping_name && (
+              <p className="text-sm">Ship To: {o.shipping_name}</p>
+            )}
+            {o.shipping_address && (
+              <p className="text-sm">Address: {o.shipping_address}</p>
+            )}
             <ul className="list-disc pl-4 text-sm mb-1">
               {o.items.map((item) => (
                 <li key={item.ID}>

@@ -5,16 +5,45 @@ import {
   getOrdersForVendor,
 } from '../../lib/orders.js';
 import { findUser } from '../../lib/users.js';
+import {
+  getProductById,
+  decreaseProductQuantity,
+  clearCart,
+} from '../../lib/db.js';
 import { withRole } from '../../lib/withRole';
 
 async function handler(req, res) {
   if (req.method === 'POST') {
-    const { email, items, total } = req.body;
+    const { email, items, total, shippingName, shippingAddress } = req.body;
     if (!email || !items) {
       return res.status(400).json({ message: 'email and items required' });
     }
-    addOrder({ user_email: email, items, total: total || 0 });
-    return res.status(201).json({ message: 'order placed' });
+
+    for (const item of items) {
+      const product = getProductById(String(item.ID));
+      if (!product) {
+        return res.status(404).json({ message: 'Product not found' });
+      }
+      if ((product.quantity || 0) < item.qty) {
+        return res
+          .status(409)
+          .json({ message: `Insufficient stock for ${product.title}` });
+      }
+    }
+
+    for (const item of items) {
+      decreaseProductQuantity(String(item.ID), item.qty);
+    }
+
+    const orderId = addOrder({
+      user_email: email,
+      items,
+      total: total || 0,
+      shipping_name: shippingName,
+      shipping_address: shippingAddress,
+    });
+    clearCart(email);
+    return res.status(201).json({ message: 'order placed', id: orderId });
   }
 
   if (req.method === 'GET') {
@@ -34,4 +63,4 @@ async function handler(req, res) {
   return res.status(405).json({ message: 'Method Not Allowed' });
 }
 
-export default withRole(['USER','BRAND','SUPER_ADMIN'])(handler);
+export default withRole(['USER', 'BRAND', 'SUPER_ADMIN'])(handler);
