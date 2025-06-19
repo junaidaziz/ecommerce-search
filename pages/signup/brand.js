@@ -504,7 +504,7 @@ export default function BrandSignup() {
           </div>
         </div>
         <button
-          className="btn btn-primary w-full mt-8 rounded-lg hover:opacity-90"
+          className="btn btn-primary mt-8 px-6 rounded-lg hover:opacity-90"
           type="submit"
           disabled={loading}
         >
