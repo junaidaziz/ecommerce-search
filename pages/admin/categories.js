@@ -5,6 +5,7 @@ export default function Categories() {
   const { user } = useContext(AppContext);
   const [categories, setCategories] = useState([]);
   const [newCat, setNewCat] = useState('');
+  const [newParent, setNewParent] = useState('');
   const [message, setMessage] = useState('');
   const [editing, setEditing] = useState(null);
   const [editName, setEditName] = useState('');
@@ -24,7 +25,7 @@ export default function Categories() {
     const res = await fetch('/api/admin/categories', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newCat }),
+      body: JSON.stringify({ name: newCat, parentId: newParent || null }),
     });
     if (res.ok) {
       setNewCat('');
@@ -73,47 +74,93 @@ export default function Categories() {
           placeholder="New category"
           className="input input-bordered flex-1"
         />
+        <select
+          className="select select-bordered"
+          value={newParent}
+          onChange={(e) => setNewParent(e.target.value)}
+        >
+          <option value="">No parent</option>
+          {categories
+            .filter((c) => !c.parentId)
+            .map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+        </select>
         <button onClick={add} className="btn btn-primary">
           Add
         </button>
       </div>
       <ul className="space-y-2">
-        {categories.map((c) => (
-          <li key={c.id} className="flex items-center gap-2">
-            {editing === c.id ? (
-              <>
-                <input
-                  className="input input-bordered flex-1"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                />
-                <button onClick={update} className="btn btn-sm">
-                  Save
-                </button>
-                <button onClick={() => setEditing(null)} className="btn btn-sm">
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <>
-                <span className="flex-1">{c.name}</span>
-                <button
-                  onClick={() => {
-                    setEditing(c.id);
-                    setEditName(c.name);
-                  }}
-                  className="btn btn-sm"
-                >
-                  Edit
-                </button>
-                <button onClick={() => remove(c.id)} className="btn btn-sm">
-                  Delete
-                </button>
-              </>
-            )}
-          </li>
+        {buildTree(categories).map((c) => (
+          <CategoryItem key={c.id} cat={c} />
         ))}
       </ul>
     </div>
   );
+
+  function buildTree(list) {
+    const map = {};
+    list.forEach((c) => {
+      map[c.id] = { ...c, children: [] };
+    });
+    const tree = [];
+    list.forEach((c) => {
+      if (c.parentId) {
+        map[c.parentId]?.children.push(map[c.id]);
+      } else {
+        tree.push(map[c.id]);
+      }
+    });
+    return tree;
+  }
+
+  function CategoryItem({ cat }) {
+    const hasChildren = cat.children && cat.children.length > 0;
+    return (
+      <li className={cat.parentId ? 'ml-4' : ''}>
+        <div className="flex items-center gap-2">
+          {editing === cat.id ? (
+            <>
+              <input
+                className="input input-bordered flex-1"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
+              <button onClick={update} className="btn btn-sm">
+                Save
+              </button>
+              <button onClick={() => setEditing(null)} className="btn btn-sm">
+                Cancel
+              </button>
+            </>
+          ) : (
+            <>
+              <span className="flex-1">{cat.name}</span>
+              <button
+                onClick={() => {
+                  setEditing(cat.id);
+                  setEditName(cat.name);
+                }}
+                className="btn btn-sm"
+              >
+                Edit
+              </button>
+              <button onClick={() => remove(cat.id)} className="btn btn-sm">
+                Delete
+              </button>
+            </>
+          )}
+        </div>
+        {hasChildren && (
+          <ul className="ml-4 space-y-2">
+            {cat.children.map((child) => (
+              <CategoryItem key={child.id} cat={child} />
+            ))}
+          </ul>
+        )}
+      </li>
+    );
+  }
 }
