@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "migrate": "node scripts/migrate.mjs",
+    "migrate:blob": "node scripts/migrate-from-blob.mjs",
     "format": "prettier --write .",
     "test": "jest"
   },
