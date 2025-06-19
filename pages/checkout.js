@@ -10,12 +10,15 @@ export default function Checkout() {
   );
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');
+  const [coupon, setCoupon] = useState('');
+  const [discount, setDiscount] = useState(0);
 
   const itemCount = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce(
     (s, i) => s + i.qty * parseFloat(i.MIN_PRICE || 0),
     0
   );
+  const discountedTotal = totalPrice * (1 - discount / 100);
 
   if (!user) return <div className="p-4">Please log in to checkout.</div>;
   if (cart.length === 0) return <div className="p-4">Your cart is empty.</div>;
@@ -32,6 +35,7 @@ export default function Checkout() {
           email: user.email,
           shippingName: name,
           shippingAddress: address,
+          discount,
         }),
       });
       const data = await res.json();
@@ -64,9 +68,45 @@ export default function Checkout() {
       </ul>
       <div className="border-t pt-4 mb-4 flex justify-between">
         <p className="font-semibold">Items: {itemCount}</p>
-        <p className="font-semibold">Total: £{totalPrice.toFixed(2)}</p>
+        <p className="font-semibold">Total: £{discountedTotal.toFixed(2)}</p>
       </div>
       <form onSubmit={submit} className="space-y-3">
+        <div>
+          <label className="label" htmlFor="coupon">
+            Coupon Code
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="coupon"
+              className="input input-bordered flex-1"
+              value={coupon}
+              onChange={(e) => setCoupon(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn"
+              onClick={async () => {
+                if (!coupon) return;
+                const res = await fetch(
+                  `/api/coupons/${encodeURIComponent(coupon)}`
+                );
+                if (res.ok) {
+                  const data = await res.json();
+                  setDiscount(data.percent);
+                } else {
+                  setDiscount(0);
+                }
+              }}
+            >
+              Apply
+            </button>
+          </div>
+          {discount > 0 && (
+            <p className="text-sm text-green-600">
+              Discount {discount}% applied
+            </p>
+          )}
+        </div>
         <div>
           <label className="label" htmlFor="name">
             Name
