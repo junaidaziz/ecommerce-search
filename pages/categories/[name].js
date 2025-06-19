@@ -5,7 +5,7 @@ import { AppContext } from '../../contexts/AppContext';
 
 export default function CategoryPage() {
   const router = useRouter();
-  const { name } = router.query;
+  const { name, type } = router.query;
   const { addToCart } = useContext(AppContext);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,9 +14,10 @@ export default function CategoryPage() {
     if (!name) return;
     async function load() {
       setLoading(true);
-      const res = await fetch(
-        `/api/search?filterByCategory=${encodeURIComponent(name)}`
-      );
+      const url = `/api/search?filterByCategory=${encodeURIComponent(name)}${
+        type ? `&filterByType=${encodeURIComponent(type)}` : ''
+      }`;
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         setProducts(data.results || []);
@@ -24,13 +25,16 @@ export default function CategoryPage() {
       setLoading(false);
     }
     load();
-  }, [name]);
+  }, [name, type]);
 
   if (!name) return <div className="p-4">Loading...</div>;
 
   return (
     <div className="p-4 max-w-screen-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Category: {name}</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        Category: {name}
+        {type && ` - ${type}`}
+      </h1>
       {loading && <div>Loading...</div>}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((p) => (
