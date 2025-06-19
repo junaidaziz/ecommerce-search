@@ -3,6 +3,7 @@ import {
   updateUserRole,
   deleteUser,
   addUser,
+  setUserDisabled,
 } from '../../../lib/users';
 import { withRole } from '../../../lib/withRole';
 
@@ -16,6 +17,13 @@ async function handler(req, res) {
       return res.status(400).json({ message: 'email and role required' });
     await updateUserRole(email, role);
     return res.status(200).json({ message: 'role updated' });
+  }
+  if (req.method === 'PATCH') {
+    const { email, disabled } = req.body || {};
+    if (typeof disabled !== 'boolean' || !email)
+      return res.status(400).json({ message: 'email and disabled required' });
+    await setUserDisabled(email, disabled);
+    return res.status(200).json({ message: 'status updated' });
   }
   if (req.method === 'DELETE') {
     const { email } = req.query;
