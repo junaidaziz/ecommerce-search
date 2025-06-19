@@ -6,7 +6,8 @@ import Link from 'next/link';
 export default function ProductDetail() {
   const router = useRouter();
   const { id } = router.query;
-  const { addToCart } = useContext(AppContext);
+  const { addToCart, addToWishlist, removeFromWishlist, wishlist } =
+    useContext(AppContext);
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
 
@@ -56,9 +57,23 @@ export default function ProductDetail() {
       <p className="text-lg font-bold mb-4">
         {product.CURRENCY} {parseFloat(product.MIN_PRICE).toFixed(2)}
       </p>
-      <button className="btn btn-primary" onClick={() => addToCart(product)}>
-        Add to Cart
-      </button>
+      <div className="flex gap-2">
+        <button className="btn btn-primary" onClick={() => addToCart(product)}>
+          Add to Cart
+        </button>
+        {wishlist.some((w) => w.ID === product.ID) ? (
+          <button
+            className="btn"
+            onClick={() => removeFromWishlist(product.ID)}
+          >
+            Remove Wishlist
+          </button>
+        ) : (
+          <button className="btn" onClick={() => addToWishlist(product)}>
+            Add Wishlist
+          </button>
+        )}
+      </div>
       <div className="mt-4">
         <Link href="/">&larr; Back to products</Link>
       </div>

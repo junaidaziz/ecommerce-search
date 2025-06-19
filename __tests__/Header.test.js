@@ -23,8 +23,11 @@ beforeEach(() => {
   mockUseSession.mockReset();
   mockUseSession.mockReturnValue({ data: null });
 });
-const renderWithContext = (ui, { cart = [], user = null } = {}) => {
-  const value = { cart, user };
+const renderWithContext = (
+  ui,
+  { cart = [], wishlist = [], user = null } = {}
+) => {
+  const value = { cart, wishlist, user };
   return render(<AppContext.Provider value={value}>{ui}</AppContext.Provider>);
 };
 
@@ -49,4 +52,5 @@ test('shows orders link when authenticated as customer', () => {
   mockUseSession.mockReturnValue({ data: { user } });
   renderWithContext(<Header />);
   expect(screen.getAllByText('Orders').length).toBeGreaterThan(0);
+  expect(screen.getAllByText('Wishlist').length).toBeGreaterThan(0);
 });
