@@ -320,11 +320,18 @@ export default function Header() {
           {user ? (
             <>
               {user.role === 'super-admin' ? (
-                <li>
-                  <Link href="/admin" className="btn btn-ghost mr-2">
-                    Admin
-                  </Link>
-                </li>
+                <>
+                  <li>
+                    <Link href="/admin" className="btn btn-ghost mr-2">
+                      Admin
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/admin/analytics" className="btn btn-ghost mr-2">
+                      Analytics
+                    </Link>
+                  </li>
+                </>
               ) : (
                 <>
                   <li>
@@ -454,15 +461,25 @@ export default function Header() {
             </li>
             {user ? (
               <>
-                {user.role === 'super-admin' ? (
+              {user.role === 'super-admin' ? (
+                <>
                   <li>
                     <Link href="/admin">Admin</Link>
                   </li>
-                ) : user.role === 'brand' ? (
+                  <li>
+                    <Link href="/admin/analytics">Analytics</Link>
+                  </li>
+                </>
+              ) : user.role === 'brand' ? (
+                <>
                   <li>
                     <Link href="/brand/profile">Profile</Link>
                   </li>
-                ) : (
+                  <li>
+                    <Link href="/brand/analytics">Analytics</Link>
+                  </li>
+                </>
+              ) : (
                   <>
                     <li>
                       <Link href="/user/orders">Orders</Link>
