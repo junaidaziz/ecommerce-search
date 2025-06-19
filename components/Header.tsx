@@ -146,7 +146,7 @@ export default function Header({ theme = 'light', setTheme }) {
   );
   return (
     <header className="bg-base-300 mb-6">
-      <div className="max-w-screen-xl mx-auto px-4 flex items-center gap-4">
+      <div className="w-full px-4 sm:px-6 lg:px-8 flex items-center gap-4">
         <div className="flex items-center gap-2">
           <Link href="/" className="btn btn-ghost normal-case text-xl">
             Home
