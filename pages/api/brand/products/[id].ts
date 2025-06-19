@@ -1,8 +1,9 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { updateProduct, deleteProduct, loadAndIndexProducts } from '../../../../lib/products';
 import { getProductById } from '../../../../lib/db';
 import { hasOrdersForProduct } from '../../../../lib/orders';
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
   if (!id) return res.status(400).json({ message: 'id required' });
 

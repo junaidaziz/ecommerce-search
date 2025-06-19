@@ -1,6 +1,7 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { verifyUser } from '../../lib/users';
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { token } = req.query;
   if (!token) return res.status(400).json({ message: 'token required' });
   try {

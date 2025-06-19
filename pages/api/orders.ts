@@ -1,3 +1,4 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   addOrder,
   getOrdersForUser,
@@ -13,7 +14,7 @@ import {
 import { withRole } from '../../lib/withRole';
 import { sendOrderConfirmation } from '../../lib/email';
 
-async function handler(req, res) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const { email, items, total, shippingName, shippingAddress } = req.body;
     if (!email || !items) {
