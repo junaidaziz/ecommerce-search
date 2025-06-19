@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
-import { addOrder } from '../../../lib/orders.js';
-import { sendOrderConfirmation } from '../../../lib/email.js';
+import { addOrder } from '../../../lib/orders';
+import { sendOrderConfirmation } from '../../../lib/email';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2023-10-16',

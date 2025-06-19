@@ -13,3 +13,13 @@ export interface Order {
   shippingAddress: string;
   createdAt?: string;
 }
+
+export type OrderResponse = Order;
+
+export interface OrderInput {
+  email: string;
+  items: OrderItem[];
+  total: number;
+  shippingName: string;
+  shippingAddress: string;
+}
