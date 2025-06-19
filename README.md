@@ -33,7 +33,7 @@ cd product-search-app
 npm install
 ```
 
-This will also install **DaisyUI**, a Tailwind CSS component library used throughout the app.
+This will also install **DaisyUI**, a Tailwind CSS component library used throughout the app, and run `prisma generate` to build the Prisma client.
 
 3. **Create `.env.local`**
 
