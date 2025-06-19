@@ -45,7 +45,7 @@ export default function ProductDetail({ product, initialReviews, initialAverage,
   }, [id]);
 
   return (
-    <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md">
+    <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md min-h-screen">
       <Head>
         <title>{product.TITLE} - Product</title>
         <meta name="description" content={product.DESCRIPTION_TEXT?.slice(0, 150)} />
