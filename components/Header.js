@@ -9,6 +9,9 @@ export default function Header() {
   const { data: session } = useSession();
   const { cart } = useContext(AppContext);
   const user = session?.user;
+  const pathname = router.pathname || '';
+  const isSignupRoute = pathname.startsWith('/signup');
+  const isLoginRoute = pathname === '/login';
   const logout = () => signOut({ redirect: false });
   const [categories, setCategories] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -298,14 +301,14 @@ export default function Header() {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                  strokeWidth="1.5"
-                  className="w-5 h-5"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                strokeWidth="1.5"
+                className="w-5 h-5"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
                 />
               </svg>
               {itemCount > 0 && (
@@ -325,7 +328,10 @@ export default function Header() {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/admin/analytics" className="btn btn-ghost mr-2">
+                    <Link
+                      href="/admin/analytics"
+                      className="btn btn-ghost mr-2"
+                    >
                       Analytics
                     </Link>
                   </li>
@@ -355,16 +361,20 @@ export default function Header() {
             </>
           ) : (
             <>
-              <li>
-                <Link href="/login" className="btn btn-ghost">
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link href="/signup" className="btn btn-primary ml-2">
-                  Signup
-                </Link>
-              </li>
+              {!isLoginRoute && (
+                <li>
+                  <Link href="/login" className="btn btn-ghost">
+                    Login
+                  </Link>
+                </li>
+              )}
+              {!isSignupRoute && (
+                <li>
+                  <Link href="/signup" className="btn btn-primary ml-2">
+                    Signup
+                  </Link>
+                </li>
+              )}
             </>
           )}
         </ul>
@@ -402,17 +412,17 @@ export default function Header() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                    strokeWidth="1.5"
-                    className="w-5 h-5"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                    />
-                  </svg>
-                </Link>
+                  strokeWidth="1.5"
+                  className="w-5 h-5"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                  />
+                </svg>
+              </Link>
               {itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
                   {itemCount}
@@ -457,25 +467,25 @@ export default function Header() {
             </li>
             {user ? (
               <>
-              {user.role === 'super-admin' ? (
-                <>
-                  <li>
-                    <Link href="/admin">Admin</Link>
-                  </li>
-                  <li>
-                    <Link href="/admin/analytics">Analytics</Link>
-                  </li>
-                </>
-              ) : user.role === 'brand' ? (
-                <>
-                  <li>
-                    <Link href="/brand/profile">Profile</Link>
-                  </li>
-                  <li>
-                    <Link href="/brand/analytics">Analytics</Link>
-                  </li>
-                </>
-              ) : (
+                {user.role === 'super-admin' ? (
+                  <>
+                    <li>
+                      <Link href="/admin">Admin</Link>
+                    </li>
+                    <li>
+                      <Link href="/admin/analytics">Analytics</Link>
+                    </li>
+                  </>
+                ) : user.role === 'brand' ? (
+                  <>
+                    <li>
+                      <Link href="/brand/profile">Profile</Link>
+                    </li>
+                    <li>
+                      <Link href="/brand/analytics">Analytics</Link>
+                    </li>
+                  </>
+                ) : (
                   <>
                     <li>
                       <Link href="/user/orders">Orders</Link>
@@ -493,12 +503,16 @@ export default function Header() {
               </>
             ) : (
               <>
-                <li>
-                  <Link href="/login">Login</Link>
-                </li>
-                <li>
-                  <Link href="/signup">Signup</Link>
-                </li>
+                {!isLoginRoute && (
+                  <li>
+                    <Link href="/login">Login</Link>
+                  </li>
+                )}
+                {!isSignupRoute && (
+                  <li>
+                    <Link href="/signup">Signup</Link>
+                  </li>
+                )}
               </>
             )}
           </ul>
