@@ -31,7 +31,9 @@ export default function CategoryPage() {
       const res = await fetch('/api/categories');
       if (res.ok) {
         const cats = await res.json();
-        const found = cats.find((c) => c.name.toLowerCase() === name.toLowerCase());
+        const found = cats.find(
+          (c) => c.name.toLowerCase() === name.toLowerCase()
+        );
         if (found && found.image) setCatImage(found.image);
       }
     }
@@ -58,15 +60,13 @@ export default function CategoryPage() {
         />
       </Head>
       <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
-        {catImage && (
-          <Image
-            src={catImage}
-            alt=""
-            width={32}
-            height={32}
-            className="w-8 h-8 object-cover"
-          />
-        )}
+        <Image
+          src={catImage || '/placeholder.png'}
+          alt=""
+          width={32}
+          height={32}
+          className="w-8 h-8 object-cover"
+        />
         <span>
           Category: {name}
           {type && ` - ${type}`}
