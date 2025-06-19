@@ -52,12 +52,18 @@ NEXTAUTH_SECRET=random-secret
 npm run migrate
 ```
 
-5. **Place your product data**
+5. **Import products from Blob**
+
+```bash
+npm run migrate:blob
+```
+
+6. **Place your product data**
 
 Either put your `products.csv` inside the `/data/` directory **or** specify a
 remote file via the `PRODUCTS_URL` environment variable.
 
-6. **Run the project**
+7. **Run the project**
 
 ```bash
 npm run dev
