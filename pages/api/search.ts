@@ -12,9 +12,9 @@ function buildSort(sort?: string) {
     case 'price_desc':
       return 'price:desc';
     case 'date_desc':
-      return 'createdAt:desc';
     case 'date_asc':
-      return 'createdAt:asc';
+      // Deprecated: createdAt field not indexed in Typesense
+      return undefined;
     default:
       return undefined;
   }
