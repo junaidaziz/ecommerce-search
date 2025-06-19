@@ -50,6 +50,9 @@ export default async function handler(
   const searchParams: Record<string, any> = {
     q: q || '*',
     query_by: 'title,description',
+    highlight_fields: 'title,description',
+    highlight_start_tag: '<mark class="bg-yellow-200 font-bold">',
+    highlight_end_tag: '</mark>',
     page: parseInt(page, 10),
     per_page: parseInt(perPage, 10),
     facet_by: 'brand,category',
@@ -71,7 +74,11 @@ export default async function handler(
       .collections('products')
       .documents()
       .search(searchParams);
-    const hits = result.hits?.map((h: any) => h.document) || [];
+    const hits =
+      result.hits?.map((h: any) => ({
+        ...h.document,
+        highlights: h.highlights,
+      })) || [];
     const totalPages = Math.ceil(result.found / searchParams.per_page);
     const brands: string[] = [];
     const categories: string[] = [];
