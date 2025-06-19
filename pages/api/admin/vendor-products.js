@@ -27,4 +27,4 @@ function handler(req, res) {
 }
 
 
-export default withRole(['super-admin'])(handler);
+export default withRole(['SUPER_ADMIN'])(handler);

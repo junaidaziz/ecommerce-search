@@ -1,49 +1,90 @@
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id       Int      @id @default(autoincrement())
-  name     String
-  email    String   @unique
-  role     String
-  password String
-  products Product[]
-  orders   Order[]
+enum Role {
+  USER
+  BRAND
+  SUPER_ADMIN
 }
 
-model Product {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  price       Float
-  image       String
-  categoryId  Int
-  vendorId    Int
-  category    Category @relation(fields: [categoryId], references: [id])
-  vendor      User     @relation(fields: [vendorId], references: [id])
-  orders      Order[]
+model User {
+  id                Int      @id @default(autoincrement())
+  email             String   @unique
+  password          String
+  firstName         String
+  lastName          String
+  brandName         String?
+  gender            String
+  role              Role     @default(USER)
+  verified          Boolean  @default(false)
+  verificationToken String?
+  resetToken        String?
+  resetExpires      DateTime?
+  products          Product[]
+  orders            Order[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Category {
-  id       Int      @id @default(autoincrement())
-  name     String
-  slug     String   @unique
-  products Product[]
+  id        Int       @id @default(autoincrement())
+  name      String
+  slug      String    @unique
+  products  Product[]
+  requests  DeletionRequest[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  productType String
+  tags        String?
+  quantity    Int      @default(0)
+  minPrice    Float    @default(0)
+  maxPrice    Float    @default(0)
+  currency    String   @default("USD")
+  status      String   @default("approved")
+  images      String?
+  vendor      User     @relation(fields: [vendorId], references: [id])
+  vendorId    Int
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  orders      Order[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Order {
-  id        Int    @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
   userId    Int
+  product   Product  @relation(fields: [productId], references: [id])
   productId Int
   quantity  Int
   total     Float
-  status    String
-  user      User    @relation(fields: [userId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
+model DeletionRequest {
+  id        Int       @id @default(autoincrement())
+  category  Category  @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  brand     User      @relation(fields: [brandId], references: [id])
+  brandId   Int
+  reason    String?
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
