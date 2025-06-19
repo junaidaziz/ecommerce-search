@@ -209,17 +209,17 @@ export default function Header({ theme = 'light', setTheme }) {
   );
   return (
     <header className="bg-base-300 mb-6">
-      <div className="w-full px-4 sm:px-6 lg:px-8 flex items-center gap-4">
+      <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className="flex items-center gap-2">
           <Link href="/" className="btn btn-ghost normal-case text-xl">
             Home
           </Link>
         </div>
         <div
-          className="flex-1 hidden md:flex items-center justify-center gap-4"
+          className="flex-1 flex items-center gap-x-4"
           onMouseLeave={() => setMenuOpen(false)}
         >
-          <ul className="menu menu-horizontal gap-2">
+          <ul className="menu menu-horizontal gap-2 hidden md:flex">
             <li className="relative">
               <button
                 type="button"
@@ -415,8 +415,8 @@ export default function Header({ theme = 'light', setTheme }) {
             )}
           </form>
         </div>
-        <nav className="hidden md:flex flex-none items-center gap-2">
-          <ul className="menu menu-horizontal gap-2 items-center">
+        <nav className="flex flex-none items-center gap-x-2">
+          <ul className="menu menu-horizontal gap-x-2 items-center">
             <li className="relative mr-1">
               <Link
                 href="/cart"
@@ -474,15 +474,12 @@ export default function Header({ theme = 'light', setTheme }) {
                 {user.role === 'super-admin' ? (
                   <>
                     <li>
-                      <Link href="/admin" className="btn btn-ghost mr-2">
+                      <Link href="/admin" className="btn btn-ghost">
                         Admin
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        href="/admin/analytics"
-                        className="btn btn-ghost mr-2"
-                      >
+                      <Link href="/admin/analytics" className="btn btn-ghost">
                         Analytics
                       </Link>
                     </li>
@@ -490,15 +487,12 @@ export default function Header({ theme = 'light', setTheme }) {
                 ) : (
                   <>
                     <li>
-                      <Link href="/user/orders" className="btn btn-ghost mr-2">
+                      <Link href="/user/orders" className="btn btn-ghost">
                         Orders
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        href="/user/wishlist"
-                        className="btn btn-ghost mr-2"
-                      >
+                      <Link href="/user/wishlist" className="btn btn-ghost">
                         Wishlist
                       </Link>
                     </li>
@@ -508,7 +502,7 @@ export default function Header({ theme = 'light', setTheme }) {
                   Hello, {user.firstName || user.email}
                 </li>
                 <li>
-                  <button onClick={logout} className="btn btn-outline ml-2">
+                  <button onClick={logout} className="btn btn-outline">
                     Logout
                   </button>
                 </li>
@@ -524,7 +518,7 @@ export default function Header({ theme = 'light', setTheme }) {
                 )}
                 {!isSignupRoute && (
                   <li>
-                    <Link href="/signup" className="btn btn-primary ml-2">
+                    <Link href="/signup" className="btn btn-primary">
                       Signup
                     </Link>
                   </li>
