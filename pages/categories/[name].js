@@ -71,7 +71,7 @@ export default function CategoryPage() {
             className="bg-base-100 rounded-lg shadow-md p-4 flex flex-col"
           >
             <Link
-              href={`/products/${p.ID}`}
+              href={`/product/${p.SLUG}`}
               className="font-semibold mb-2 hover:underline"
             >
               {p.TITLE}
