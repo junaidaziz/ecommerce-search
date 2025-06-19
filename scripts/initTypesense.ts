@@ -24,11 +24,13 @@ const schema = {
   name: 'products',
   fields: [
     { name: 'id', type: 'string' as const },
+    { name: 'title', type: 'string' as const },
     { name: 'name', type: 'string' as const },
     { name: 'slug', type: 'string' as const },
     { name: 'description', type: 'string' as const },
     { name: 'price', type: 'float' as const },
     { name: 'category', type: 'string' as const, facet: true },
+    { name: 'brand', type: 'string' as const, facet: true },
     { name: 'sold_count', type: 'int32' as const },
   ],
   default_sorting_field: 'sold_count',
@@ -36,8 +38,24 @@ const schema = {
 
 async function init() {
   try {
-    await client.collections('products').retrieve();
-    console.log('✅ Typesense collection "products" already exists.');
+    const existing = await client.collections('products').retrieve();
+    const fieldsMatch =
+      existing.fields?.length === schema.fields.length &&
+      existing.fields.every((f: any, i: number) => {
+        const s = schema.fields[i] as any;
+        return f.name === s.name && f.type === s.type && (!!f.facet === !!s.facet);
+      }) &&
+      existing.default_sorting_field === schema.default_sorting_field;
+
+    if (fieldsMatch) {
+      console.log('✅ Typesense collection "products" already up-to-date.');
+      return;
+    }
+
+    console.log('ℹ️  Schema mismatch detected. Recreating collection...');
+    await client.collections('products').delete();
+    await client.collections().create(schema);
+    console.log('✅ Recreated Typesense collection "products".');
   } catch (err: unknown) {
     if (err instanceof ObjectNotFound) {
       console.log('ℹ️  "products" collection not found. Creating new collection...');
