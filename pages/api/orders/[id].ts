@@ -1,6 +1,6 @@
-import { getOrderById } from '../../../lib/orders.js';
-import { updateOrderStatus } from '../../../lib/orders.js';
-import { sendOrderStatusUpdate } from '../../../lib/email.js';
+import { getOrderById } from '../../../lib/orders';
+import { updateOrderStatus } from '../../../lib/orders';
+import { sendOrderStatusUpdate } from '../../../lib/email';
 import { withRole } from '../../../lib/withRole';
 
 async function handler(req, res) {

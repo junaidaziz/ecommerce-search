@@ -1,4 +1,4 @@
-import { getWishlist, setWishlist } from '../../lib/db.js';
+import { getWishlist, setWishlist } from '../../lib/db';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 

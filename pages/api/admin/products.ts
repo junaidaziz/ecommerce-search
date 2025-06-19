@@ -4,7 +4,7 @@ import {
   deleteProduct,
   loadAndIndexProducts,
 } from '../../../lib/products';
-import { getProductById } from '../../../lib/db.js';
+import { getProductById } from '../../../lib/db';
 import { hasOrdersForProduct } from '../../../lib/orders';
 import formidable from 'formidable';
 import fs from 'fs';
