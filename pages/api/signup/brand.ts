@@ -1,8 +1,9 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { addUser, findUser } from '../../../lib/users';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }

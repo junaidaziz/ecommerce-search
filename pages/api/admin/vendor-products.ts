@@ -1,3 +1,4 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   getPendingProducts,
   approveProduct,
@@ -5,7 +6,7 @@ import {
 } from '../../../lib/products';
 import { withRole } from '../../../lib/withRole';
 
-function handler(req, res) {
+function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     return res.status(200).json(getPendingProducts());
   }

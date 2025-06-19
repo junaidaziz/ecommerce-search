@@ -1,3 +1,4 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { addProduct, loadAndIndexProducts } from '../../../../lib/products';
 
 function slugify(text) {
@@ -9,7 +10,7 @@ function slugify(text) {
     .replace(/-+/g, '-');
 }
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     const { vendor } = req.query;
     if (!vendor) return res.status(400).json({ message: 'vendor required' });

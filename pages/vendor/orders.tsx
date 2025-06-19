@@ -1,15 +1,21 @@
-import { useContext, useEffect, useState, useCallback } from 'react';
+import {
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import { NotificationContext } from '../../contexts/NotificationContext';
+import type { Order } from '../../types';
 
 export default function VendorOrders() {
   const { user } = useContext(AppContext);
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const { addNotification } = useContext(NotificationContext);
 
-  const fetchOrders = useCallback(() => {
+  const fetchOrders = useCallback((): void => {
     if (!user) return;
     setLoading(true);
     fetch(
@@ -28,7 +34,7 @@ export default function VendorOrders() {
     fetchOrders();
   }, [fetchOrders]);
 
-  const updateStatus = async (id, status) => {
+  const updateStatus = async (id: number, status: string): Promise<void> => {
     const res = await fetch(`/api/orders/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
