@@ -32,3 +32,6 @@ coverage/
 *.csv~
 *.bak
 *.tmp
+
+# Search index
+public/index.json
