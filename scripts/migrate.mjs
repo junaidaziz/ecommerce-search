@@ -39,6 +39,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS categories (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT UNIQUE,
   parent_id INTEGER,
+  image TEXT,
   FOREIGN KEY(parent_id) REFERENCES categories(id)
 )`);
 
@@ -50,12 +51,12 @@ if (existingCount.c === 0) {
     { name: 'Fashion', subs: ['Men', 'Women'] },
   ];
   const insert = db.prepare(
-    'INSERT INTO categories (name, parent_id) VALUES (?, ?)'
+    'INSERT INTO categories (name, parent_id, image) VALUES (?, ?, ?)'
   );
   sample.forEach((cat) => {
-    const info = insert.run(cat.name, null);
+    const info = insert.run(cat.name, null, null);
     const parentId = info.lastInsertRowid;
-    cat.subs.forEach((sub) => insert.run(sub, parentId));
+    cat.subs.forEach((sub) => insert.run(sub, parentId, null));
   });
 }
 
