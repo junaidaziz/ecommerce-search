@@ -216,7 +216,7 @@ export default function Header() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500">No categories</p>
+                      <p className="text-gray-500">No categories found</p>
                     )}
                   </div>
                 </div>
@@ -460,7 +460,7 @@ export default function Header() {
                       </li>
                     ))
                   ) : (
-                    <li className="text-gray-500 px-2 py-1">No categories</li>
+                    <li className="text-gray-500 px-2 py-1">No categories found</li>
                   )}
                 </ul>
               </details>

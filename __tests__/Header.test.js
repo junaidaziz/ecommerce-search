@@ -22,6 +22,13 @@ jest.mock('next/link', () => ({
 beforeEach(() => {
   mockUseSession.mockReset();
   mockUseSession.mockReturnValue({ data: null });
+  global.fetch = jest.fn(() =>
+    Promise.resolve({ ok: true, json: () => Promise.resolve([]) })
+  );
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 const renderWithContext = (
   ui,
@@ -53,4 +60,30 @@ test('shows orders link when authenticated as customer', () => {
   renderWithContext(<Header />);
   expect(screen.getAllByText('Orders').length).toBeGreaterThan(0);
   expect(screen.getAllByText('Wishlist').length).toBeGreaterThan(0);
+});
+
+test('renders categories from API', async () => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve([{ name: 'Electronics', subcategories: ['Phones'] }]),
+    })
+  );
+  renderWithContext(<Header />);
+  // open the menu to render categories
+  const button = screen.getByRole('button', { name: /categories/i });
+  button.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+  expect(await screen.findByText('Electronics')).toBeInTheDocument();
+  global.fetch.mockRestore();
+});
+
+test('shows fallback when no categories are available', async () => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({ ok: true, json: () => Promise.resolve([]) })
+  );
+  renderWithContext(<Header />);
+  const button = screen.getByRole('button', { name: /categories/i });
+  button.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+  expect(await screen.findByText('No categories found')).toBeInTheDocument();
+  global.fetch.mockRestore();
 });
