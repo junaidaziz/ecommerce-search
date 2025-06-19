@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
+import Head from 'next/head';
 
 export default function CategoryPage() {
   const router = useRouter();
@@ -31,6 +32,20 @@ export default function CategoryPage() {
 
   return (
     <div className="p-4 max-w-screen-2xl mx-auto">
+      <Head>
+        <title>Category: {name}</title>
+        <meta name="description" content={`Products for ${name}`} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'CollectionPage',
+              name: name,
+            }),
+          }}
+        />
+      </Head>
       <h1 className="text-2xl font-bold mb-4">
         Category: {name}
         {type && ` - ${type}`}
