@@ -22,7 +22,7 @@ export default function ProductCard({
   const rating = Math.round(product.AVERAGE_RATING || 0);
 
   return (
-    <div className="group relative bg-base-100 border border-base-300 rounded-xl overflow-hidden shadow hover:shadow-lg transition-shadow duration-200">
+    <div className="group relative flex flex-col h-full bg-base-100 border border-base-300 rounded-xl overflow-hidden shadow hover:shadow-lg transition-shadow duration-200">
       <Link href={`/product/${product.SLUG}`} className="block overflow-hidden">
         <ProductImageSlider
           images={
