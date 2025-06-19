@@ -4,7 +4,7 @@ import { AppContext } from '../contexts/AppContext';
 
 export default function Checkout() {
   const router = useRouter();
-  const { cart, user, placeOrder } = useContext(AppContext);
+  const { cart, user } = useContext(AppContext);
   const [name, setName] = useState(
     user ? `${user.firstName} ${user.lastName}` : ''
   );
@@ -24,8 +24,19 @@ export default function Checkout() {
     e.preventDefault();
     setError('');
     try {
-      await placeOrder({ shippingName: name, shippingAddress: address });
-      router.push('/user/orders');
+      const res = await fetch('/api/checkout/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cart,
+          email: user.email,
+          shippingName: name,
+          shippingAddress: address,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Checkout failed');
+      window.location.href = data.url;
     } catch (e) {
       setError(e.message || 'Order failed');
     }
