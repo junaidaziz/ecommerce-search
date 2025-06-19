@@ -1,5 +1,9 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from './prisma';
 
 export default prisma;
+
+export function dbGetCategories() {
+  return prisma.category.findMany({
+    orderBy: { name: 'asc' },
+  });
+}

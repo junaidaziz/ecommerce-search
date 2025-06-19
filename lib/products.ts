@@ -10,7 +10,7 @@ import {
   deleteProduct as dbDeleteProduct,
   getPendingFromDb,
   setProductStatus,
-  getCategories as dbGetCategories,
+  dbGetCategories,
   addCategory as dbAddCategory,
   updateCategory as dbUpdateCategory,
   deleteCategory as dbDeleteCategory,
@@ -306,8 +306,8 @@ export function getCategoriesFlat() {
   return dbGetCategories();
 }
 
-export function getCategoryTree() {
-  const flat = dbGetCategories();
+export async function getCategoryTree() {
+  const flat = await dbGetCategories();
   if (flat.length > 0) {
     const map = {};
     flat.forEach((c) => {
