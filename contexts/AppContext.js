@@ -59,8 +59,8 @@ export function AppProvider({ children }) {
     if (res?.error) throw new Error('Login failed');
   };
 
-  const signup = async (payload) => {
-    const res = await fetch('/api/signup', {
+  const signup = async (url, payload) => {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
