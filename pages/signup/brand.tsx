@@ -2,7 +2,7 @@ import { useState, useContext, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Image from 'next/image';
-import Select from 'react-select';
+import Select, { components, OptionProps, SingleValueProps } from 'react-select';
 import countryList from 'react-select-country-list';
 import Flag from 'react-world-flags';
 import { AppContext } from '../../contexts/AppContext';
@@ -10,6 +10,30 @@ import { signIn } from 'next-auth/react';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+type CountryOptionType = { label: string; value: string };
+
+const CountryOption = (
+  props: OptionProps<CountryOptionType, false>
+) => (
+  <components.Option {...props}>
+    <div className="flex items-center gap-2">
+      <Flag code={props.data.value} style={{ width: 20, height: 15 }} />
+      <span>{props.data.label}</span>
+    </div>
+  </components.Option>
+);
+
+const CountrySingleValue = (
+  props: SingleValueProps<CountryOptionType, false>
+) => (
+  <components.SingleValue {...props}>
+    <div className="flex items-center gap-2">
+      <Flag code={props.data.value} style={{ width: 20, height: 15 }} />
+      <span>{props.data.label}</span>
+    </div>
+  </components.SingleValue>
+);
 
 export default function BrandSignup() {
   const router = useRouter();
@@ -452,12 +476,7 @@ export default function BrandSignup() {
                   placeholder="Country"
                   className="w-full"
                   classNamePrefix="react-select"
-                  formatOptionLabel={({ label, value }) => (
-                    <div className="flex items-center gap-2">
-                      <Flag code={value} height="16" />
-                      <span>{label}</span>
-                    </div>
-                  )}
+                  components={{ Option: CountryOption, SingleValue: CountrySingleValue }}
                 />
                 {errors.country && (
                   <p className="text-red-500 text-sm">{errors.country}</p>
