@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
-import { useFormState } from 'react-use-form-state';
+import { useForm } from 'react-hook-form';
 import { AppContext } from '../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
@@ -19,10 +19,11 @@ export default function Login() {
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const [formState, inputs] = useFormState({
-    email: '',
-    password: '',
-  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ email: string; password: string }>();
 
   useEffect(() => {
     if (user) {
@@ -32,15 +33,7 @@ export default function Login() {
     }
   }, [user, router]);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { email, password } = formState.values;
-    const errors: Record<string, string> = {};
-    if (!email) errors.email = 'Email is required';
-    else if (!emailRegex.test(email)) errors.email = 'Invalid email format';
-    if (!password) errors.password = 'Password is required';
-    Object.entries(errors).forEach(([k, v]) => formState.setFieldError(k, v));
-    if (Object.keys(errors).length > 0) return;
+  const onSubmit = async ({ email, password }: { email: string; password: string }) => {
     try {
       setLoading(true);
       await login(email, password);
@@ -72,19 +65,25 @@ export default function Login() {
           Login with GitHub
         </button>
         {formError && <div className="text-red-500 mb-2">{formError}</div>}
-        <form onSubmit={onSubmit} className="space-y-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
           <EmailInput
-            field={inputs.email('email', { validate: (v) =>
-              v && !emailRegex.test(v) ? 'Invalid email format' : true })}
+            name="email"
             placeholder="Email"
             required
-            error={formState.errors.email as string}
+            register={register}
+            rules={{
+              required: 'Email is required',
+              pattern: { value: emailRegex, message: 'Invalid email format' },
+            }}
+            error={errors.email?.message as string}
           />
           <PasswordInput
-            field={inputs.password('password')}
+            name="password"
             placeholder="Password"
             required
-            error={formState.errors.password as string}
+            register={register}
+            rules={{ required: 'Password is required' }}
+            error={errors.password?.message as string}
           />
           <button
             className="btn btn-primary w-full"

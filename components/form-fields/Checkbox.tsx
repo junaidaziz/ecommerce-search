@@ -1,5 +1,5 @@
 import React from 'react';
-import { UseFormFieldProps } from '../../types';
+import { UseFormRegister, RegisterOptions } from 'react-hook-form';
 
 export interface CheckboxProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -12,7 +12,8 @@ export interface CheckboxProps
   required?: boolean;
   disabled?: boolean;
   className?: string;
-  field?: UseFormFieldProps;
+  register?: UseFormRegister<any>;
+  rules?: RegisterOptions;
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({
@@ -25,24 +26,26 @@ const Checkbox: React.FC<CheckboxProps> = ({
   required = false,
   disabled = false,
   className = '',
-  field,
+  register,
+  rules,
   ...rest
 }) => {
-  const inputId = rest.id || field?.id || name;
+  const inputId = rest.id || name;
+  const registration = register ? register(name, rules) : {};
   return (
     <div className="mb-4 w-full">
       <div className="flex items-center">
         <input
           type="checkbox"
           id={inputId}
-          name={field?.name ?? name}
-          checked={field?.checked ?? checked}
-          onChange={field?.onChange ?? onChange}
-          onBlur={field?.onBlur ?? onBlur}
+          name={name}
+          checked={checked}
+          onChange={onChange}
+          onBlur={onBlur}
           disabled={disabled}
           required={required}
           className={`mr-2 border rounded text-blue-600 focus:ring-blue-500 ${className}`}
-          ref={field?.ref as any}
+          {...registration}
           {...rest}
         />
         {label && (
