@@ -22,7 +22,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     for (const item of items) {
-      const product = getProductById(String(item.ID));
+      const product = await getProductById(String(item.ID));
       if (!product) {
         return res.status(404).json({ message: 'Product not found' });
       }
@@ -34,17 +34,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     for (const item of items) {
-      decreaseProductQuantity(String(item.ID), item.qty);
+      await decreaseProductQuantity(String(item.ID), item.qty);
     }
 
-    const orderId = addOrder({
+    const orderId = await addOrder({
       user_email: email,
       items,
       total: total || 0,
       shipping_name: shippingName,
       shipping_address: shippingAddress,
     });
-    clearCart(email);
+    await clearCart(email);
     await sendOrderConfirmation(email, { id: orderId });
     return res.status(201).json({ message: 'order placed', id: orderId });
   }
@@ -55,12 +55,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const user = await findUser(email);
     if (!user) return res.status(404).json({ message: 'user not found' });
     if (user.role === 'SUPER_ADMIN') {
-      return res.status(200).json(getAllOrders());
+      return res.status(200).json(await getAllOrders());
     }
     if (user.role === 'BRAND') {
-      return res.status(200).json(getOrdersForVendor(user.brandName));
+      return res.status(200).json(await getOrdersForVendor(user.brandName));
     }
-    return res.status(200).json(getOrdersForUser(email));
+    return res.status(200).json(await getOrdersForUser(email));
   }
 
   return res.status(405).json({ message: 'Method Not Allowed' });

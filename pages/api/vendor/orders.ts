@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getOrdersForVendor } from '../../../lib/orders';
 import { withRole } from '../../../lib/withRole';
 
-function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
@@ -10,7 +10,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!vendor) {
     return res.status(400).json({ message: 'vendor required' });
   }
-  const orders = getOrdersForVendor(vendor);
+  const orders = await getOrdersForVendor(vendor as string);
   return res.status(200).json(orders);
 }
 
