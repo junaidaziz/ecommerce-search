@@ -23,8 +23,8 @@ export async function addOrder({
   for (const item of items) {
     const created = await db.order.create({
       data: {
-        userId: user.id,
-        productId: Number(item.ID),
+        user: { connect: { id: user.id } },
+        product: { connect: { id: Number(item.ID) } },
         quantity: item.qty || 1,
         total,
         status,
