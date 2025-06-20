@@ -1,4 +1,5 @@
 import React from 'react';
+import { UseFormFieldProps } from '../../types';
 import Select from 'react-select';
 
 export interface SelectOption {
@@ -19,6 +20,7 @@ export interface SelectDropdownProps {
   error?: string;
   className?: string;
   icon?: React.ReactNode;
+  field?: UseFormFieldProps;
   [key: string]: unknown;
 }
 
@@ -35,9 +37,10 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
   error,
   className = '',
   icon,
+  field,
   ...rest
 }) => {
-  const inputId = rest.id || name;
+  const inputId = rest.id || field?.id || name;
 
   return (
     <div className="mb-4 w-full">
@@ -57,9 +60,16 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
         )}
         <Select<SelectOption, boolean>
           inputId={inputId}
-          name={name}
-          value={value as SelectOption | SelectOption[] | null}
-          onChange={(val) => onChange?.(val as SelectOption | SelectOption[] | null)}
+          name={field?.name ?? name}
+          value={
+            (field?.value ?? value) as SelectOption | SelectOption[] | null
+          }
+          onChange={(val) =>
+            (field?.onChange ?? onChange)?.(
+              val as SelectOption | SelectOption[] | null
+            )
+          }
+          onBlur={(e) => field?.onBlur?.(e as any)}
           options={options}
           placeholder={placeholder}
           isSearchable={isSearchable}
@@ -72,6 +82,7 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
               ? { control: (base) => ({ ...base, paddingLeft: '2rem' }) }
               : undefined
           }
+          ref={field?.ref as any}
           {...rest}
         />
       </div>

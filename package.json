@@ -16,6 +16,7 @@
     "init:typesense": "ts-node scripts/initTypesense.ts"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.4",
     "@prisma/client": "^6.9.0",
     "@vercel/blob": "^0.23.0",
     "bcryptjs": "^3.0.2",
@@ -29,15 +30,15 @@
     "nodemailer": "^6.10.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.50.0",
     "react-select": "^5.10.1",
     "react-select-country-list": "^2.2.3",
+    "react-use-form-state": "^0.13.2",
     "react-world-flags": "^1.6.0",
-    "react-hook-form": "^7.50.0",
-    "@hookform/resolvers": "^3.3.4",
-    "zod": "^3.22.4",
     "stripe": "^12.18.0",
     "swiper": "^11.2.8",
-    "typesense": "^2.0.3"
+    "typesense": "^2.0.3",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.27.2",
