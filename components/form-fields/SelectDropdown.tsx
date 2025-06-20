@@ -20,6 +20,7 @@ export interface SelectDropdownProps {
   error?: string;
   className?: string;
   icon?: React.ReactNode;
+  components?: any;
   field?: UseFormFieldProps;
   [key: string]: unknown;
 }
@@ -37,6 +38,7 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
   error,
   className = '',
   icon,
+  components: selectComponents,
   field,
   ...rest
 }) => {
@@ -75,6 +77,7 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
           isSearchable={isSearchable}
           isDisabled={isDisabled}
           isMulti={isMulti}
+          components={selectComponents}
           className={`w-full ${className}`}
           classNamePrefix="react-select"
           styles={
