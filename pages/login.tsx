@@ -1,35 +1,28 @@
 import { useState, useContext, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useFormState } from 'react-use-form-state';
 import { AppContext } from '../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import InputField from '../components/ui/InputField';
+import {
+  EmailInput,
+  PasswordInput,
+} from '../components/form-fields';
 import GoogleIcon from '../components/icons/GoogleIcon';
 import GithubIcon from '../components/icons/GithubIcon';
-import EyeIcon from '../components/icons/EyeIcon';
-import EyeOffIcon from '../components/icons/EyeOffIcon';
 
-const schema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(1, 'Password is required'),
-});
-type LoginFormValues = z.infer<typeof schema>;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login() {
   const router = useRouter();
   const { login, user } = useContext(AppContext)!;
-  const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormValues>({ resolver: zodResolver(schema) });
+  const [formState, inputs] = useFormState({
+    email: '',
+    password: '',
+  });
 
   useEffect(() => {
     if (user) {
@@ -39,7 +32,15 @@ export default function Login() {
     }
   }, [user, router]);
 
-  const onSubmit = async ({ email, password }: LoginFormValues) => {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { email, password } = formState.values;
+    const errors: Record<string, string> = {};
+    if (!email) errors.email = 'Email is required';
+    else if (!emailRegex.test(email)) errors.email = 'Invalid email format';
+    if (!password) errors.password = 'Password is required';
+    Object.entries(errors).forEach(([k, v]) => formState.setFieldError(k, v));
+    if (Object.keys(errors).length > 0) return;
     try {
       setLoading(true);
       await login(email, password);
@@ -71,33 +72,20 @@ export default function Login() {
           Login with GitHub
         </button>
         {formError && <div className="text-red-500 mb-2">{formError}</div>}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
-          <InputField
-            type="email"
+        <form onSubmit={onSubmit} className="space-y-2">
+          <EmailInput
+            field={inputs.email('email', { validate: (v) =>
+              v && !emailRegex.test(v) ? 'Invalid email format' : true })}
             placeholder="Email"
-            {...register('email')}
-            error={errors.email?.message as string}
+            required
+            error={formState.errors.email as string}
           />
-          <div className="relative">
-            <InputField
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Password"
-              className="pr-10"
-              {...register('password')}
-              error={errors.password?.message as string}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2 top-2"
-            >
-              {showPassword ? (
-                <EyeOffIcon className="h-5 w-5" />
-              ) : (
-                <EyeIcon className="h-5 w-5" />
-              )}
-            </button>
-          </div>
+          <PasswordInput
+            field={inputs.password('password')}
+            placeholder="Password"
+            required
+            error={formState.errors.password as string}
+          />
           <button
             className="btn btn-primary w-full"
             type="submit"
