@@ -10,18 +10,18 @@ import { handleApiError } from '../../../lib/utils/handleApiError';
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method === 'GET') {
-      return res.status(200).json(getPendingProducts());
+      return res.status(200).json(await getPendingProducts());
     }
     if (req.method === 'PUT') {
       const { id, action } = req.body || {};
       if (!id || !action)
         return res.status(400).json({ message: 'id and action required' });
       if (action === 'approve') {
-        approveProduct(id);
+        await approveProduct(id);
         return res.status(200).json({ message: 'approved' });
       }
       if (action === 'reject') {
-        rejectProduct(id);
+        await rejectProduct(id);
         return res.status(200).json({ message: 'rejected' });
       }
       return res.status(400).json({ message: 'invalid action' });
