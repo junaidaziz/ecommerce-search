@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { components, OptionProps, SingleValueProps } from 'react-select';
 import countryList from 'react-select-country-list';
 import Flag from 'react-world-flags';
-import { useFormState } from 'react-use-form-state';
+import { useForm, Controller } from 'react-hook-form';
 import { AppContext } from '../../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 import {
@@ -44,21 +44,30 @@ const CountrySingleValue = (props: SingleValueProps<CountryOptionType, false>) =
 export default function BrandSignup() {
   const router = useRouter();
   const { signup, user } = useContext(AppContext)!;
-  const [formState, inputs] = useFormState({
-    brandName: '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirm: '',
-    phoneNumber: '',
-    businessAddress: '',
-    city: '',
-    country: '',
-    website: '',
-    businessDescription: '',
-    taxId: '',
-  });
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    getValues,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm<{
+    brandName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    confirm: string;
+    phoneNumber: string;
+    businessAddress: string;
+    city: string;
+    country: string;
+    website: string;
+    businessDescription: string;
+    taxId: string;
+  }>();
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -81,7 +90,7 @@ export default function BrandSignup() {
   }, [user, router]);
 
   const handleEmailBlur = async () => {
-    const value = formState.values.email;
+    const value = getValues('email');
     if (value && emailRegex.test(value)) {
       try {
         const res = await fetch(
@@ -90,11 +99,12 @@ export default function BrandSignup() {
         if (res.ok) {
           const data = await res.json();
           if (data.exists) {
-            formState.setFieldError('email', 'Email already registered');
+            return 'Email already registered';
           }
         }
       } catch (_) {}
     }
+    return true;
   };
 
   const handlePasswordFocus = () => {
@@ -106,13 +116,12 @@ export default function BrandSignup() {
   };
 
   const handleConfirmBlur = () => {
-    if (
-      formState.values.password &&
-      formState.values.confirm &&
-      formState.values.password !== formState.values.confirm
-    ) {
-      formState.setFieldError('confirm', 'Passwords do not match');
+    const password = getValues('password');
+    const confirm = getValues('confirm');
+    if (password && confirm && password !== confirm) {
+      return 'Passwords do not match';
     }
+    return true;
   };
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,58 +135,16 @@ export default function BrandSignup() {
       !['image/png', 'image/jpeg'].includes(file.type) ||
       file.size > 2 * 1024 * 1024
     ) {
-      formState.setFieldError('logo', 'Logo must be PNG/JPG and under 2MB');
+      setError('logo', { type: 'manual', message: 'Logo must be PNG/JPG and under 2MB' });
       return;
     }
-    formState.setFieldError('logo', undefined as any);
+    clearErrors('logo');
     setLogoFile(file);
     setLogoPreview(URL.createObjectURL(file));
   };
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await handleEmailBlur();
-    const values = formState.values;
-    const newErrors: Record<string, string> = {};
-    const requiredFields = [
-      'brandName',
-      'firstName',
-      'lastName',
-      'email',
-      'password',
-      'confirm',
-      'phoneNumber',
-      'businessAddress',
-      'city',
-      'country',
-    ];
-    requiredFields.forEach((f) => {
-      if (!values[f]) newErrors[f] = `${f} is required`;
-    });
-    if (
-      values.password &&
-      values.confirm &&
-      values.password !== values.confirm
-    ) {
-      newErrors.confirm = 'Passwords do not match';
-    }
-    if (logoFile && !['image/png', 'image/jpeg'].includes(logoFile.type)) {
-      newErrors.logo = 'Logo must be PNG or JPG';
-    }
-    Object.entries(newErrors).forEach(([k, v]) =>
-      formState.setFieldError(k, v)
-    );
-    if (Object.keys(newErrors).length > 0 || Object.keys(formState.errors).some((k) => formState.errors[k])) {
-      const firstKey = Object.keys({ ...formState.errors, ...newErrors })[0];
-      document.querySelector(`[name="${firstKey}"]`)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-      return;
-    }
-
+  const submit = async (values: any) => {
     setLoading(true);
-
     try {
       const {
         brandName,
@@ -192,8 +159,7 @@ export default function BrandSignup() {
         website,
         businessDescription,
         taxId,
-        // confirm not needed
-      } = formState.values as any;
+      } = values;
       const data = await signup('/api/signup/brand', {
         brandName,
         firstName,
@@ -217,10 +183,10 @@ export default function BrandSignup() {
     }
   };
 
+  const passwordValue = watch('password');
   const showPasswordHint =
     passwordFocused ||
-    (formState.values.password !== '' &&
-      !passwordRegex.test(formState.values.password || ''));
+    (passwordValue !== '' && !passwordRegex.test(passwordValue || ''));
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
@@ -247,61 +213,64 @@ export default function BrandSignup() {
         </button>
       </div>
       {formError && <div className="text-red-500 mb-2">{formError}</div>}
-      <form id="brand-signup-form" onSubmit={submit} className="space-y-6">
+      <form id="brand-signup-form" onSubmit={handleSubmit(submit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-5">
             <h2 className="text-xl font-semibold">Account Info</h2>
             <TextInput
-              field={inputs.text('firstName')}
+              name="firstName"
               placeholder="First Name"
               required
-              error={formState.errors.firstName as string}
+              register={register}
+              rules={{ required: 'firstName is required' }}
+              error={errors.firstName?.message as string}
             />
             <TextInput
-              field={inputs.text('lastName')}
+              name="lastName"
               placeholder="Last Name"
               required
-              error={formState.errors.lastName as string}
+              register={register}
+              rules={{ required: 'lastName is required' }}
+              error={errors.lastName?.message as string}
             />
             <EmailInput
-              field={inputs.email('email', {
-                validate: (v) =>
-                  v && !emailRegex.test(v) ? 'Invalid email format' : true,
-                onBlur: handleEmailBlur,
-                validateOnBlur: true,
-              })}
+              name="email"
               placeholder="Email"
               required
-              error={formState.errors.email as string}
+              register={register}
+              rules={{
+                required: 'Email is required',
+                pattern: { value: emailRegex, message: 'Invalid email format' },
+                validate: handleEmailBlur,
+              }}
+              error={errors.email?.message as string}
             />
             <div className="space-y-5">
               <PasswordInput
-                field={inputs.password('password', {
-                  validate: (v) =>
-                    v && !passwordRegex.test(v)
-                      ? 'Password must be at least 8 characters and include uppercase, lowercase, number and special character'
-                      : true,
-                  onFocus: handlePasswordFocus,
-                  onBlur: handlePasswordBlur,
-                  validateOnBlur: true,
-                })}
+                name="password"
                 aria-describedby="password-help"
                 placeholder="Password"
                 required
-                error={formState.errors.password as string}
+                register={register}
+                rules={{
+                  required: 'Password is required',
+                  pattern: {
+                    value: passwordRegex,
+                    message:
+                      'Password must be at least 8 characters and include uppercase, lowercase, number and special character',
+                  },
+                  onBlur: handlePasswordBlur,
+                  onFocus: handlePasswordFocus,
+                }}
+                error={errors.password?.message as string}
               />
               <PasswordInput
-                field={inputs.password('confirm', {
-                  validate: (v, values) =>
-                    values.password && v !== values.password
-                      ? 'Passwords do not match'
-                      : true,
-                  onBlur: handleConfirmBlur,
-                  validateOnBlur: true,
-                })}
+                name="confirm"
                 placeholder="Confirm Password"
                 required
-                error={formState.errors.confirm as string}
+                register={register}
+                rules={{ validate: handleConfirmBlur }}
+                error={errors.confirm?.message as string}
               />
               {showPasswordHint && (
                 <p id="password-help" className="text-sm text-gray-500">
@@ -314,49 +283,49 @@ export default function BrandSignup() {
           <div className="space-y-5">
             <h2 className="text-xl font-semibold">Business Info</h2>
             <TextInput
-              field={inputs.text('brandName')}
+              name="brandName"
               placeholder="Brand Name"
               required
-              error={formState.errors.brandName as string}
+              register={register}
+              rules={{ required: 'brandName is required' }}
+              error={errors.brandName?.message as string}
             />
             <TextInput
-              field={inputs.text('phoneNumber')}
+              name="phoneNumber"
               placeholder="Phone Number"
               required
-              error={formState.errors.phoneNumber as string}
+              register={register}
+              rules={{ required: 'phoneNumber is required' }}
+              error={errors.phoneNumber?.message as string}
             />
             <TextInput
-              field={inputs.text('businessAddress')}
+              name="businessAddress"
               placeholder="Business Address"
               required
-              error={formState.errors.businessAddress as string}
+              register={register}
+              rules={{ required: 'businessAddress is required' }}
+              error={errors.businessAddress?.message as string}
             />
             <div className="space-y-5">
               <div>
                 <TextInput
-                  field={inputs.text('city')}
+                  name="city"
                   placeholder="City"
                   required
-                  error={formState.errors.city as string}
+                  register={register}
+                  rules={{ required: 'city is required' }}
+                  error={errors.city?.message as string}
                 />
               </div>
               <div>
                 <SelectDropdown
-                  field={inputs.raw('country', {
-                    onChange: (o: any) => o?.label || '',
-                    touchOnChange: true,
-                  })}
+                  name="country"
+                  control={control}
                   options={countryOptions}
-                  value={
-                    formState.values.country
-                      ? countryOptions.find(
-                          (c) => c.label === formState.values.country
-                        ) || null
-                      : null
-                  }
                   placeholder="Country"
                   components={{ Option: CountryOption, SingleValue: CountrySingleValue }}
-                  error={formState.errors.country as string}
+                  rules={{ required: 'country is required' }}
+                  error={errors.country?.message as string}
                 />
               </div>
             </div>
@@ -366,18 +335,24 @@ export default function BrandSignup() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-5">
             <TextInput
-              field={inputs.text('website')}
+              name="website"
               placeholder="Website"
+              register={register}
+              error={errors.website?.message as string}
             />
             <TextInput
-              field={inputs.text('taxId')}
+              name="taxId"
               placeholder="Tax ID"
+              register={register}
+              error={errors.taxId?.message as string}
             />
           </div>
           <div className="space-y-5">
             <Textarea
-              field={inputs.textarea('businessDescription')}
+              name="businessDescription"
               placeholder="Business Description"
+              register={register}
+              error={errors.businessDescription?.message as string}
             />
             <div>
               <label className="block text-sm mb-1">Logo</label>
@@ -401,8 +376,8 @@ export default function BrandSignup() {
                 onChange={handleLogoChange}
                 className="file-input file-input-bordered w-full rounded-lg mt-2"
               />
-              {formState.errors.logo && (
-                <p className="text-red-500 text-sm">{formState.errors.logo as string}</p>
+              {errors.logo && (
+                <p className="text-red-500 text-sm">{errors.logo.message as string}</p>
               )}
             </div>
           </div>

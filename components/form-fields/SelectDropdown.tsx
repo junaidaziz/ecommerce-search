@@ -1,5 +1,5 @@
 import React from 'react';
-import { UseFormFieldProps } from '../../types';
+import { Control, Controller, RegisterOptions } from 'react-hook-form';
 import Select from 'react-select';
 
 export interface SelectOption {
@@ -21,7 +21,8 @@ export interface SelectDropdownProps {
   className?: string;
   icon?: React.ReactNode;
   components?: any;
-  field?: UseFormFieldProps;
+  control?: Control<any>;
+  rules?: RegisterOptions;
   [key: string]: unknown;
 }
 
@@ -39,10 +40,11 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
   className = '',
   icon,
   components: selectComponents,
-  field,
+  control,
+  rules,
   ...rest
 }) => {
-  const inputId = rest.id || field?.id || name;
+  const inputId = rest.id || name;
 
   return (
     <div className="mb-4 w-full">
@@ -60,34 +62,57 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
             {icon}
           </span>
         )}
-        <Select<SelectOption, boolean>
-          inputId={inputId}
-          name={field?.name ?? name}
-          value={
-            (field?.value ?? value) as SelectOption | SelectOption[] | null
-          }
-          onChange={(val) =>
-            (field?.onChange ?? onChange)?.(
-              val as SelectOption | SelectOption[] | null
-            )
-          }
-          onBlur={(e) => field?.onBlur?.(e as any)}
-          options={options}
-          placeholder={placeholder}
-          isSearchable={isSearchable}
-          isDisabled={isDisabled}
-          isMulti={isMulti}
-          components={selectComponents}
-          className={`w-full ${className}`}
-          classNamePrefix="react-select"
-          styles={
-            icon
-              ? { control: (base) => ({ ...base, paddingLeft: '2rem' }) }
-              : undefined
-          }
-          ref={field?.ref as any}
-          {...rest}
-        />
+        {control ? (
+          <Controller
+            name={name}
+            control={control}
+            rules={rules}
+            render={({ field }) => (
+              <Select<SelectOption, boolean>
+                inputId={inputId}
+                {...field}
+                value={field.value as any}
+                onChange={(val) => field.onChange(val)}
+                onBlur={field.onBlur}
+                options={options}
+                placeholder={placeholder}
+                isSearchable={isSearchable}
+                isDisabled={isDisabled}
+                isMulti={isMulti}
+                components={selectComponents}
+                className={`w-full ${className}`}
+                classNamePrefix="react-select"
+                styles={
+                  icon
+                    ? { control: (base) => ({ ...base, paddingLeft: '2rem' }) }
+                    : undefined
+                }
+                {...rest}
+              />
+            )}
+          />
+        ) : (
+          <Select<SelectOption, boolean>
+            inputId={inputId}
+            name={name}
+            value={value as any}
+            onChange={(val) => onChange?.(val)}
+            options={options}
+            placeholder={placeholder}
+            isSearchable={isSearchable}
+            isDisabled={isDisabled}
+            isMulti={isMulti}
+            components={selectComponents}
+            className={`w-full ${className}`}
+            classNamePrefix="react-select"
+            styles={
+              icon
+                ? { control: (base) => ({ ...base, paddingLeft: '2rem' }) }
+                : undefined
+            }
+            {...rest}
+          />
+        )}
       </div>
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
     </div>
