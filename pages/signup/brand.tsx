@@ -1,7 +1,10 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Image from 'next/image';
+import Select from 'react-select';
+import countryList from 'react-select-country-list';
+import Flag from 'react-world-flags';
 import { AppContext } from '../../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 
@@ -31,6 +34,7 @@ export default function BrandSignup() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
+  const countryOptions = useMemo(() => countryList().getData(), []);
 
   useEffect(() => {
     if (user) {
@@ -261,7 +265,7 @@ export default function BrandSignup() {
             {errors.email && (
               <p className="text-red-500 text-sm">{errors.email}</p>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-5">
               <div className="relative">
                 <input
                   name="password"
@@ -426,7 +430,7 @@ export default function BrandSignup() {
             {errors.businessAddress && (
               <p className="text-red-500 text-sm">{errors.businessAddress}</p>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-5">
               <div>
                 <input
                   name="city"
@@ -440,12 +444,20 @@ export default function BrandSignup() {
                 )}
               </div>
               <div>
-                <input
+                <Select
                   name="country"
-                  className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.country ? 'border-red-500' : ''}`}
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
+                  options={countryOptions}
+                  value={country ? countryOptions.find((c) => c.label === country) : null}
+                  onChange={(option) => setCountry(option?.label || '')}
                   placeholder="Country"
+                  className="w-full"
+                  classNamePrefix="react-select"
+                  formatOptionLabel={({ label, value }) => (
+                    <div className="flex items-center gap-2">
+                      <Flag code={value} height="16" />
+                      <span>{label}</span>
+                    </div>
+                  )}
                 />
                 {errors.country && (
                   <p className="text-red-500 text-sm">{errors.country}</p>

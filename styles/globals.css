@@ -40,3 +40,20 @@ body {
     opacity: 1;
   }
 }
+
+/* React Select styling */
+.react-select__control {
+  @apply input input-bordered w-full rounded-lg shadow-none;
+}
+.react-select__menu {
+  @apply bg-white text-base-content rounded-lg shadow-lg mt-1;
+}
+.react-select__option {
+  @apply cursor-pointer px-3 py-2;
+}
+.react-select__option--is-focused {
+  @apply bg-gray-100;
+}
+.react-select__option--is-selected {
+  @apply bg-indigo-500 text-white;
+}
