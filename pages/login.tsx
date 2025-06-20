@@ -1,20 +1,31 @@
 import { useState, useContext, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AppContext } from '../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import InputField from '../components/ui/InputField';
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const schema = z.object({
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(1, 'Password is required'),
+});
+type LoginFormValues = z.infer<typeof schema>;
 
 export default function Login() {
   const router = useRouter();
   const { login, user } = useContext(AppContext)!;
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
     if (user) {
@@ -24,26 +35,7 @@ export default function Login() {
     }
   }, [user, router]);
 
-  const handleEmailBlur = () => {
-    setErrors((prev) => {
-      const next = { ...prev };
-      if (email && !emailRegex.test(email)) {
-        next.email = 'Invalid email format';
-      } else if (next.email === 'Invalid email format') {
-        delete next.email;
-      }
-      return next;
-    });
-  };
-
-  const submit = async (e) => {
-    e.preventDefault();
-    const newErrors = {};
-    if (!email) newErrors.email = 'Email is required';
-    if (!password) newErrors.password = 'Password is required';
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
-
+  const onSubmit = async ({ email, password }: LoginFormValues) => {
     try {
       setLoading(true);
       await login(email, password);
@@ -93,26 +85,20 @@ export default function Login() {
           Login with GitHub
         </button>
         {formError && <div className="text-red-500 mb-2">{formError}</div>}
-        <form onSubmit={submit} className="space-y-2">
-          <div>
-            <input
-              className={`input input-bordered w-full ${errors.email ? 'border-red-500' : ''}`}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={handleEmailBlur}
-              placeholder="Email"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email}</p>
-            )}
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+          <InputField
+            type="email"
+            placeholder="Email"
+            {...register('email')}
+            error={errors.email?.message as string}
+          />
           <div className="relative">
-            <input
+            <InputField
               type={showPassword ? 'text' : 'password'}
-              className={`input input-bordered w-full pr-10 ${errors.password ? 'border-red-500' : ''}`}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
+              className="pr-10"
+              {...register('password')}
+              error={errors.password?.message as string}
             />
             <button
               type="button"
@@ -163,9 +149,6 @@ export default function Login() {
                 </svg>
               )}
             </button>
-            {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password}</p>
-            )}
           </div>
           <button
             className="btn btn-primary w-full"
