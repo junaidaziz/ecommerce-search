@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { addUser, findUser } from '../../lib/users';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import { handleApiError } from '../../lib/utils/handleApiError';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -41,6 +42,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       token,
     });
   } catch (e) {
-    return res.status(500).json({ message: 'Error creating user' });
+    return handleApiError(res, e, 'Error creating user');
   }
 }

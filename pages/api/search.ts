@@ -4,6 +4,7 @@ import { getDb } from '../../lib/db';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import client from '../../lib/typesenseClient';
+import { handleApiError } from '../../lib/utils/handleApiError';
 
 function buildSort(sort?: string) {
   switch (sort) {
@@ -118,6 +119,6 @@ export default async function handler(
     });
   } catch (err) {
     console.error('Typesense search error', err);
-    return res.status(500).json({ message: 'Search failed' });
+    return handleApiError(res, err, 'Search failed');
   }
 }

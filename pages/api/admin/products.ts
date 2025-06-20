@@ -11,6 +11,7 @@ import formidable from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import { withRole } from '../../../lib/withRole';
+import { handleApiError } from '../../../lib/utils/handleApiError';
 
 function slugify(text) {
   return text
@@ -38,8 +39,9 @@ function parseForm(req) {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST' || req.method === 'PUT') {
-    const { fields, files } = await parseForm(req);
+  try {
+    if (req.method === 'POST' || req.method === 'PUT') {
+      const { fields, files } = await parseForm(req);
     const {
       id,
       title,
@@ -134,7 +136,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json(filtered);
   }
 
-  return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  } catch (error) {
+    return handleApiError(res, error, 'Failed to process product');
+  }
 }
 
 

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { resetPassword } from '../../lib/users';
+import { handleApiError } from '../../lib/utils/handleApiError';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST')
@@ -11,6 +12,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await resetPassword(token, password);
     return res.status(200).json({ message: 'Password reset' });
   } catch (e) {
-    return res.status(500).json({ message: 'Error resetting password' });
+    return handleApiError(res, e, 'Error resetting password');
   }
 }

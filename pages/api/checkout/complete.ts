@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 import { addOrder } from '../../../lib/orders';
 import { sendOrderConfirmation } from '../../../lib/email';
+import { handleApiError } from '../../../lib/utils/handleApiError';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2023-10-16',
@@ -30,7 +31,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await sendOrderConfirmation(metadata.email, { id: orderId });
     return res.status(200).json({ id: orderId });
   } catch (e) {
-    console.error(e);
-    return res.status(500).json({ message: 'stripe error' });
+    return handleApiError(res, e, 'stripe error');
   }
 }

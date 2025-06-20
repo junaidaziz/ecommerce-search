@@ -1,16 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { findUser, setResetToken } from '../../lib/users';
 import crypto from 'crypto';
+import { handleApiError } from '../../lib/utils/handleApiError';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST')
-    return res.status(405).json({ message: 'Method Not Allowed' });
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ message: 'email required' });
-  const user = await findUser(email);
-  if (!user) return res.status(404).json({ message: 'User not found' });
-  const token = crypto.randomBytes(20).toString('hex');
-  const expires = Date.now() + 3600 * 1000; // 1 hour
-  await setResetToken(email, token, expires);
-  return res.status(200).json({ message: 'Reset email sent', token });
+  try {
+    if (req.method !== 'POST')
+      return res.status(405).json({ message: 'Method Not Allowed' });
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'email required' });
+    const user = await findUser(email);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    const token = crypto.randomBytes(20).toString('hex');
+    const expires = Date.now() + 3600 * 1000; // 1 hour
+    await setResetToken(email, token, expires);
+    return res.status(200).json({ message: 'Reset email sent', token });
+  } catch (error) {
+    return handleApiError(res, error, 'Failed to request reset');
+  }
 }

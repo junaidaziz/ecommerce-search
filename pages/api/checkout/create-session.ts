@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
+import { handleApiError } from '../../../lib/utils/handleApiError';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2023-10-16',
@@ -36,7 +37,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     return res.status(200).json({ url: session.url, id: session.id });
   } catch (e) {
-    console.error(e);
-    return res.status(500).json({ message: 'stripe error' });
+    return handleApiError(res, e, 'stripe error');
   }
 }

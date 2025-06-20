@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { addProduct, loadAndIndexProducts } from '../../../../lib/products';
+import { handleApiError } from '../../../../lib/utils/handleApiError';
 
 function slugify(text) {
   return text
@@ -11,20 +12,21 @@ function slugify(text) {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') {
-    const { vendor } = req.query;
-    if (!vendor) return res.status(400).json({ message: 'vendor required' });
-    const { products } = await loadAndIndexProducts();
-    const filtered = products.filter((p) => p.VENDOR === vendor);
-    return res.status(200).json(filtered);
-  }
+  try {
+    if (req.method === 'GET') {
+      const { vendor } = req.query;
+      if (!vendor) return res.status(400).json({ message: 'vendor required' });
+      const { products } = await loadAndIndexProducts();
+      const filtered = products.filter((p) => p.VENDOR === vendor);
+      return res.status(200).json(filtered);
+    }
 
-  if (req.method === 'POST') {
-    const {
-      id,
-      title,
-      vendor,
-      description,
+    if (req.method === 'POST') {
+      const {
+        id,
+        title,
+        vendor,
+        description,
       product_type,
       tags,
       category,
@@ -51,10 +53,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       currency: currency || 'USD',
       status: 'approved',
       images: JSON.stringify([]),
-    });
-    await loadAndIndexProducts();
-    return res.status(201).json({ message: 'product created' });
-  }
+      });
+      await loadAndIndexProducts();
+      return res.status(201).json({ message: 'product created' });
+    }
 
-  return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  } catch (error) {
+    return handleApiError(res, error, 'Failed to manage products');
+  }
 }
