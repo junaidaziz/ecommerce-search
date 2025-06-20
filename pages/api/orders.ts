@@ -13,10 +13,12 @@ import {
 } from '../../lib/db';
 import { withRole } from '../../lib/withRole';
 import { sendOrderConfirmation } from '../../lib/email';
+import { handleApiError } from '../../lib/utils/handleApiError';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
-    const { email, items, total, shippingName, shippingAddress } = req.body;
+  try {
+    if (req.method === 'POST') {
+      const { email, items, total, shippingName, shippingAddress } = req.body;
     if (!email || !items) {
       return res.status(400).json({ message: 'email and items required' });
     }
@@ -63,7 +65,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json(await getOrdersForUser(email));
   }
 
-  return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  } catch (error) {
+    return handleApiError(res, error, 'Failed to process orders');
+  }
 }
 
 export default withRole(['USER', 'BRAND', 'SUPER_ADMIN'])(handler);
