@@ -24,3 +24,33 @@ export interface OrderInput {
   shippingName: string;
   shippingAddress: string;
 }
+
+export interface OrderRow {
+  id: number;
+  userId: number;
+  user: {
+    id: number;
+    email: string;
+    // add other user properties if needed
+  };
+  product: {
+    id: number;
+    slug: string;
+    title: string;
+    vendorId: number;
+    vendor?: { brandName?: string | null };
+    description: string;
+    productType: string;
+    tags: string[];
+    category?: { name: string };
+    images: string[];
+    quantity: number;
+    minPrice: number;
+    maxPrice: number;
+    currency: string;
+  };
+  quantity: number;
+  total: number;
+  status: string;
+  createdAt: Date;
+}
