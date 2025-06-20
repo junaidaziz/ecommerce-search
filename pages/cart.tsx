@@ -1,13 +1,36 @@
 import { useContext } from 'react';
 import { useRouter } from 'next/router';
-import { AppContext } from '../contexts/AppContext';
+import { AppContext, AppContextValue } from '../contexts/AppContext';
 
-export default function Cart() {
+// Define the type for a cart item
+type CartItem = {
+  ID: string | number;
+  TITLE: string;
+  MIN_PRICE?: string;
+  qty: number;
+};
+
+
+const Cart: React.FC = () => {
   const router = useRouter();
-  const { cart, changeQty, removeFromCart } = useContext(AppContext)!;
+  const context = useContext(AppContext);
+
+  if (!context) {
+    throw new Error('AppContext is undefined. Make sure your component is wrapped in an AppContext.Provider.');
+  }
+
+  const { cart, changeQty, removeFromCart } = context;
+
   const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
   const totalPrice = cart.reduce(
-    (sum, item) => sum + item.qty * parseFloat(item.MIN_PRICE || 0),
+    (sum, item) =>
+      sum +
+      item.qty *
+        parseFloat(
+          typeof item.MIN_PRICE === 'number'
+            ? item.MIN_PRICE.toString()
+            : item.MIN_PRICE || '0'
+        ),
     0
   );
 
@@ -17,7 +40,11 @@ export default function Cart() {
       {cart.length === 0 && <p>Your cart is empty.</p>}
       <ul className="space-y-2 mb-4">
         {cart.map((item) => {
-          const price = parseFloat(item.MIN_PRICE || 0);
+          const price = parseFloat(
+            typeof item.MIN_PRICE === 'number'
+              ? item.MIN_PRICE.toString()
+              : item.MIN_PRICE || '0'
+          );
           const subtotal = price * item.qty;
           return (
             <li
@@ -72,4 +99,6 @@ export default function Cart() {
       )}
     </div>
   );
-}
+};
+
+export default Cart;

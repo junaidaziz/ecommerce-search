@@ -1,26 +1,64 @@
-import { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback, ChangeEvent, FormEvent } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
-export default function BrandDashboard() {
-  const { user } = useContext(AppContext)!;
-  const emptyForm = {
-    id: '',
-    title: '',
-    vendor: '',
-    description: '',
-    product_type: '',
-    tags: '',
-    category: '',
-    quantity: 0,
-    min_price: 0,
-    max_price: 0,
-    currency: 'USD',
-  };
-  const [form, setForm] = useState(emptyForm);
-  const [products, setProducts] = useState([]);
-  const [lowStock, setLowStock] = useState([]);
-  const [message, setMessage] = useState('');
-  const [editingId, setEditingId] = useState(null);
+type ProductForm = {
+  id: string;
+  title: string;
+  vendor: string;
+  description: string;
+  product_type: string;
+  tags: string;
+  category: string;
+  quantity: number;
+  min_price: number;
+  max_price: number;
+  currency: string;
+};
+
+type ProductApi = {
+  ID: string;
+  TITLE: string;
+  VENDOR: string;
+  DESCRIPTION: string;
+  PRODUCT_TYPE: string;
+  TAGS: string;
+  CATEGORY: string;
+  TOTAL_INVENTORY: number;
+  MIN_PRICE: number;
+  MAX_PRICE: number;
+  CURRENCY: string;
+};
+
+type User = {
+  brandName?: string;
+  role: string;
+};
+
+type AppContextType = {
+  user: User | null;
+};
+
+const emptyForm: ProductForm = {
+  id: '',
+  title: '',
+  vendor: '',
+  description: '',
+  product_type: '',
+  tags: '',
+  category: '',
+  quantity: 0,
+  min_price: 0,
+  max_price: 0,
+  currency: 'USD',
+};
+
+const BrandDashboard: React.FC = () => {
+  const { user } = useContext(AppContext) as AppContextType;
+  const [form, setForm] = useState<ProductForm>(emptyForm);
+  const [products, setProducts] = useState<ProductApi[]>([]);
+  const [lowStock, setLowStock] = useState<ProductApi[]>([]);
+  const [message, setMessage] = useState<string>('');
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchProducts = useCallback(async () => {
     if (!user) return;
@@ -42,11 +80,18 @@ export default function BrandDashboard() {
     fetchProducts();
   }, [fetchProducts]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]:
+        name === 'quantity' || name === 'min_price' || name === 'max_price'
+          ? Number(value)
+          : value,
+    }));
   };
 
-  const submit = async (e) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const payload = editingId ? { ...form, id: editingId } : form;
     const url = editingId
@@ -69,7 +114,7 @@ export default function BrandDashboard() {
     }
   };
 
-  const handleEdit = (p) => {
+  const handleEdit = (p: ProductApi) => {
     setForm({
       id: p.ID,
       title: p.TITLE || '',
@@ -91,8 +136,8 @@ export default function BrandDashboard() {
     setForm(emptyForm);
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Delete this product?')) return;
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this product?')) return;
     const res = await fetch(`/api/brand/products/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     });
@@ -119,19 +164,21 @@ export default function BrandDashboard() {
       )}
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <form onSubmit={submit} className="space-y-2 mb-6">
-        {[
-          'id',
-          'title',
-          'vendor',
-          'description',
-          'product_type',
-          'tags',
-          'category',
-          'quantity',
-          'min_price',
-          'max_price',
-          'currency',
-        ].map((field) => (
+        {(
+          [
+            'id',
+            'title',
+            'vendor',
+            'description',
+            'product_type',
+            'tags',
+            'category',
+            'quantity',
+            'min_price',
+            'max_price',
+            'currency',
+          ] as (keyof ProductForm)[]
+        ).map((field) => (
           <div key={field}>
             <label className="label capitalize">
               <span className="label-text">{field.replace('_', ' ')}</span>
@@ -142,6 +189,13 @@ export default function BrandDashboard() {
               onChange={handleChange}
               placeholder={field}
               className="input input-bordered w-full"
+              type={
+                field === 'quantity' ||
+                field === 'min_price' ||
+                field === 'max_price'
+                  ? 'number'
+                  : 'text'
+              }
             />
           </div>
         ))}
@@ -184,4 +238,6 @@ export default function BrandDashboard() {
       </ul>
     </div>
   );
-}
+};
+
+export default BrandDashboard;

@@ -1,13 +1,24 @@
-import { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, FormEvent } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
-export default function UserProfile() {
-  const { user } = useContext(AppContext)!;
-  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
-  const [address, setAddress] = useState(user?.address || '');
-  const [city, setCity] = useState(user?.city || '');
-  const [country, setCountry] = useState(user?.country || '');
-  const [message, setMessage] = useState('');
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  phoneNumber?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+}
+
+export const UserProfile: React.FC = () => {
+  const { user } = useContext(AppContext) as { user: User | null };
+  const [phoneNumber, setPhoneNumber] = useState<string>(user?.phoneNumber || '');
+  const [address, setAddress] = useState<string>(user?.address || '');
+  const [city, setCity] = useState<string>(user?.city || '');
+  const [country, setCountry] = useState<string>(user?.country || '');
+  const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
     if (user) {
@@ -18,7 +29,7 @@ export default function UserProfile() {
     }
   }, [user]);
 
-  const submit = async (e) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage('');
     const res = await fetch('/api/user/profile', {
@@ -42,25 +53,25 @@ export default function UserProfile() {
         <input
           className="input input-bordered w-full"
           value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhoneNumber(e.target.value)}
           placeholder="Phone Number"
         />
         <input
           className="input input-bordered w-full"
           value={address}
-          onChange={(e) => setAddress(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)}
           placeholder="Address"
         />
         <input
           className="input input-bordered w-full"
           value={city}
-          onChange={(e) => setCity(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCity(e.target.value)}
           placeholder="City"
         />
         <input
           className="input input-bordered w-full"
           value={country}
-          onChange={(e) => setCountry(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCountry(e.target.value)}
           placeholder="Country"
         />
         <button className="btn btn-primary w-full" type="submit">
@@ -69,4 +80,6 @@ export default function UserProfile() {
       </form>
     </div>
   );
-}
+};
+
+export default UserProfile;

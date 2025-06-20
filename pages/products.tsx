@@ -1,12 +1,13 @@
 import { useState, useEffect, useContext } from 'react';
 import { AppContext } from '../contexts/AppContext';
+import type { Product } from '../types/product';
 
-export default function Products() {
+const Products: React.FC = () => {
   const { addToCart } = useContext(AppContext)!;
-  const [products, setProducts] = useState([]);
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function load() {
@@ -14,7 +15,7 @@ export default function Products() {
         const res = await fetch('/api/search');
         if (res.ok) {
           const data = await res.json();
-          setProducts(data.results);
+          setProducts(data.results as Product[]);
         }
       } finally {
         setLoading(false);
@@ -24,7 +25,7 @@ export default function Products() {
   }, []);
 
   const filteredProducts = products.filter((p) => {
-    const price = parseFloat(p.MIN_PRICE || 0);
+    const price = typeof p.MIN_PRICE === 'number' ? p.MIN_PRICE : parseFloat(p.MIN_PRICE) || 0;
     if (minPrice && price < parseFloat(minPrice)) return false;
     if (maxPrice && price > parseFloat(maxPrice)) return false;
     return true;
@@ -93,3 +94,5 @@ export default function Products() {
     </div>
   );
 }
+
+export default Products;

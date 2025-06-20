@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
 import { Product } from '../types/product';
 
@@ -8,7 +8,11 @@ interface RecommendedProductsProps {
   title?: string;
 }
 
-export default function RecommendedProducts({ category, excludeId, title = 'You may also like' }: RecommendedProductsProps) {
+const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
+  category,
+  excludeId,
+  title = 'You may also like',
+}) => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -36,4 +40,6 @@ export default function RecommendedProducts({ category, excludeId, title = 'You 
       </div>
     </div>
   );
-}
+};
+
+export default RecommendedProducts;

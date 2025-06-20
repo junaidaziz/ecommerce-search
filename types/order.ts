@@ -10,6 +10,7 @@ export interface Order {
   items: OrderItem[];
   total: number;
   shippingName: string;
+  status: string;
   shippingAddress: string;
   createdAt?: string;
 }

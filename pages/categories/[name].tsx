@@ -1,23 +1,25 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import ProductCard from '../../components/ProductCard';
 import Head from 'next/head';
+import React from 'react';
+import { Category, Product } from '../../types';
 
-export default function CategoryPage() {
+
+const CategoryPage: React.FC = () => {
   const router = useRouter();
   const { name, type } = router.query;
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [catImage, setCatImage] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [catImage, setCatImage] = useState<string>('');
 
   useEffect(() => {
-    if (!name) return;
+    if (!name || Array.isArray(name)) return;
     async function load() {
       setLoading(true);
-      const url = `/api/search?filterByCategory=${encodeURIComponent(name)}${
-        type ? `&filterByType=${encodeURIComponent(type)}` : ''
+      const url = `/api/search?filterByCategory=${encodeURIComponent(name as string)}${
+        type && typeof type === 'string' ? `&filterByType=${encodeURIComponent(type)}` : ''
       }`;
       const res = await fetch(url);
       if (res.ok) {
@@ -29,10 +31,12 @@ export default function CategoryPage() {
     async function loadCat() {
       const res = await fetch('/api/categories');
       if (res.ok) {
-        const cats = await res.json();
-        const found = cats.find(
-          (c) => c.name.toLowerCase() === name.toLowerCase()
-        );
+        const cats: Category[] = await res.json();
+        const found = typeof name === 'string'
+          ? cats.find(
+              (c) => c.name.toLowerCase() === name.toLowerCase()
+            )
+          : undefined;
         if (found && found.image) setCatImage(found.image);
       }
     }
@@ -40,7 +44,7 @@ export default function CategoryPage() {
     loadCat();
   }, [name, type]);
 
-  if (!name) return <div className="p-4">Loading...</div>;
+  if (!name || Array.isArray(name)) return <div className="p-4">Loading...</div>;
 
   return (
     <div className="max-w-screen-2xl mx-auto min-h-screen p-4">
@@ -68,7 +72,7 @@ export default function CategoryPage() {
         />
         <span>
           Category: {name}
-          {type && ` - ${type}`}
+          {type && typeof type === 'string' && ` - ${type}`}
         </span>
       </h1>
       {loading && <div>Loading...</div>}
@@ -82,4 +86,6 @@ export default function CategoryPage() {
       )}
     </div>
   );
-}
+};
+
+export default CategoryPage;
