@@ -2,15 +2,21 @@ import { useState, useContext, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Image from 'next/image';
-import Select, { components, OptionProps, SingleValueProps } from 'react-select';
+import { components, OptionProps, SingleValueProps } from 'react-select';
 import countryList from 'react-select-country-list';
 import Flag from 'react-world-flags';
+import { useFormState } from 'react-use-form-state';
 import { AppContext } from '../../contexts/AppContext';
 import { signIn } from 'next-auth/react';
+import {
+  TextInput,
+  EmailInput,
+  PasswordInput,
+  Textarea,
+  SelectDropdown,
+} from '../../components/form-fields';
 import GoogleIcon from '../../components/icons/GoogleIcon';
 import GithubIcon from '../../components/icons/GithubIcon';
-import EyeIcon from '../../components/icons/EyeIcon';
-import EyeOffIcon from '../../components/icons/EyeOffIcon';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -38,26 +44,25 @@ const CountrySingleValue = (props: SingleValueProps<CountryOptionType, false>) =
 export default function BrandSignup() {
   const router = useRouter();
   const { signup, user } = useContext(AppContext)!;
-  const [brandName, setBrandName] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [businessAddress, setBusinessAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
-  const [website, setWebsite] = useState('');
-  const [businessDescription, setBusinessDescription] = useState('');
-  const [taxId, setTaxId] = useState('');
-  const [logoFile, setLogoFile] = useState(null);
-  const [logoPreview, setLogoPreview] = useState(null);
+  const [formState, inputs] = useFormState({
+    brandName: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirm: '',
+    phoneNumber: '',
+    businessAddress: '',
+    city: '',
+    country: '',
+    website: '',
+    businessDescription: '',
+    taxId: '',
+  });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
-  const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const countryOptions = useMemo(
     () =>
@@ -76,33 +81,19 @@ export default function BrandSignup() {
   }, [user, router]);
 
   const handleEmailBlur = async () => {
-    setErrors((prev) => {
-      const next = { ...prev };
-      if (email && !emailRegex.test(email)) {
-        next.email = 'Invalid email format';
-      } else if (
-        next.email === 'Invalid email format' ||
-        next.email === 'Email already registered'
-      ) {
-        delete next.email;
-      }
-      return next;
-    });
-    if (email && emailRegex.test(email)) {
+    const value = formState.values.email;
+    if (value && emailRegex.test(value)) {
       try {
         const res = await fetch(
-          `/api/check-email?email=${encodeURIComponent(email)}`
+          `/api/check-email?email=${encodeURIComponent(value)}`
         );
         if (res.ok) {
           const data = await res.json();
           if (data.exists) {
-            setErrors((prev) => ({
-              ...prev,
-              email: 'Email already registered',
-            }));
+            formState.setFieldError('email', 'Email already registered');
           }
         }
-      } catch (_) { }
+      } catch (_) {}
     }
   };
 
@@ -112,37 +103,20 @@ export default function BrandSignup() {
 
   const handlePasswordBlur = () => {
     setPasswordFocused(false);
-    setErrors((prev) => {
-      const next = { ...prev };
-      if (password && !passwordRegex.test(password)) {
-        next.password =
-          'Password must be at least 8 characters and include uppercase, lowercase, number and special character';
-      } else if (next.password && next.password.startsWith('Password must')) {
-        delete next.password;
-      }
-      if (confirm && password !== confirm) {
-        next.confirm = 'Passwords do not match';
-      } else if (next.confirm === 'Passwords do not match') {
-        delete next.confirm;
-      }
-      return next;
-    });
   };
 
   const handleConfirmBlur = () => {
-    setErrors((prev) => {
-      const next = { ...prev };
-      if (password && confirm && password !== confirm) {
-        next.confirm = 'Passwords do not match';
-      } else if (next.confirm === 'Passwords do not match') {
-        delete next.confirm;
-      }
-      return next;
-    });
+    if (
+      formState.values.password &&
+      formState.values.confirm &&
+      formState.values.password !== formState.values.confirm
+    ) {
+      formState.setFieldError('confirm', 'Passwords do not match');
+    }
   };
 
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) {
       setLogoFile(null);
       setLogoPreview(null);
@@ -152,44 +126,49 @@ export default function BrandSignup() {
       !['image/png', 'image/jpeg'].includes(file.type) ||
       file.size > 2 * 1024 * 1024
     ) {
-      setErrors((prev) => ({
-        ...prev,
-        logo: 'Logo must be PNG/JPG and under 2MB',
-      }));
+      formState.setFieldError('logo', 'Logo must be PNG/JPG and under 2MB');
       return;
     }
-    setErrors((prev) => {
-      const next = { ...prev };
-      if (next.logo) delete next.logo;
-      return next;
-    });
+    formState.setFieldError('logo', undefined as any);
     setLogoFile(file);
     setLogoPreview(URL.createObjectURL(file));
   };
 
-  const submit = async (e) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newErrors = {};
-    if (!brandName) newErrors.brandName = 'Brand name is required';
-    if (!firstName) newErrors.firstName = 'First name is required';
-    if (!lastName) newErrors.lastName = 'Last name is required';
-    if (!email) newErrors.email = 'Email is required';
-    if (!password) newErrors.password = 'Password is required';
-    if (!confirm) newErrors.confirm = 'Confirm password is required';
-    if (!phoneNumber) newErrors.phoneNumber = 'Phone number is required';
-    if (!businessAddress)
-      newErrors.businessAddress = 'Business address is required';
-    if (!city) newErrors.city = 'City is required';
-    if (!country) newErrors.country = 'Country is required';
-    if (password && confirm && password !== confirm) {
+    await handleEmailBlur();
+    const values = formState.values;
+    const newErrors: Record<string, string> = {};
+    const requiredFields = [
+      'brandName',
+      'firstName',
+      'lastName',
+      'email',
+      'password',
+      'confirm',
+      'phoneNumber',
+      'businessAddress',
+      'city',
+      'country',
+    ];
+    requiredFields.forEach((f) => {
+      if (!values[f]) newErrors[f] = `${f} is required`;
+    });
+    if (
+      values.password &&
+      values.confirm &&
+      values.password !== values.confirm
+    ) {
       newErrors.confirm = 'Passwords do not match';
     }
     if (logoFile && !['image/png', 'image/jpeg'].includes(logoFile.type)) {
       newErrors.logo = 'Logo must be PNG or JPG';
     }
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) {
-      const firstKey = Object.keys(newErrors)[0];
+    Object.entries(newErrors).forEach(([k, v]) =>
+      formState.setFieldError(k, v)
+    );
+    if (Object.keys(newErrors).length > 0 || Object.keys(formState.errors).some((k) => formState.errors[k])) {
+      const firstKey = Object.keys({ ...formState.errors, ...newErrors })[0];
       document.querySelector(`[name="${firstKey}"]`)?.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
@@ -200,6 +179,21 @@ export default function BrandSignup() {
     setLoading(true);
 
     try {
+      const {
+        brandName,
+        firstName,
+        lastName,
+        email,
+        password,
+        phoneNumber,
+        businessAddress,
+        city,
+        country,
+        website,
+        businessDescription,
+        taxId,
+        // confirm not needed
+      } = formState.values as any;
       const data = await signup('/api/signup/brand', {
         brandName,
         firstName,
@@ -224,7 +218,9 @@ export default function BrandSignup() {
   };
 
   const showPasswordHint =
-    passwordFocused || (password !== '' && !passwordRegex.test(password));
+    passwordFocused ||
+    (formState.values.password !== '' &&
+      !passwordRegex.test(formState.values.password || ''));
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
@@ -255,157 +251,113 @@ export default function BrandSignup() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-5">
             <h2 className="text-xl font-semibold">Account Info</h2>
-            <input
-              name="firstName"
-              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.firstName ? 'border-red-500' : ''}`}
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+            <TextInput
+              field={inputs.text('firstName')}
               placeholder="First Name"
+              required
+              error={formState.errors.firstName as string}
             />
-            {errors.firstName && (
-              <p className="text-red-500 text-sm">{errors.firstName}</p>
-            )}
-            <input
-              name="lastName"
-              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.lastName ? 'border-red-500' : ''}`}
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+            <TextInput
+              field={inputs.text('lastName')}
               placeholder="Last Name"
+              required
+              error={formState.errors.lastName as string}
             />
-            {errors.lastName && (
-              <p className="text-red-500 text-sm">{errors.lastName}</p>
-            )}
-            <input
-              name="email"
-              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.email ? 'border-red-500' : ''}`}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={handleEmailBlur}
+            <EmailInput
+              field={inputs.email('email', {
+                validate: (v) =>
+                  v && !emailRegex.test(v) ? 'Invalid email format' : true,
+                onBlur: handleEmailBlur,
+                validateOnBlur: true,
+              })}
               placeholder="Email"
+              required
+              error={formState.errors.email as string}
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email}</p>
-            )}
             <div className="space-y-5">
-              <div className="relative">
-                <input
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  className={`input input-bordered w-full pr-10 rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.password ? 'border-red-500' : ''}`}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onFocus={handlePasswordFocus}
-                  onBlur={handlePasswordBlur}
-                  aria-describedby="password-help"
-                  placeholder="Password"
-                />
-                <button
-                  type="button"
-                  className="absolute right-2 top-2"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOffIcon className="h-5 w-5" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5" />
-                  )}
-                </button>
-                {showPasswordHint && (
-                  <p id="password-help" className="text-sm text-gray-500 mt-1">
-                    Password must be at least 8 characters and include uppercase,
-                    lowercase, number and special character
-                  </p>
-                )}
-                {errors.password && (
-                  <p className="text-red-500 text-sm">{errors.password}</p>
-                )}
-              </div>
-              <div className="relative">
-                <input
-                  name="confirm"
-                  type={showConfirm ? 'text' : 'password'}
-                  className={`input input-bordered w-full pr-10 rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.confirm ? 'border-red-500' : ''}`}
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  onBlur={handleConfirmBlur}
-                  placeholder="Confirm Password"
-                />
-                <button
-                  type="button"
-                  className="absolute right-2 top-2"
-                  onClick={() => setShowConfirm(!showConfirm)}
-                >
-                  {showConfirm ? (
-                    <EyeOffIcon className="h-5 w-5" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5" />
-                  )}
-                </button>
-                {errors.confirm && (
-                  <p className="text-red-500 text-sm">{errors.confirm}</p>
-                )}
-              </div>
+              <PasswordInput
+                field={inputs.password('password', {
+                  validate: (v) =>
+                    v && !passwordRegex.test(v)
+                      ? 'Password must be at least 8 characters and include uppercase, lowercase, number and special character'
+                      : true,
+                  onFocus: handlePasswordFocus,
+                  onBlur: handlePasswordBlur,
+                  validateOnBlur: true,
+                })}
+                aria-describedby="password-help"
+                placeholder="Password"
+                required
+                error={formState.errors.password as string}
+              />
+              <PasswordInput
+                field={inputs.password('confirm', {
+                  validate: (v, values) =>
+                    values.password && v !== values.password
+                      ? 'Passwords do not match'
+                      : true,
+                  onBlur: handleConfirmBlur,
+                  validateOnBlur: true,
+                })}
+                placeholder="Confirm Password"
+                required
+                error={formState.errors.confirm as string}
+              />
+              {showPasswordHint && (
+                <p id="password-help" className="text-sm text-gray-500">
+                  Password must be at least 8 characters and include uppercase,
+                  lowercase, number and special character
+                </p>
+              )}
             </div>
           </div>
           <div className="space-y-5">
             <h2 className="text-xl font-semibold">Business Info</h2>
-            <input
-              name="brandName"
-              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.brandName ? 'border-red-500' : ''}`}
-              value={brandName}
-              onChange={(e) => setBrandName(e.target.value)}
+            <TextInput
+              field={inputs.text('brandName')}
               placeholder="Brand Name"
+              required
+              error={formState.errors.brandName as string}
             />
-            {errors.brandName && (
-              <p className="text-red-500 text-sm">{errors.brandName}</p>
-            )}
-            <input
-              name="phoneNumber"
-              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.phoneNumber ? 'border-red-500' : ''}`}
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+            <TextInput
+              field={inputs.text('phoneNumber')}
               placeholder="Phone Number"
+              required
+              error={formState.errors.phoneNumber as string}
             />
-            {errors.phoneNumber && (
-              <p className="text-red-500 text-sm">{errors.phoneNumber}</p>
-            )}
-            <input
-              name="businessAddress"
-              className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.businessAddress ? 'border-red-500' : ''}`}
-              value={businessAddress}
-              onChange={(e) => setBusinessAddress(e.target.value)}
+            <TextInput
+              field={inputs.text('businessAddress')}
               placeholder="Business Address"
+              required
+              error={formState.errors.businessAddress as string}
             />
-            {errors.businessAddress && (
-              <p className="text-red-500 text-sm">{errors.businessAddress}</p>
-            )}
             <div className="space-y-5">
               <div>
-                <input
-                  name="city"
-                  className={`input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.city ? 'border-red-500' : ''}`}
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
+                <TextInput
+                  field={inputs.text('city')}
                   placeholder="City"
+                  required
+                  error={formState.errors.city as string}
                 />
-                {errors.city && (
-                  <p className="text-red-500 text-sm">{errors.city}</p>
-                )}
               </div>
               <div>
-                <Select
-                  name="country"
+                <SelectDropdown
+                  field={inputs.raw('country', {
+                    onChange: (o: any) => o?.label || '',
+                    touchOnChange: true,
+                  })}
                   options={countryOptions}
-                  value={country ? countryOptions.find((c) => c.label === country) : null}
-                  onChange={(option) => setCountry(option?.label || '')}
+                  value={
+                    formState.values.country
+                      ? countryOptions.find(
+                          (c) => c.label === formState.values.country
+                        ) || null
+                      : null
+                  }
                   placeholder="Country"
-                  className="w-full"
-                  classNamePrefix="react-select"
                   components={{ Option: CountryOption, SingleValue: CountrySingleValue }}
+                  error={formState.errors.country as string}
                 />
-                {errors.country && (
-                  <p className="text-red-500 text-sm">{errors.country}</p>
-                )}
               </div>
             </div>
 
@@ -413,27 +365,18 @@ export default function BrandSignup() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-5">
-            <input
-              name="website"
-              className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500"
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
+            <TextInput
+              field={inputs.text('website')}
               placeholder="Website"
             />
-            <input
-              name="taxId"
-              className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500"
-              value={taxId}
-              onChange={(e) => setTaxId(e.target.value)}
+            <TextInput
+              field={inputs.text('taxId')}
               placeholder="Tax ID"
             />
           </div>
           <div className="space-y-5">
-            <textarea
-              name="businessDescription"
-              className="textarea textarea-bordered w-full rounded-lg focus:ring-2 focus:ring-indigo-500"
-              value={businessDescription}
-              onChange={(e) => setBusinessDescription(e.target.value)}
+            <Textarea
+              field={inputs.textarea('businessDescription')}
               placeholder="Business Description"
             />
             <div>
@@ -458,8 +401,8 @@ export default function BrandSignup() {
                 onChange={handleLogoChange}
                 className="file-input file-input-bordered w-full rounded-lg mt-2"
               />
-              {errors.logo && (
-                <p className="text-red-500 text-sm">{errors.logo}</p>
+              {formState.errors.logo && (
+                <p className="text-red-500 text-sm">{formState.errors.logo as string}</p>
               )}
             </div>
           </div>
