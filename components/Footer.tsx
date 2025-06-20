@@ -1,6 +1,7 @@
 import Link from 'next/link'
+import type { FC } from 'react'
 
-export default function Footer() {
+const Footer: FC = () => {
   return (
     <footer className="bg-base-300 mt-12 py-8 text-base-content">
       <div className="w-full px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -32,3 +33,5 @@ export default function Footer() {
     </footer>
   )
 }
+
+export default Footer

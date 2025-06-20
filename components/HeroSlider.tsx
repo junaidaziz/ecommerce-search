@@ -1,5 +1,6 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import Image from 'next/image';
+import type { FC } from 'react';
 import {
   Navigation,
   Pagination,
@@ -36,7 +37,7 @@ const slides = [
   },
 ];
 
-export default function HeroSlider() {
+const HeroSlider: FC = () => {
   return (
     <section className="w-full" role="banner">
       <Swiper
@@ -74,3 +75,5 @@ export default function HeroSlider() {
     </section>
   );
 }
+
+export default HeroSlider;
