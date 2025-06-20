@@ -8,11 +8,12 @@ export default function App({
   Component,
   pageProps: { session, ...pageProps },
 }) {
+  const HeroSecond = (Component as any).heroSecond;
   return (
     <SessionProvider session={session}>
       <NotificationProvider>
         <AppProvider>
-          <Layout>
+          <Layout heroSecond={HeroSecond ? <HeroSecond /> : null}>
             <Component {...pageProps} />
           </Layout>
         </AppProvider>

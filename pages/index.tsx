@@ -9,6 +9,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import ProductCard from '../components/ProductCard';
 import Hero from '../components/Hero';
+import HeroSlider from '../components/HeroSlider';
 import { Product } from '../types/product';
 import RecommendedProducts from '../components/RecommendedProducts';
 
@@ -572,3 +573,5 @@ export default function Home() {
     </div>
   );
 }
+
+Home.heroSecond = HeroSlider;
