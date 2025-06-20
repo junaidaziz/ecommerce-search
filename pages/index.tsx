@@ -5,10 +5,8 @@ import React, {
   useRef,
 } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import Head from 'next/head';
 import ProductCard from '../components/ProductCard';
-import Hero from '../components/Hero';
 import HeroSlider from '../components/HeroSlider';
 import { Product } from '../types/product';
 import RecommendedProducts from '../components/RecommendedProducts';
@@ -291,7 +289,6 @@ export default function Home() {
       </Head>
 
       <main className="w-full bg-base-100 p-8 sm:p-10 lg:p-12 rounded-box shadow-xl space-y-6">
-        <Hero />
         {/* Theme toggle moved to header */}
 
         {allProductTypes.length > 0 && (
