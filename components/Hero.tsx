@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import type { FC } from 'react'
 
-export default function Hero() {
+const Hero: FC = () => {
   return (
     <section className="bg-green-50 rounded-lg overflow-hidden flex flex-col md:flex-row items-center p-6 md:p-12">
       <div className="flex-1 text-center md:text-left space-y-4">
@@ -15,3 +16,5 @@ export default function Hero() {
     </section>
   )
 }
+
+export default Hero

@@ -19,7 +19,7 @@ export interface SelectDropdownProps {
   error?: string;
   className?: string;
   icon?: React.ReactNode;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const SelectDropdown: React.FC<SelectDropdownProps> = ({
@@ -55,11 +55,11 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
             {icon}
           </span>
         )}
-        <Select
+        <Select<SelectOption, boolean>
           inputId={inputId}
           name={name}
-          value={value as any}
-          onChange={(val) => onChange?.(val as any)}
+          value={value as SelectOption | SelectOption[] | null}
+          onChange={(val) => onChange?.(val as SelectOption | SelectOption[] | null)}
           options={options}
           placeholder={placeholder}
           isSearchable={isSearchable}

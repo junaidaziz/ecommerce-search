@@ -3,9 +3,17 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
+import type { FC, KeyboardEvent, MouseEvent } from 'react';
 import { AppContext } from '../contexts/AppContext';
+import type { Category } from '../types/category';
+import type { Theme } from '../hooks/useTheme';
 
-export default function Header({ theme = 'light', setTheme }) {
+interface HeaderProps {
+  theme?: Theme;
+  setTheme?: React.Dispatch<React.SetStateAction<Theme>>;
+}
+
+const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const router = useRouter();
   const { data: session } = useSession();
   const { cart } = useContext(AppContext);
@@ -14,7 +22,7 @@ export default function Header({ theme = 'light', setTheme }) {
   const isSignupRoute = pathname.startsWith('/signup');
   const isLoginRoute = pathname === '/login';
   const logout = () => signOut({ redirect: false });
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -22,7 +30,7 @@ export default function Header({ theme = 'light', setTheme }) {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [trendingKeywords, setTrendingKeywords] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-  const searchRef = useRef(null);
+  const searchRef = useRef<HTMLFormElement | null>(null);
   const iconMap = {
     Electronics: (
       <svg
@@ -100,10 +108,10 @@ export default function Header({ theme = 'light', setTheme }) {
   }, []);
 
   useEffect(() => {
-    function handleKey(e) {
+    function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') setMenuOpen(false);
     }
-    function handleClick(e) {
+    function handleClick(e: MouseEvent) {
       if (
         searchRef.current &&
         !searchRef.current.contains(e.target) &&
@@ -183,19 +191,19 @@ export default function Header({ theme = 'light', setTheme }) {
     runSearch(term);
   };
   const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
-  const submitSearch = (e) => {
+  const submitSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!search.trim()) return;
     runSearch(search.trim());
   };
 
-  const selectSuggestion = (text) => {
+  const selectSuggestion = (text: string) => {
     router.push(`/?q=${encodeURIComponent(text)}`);
     setSuggestions([]);
     setSearch(text);
   };
 
-  const renderCat = (cat) => (
+  const renderCat = (cat: Category) => (
     <li key={cat.id} className={cat.parentId ? 'ml-4' : ''}>
       <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
         {cat.name}
@@ -709,4 +717,6 @@ export default function Header({ theme = 'light', setTheme }) {
       </div>
     </header>
   );
-}
+};
+
+export default Header;
