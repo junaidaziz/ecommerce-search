@@ -128,7 +128,7 @@ export default function UserSignup() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
-      <div className="w-full max-w-2xl -mt-8">
+      <div className="max-w-md mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
         <h1 className="text-2xl font-bold mb-4">User Sign Up</h1>
       <div className="flex flex-col gap-6 mb-4">
         <button
@@ -386,6 +386,12 @@ export default function UserSignup() {
         Already have an account?{' '}
         <Link href="/login" className="link">
           Login
+        </Link>
+      </p>
+      <p className="text-sm text-center mt-4 text-gray-600">
+        Want to sign up as a brand instead?{' '}
+        <Link href="/brands/signup" className="text-blue-600 hover:underline">
+          Sign up as a brand instead
         </Link>
       </p>
       </div>
