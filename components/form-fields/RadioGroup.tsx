@@ -1,4 +1,5 @@
 import React from 'react';
+import { UseFormFieldProps } from '../../types';
 
 export interface RadioOption {
   label: string;
@@ -10,11 +11,13 @@ export interface RadioGroupProps {
   name: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   options: RadioOption[];
   error?: string;
   required?: boolean;
   disabled?: boolean;
   className?: string;
+  field?: UseFormFieldProps;
 }
 
 const RadioGroup: React.FC<RadioGroupProps> = ({
@@ -22,11 +25,13 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
   name,
   value,
   onChange,
+  onBlur,
   options,
   error,
   required = false,
   disabled = false,
   className = '',
+  field,
 }) => {
   const groupName = name;
 
@@ -40,10 +45,11 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
           <label key={opt.value} className="flex items-center">
             <input
               type="radio"
-              name={groupName}
+              name={field?.name ?? groupName}
               value={opt.value}
-              checked={value === opt.value}
-              onChange={onChange}
+              checked={(field?.value ?? value) === opt.value}
+              onChange={field?.onChange ?? onChange}
+              onBlur={field?.onBlur ?? onBlur}
               disabled={disabled}
               required={required}
               className="mr-2 text-blue-600 focus:ring-blue-500"
