@@ -22,6 +22,7 @@ export default function UserSignup() {
   const [country, setCountry] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
 
@@ -64,7 +65,12 @@ export default function UserSignup() {
     }
   };
 
+  const handlePasswordFocus = () => {
+    setPasswordFocused(true);
+  };
+
   const handlePasswordBlur = () => {
+    setPasswordFocused(false);
     setErrors((prev) => {
       const next = { ...prev };
       if (password && !passwordRegex.test(password)) {
@@ -125,6 +131,9 @@ export default function UserSignup() {
       setFormError('Signup failed');
     }
   };
+
+  const showPasswordHint =
+    passwordFocused || (password !== '' && !passwordRegex.test(password));
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
@@ -209,7 +218,9 @@ export default function UserSignup() {
               className={`input input-bordered w-full pr-10 ${errors.password ? 'border-red-500' : ''}`}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onFocus={handlePasswordFocus}
               onBlur={handlePasswordBlur}
+              aria-describedby="password-help"
               placeholder="Password"
             />
             <button
@@ -261,10 +272,12 @@ export default function UserSignup() {
                 </svg>
               )}
             </button>
-            <p className="text-sm text-gray-500">
-              Password must be at least 8 characters and include uppercase,
-              lowercase, number and special character
-            </p>
+            {showPasswordHint && (
+              <p id="password-help" className="text-sm text-gray-500 mt-1">
+                Password must be at least 8 characters and include uppercase,
+                lowercase, number and special character
+              </p>
+            )}
             {errors.password && (
               <p className="text-red-500 text-sm">{errors.password}</p>
             )}
