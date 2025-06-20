@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getProductById, getAverageRating } from '../../../lib/db.js';
 import { mapDbRowToProduct } from '../../../lib/products.js';
 import { Product } from '../../../types/product';
+import { handleApiError } from '../../../lib/utils/handleApiError';
 
 export type ProductResponse = Product & {
   AVERAGE_RATING: number;
@@ -29,6 +30,6 @@ export default async function handler(
       REVIEW_COUNT: stats.count,
     });
   } catch (e) {
-    res.status(500).json({ message: 'Failed to load product' });
+    return handleApiError(res, e, 'Failed to load product');
   }
 }

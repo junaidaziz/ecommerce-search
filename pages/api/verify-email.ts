@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { verifyUser } from '../../lib/users';
+import { handleApiError } from '../../lib/utils/handleApiError';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { token } = req.query;
@@ -8,6 +9,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await verifyUser(token);
     return res.status(200).json({ message: 'Email verified' });
   } catch (e) {
-    return res.status(500).json({ message: 'Error verifying email' });
+    return handleApiError(res, e, 'Error verifying email');
   }
 }
