@@ -1,10 +1,32 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import NextAuth from 'next-auth';
+import NextAuth, { AuthOptions, User as NextAuthUser } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { findUser, addUser } from '../../../lib/users';
+
+// Extend the User type to include 'role'
+declare module 'next-auth' {
+  interface User {
+    role?: string;
+    disabled?: boolean;
+  }
+  interface Session {
+    user?: {
+      role?: string;
+      disabled?: boolean;
+      [key: string]: any;
+    };
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    role?: string;
+    [key: string]: any;
+  }
+}
 
 if (!process.env.NEXTAUTH_SECRET) {
   console.error('NEXTAUTH_SECRET environment variable is not set');
@@ -13,7 +35,7 @@ if (!process.env.NEXTAUTH_URL) {
   console.error('NEXTAUTH_URL environment variable is not set');
 }
 
-export const authOptions = {
+export const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -30,6 +52,9 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
+        if (!credentials || !credentials.email || !credentials.password) {
+          return null;
+        }
         const user = await findUser(credentials.email);
         if (
           user &&
@@ -52,7 +77,10 @@ export const authOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account.provider === 'google' || account.provider === 'github') {
+      if (account && (account.provider === 'google' || account.provider === 'github')) {
+        if (!user.email) {
+          return false;
+        }
         const existing = await findUser(user.email);
         if (existing && existing.disabled) {
           return false;
@@ -62,10 +90,10 @@ export const authOptions = {
           await addUser({
             email: user.email,
             password: '',
-            first_name: profile?.given_name || nameParts[0] || '',
-            last_name: profile?.family_name || nameParts.slice(1).join(' ') || '',
-            brand_name: null,
-            gender: profile?.gender || '',
+            first_name: nameParts[0] || '',
+            last_name: nameParts.slice(1).join(' ') || '',
+            brand_name: '',
+            gender: '',
             role: 'USER',
           });
         }
@@ -79,8 +107,10 @@ export const authOptions = {
       if (user) {
         token.role = user.role;
       } else if (!token.role) {
-        const dbUser = await findUser(token.email);
-        if (dbUser) token.role = dbUser.role;
+        if (typeof token.email === 'string') {
+          const dbUser = await findUser(token.email);
+          if (dbUser) token.role = dbUser.role;
+        }
       }
       return token;
     },
