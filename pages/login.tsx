@@ -1,20 +1,31 @@
 import { useState, useContext, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AppContext } from '../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { EmailInput, PasswordInput } from '../components/form-fields';
+import InputField from '../components/ui/InputField';
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const schema = z.object({
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(1, 'Password is required'),
+});
+type LoginFormValues = z.infer<typeof schema>;
 
 export default function Login() {
   const router = useRouter();
   const { login, user } = useContext(AppContext)!;
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
     if (user) {
@@ -24,26 +35,7 @@ export default function Login() {
     }
   }, [user, router]);
 
-  const handleEmailBlur = () => {
-    setErrors((prev) => {
-      const next = { ...prev };
-      if (email && !emailRegex.test(email)) {
-        next.email = 'Invalid email format';
-      } else if (next.email === 'Invalid email format') {
-        delete next.email;
-      }
-      return next;
-    });
-  };
-
-  const submit = async (e) => {
-    e.preventDefault();
-    const newErrors = {};
-    if (!email) newErrors.email = 'Email is required';
-    if (!password) newErrors.password = 'Password is required';
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
-
+  const onSubmit = async ({ email, password }: LoginFormValues) => {
     try {
       setLoading(true);
       await login(email, password);
@@ -93,22 +85,71 @@ export default function Login() {
           Login with GitHub
         </button>
         {formError && <div className="text-red-500 mb-2">{formError}</div>}
-        <form onSubmit={submit} className="space-y-2">
-          <EmailInput
-            name="email"
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+          <InputField
+            type="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onBlur={handleEmailBlur}
-            error={errors.email as string}
+            {...register('email')}
+            error={errors.email?.message as string}
           />
-          <PasswordInput
-            name="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={errors.password as string}
-          />
+          <div className="relative">
+            <InputField
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              className="pr-10"
+              {...register('password')}
+              error={errors.password?.message as string}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-2 top-2"
+            >
+              {showPassword ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="h-5 w-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.269-2.943-9.543-7a9.965 9.965 0 012.652-4.304m3.821-2.338A9.953 9.953 0 0112 5c4.478 0 8.269 2.943 9.543 7a9.952 9.952 0 01-.46 1.08M15 12a3 3 0 11-6 0 3 3 0 016 0zm-1.259 4.75L5.21 5.21"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M3 3l18 18"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="h-5 w-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
           <button
             className="btn btn-primary w-full"
             type="submit"
