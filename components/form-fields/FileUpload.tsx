@@ -1,5 +1,5 @@
 import React from 'react';
-import { UseFormFieldProps } from '../../types';
+import { UseFormRegister, RegisterOptions } from 'react-hook-form';
 
 export interface FileUploadProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -11,7 +11,8 @@ export interface FileUploadProps
   required?: boolean;
   disabled?: boolean;
   className?: string;
-  field?: UseFormFieldProps;
+  register?: UseFormRegister<any>;
+  rules?: RegisterOptions;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({
@@ -23,10 +24,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
   required = false,
   disabled = false,
   className = '',
-  field,
+  register,
+  rules,
   ...rest
 }) => {
-  const inputId = rest.id || field?.id || name;
+  const inputId = rest.id || name;
+  const registration = register ? register(name, rules) : {};
 
   return (
     <div className="mb-4 w-full">
@@ -41,13 +44,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
       <input
         type="file"
         id={inputId}
-        name={field?.name ?? name}
-        onChange={field?.onChange ?? onChange}
-        onBlur={field?.onBlur ?? onBlur}
+        name={name}
+        onChange={onChange}
+        onBlur={onBlur}
         disabled={disabled}
         required={required}
         className={`w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${className}`}
-        ref={field?.ref as any}
+        {...registration}
         {...rest}
       />
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}

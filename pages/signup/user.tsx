@@ -1,4 +1,5 @@
-import { useState, useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
@@ -41,18 +42,28 @@ const CountrySingleValue = (props: SingleValueProps<CountryOptionType, false>) =
 export default function UserSignup() {
   const router = useRouter();
   const { signup, user } = useContext(AppContext)!;
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [gender, setGender] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    getValues,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm<{
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    confirm: string;
+    gender: string;
+    phone: string;
+    address: string;
+    city: string;
+    country: string;
+  }>();
   const [passwordFocused, setPasswordFocused] = useState(false);
-  const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const countryOptions = useMemo(
     () =>
@@ -71,33 +82,23 @@ export default function UserSignup() {
   }, [user, router]);
 
   const handleEmailBlur = async () => {
-    setErrors((prev) => {
-      const next = { ...prev };
-      if (email && !emailRegex.test(email)) {
-        next.email = 'Invalid email format';
-      } else if (
-        next.email === 'Invalid email format' ||
-        next.email === 'Email already registered'
-      ) {
-        delete next.email;
-      }
-      return next;
-    });
-    if (email && emailRegex.test(email)) {
+    const value = getValues('email');
+    if (value && !emailRegex.test(value)) {
+      setError('email', { type: 'pattern', message: 'Invalid email format' });
+      return;
+    }
+    if (value) {
       try {
-        const res = await fetch(
-          `/api/check-email?email=${encodeURIComponent(email)}`
-        );
+        const res = await fetch(`/api/check-email?email=${encodeURIComponent(value)}`);
         if (res.ok) {
           const data = await res.json();
           if (data.exists) {
-            setErrors((prev) => ({
-              ...prev,
-              email: 'Email already registered',
-            }));
+            setError('email', { type: 'manual', message: 'Email already registered' });
+          } else {
+            clearErrors('email');
           }
         }
-      } catch (_) { }
+      } catch (_) {}
     }
   };
 
@@ -107,60 +108,30 @@ export default function UserSignup() {
 
   const handlePasswordBlur = () => {
     setPasswordFocused(false);
-    setErrors((prev) => {
-      const next = { ...prev };
-      if (password && !passwordRegex.test(password)) {
-        next.password =
-          'Password must be at least 8 characters and include uppercase, lowercase, number and special character';
-      } else if (next.password && next.password.startsWith('Password must')) {
-        delete next.password;
-      }
-      if (confirm && password !== confirm) {
-        next.confirm = 'Passwords do not match';
-      } else if (next.confirm === 'Passwords do not match') {
-        delete next.confirm;
-      }
-      return next;
-    });
   };
 
   const handleConfirmBlur = () => {
-    setErrors((prev) => {
-      const next = { ...prev };
-      if (password && confirm && password !== confirm) {
-        next.confirm = 'Passwords do not match';
-      } else if (next.confirm === 'Passwords do not match') {
-        delete next.confirm;
-      }
-      return next;
-    });
+    const password = getValues('password');
+    const confirm = getValues('confirm');
+    if (password && confirm && password !== confirm) {
+      setError('confirm', { type: 'manual', message: 'Passwords do not match' });
+    } else {
+      clearErrors('confirm');
+    }
   };
 
-  const submit = async (e) => {
-    e.preventDefault();
-    const newErrors = {};
-    if (!firstName) newErrors.firstName = 'First name is required';
-    if (!lastName) newErrors.lastName = 'Last name is required';
-    if (!email) newErrors.email = 'Email is required';
-    if (!password) newErrors.password = 'Password is required';
-    if (!confirm) newErrors.confirm = 'Confirm password is required';
-    if (password && confirm && password !== confirm) {
-      newErrors.confirm = 'Passwords do not match';
-    }
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
-
+  const submit = async (values: any) => {
     try {
       const data = await signup('/api/signup/user', {
-        firstName,
-        lastName,
-        email,
-        password,
-        gender,
-        phoneNumber,
-        address,
-        city,
-        country,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+        gender: values.gender,
+        phoneNumber: values.phone,
+        address: values.address,
+        city: values.city,
+        country: values.country,
       });
       router.push(`/confirm/${data.token}`);
     } catch (e) {
@@ -168,8 +139,9 @@ export default function UserSignup() {
     }
   };
 
+  const passwordValue = watch('password');
   const showPasswordHint =
-    passwordFocused || (password !== '' && !passwordRegex.test(password));
+    passwordFocused || (passwordValue !== '' && !passwordRegex.test(passwordValue));
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
@@ -194,46 +166,58 @@ export default function UserSignup() {
         </button>
       </div>
       {formError && <div className="text-red-500 mb-2">{formError}</div>}
-      <form onSubmit={submit} className="space-y-2">
+      <form onSubmit={handleSubmit(submit)} className="space-y-2">
         <TextInput
           name="firstName"
           placeholder="First Name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          error={errors.firstName as string}
+          register={register}
+          rules={{ required: 'First name is required' }}
+          error={errors.firstName?.message as string}
         />
         <TextInput
           name="lastName"
           placeholder="Last Name"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          error={errors.lastName as string}
+          register={register}
+          rules={{ required: 'Last name is required' }}
+          error={errors.lastName?.message as string}
         />
         <EmailInput
           name="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          onBlur={handleEmailBlur}
-          error={errors.email as string}
+          register={register}
+          rules={{
+            required: 'Email is required',
+            pattern: { value: emailRegex, message: 'Invalid email format' },
+            validate: async () => {
+              await handleEmailBlur();
+              return true;
+            },
+          }}
+          error={errors.email?.message as string}
         />
         <div className="grid grid-cols-2 gap-2">
           <PasswordInput
             name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onFocus={handlePasswordFocus}
-            onBlur={handlePasswordBlur}
-            error={errors.password as string}
+            register={register}
+            rules={{
+              required: 'Password is required',
+              pattern: {
+                value: passwordRegex,
+                message:
+                  'Password must be at least 8 characters and include uppercase, lowercase, number and special character',
+              },
+              onBlur: handlePasswordBlur,
+              onFocus: handlePasswordFocus,
+            }}
+            error={errors.password?.message as string}
           />
           <PasswordInput
             name="confirm"
             placeholder="Confirm Password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            onBlur={handleConfirmBlur}
-            error={errors.confirm as string}
+            register={register}
+            rules={{ validate: handleConfirmBlur }}
+            error={errors.confirm?.message as string}
           />
         </div>
         {showPasswordHint && (
@@ -244,38 +228,33 @@ export default function UserSignup() {
         )}
         <SelectDropdown
           name="gender"
+          control={control}
           options={[
             { label: 'Male', value: 'male' },
             { label: 'Female', value: 'female' },
             { label: 'Other', value: 'other' },
           ]}
-          value={gender ? { label: gender.charAt(0).toUpperCase() + gender.slice(1), value: gender } : null}
-          onChange={(opt) => setGender((opt as any)?.value || '')}
           placeholder="Select Gender"
         />
         <TextInput
           name="phone"
           placeholder="Phone Number"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
+          register={register}
         />
         <TextInput
           name="address"
           placeholder="Address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
+          register={register}
         />
         <TextInput
           name="city"
           placeholder="City"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
+          register={register}
         />
         <SelectDropdown
           name="country"
+          control={control}
           options={countryOptions}
-          value={country ? countryOptions.find((c) => c.label === country) : null}
-          onChange={(opt) => setCountry((opt as any)?.label || '')}
           placeholder="Country"
           components={{ Option: CountryOption, SingleValue: CountrySingleValue }}
         />

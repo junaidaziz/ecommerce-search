@@ -1,5 +1,5 @@
 import React from 'react';
-import { UseFormFieldProps } from '../../types';
+import { UseFormRegister, RegisterOptions } from 'react-hook-form';
 
 export interface RadioOption {
   label: string;
@@ -17,7 +17,8 @@ export interface RadioGroupProps {
   required?: boolean;
   disabled?: boolean;
   className?: string;
-  field?: UseFormFieldProps;
+  register?: UseFormRegister<any>;
+  rules?: RegisterOptions;
 }
 
 const RadioGroup: React.FC<RadioGroupProps> = ({
@@ -31,9 +32,11 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
   required = false,
   disabled = false,
   className = '',
-  field,
+  register,
+  rules,
 }) => {
   const groupName = name;
+  const registration = register ? register(name, rules) : {};
 
   return (
     <div className={`mb-4 w-full ${className}`}>
@@ -45,14 +48,15 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
           <label key={opt.value} className="flex items-center">
             <input
               type="radio"
-              name={field?.name ?? groupName}
+              name={groupName}
               value={opt.value}
-              checked={(field?.value ?? value) === opt.value}
-              onChange={field?.onChange ?? onChange}
-              onBlur={field?.onBlur ?? onBlur}
+              checked={value === opt.value}
+              onChange={onChange}
+              onBlur={onBlur}
               disabled={disabled}
               required={required}
               className="mr-2 text-blue-600 focus:ring-blue-500"
+              {...registration}
             />
             <span>{opt.label}</span>
           </label>
