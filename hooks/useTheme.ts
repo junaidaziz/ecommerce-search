@@ -20,9 +20,8 @@ export default function useTheme() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const html = document.documentElement;
-    const isDark = theme === 'dark';
-    html.setAttribute('data-theme', isDark ? 'dark' : 'cupcake');
-    html.classList.toggle('dark', isDark);
+    html.className = theme;
+    html.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
 
