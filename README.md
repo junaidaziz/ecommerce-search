@@ -162,6 +162,26 @@ import { TextInput, PasswordInput } from "@/components/form-fields";
 <PasswordInput label="Password" name="password" value={password} onChange={e => setPassword(e.target.value)} />
 ```
 
+`SelectDropdown` uses **react-select** and supports searchable single or multi selects.
+
+```tsx
+import { SelectDropdown } from '@/components/form-fields';
+
+const options = [
+  { label: 'One', value: 'one' },
+  { label: 'Two', value: 'two' },
+];
+
+<SelectDropdown
+  label="Pick one"
+  name="choice"
+  options={options}
+  value={options[0]}
+  onChange={(val) => console.log(val)}
+  isSearchable
+/>;
+```
+
 ---
 
 ## 🔎 FlexSearch Notes
