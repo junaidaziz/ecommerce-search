@@ -56,6 +56,7 @@ export default function BrandSignup() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const countryOptions = useMemo(() => countryList().getData(), []);
@@ -99,7 +100,12 @@ export default function BrandSignup() {
     }
   };
 
+  const handlePasswordFocus = () => {
+    setPasswordFocused(true);
+  };
+
   const handlePasswordBlur = () => {
+    setPasswordFocused(false);
     setErrors((prev) => {
       const next = { ...prev };
       if (password && !passwordRegex.test(password)) {
@@ -211,6 +217,9 @@ export default function BrandSignup() {
     }
   };
 
+  const showPasswordHint =
+    passwordFocused || (password !== '' && !passwordRegex.test(password));
+
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
@@ -297,7 +306,9 @@ export default function BrandSignup() {
                   className={`input input-bordered w-full pr-10 rounded-lg focus:ring-2 focus:ring-indigo-500 ${errors.password ? 'border-red-500' : ''}`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onFocus={handlePasswordFocus}
                   onBlur={handlePasswordBlur}
+                  aria-describedby="password-help"
                   placeholder="Password"
                 />
                 <button
@@ -349,10 +360,12 @@ export default function BrandSignup() {
                     </svg>
                   )}
                 </button>
-                <p className="text-sm text-gray-500">
-                  Password must be at least 8 characters and include uppercase,
-                  lowercase, number and special character
-                </p>
+                {showPasswordHint && (
+                  <p id="password-help" className="text-sm text-gray-500 mt-1">
+                    Password must be at least 8 characters and include uppercase,
+                    lowercase, number and special character
+                  </p>
+                )}
                 {errors.password && (
                   <p className="text-red-500 text-sm">{errors.password}</p>
                 )}
