@@ -1,22 +1,23 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function Approvals() {
   const { user } = useContext(AppContext)!;
-  const [pending, setPending] = useState([]);
+  type PendingProduct = { id: string; title: string };
+  const [pending, setPending] = useState<PendingProduct[]>([]);
   const [message, setMessage] = useState('');
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!user) return;
     const res = await fetch('/api/admin/vendor-products');
     if (res.ok) setPending(await res.json());
-  };
+  }, [user]);
 
   useEffect(() => {
     load();
-  }, [load, user]);
+  }, [load]);
 
-  const act = async (id, action) => {
+  const act = async (id: string, action: 'approve' | 'reject') => {
     const res = await fetch('/api/admin/vendor-products', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

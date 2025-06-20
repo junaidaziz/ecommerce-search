@@ -2,9 +2,15 @@ import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
 
+type AnalyticsData = {
+  totalOrders: number;
+  totalRevenue: number;
+  topProducts: { id: string; qty: number }[];
+};
+
 export default function AdminAnalytics() {
   const { user } = useContext(AppContext)!;
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<AnalyticsData | null>(null);
 
   useEffect(() => {
     if (!user) return;

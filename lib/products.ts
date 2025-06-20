@@ -1,28 +1,12 @@
 import { JSDOM } from 'jsdom';
 import { getDb } from './db';
-import type { Product } from '../types/product';
+import type { Product, ProductDbRow } from '../types/product';
 import type { Category } from '../types/category';
 
 /**
  * Simplified representation of a product row returned from the database.
  * Only the fields that are accessed in this module are included.
  */
-interface ProductDbRow {
-  id: number;
-  slug: string | null;
-  title: string;
-  vendorId?: number | null;
-  vendor?: { brandName: string | null } | null;
-  description: string | null;
-  productType: string | null;
-  tags: string | null;
-  category?: { name: string | null } | null;
-  images: string | null;
-  quantity: number;
-  minPrice: number;
-  maxPrice: number;
-  currency: string;
-}
 
 const stripHtml = (html: string | null | undefined): string => {
   if (!html) return '';
@@ -154,52 +138,56 @@ export async function loadAndIndexProducts(): Promise<{ products: Product[]; pro
   return { products, productIndex: null };
 }
 
-export async function addProduct(product: Record<string, unknown>): Promise<void> {
+export async function addProduct(product: Product): Promise<void> {
   const db = getDb();
-  const vendor = await db.user.findFirst({ where: { brandName: product.vendor } });
-  const category = product.category
-    ? await db.category.findFirst({ where: { name: product.category } })
+  const vendor = await db.user.findFirst({ where: { brandName: String(product.VENDOR) } });
+  const category = product.CATEGORY
+    ? await db.category.findFirst({ where: { name: product.CATEGORY } })
     : null;
+  const data: any = {
+    id: Number(product.ID),
+    slug: product.SLUG,
+    title: product.TITLE,
+    description: product.DESCRIPTION ?? '',
+    productType: product.PRODUCT_TYPE ?? '',
+    tags: product.TAGS ?? '',
+    quantity: product.QUANTITY ?? 0,
+    minPrice: product.MIN_PRICE ?? 0,
+    maxPrice: product.MAX_PRICE ?? 0,
+    currency: product.CURRENCY ?? 'USD',
+    status: product.STATUS ?? 'approved',
+  };
+  if (vendor) {
+    data.vendor = { connect: { id: vendor.id } };
+  }
+  if (category) {
+    data.category = { connect: { id: category.id } };
+  }
   await db.product.create({
-    data: {
-      id: Number(product.id),
-      slug: product.slug,
-      title: product.title,
-      description: product.description ?? '',
-      productType: product.product_type ?? '',
-      tags: product.tags ?? '',
-      quantity: product.quantity ?? 0,
-      minPrice: product.min_price ?? 0,
-      maxPrice: product.max_price ?? 0,
-      currency: product.currency ?? 'USD',
-      status: product.status ?? 'approved',
-      images: product.images ?? null,
-      vendor: vendor ? { connect: { id: vendor.id } } : undefined,
-      category: category ? { connect: { id: category.id } } : undefined,
-    },
+    data,
   });
 }
 
-export async function updateProduct(product: Record<string, unknown>): Promise<void> {
+export async function updateProduct(product: Product): Promise<void> {
   const db = getDb();
-  const vendor = product.vendor
-    ? await db.user.findFirst({ where: { brandName: product.vendor } })
+  const vendor = product.VENDOR
+    ? await db.user.findFirst({ where: { brandName: product.VENDOR } })
     : null;
-  const category = product.category
-    ? await db.category.findFirst({ where: { name: product.category } })
+  const category = product.CATEGORY
+    ? await db.category.findFirst({ where: { name: product.CATEGORY } })
     : null;
   await db.product.update({
-    where: { id: Number(product.id) },
+    where: { id: Number(product.ID) },
     data: {
-      title: product.title,
-      description: product.description,
-      productType: product.product_type,
-      tags: product.tags,
-      quantity: product.quantity,
-      minPrice: product.min_price,
-      maxPrice: product.max_price,
-      currency: product.currency,
-      images: product.images,
+      title: product.TITLE,
+      description: product.DESCRIPTION,
+      productType: product.PRODUCT_TYPE,
+      tags: product.TAGS,
+      quantity: product.QUANTITY,
+      minPrice: product.MIN_PRICE,
+      maxPrice: product.MAX_PRICE,
+      currency: product.CURRENCY,
+      images: undefined,
       vendor: vendor ? { connect: { id: vendor.id } } : undefined,
       category: category ? { connect: { id: category.id } } : undefined,
     },
