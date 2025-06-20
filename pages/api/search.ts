@@ -100,7 +100,7 @@ export default async function handler(
       await db.searchLog.create({
         data: {
           query: String(q),
-          userId,
+          user: userId ? { connect: { id: userId } } : undefined,
           noResults: result.found === 0,
         },
       });
