@@ -1,3 +1,4 @@
+import { OrderRow } from '../types';
 import { getDb } from './db';
 import { mapDbRowToProduct } from './products';
 
@@ -56,7 +57,11 @@ export async function getOrdersForUser(email: string) {
           vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
           description: row.product.description,
           product_type: row.product.productType,
-          tags: row.product.tags,
+          tags: Array.isArray(row.product.tags)
+            ? row.product.tags
+            : typeof row.product.tags === 'string'
+            ? row.product.tags.split(',').map((t) => t.trim()).filter(Boolean)
+            : [],
           category: row.product.category?.name,
           images: row.product.images,
           quantity: row.product.quantity,
@@ -93,7 +98,11 @@ export async function getAllOrders() {
           vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
           description: row.product.description,
           product_type: row.product.productType,
-          tags: row.product.tags,
+          tags: Array.isArray(row.product.tags)
+            ? row.product.tags
+            : typeof row.product.tags === 'string'
+            ? row.product.tags.split(',').map((t) => t.trim()).filter(Boolean)
+            : [],
           category: row.product.category?.name,
           images: row.product.images,
           quantity: row.product.quantity,
@@ -132,7 +141,11 @@ export async function getOrdersForVendor(vendor: string) {
             vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
             description: row.product.description,
             product_type: row.product.productType,
-            tags: row.product.tags,
+            tags: Array.isArray(row.product.tags)
+              ? row.product.tags
+              : typeof row.product.tags === 'string'
+              ? row.product.tags.split(',').map((t) => t.trim()).filter(Boolean)
+              : [],
             category: row.product.category?.name,
             images: row.product.images,
             quantity: row.product.quantity,
@@ -208,12 +221,12 @@ export async function getBestSellingProducts(limit = 8) {
     orderBy: { _sum: { quantity: 'desc' } },
     take: limit,
   });
-  const ids = grouped.map((g) => g.productId);
+  const ids = grouped.map((g: { productId: number }) => g.productId);
   const products = await db.product.findMany({
     where: { id: { in: ids } },
     include: { category: true, vendor: true },
   });
-  return products.map((p) =>
+  return products.map((p: any) =>
     mapDbRowToProduct({
       id: p.id,
       slug: p.slug,

@@ -44,7 +44,7 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
   rules,
   ...rest
 }) => {
-  const inputId = rest.id || name;
+  const inputId: string = typeof rest.id === 'string' ? rest.id : String(name);
 
   return (
     <div className="mb-4 w-full">
@@ -96,7 +96,16 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
             inputId={inputId}
             name={name}
             value={value as any}
-            onChange={(val) => onChange?.(val)}
+            onChange={(val) => {
+              if (Array.isArray(val)) {
+                // Cast readonly array to mutable array
+                onChange?.([...val]);
+              } else if (val === null) {
+                onChange?.(null);
+              } else {
+                onChange?.(val as SelectOption);
+              }
+            }}
             options={options}
             placeholder={placeholder}
             isSearchable={isSearchable}
