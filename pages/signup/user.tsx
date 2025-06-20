@@ -403,7 +403,7 @@ export default function UserSignup() {
       </p>
       <p className="text-sm text-center mt-4 text-gray-600">
         Want to sign up as a brand instead?{' '}
-        <Link href="/brands/signup" className="text-blue-600 hover:underline">
+        <Link href="/signup/brand" className="text-blue-600 hover:underline">
           Sign up as a brand instead
         </Link>
       </p>
