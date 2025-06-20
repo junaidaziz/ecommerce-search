@@ -1,4 +1,5 @@
 import React from 'react';
+import { UseFormFieldProps } from '../../types';
 
 export interface TextInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -7,12 +8,14 @@ export interface TextInputProps
   placeholder?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   error?: string;
   required?: boolean;
   disabled?: boolean;
   className?: string;
   leftAddon?: React.ReactNode;
   rightAddon?: React.ReactNode;
+  field?: UseFormFieldProps;
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -21,15 +24,17 @@ const TextInput: React.FC<TextInputProps> = ({
   placeholder,
   value,
   onChange,
+  onBlur,
   error,
   required = false,
   disabled = false,
   className = '',
   leftAddon,
   rightAddon,
+  field,
   ...rest
 }) => {
-  const inputId = rest.id || name;
+  const inputId = rest.id || field?.id || name;
 
   return (
     <div className="mb-4 w-full">
@@ -50,15 +55,17 @@ const TextInput: React.FC<TextInputProps> = ({
         <input
           type="text"
           id={inputId}
-          name={name}
+          name={field?.name ?? name}
           placeholder={placeholder}
-          value={value}
-          onChange={onChange}
+          value={field?.value ?? value}
+          onChange={field?.onChange ?? onChange}
+          onBlur={field?.onBlur ?? onBlur}
           disabled={disabled}
           required={required}
           className={`flex-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
             error ? 'border-red-500' : 'border-gray-300'
           } ${leftAddon ? 'rounded-l-none' : ''} ${rightAddon ? 'rounded-r-none' : ''} ${className}`}
+          ref={field?.ref as any}
           {...rest}
         />
         {rightAddon && (
