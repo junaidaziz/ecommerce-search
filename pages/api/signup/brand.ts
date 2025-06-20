@@ -4,39 +4,53 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<{ token: string } | { message: string }>
+) {
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
+
     const {
       email,
       password,
       firstName,
       lastName,
       brandName,
-    phoneNumber,
-    businessAddress,
-    city,
-    country,
-    website,
-    businessDescription,
-    taxId,
-  } = req.body;
-    } = req.body;
+      phoneNumber,
+      businessAddress,
+      city,
+      country,
+      website,
+      businessDescription,
+      taxId,
+    } = req.body as {
+      email?: string;
+      password?: string;
+      firstName?: string;
+      lastName?: string;
+      brandName?: string;
+      phoneNumber?: string;
+      businessAddress?: string;
+      city?: string;
+      country?: string;
+      website?: string;
+      businessDescription?: string;
+      taxId?: string;
+    };
+
     if (
       !email ||
       !password ||
       !firstName ||
       !lastName ||
       !brandName ||
-    !phoneNumber ||
-    !businessAddress ||
-    !city ||
-    !country
-  ) {
-    return res.status(400).json({ message: 'missing required fields' });
-  }
+      !phoneNumber ||
+      !businessAddress ||
+      !city ||
+      !country
     ) {
       return res.status(400).json({ message: 'missing required fields' });
     }
@@ -51,14 +65,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       first_name: firstName,
       last_name: lastName,
       brand_name: brandName,
-    phone_number: phoneNumber,
-    business_address: businessAddress,
-    city,
-    country,
-    website: website || null,
-    business_description: businessDescription || null,
-    tax_id: taxId || null,
-    role: 'BRAND',
+      phone_number: phoneNumber,
+      business_address: businessAddress,
+      city,
+      country,
+      website: website || null,
+      business_description: businessDescription || null,
+      tax_id: taxId || null,
+      role: 'BRAND',
       verification_token: token,
     });
     return res.status(201).json({ token });

@@ -10,7 +10,7 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
 export default function BrandSignup() {
   const router = useRouter();
-  const { signup, user } = useContext(AppContext);
+  const { signup, user } = useContext(AppContext)!;
   const [brandName, setBrandName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');

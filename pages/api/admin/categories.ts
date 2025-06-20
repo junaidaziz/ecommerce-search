@@ -25,8 +25,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
       try {
         createCategory(name, parentId || null, image || null);
-      } catch (e: any) {
-        if (e.message === 'depth') {
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === 'depth') {
           return res.status(400).json({ message: 'max depth exceeded' });
         }
         throw e;
@@ -49,8 +49,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         removeCategory(id);
         logAudit('delete_category', { id });
         return res.status(200).json({ message: 'category deleted' });
-      } catch (e: any) {
-        if (e.message === 'category in use') {
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === 'category in use') {
           return res
             .status(400)
             .json({ message: 'cannot delete category with products' });

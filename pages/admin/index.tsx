@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function Admin() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const emptyForm = {
     id: '',
     title: '',

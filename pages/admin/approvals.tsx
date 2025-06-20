@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function Approvals() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const [pending, setPending] = useState([]);
   const [message, setMessage] = useState('');
 

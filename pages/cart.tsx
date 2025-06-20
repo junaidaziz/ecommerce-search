@@ -4,7 +4,7 @@ import { AppContext } from '../contexts/AppContext';
 
 export default function Cart() {
   const router = useRouter();
-  const { cart, changeQty, removeFromCart } = useContext(AppContext);
+  const { cart, changeQty, removeFromCart } = useContext(AppContext)!;
   const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.qty * parseFloat(item.MIN_PRICE || 0),

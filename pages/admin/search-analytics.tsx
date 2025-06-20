@@ -2,11 +2,16 @@ import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
 
+interface SearchCount {
+  query: string;
+  count: number;
+}
+
 export default function SearchAnalytics() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const [data, setData] = useState<{
-    topSearches: any[];
-    failedSearches: any[];
+    topSearches: SearchCount[];
+    failedSearches: SearchCount[];
   } | null>(null);
 
   useEffect(() => {

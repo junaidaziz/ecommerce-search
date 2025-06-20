@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function UserWishlist() {
   const { user, wishlist, addToCart, removeFromWishlist } =
-    useContext(AppContext);
+    useContext(AppContext)!;
 
   if (!user) {
     return <div className="p-4">Please log in to view wishlist.</div>;

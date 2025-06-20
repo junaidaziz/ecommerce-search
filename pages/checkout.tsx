@@ -5,7 +5,7 @@ import { AppContext } from '../contexts/AppContext';
 
 export default function Checkout() {
   const router = useRouter();
-  const { cart, user } = useContext(AppContext);
+  const { cart, user } = useContext(AppContext)!;
   const [name, setName] = useState(
     user ? `${user.firstName} ${user.lastName}` : ''
   );
