@@ -1,8 +1,14 @@
 import useTheme from '../hooks/useTheme';
 import Header from './Header';
 import Footer from './Footer';
+import type { FC, ReactNode } from 'react';
 
-export default function Layout({ children, heroSecond }) {
+interface LayoutProps {
+  children: ReactNode;
+  heroSecond?: ReactNode;
+}
+
+const Layout: FC<LayoutProps> = ({ children, heroSecond }) => {
   const [theme, setTheme] = useTheme();
 
   return (
@@ -15,4 +21,6 @@ export default function Layout({ children, heroSecond }) {
       <Footer />
     </div>
   );
-}
+};
+
+export default Layout;
