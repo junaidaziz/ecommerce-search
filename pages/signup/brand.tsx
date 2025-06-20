@@ -570,7 +570,7 @@ export default function BrandSignup() {
       </p>
       <p className="text-sm text-center mt-4 text-gray-600">
         Not a brand?{' '}
-        <Link href="/users/signup" className="text-blue-600 hover:underline">
+        <Link href="/signup/user" className="text-blue-600 hover:underline">
           Sign up as a user instead
         </Link>
       </p>
