@@ -26,7 +26,7 @@ export async function getServerSideProps({ params }) {
 }
 
 export default function ProductDetail({ product, initialReviews, initialAverage, initialCount }) {
-  const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } = useContext(AppContext);
+  const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } = useContext(AppContext)!;
   const [reviews, setReviews] = useState(initialReviews);
   const [averageRating, setAverageRating] = useState(initialAverage);
   const [reviewCount, setReviewCount] = useState(initialCount);

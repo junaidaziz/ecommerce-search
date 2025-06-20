@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { AppContext } from '../contexts/AppContext';
 
 export default function Products() {
-  const { addToCart } = useContext(AppContext);
+  const { addToCart } = useContext(AppContext)!;
   const [products, setProducts] = useState([]);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');

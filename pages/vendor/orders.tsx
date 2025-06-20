@@ -9,7 +9,7 @@ import { NotificationContext } from '../../contexts/NotificationContext';
 import type { Order } from '../../types';
 
 export default function VendorOrders() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);

@@ -11,7 +11,7 @@ export default function ProductDetail() {
   const router = useRouter();
   const { id } = router.query as { id?: string };
   const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } =
-    useContext(AppContext);
+    useContext(AppContext)!;
   const [product, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);

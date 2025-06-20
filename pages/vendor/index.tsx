@@ -10,7 +10,7 @@ import { AppContext } from '../../contexts/AppContext';
 import type { Product } from '../../types';
 
 export default function VendorDashboard() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   interface FormState {
     id: string;
     title: string;

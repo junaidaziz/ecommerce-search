@@ -1,8 +1,10 @@
 import { prisma } from './prisma';
+import type { Product } from '../types/product';
+import type { Review } from '../types/review';
 
-const cartStore = new Map<string, any[]>();
-const wishlistStore = new Map<string, any[]>();
-const reviewsStore = new Map<string, any[]>();
+const cartStore = new Map<string, (Product & { qty: number })[]>();
+const wishlistStore = new Map<string, Product[]>();
+const reviewsStore = new Map<string, Review[]>();
 
 export const getDb = () => prisma;
 export default prisma;
@@ -30,11 +32,11 @@ export async function decreaseProductQuantity(id: string | number, qty: number) 
   });
 }
 
-export function getCart(email: string) {
+export function getCart(email: string): (Product & { qty: number })[] {
   return cartStore.get(email) || [];
 }
 
-export function setCart(email: string, items: any[]) {
+export function setCart(email: string, items: (Product & { qty: number })[]): void {
   cartStore.set(email, items);
 }
 
@@ -42,11 +44,11 @@ export function clearCart(email: string) {
   cartStore.delete(email);
 }
 
-export function getWishlist(email: string) {
+export function getWishlist(email: string): Product[] {
   return wishlistStore.get(email) || [];
 }
 
-export function setWishlist(email: string, items: any[]) {
+export function setWishlist(email: string, items: Product[]): void {
   wishlistStore.set(email, items);
 }
 
@@ -64,11 +66,14 @@ export function addReview(review: {
   reviewsStore.set(review.productId, list);
 }
 
-export function getReviewsForProduct(productId: string) {
+export function getReviewsForProduct(productId: string): Review[] {
   return reviewsStore.get(productId) || [];
 }
 
-export function getAverageRating(productId: string) {
+export function getAverageRating(productId: string): {
+  average: number;
+  count: number;
+} {
   const reviews = reviewsStore.get(productId) || [];
   if (reviews.length === 0) return { average: 0, count: 0 };
   const sum = reviews.reduce((acc, r) => acc + r.rating, 0);

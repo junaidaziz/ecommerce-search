@@ -3,7 +3,7 @@ import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
 
 export default function AdminAnalytics() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const [data, setData] = useState(null);
 
   useEffect(() => {

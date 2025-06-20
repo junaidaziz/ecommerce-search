@@ -1,9 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+interface SearchAnalyticsResponse {
+  topSearches: { query: string; count: number }[];
+  failedSearches: { query: string; count: number }[];
+}
 import { getDb } from '../../../lib/db';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<SearchAnalyticsResponse | { message: string }>
+) {
   try {
     if (req.method !== 'GET') {
       return res.status(405).json({ message: 'Method Not Allowed' });

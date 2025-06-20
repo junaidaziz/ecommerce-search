@@ -2,7 +2,7 @@ import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function ManageUsers() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState('');
 
