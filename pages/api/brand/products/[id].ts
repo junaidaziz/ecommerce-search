@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!id) return res.status(400).json({ message: 'id required' });
 
   if (req.method === 'PUT') {
-    const existing = getProductById(String(id));
+    const existing = await getProductById(String(id));
     if (!existing) return res.status(404).json({ message: 'Not found' });
     const {
       title,
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       max_price,
       currency,
     } = req.body || {};
-    updateProduct({
+    await updateProduct({
       id: String(id),
       title: title ?? existing.title,
       vendor: vendor ?? existing.vendor,
@@ -43,12 +43,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'DELETE') {
-    const existing = getProductById(String(id));
+    const existing = await getProductById(String(id));
     if (!existing) return res.status(404).json({ message: 'Not found' });
     if (existing.quantity > 0 || hasOrdersForProduct(String(id))) {
       return res.status(400).json({ message: 'cannot delete product with stock or orders' });
     }
-    deleteProduct(String(id));
+    await deleteProduct(String(id));
     await loadAndIndexProducts();
     return res.status(200).json({ message: 'product deleted' });
   }

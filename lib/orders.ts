@@ -1,104 +1,233 @@
-import { getDb, getProductById, getProductsByIds } from './db';
+import { getDb } from './db';
 import { mapDbRowToProduct } from './products';
 
-export function addOrder({
+export async function addOrder({
   user_email,
   items,
   total,
   status = 'pending',
   shipping_name = null,
   shipping_address = null,
+}: {
+  user_email: string;
+  items: any[];
+  total: number;
+  status?: string;
+  shipping_name?: string | null;
+  shipping_address?: string | null;
 }) {
   const db = getDb();
-  const stmt = db.prepare(
-    `INSERT INTO orders (user_email, items, total, status, shipping_name, shipping_address)
-      VALUES (?, ?, ?, ?, ?, ?)`
-  );
-  const info = stmt.run(
-    user_email,
-    JSON.stringify(items),
-    total,
-    status,
-    shipping_name,
-    shipping_address
-  );
-  return info.lastInsertRowid;
-}
-
-export function getOrdersForUser(email) {
-  const db = getDb();
-  const stmt = db.prepare(
-    `SELECT * FROM orders WHERE user_email = ? ORDER BY created_at DESC`
-  );
-  return stmt.all(email).map((row) => ({
-    ...row,
-    items: JSON.parse(row.items),
-  }));
-}
-
-export function getAllOrders() {
-  const db = getDb();
-  const stmt = db.prepare(`SELECT * FROM orders ORDER BY created_at DESC`);
-  return stmt.all().map((row) => ({
-    ...row,
-    items: JSON.parse(row.items),
-  }));
-}
-
-export function getOrdersForVendor(vendor) {
-  const db = getDb();
-  const stmt = db.prepare(`SELECT * FROM orders ORDER BY created_at DESC`);
-  const rows = stmt.all();
-  return rows
-    .map((row) => ({
-      ...row,
-      items: JSON.parse(row.items),
-    }))
-    .filter((order) => order.items.some((item) => item.VENDOR === vendor));
-}
-
-export function hasOrdersForProduct(productId) {
-  const db = getDb();
-  const stmt = db.prepare('SELECT items FROM orders');
-  const rows = stmt.all();
-  for (const row of rows) {
-    try {
-      const items = JSON.parse(row.items);
-      if (items.some((item) => String(item.ID) === String(productId))) {
-        return true;
-      }
-    } catch (_) {
-      // ignore parse errors
-    }
-  }
-  return false;
-}
-export function getOrderById(id) {
-  const db = getDb();
-  const stmt = db.prepare('SELECT * FROM orders WHERE id = ?');
-  const row = stmt.get(id);
-  return row ? { ...row, items: JSON.parse(row.items) } : null;
-}
-
-export function updateOrderStatus(id, status) {
-  const db = getDb();
-  const stmt = db.prepare('UPDATE orders SET status = ? WHERE id = ?');
-  stmt.run(status, id);
-}
-
-export function getBestSellingProducts(limit = 8) {
-  const orders = getAllOrders();
-  const counts: Record<string, number> = {};
-  orders.forEach((o) => {
-    o.items.forEach((i: any) => {
-      const id = String(i.ID);
-      counts[id] = (counts[id] || 0) + (i.qty || 0);
+  const user = await db.user.findUnique({ where: { email: user_email } });
+  if (!user) throw new Error('user not found');
+  let lastId: number | null = null;
+  for (const item of items) {
+    const created = await db.order.create({
+      data: {
+        userId: user.id,
+        productId: Number(item.ID),
+        quantity: item.qty || 1,
+        total,
+        status,
+      },
     });
+    lastId = created.id;
+  }
+  return lastId;
+}
+
+export async function getOrdersForUser(email: string) {
+  const db = getDb();
+  const user = await db.user.findUnique({ where: { email } });
+  if (!user) return [];
+  const rows = await db.order.findMany({
+    where: { userId: user.id },
+    include: { product: { include: { vendor: true, category: true } } },
+    orderBy: { createdAt: 'desc' },
   });
-  const topIds = Object.entries(counts)
-    .sort((a, b) => (b[1] as number) - (a[1] as number))
-    .slice(0, limit)
-    .map(([id]) => id);
-  const rows = getProductsByIds(topIds);
-  return rows.map((r) => mapDbRowToProduct(r));
+  return rows.map((row) => ({
+    id: row.id,
+    user_email: email,
+    items: [
+      {
+        ...mapDbRowToProduct({
+          id: row.product.id,
+          slug: row.product.slug,
+          title: row.product.title,
+          vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
+          description: row.product.description,
+          product_type: row.product.productType,
+          tags: row.product.tags,
+          category: row.product.category?.name,
+          images: row.product.images,
+          quantity: row.product.quantity,
+          min_price: row.product.minPrice,
+          max_price: row.product.maxPrice,
+          currency: row.product.currency,
+        }),
+        qty: row.quantity,
+      },
+    ],
+    total: row.total,
+    status: row.status,
+    shipping_name: null,
+    shipping_address: null,
+    created_at: row.createdAt,
+  }));
+}
+
+export async function getAllOrders() {
+  const db = getDb();
+  const rows = await db.order.findMany({
+    include: { user: true, product: { include: { vendor: true, category: true } } },
+    orderBy: { createdAt: 'desc' },
+  });
+  return rows.map((row) => ({
+    id: row.id,
+    user_email: row.user.email,
+    items: [
+      {
+        ...mapDbRowToProduct({
+          id: row.product.id,
+          slug: row.product.slug,
+          title: row.product.title,
+          vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
+          description: row.product.description,
+          product_type: row.product.productType,
+          tags: row.product.tags,
+          category: row.product.category?.name,
+          images: row.product.images,
+          quantity: row.product.quantity,
+          min_price: row.product.minPrice,
+          max_price: row.product.maxPrice,
+          currency: row.product.currency,
+        }),
+        qty: row.quantity,
+      },
+    ],
+    total: row.total,
+    status: row.status,
+    shipping_name: null,
+    shipping_address: null,
+    created_at: row.createdAt,
+  }));
+}
+
+export async function getOrdersForVendor(vendor: string) {
+  const db = getDb();
+  const rows = await db.order.findMany({
+    include: { product: { include: { vendor: true, category: true } }, user: true },
+    orderBy: { createdAt: 'desc' },
+  });
+  return rows
+    .filter((row) => row.product.vendor?.brandName === vendor)
+    .map((row) => ({
+      id: row.id,
+      user_email: row.user.email,
+      items: [
+        {
+          ...mapDbRowToProduct({
+            id: row.product.id,
+            slug: row.product.slug,
+            title: row.product.title,
+            vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
+            description: row.product.description,
+            product_type: row.product.productType,
+            tags: row.product.tags,
+            category: row.product.category?.name,
+            images: row.product.images,
+            quantity: row.product.quantity,
+            min_price: row.product.minPrice,
+            max_price: row.product.maxPrice,
+            currency: row.product.currency,
+          }),
+          qty: row.quantity,
+        },
+      ],
+      total: row.total,
+      status: row.status,
+      shipping_name: null,
+      shipping_address: null,
+      created_at: row.createdAt,
+    }));
+}
+
+export async function hasOrdersForProduct(productId: string | number) {
+  const db = getDb();
+  const count = await db.order.count({ where: { productId: Number(productId) } });
+  return count > 0;
+}
+
+export async function getOrderById(id: string | number) {
+  const db = getDb();
+  const row = await db.order.findUnique({
+    where: { id: Number(id) },
+    include: { user: true, product: { include: { vendor: true, category: true } } },
+  });
+  if (!row) return null;
+  return {
+    id: row.id,
+    user_email: row.user.email,
+    items: [
+      {
+        ...mapDbRowToProduct({
+          id: row.product.id,
+          slug: row.product.slug,
+          title: row.product.title,
+          vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
+          description: row.product.description,
+          product_type: row.product.productType,
+          tags: row.product.tags,
+          category: row.product.category?.name,
+          images: row.product.images,
+          quantity: row.product.quantity,
+          min_price: row.product.minPrice,
+          max_price: row.product.maxPrice,
+          currency: row.product.currency,
+        }),
+        qty: row.quantity,
+      },
+    ],
+    total: row.total,
+    status: row.status,
+    shipping_name: null,
+    shipping_address: null,
+    created_at: row.createdAt,
+  };
+}
+
+export async function updateOrderStatus(id: string | number, status: string) {
+  const db = getDb();
+  await db.order.update({ where: { id: Number(id) }, data: { status } });
+}
+
+export async function getBestSellingProducts(limit = 8) {
+  const db = getDb();
+  const grouped = await db.order.groupBy({
+    by: ['productId'],
+    _sum: { quantity: true },
+    orderBy: { _sum: { quantity: 'desc' } },
+    take: limit,
+  });
+  const ids = grouped.map((g) => g.productId);
+  const products = await db.product.findMany({
+    where: { id: { in: ids } },
+    include: { category: true, vendor: true },
+  });
+  return products.map((p) =>
+    mapDbRowToProduct({
+      id: p.id,
+      slug: p.slug,
+      title: p.title,
+      vendor: p.vendor?.brandName ?? String(p.vendorId),
+      description: p.description,
+      product_type: p.productType,
+      tags: p.tags,
+      category: p.category?.name,
+      images: p.images,
+      quantity: p.quantity,
+      min_price: p.minPrice,
+      max_price: p.maxPrice,
+      currency: p.currency,
+    })
+  );
 }

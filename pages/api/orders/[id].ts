@@ -11,7 +11,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (req.method === 'GET') {
-    const order = getOrderById(String(id));
+    const order = await getOrderById(String(id));
     if (!order) return res.status(404).json({ message: 'Not found' });
     return res.status(200).json(order);
   }
@@ -21,8 +21,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (!status || !['pending', 'shipped', 'completed'].includes(status)) {
       return res.status(400).json({ message: 'invalid status' });
     }
-    updateOrderStatus(String(id), status);
-    const order = getOrderById(String(id));
+    await updateOrderStatus(String(id), status);
+    const order = await getOrderById(String(id));
     await sendOrderStatusUpdate(order.user_email, order);
     return res.status(200).json(order);
   }
