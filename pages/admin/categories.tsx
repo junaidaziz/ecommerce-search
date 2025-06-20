@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function Categories() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const [categories, setCategories] = useState([]);
   const [newCat, setNewCat] = useState('');
   const [newParent, setNewParent] = useState('');

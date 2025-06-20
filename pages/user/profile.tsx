@@ -2,7 +2,7 @@ import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function UserProfile() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
   const [address, setAddress] = useState(user?.address || '');
   const [city, setCity] = useState(user?.city || '');

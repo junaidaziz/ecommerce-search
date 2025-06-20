@@ -4,7 +4,10 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<{ token: string } | { message: string }>
+) {
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ message: 'Method Not Allowed' });
@@ -15,11 +18,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       firstName,
       lastName,
       gender,
-    phoneNumber,
-    address,
-    city,
-    country,
-    } = req.body;
+      phoneNumber,
+      address,
+      city,
+      country,
+    } = req.body as {
+      email?: string;
+      password?: string;
+      firstName?: string;
+      lastName?: string;
+      gender?: string;
+      phoneNumber?: string;
+      address?: string;
+      city?: string;
+      country?: string;
+    };
     if (!email || !password || !firstName || !lastName) {
       return res.status(400).json({ message: 'missing required fields' });
     }
@@ -34,11 +47,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       first_name: firstName,
       last_name: lastName,
       gender: gender || '',
-    phone_number: phoneNumber || null,
-    address: address || null,
-    city: city || null,
-    country: country || null,
-    role: 'USER',
+      phone_number: phoneNumber || null,
+      address: address || null,
+      city: city || null,
+      country: country || null,
+      role: 'USER',
       verification_token: token,
     });
     return res.status(201).json({ token });

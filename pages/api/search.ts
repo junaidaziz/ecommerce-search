@@ -1,10 +1,35 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getBestSellingProducts } from '../../lib/orders';
 import { getDb } from '../../lib/db';
+import type { Product } from '../../types/product';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import client from '../../lib/typesenseClient';
 import { handleApiError } from '../../lib/utils/handleApiError';
+
+interface SearchParams {
+  q: string;
+  query_by: string;
+  highlight_fields: string;
+  highlight_start_tag: string;
+  highlight_end_tag: string;
+  page: number;
+  per_page: number;
+  facet_by: string;
+  max_facet_values: number;
+  filter_by?: string;
+  sort_by?: string;
+}
+
+interface TypesenseHit {
+  document: Product;
+  highlights: unknown[];
+}
+
+interface FacetCount {
+  field_name: string;
+  counts: { value: string }[];
+}
 
 function buildSort(sort?: string) {
   switch (sort) {
@@ -51,7 +76,7 @@ export default async function handler(
     perPage = '20',
   } = req.query as { [key: string]: string };
 
-  const searchParams: Record<string, any> = {
+  const searchParams: SearchParams = {
     q: q || '*',
     query_by: 'title,description',
     highlight_fields: 'title,description',
@@ -79,7 +104,7 @@ export default async function handler(
       .documents()
       .search(searchParams);
     const hits =
-      result.hits?.map((h: any) => ({
+      result.hits?.map((h: TypesenseHit) => ({
         ...h.document,
         highlights: h.highlights,
       })) || [];
@@ -87,12 +112,12 @@ export default async function handler(
     const brands: string[] = [];
     const categories: string[] = [];
     if (Array.isArray(result.facet_counts)) {
-      for (const facet of result.facet_counts) {
+      for (const facet of result.facet_counts as FacetCount[]) {
         if (facet.field_name === 'brand') {
-          brands.push(...facet.counts.map((c: any) => c.value));
+          brands.push(...facet.counts.map((c) => c.value));
         }
         if (facet.field_name === 'category') {
-          categories.push(...facet.counts.map((c: any) => c.value));
+          categories.push(...facet.counts.map((c) => c.value));
         }
       }
     }

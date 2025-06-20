@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, useCallback } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function BrandDashboard() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const emptyForm = {
     id: '',
     title: '',

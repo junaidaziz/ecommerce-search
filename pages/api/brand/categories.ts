@@ -15,8 +15,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     if (!exists) {
       try {
         createCategory(name, parentId || null);
-      } catch (e: any) {
-        if (e.message === 'depth') {
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === 'depth') {
           return res.status(400).json({ message: 'max depth exceeded' });
         }
         throw e;

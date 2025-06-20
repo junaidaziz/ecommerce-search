@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../contexts/AppContext';
 
 export default function Orders() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
