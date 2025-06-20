@@ -127,8 +127,8 @@ export default function UserSignup() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="w-full max-w-2xl px-4 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+      <div className="w-full max-w-2xl -mt-8">
         <h1 className="text-2xl font-bold mb-4">User Sign Up</h1>
       <div className="flex flex-col gap-6 mb-4">
         <button
