@@ -19,9 +19,8 @@ export default function Document() {
       theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     var html = document.documentElement;
-    var isDark = theme === 'dark';
-    html.setAttribute('data-theme', isDark ? 'dark' : 'cupcake');
-    if (isDark) html.classList.add('dark');
+    html.className = theme;
+    html.setAttribute('data-theme', theme);
   } catch (e) {}
 })();
             `,
