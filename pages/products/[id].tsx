@@ -1,24 +1,28 @@
 import { useRouter } from 'next/router';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, FormEvent, ChangeEvent } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
 import Head from 'next/head';
 import ProductImageSlider from '../../components/ProductImageSlider';
-import type { Product } from '../../types/product';
+import type { Product } from '../../types';
 import type { Review, ReviewsResponse, ReviewAddedResponse } from '../../types/review';
 
-export default function ProductDetail() {
+interface ProductDetailProps {}
+
+const ProductDetail: React.FC<ProductDetailProps> = () => {
   const router = useRouter();
   const { id } = router.query as { id?: string };
-  const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } =
-    useContext(AppContext)!;
+  const appContext = useContext(AppContext);
+
   const [product, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [averageRating, setAverageRating] = useState(0);
-  const [reviewCount, setReviewCount] = useState(0);
-  const [myRating, setMyRating] = useState(5);
-  const [comment, setComment] = useState('');
+  const [averageRating, setAverageRating] = useState<number>(0);
+  const [reviewCount, setReviewCount] = useState<number>(0);
+  const [myRating, setMyRating] = useState<number>(5);
+  const [comment, setComment] = useState<string>('');
+
+  const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } = appContext ?? {};
 
   useEffect(() => {
     if (!id) return;
@@ -108,18 +112,22 @@ export default function ProductDetail() {
       </p>
       <p className="mb-2">Rating: {averageRating.toFixed(1)} ({reviewCount})</p>
       <div className="flex gap-2">
-        <button className="btn btn-primary" onClick={() => addToCart(product)}>
+        <button
+          className="btn btn-primary"
+          onClick={() => addToCart?.(product)}
+          disabled={!addToCart}
+        >
           Add to Cart
         </button>
-        {wishlist.some((w) => w.ID === product.ID) ? (
+        {(wishlist ?? []).some((w: Product) => w.ID === product.ID) ? (
           <button
             className="btn"
-            onClick={() => removeFromWishlist(product.ID)}
+            onClick={() => removeFromWishlist?.(product.ID)}
           >
             Remove Wishlist
           </button>
         ) : (
-          <button className="btn" onClick={() => addToWishlist(product)}>
+          <button className="btn" onClick={() => addToWishlist?.(product)} disabled={!addToWishlist}>
             Add Wishlist
           </button>
         )}
@@ -138,7 +146,7 @@ export default function ProductDetail() {
         {reviews.length === 0 && <p>No reviews yet.</p>}
         {user && (
           <form
-            onSubmit={async (e) => {
+            onSubmit={async (e: FormEvent<HTMLFormElement>) => {
               e.preventDefault();
               const res = await fetch(`/api/products/${id}/reviews`, {
                 method: 'POST',
@@ -164,18 +172,18 @@ export default function ProductDetail() {
               <label className="mr-2">Rating</label>
               <select
                 value={myRating}
-                onChange={(e) => setMyRating(parseInt(e.target.value))}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => setMyRating(parseInt(e.target.value))}
                 className="select select-bordered"
               >
                 {[1, 2, 3, 4, 5].map((n) => (
-                  <option key={n}>{n}</option>
+                  <option key={n} value={n}>{n}</option>
                 ))}
               </select>
             </div>
             <textarea
               className="textarea textarea-bordered w-full"
               value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
               placeholder="Write a review"
             />
             <button className="btn btn-sm btn-primary" type="submit">
@@ -189,4 +197,6 @@ export default function ProductDetail() {
       </div>
     </div>
   );
-}
+};
+
+export default ProductDetail;

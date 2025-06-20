@@ -1,7 +1,7 @@
+import React, { useContext } from 'react';
 import Link from 'next/link';
-import { useContext } from 'react';
 import ProductImageSlider from './ProductImageSlider';
-import { AppContext } from '../contexts/AppContext';
+import { AppContext, AppContextValue } from '../contexts/AppContext';
 import type { Product } from '../types/product';
 
 interface ProductCardProps {
@@ -10,12 +10,14 @@ interface ProductCardProps {
   highlightDescription?: string;
 }
 
-export default function ProductCard({
+const ProductCard: React.FC<ProductCardProps> = ({
   product,
   highlightTitle,
   highlightDescription,
-}: ProductCardProps) {
-  const { addToCart } = useContext(AppContext);
+}) => {
+  const context = useContext(AppContext) as AppContextValue;
+  const addToCart = context?.addToCart;
+
   const isOut = product.TOTAL_INVENTORY !== undefined && product.TOTAL_INVENTORY <= 0;
   const onSale = product.MAX_PRICE > product.MIN_PRICE;
   const isNew = product.TAGS?.toLowerCase().includes('new');
@@ -75,11 +77,14 @@ export default function ProductCard({
         </div>
         <button
           className="btn btn-sm btn-primary absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={() => addToCart(product)}
+          onClick={() => addToCart && addToCart(product)}
+          disabled={!addToCart}
         >
           Add to Cart
         </button>
       </div>
     </div>
   );
-}
+};
+
+export default ProductCard;

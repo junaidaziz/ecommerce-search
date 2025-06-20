@@ -1,20 +1,35 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { AppContext } from '../../contexts/AppContext';
 import ProductImageSlider from '../../components/ProductImageSlider';
 import RecommendedProducts from '../../components/RecommendedProducts';
 import { getProductBySlug, getReviewsForProduct, getAverageRating } from '../../lib/db';
 import { mapDbRowToProduct } from '../../lib/products';
+import { Product, Review } from '../../types';
 
-export async function getServerSideProps({ params }) {
+
+type ProductDetailProps = {
+  product: Product;
+  initialReviews: Review[];
+  initialAverage: number;
+  initialCount: number;
+};
+
+// --- getServerSideProps ---
+export const getServerSideProps: GetServerSideProps<ProductDetailProps> = async (context: GetServerSidePropsContext) => {
+  const { params } = context;
+  if (!params || typeof params.slug !== 'string') {
+    return { notFound: true };
+  }
   const row = await getProductBySlug(params.slug);
   if (!row) {
     return { notFound: true };
   }
   const product = mapDbRowToProduct(row);
-  const reviews = getReviewsForProduct(String(row.id));
-  const stats = getAverageRating(String(row.id));
+  const reviews = await getReviewsForProduct(String(row.id));
+  const stats = await getAverageRating(String(row.id));
   return {
     props: {
       product,
@@ -23,26 +38,35 @@ export async function getServerSideProps({ params }) {
       initialCount: stats.count,
     },
   };
-}
+};
 
-export default function ProductDetail({ product, initialReviews, initialAverage, initialCount }) {
-  const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } = useContext(AppContext)!;
-  const [reviews, setReviews] = useState(initialReviews);
-  const [averageRating, setAverageRating] = useState(initialAverage);
-  const [reviewCount, setReviewCount] = useState(initialCount);
-  const [myRating, setMyRating] = useState(5);
-  const [comment, setComment] = useState('');
+// --- Component ---
+export default function ProductDetail({
+  product,
+  initialReviews,
+  initialAverage,
+  initialCount,
+}: ProductDetailProps) {
+  const appCtx = useContext(AppContext);
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
+  const [averageRating, setAverageRating] = useState<number>(initialAverage);
+  const [reviewCount, setReviewCount] = useState<number>(initialCount);
+  const [myRating, setMyRating] = useState<number>(5);
+  const [comment, setComment] = useState<string>('');
   const id = product.ID;
 
   useEffect(() => {
     try {
-      const stored = JSON.parse(localStorage.getItem('browse-history') || '[]');
-      const updated = [id, ...stored.filter((v: string) => v !== id)];
+      const stored: string[] = JSON.parse(localStorage.getItem('browse-history') || '[]');
+      const updated = [id, ...stored.filter((v) => v !== id)];
       localStorage.setItem('browse-history', JSON.stringify(updated.slice(0, 20)));
     } catch {
       // ignore
     }
   }, [id]);
+
+  if (!appCtx) return null;
+  const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } = appCtx;
 
   return (
     <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md min-h-screen">
@@ -54,7 +78,13 @@ export default function ProductDetail({ product, initialReviews, initialAverage,
         <div className="md:w-1/2 flex justify-center">
           <ProductImageSlider
             className="w-full max-w-md aspect-[4/5]"
-            images={product.IMAGES && product.IMAGES.length > 0 ? product.IMAGES : [product.FEATURED_IMAGE?.url]}
+            images={
+              product.IMAGES && product.IMAGES.length > 0
+                ? product.IMAGES
+                : product.FEATURED_IMAGE?.url
+                ? [product.FEATURED_IMAGE.url]
+                : []
+            }
             imgClass="hover:scale-110 transition"
           />
         </div>
@@ -62,15 +92,41 @@ export default function ProductDetail({ product, initialReviews, initialAverage,
           <h1 className="text-2xl font-bold mb-4">{product.TITLE}</h1>
           <p className="mb-2">Vendor: {product.VENDOR}</p>
           <p className="mb-2">Type: {product.PRODUCT_TYPE}</p>
-          <p className="mb-4">{product.DESCRIPTION_TEXT || product.BODY_HTML_TEXT || 'No description available.'}</p>
-          <p className="text-lg font-bold mb-4">{product.CURRENCY} {parseFloat(product.MIN_PRICE).toFixed(2)}</p>
-          <p className="mb-2">Rating: {averageRating.toFixed(1)} ({reviewCount})</p>
+          <p className="mb-4">
+            {product.DESCRIPTION_TEXT || product.BODY_HTML_TEXT || 'No description available.'}
+          </p>
+          <p className="text-lg font-bold mb-4">
+            {product.CURRENCY}{' '}
+            {parseFloat(
+              typeof product.MIN_PRICE === 'number'
+                ? product.MIN_PRICE.toString()
+                : product.MIN_PRICE || '0'
+            ).toFixed(2)}
+          </p>
+          <p className="mb-2">
+            Rating: {averageRating.toFixed(1)} ({reviewCount})
+          </p>
           <div className="flex gap-2">
-            <button className="btn btn-primary transition-all duration-200" onClick={() => addToCart(product)}>Add to Cart</button>
+            <button
+              className="btn btn-primary transition-all duration-200"
+              onClick={() => addToCart(product)}
+            >
+              Add to Cart
+            </button>
             {wishlist.some((w) => w.ID === product.ID) ? (
-              <button className="btn transition-all duration-200" onClick={() => removeFromWishlist(product.ID)}>Remove Wishlist</button>
+              <button
+                className="btn transition-all duration-200"
+                onClick={() => removeFromWishlist(product.ID)}
+              >
+                Remove Wishlist
+              </button>
             ) : (
-              <button className="btn transition-all duration-200" onClick={() => addToWishlist(product)}>Add Wishlist</button>
+              <button
+                className="btn transition-all duration-200"
+                onClick={() => addToWishlist(product)}
+              >
+                Add Wishlist
+              </button>
             )}
           </div>
         </div>
@@ -80,13 +136,16 @@ export default function ProductDetail({ product, initialReviews, initialAverage,
         {reviews.map((r, i) => (
           <div key={i} className="border-b py-2 text-sm">
             <p className="font-medium">{r.userEmail}</p>
-            <p>{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)} - {r.comment}</p>
+            <p>
+              {'★'.repeat(r.rating)}
+              {'☆'.repeat(5 - r.rating)} - {r.comment}
+            </p>
           </div>
         ))}
         {reviews.length === 0 && <p>No reviews yet.</p>}
         {user && (
           <form
-            onSubmit={async (e) => {
+            onSubmit={async (e: FormEvent<HTMLFormElement>) => {
               e.preventDefault();
               const res = await fetch(`/api/products/${id}/reviews`, {
                 method: 'POST',
@@ -110,14 +169,27 @@ export default function ProductDetail({ product, initialReviews, initialAverage,
           >
             <div>
               <label className="mr-2">Rating</label>
-              <select value={myRating} onChange={(e) => setMyRating(parseInt(e.target.value))} className="select select-bordered">
+              <select
+                value={myRating}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => setMyRating(parseInt(e.target.value))}
+                className="select select-bordered"
+              >
                 {[1, 2, 3, 4, 5].map((n) => (
-                  <option key={n}>{n}</option>
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
                 ))}
               </select>
             </div>
-            <textarea className="textarea textarea-bordered w-full" value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Write a review" />
-            <button className="btn btn-sm btn-primary transition-all duration-200" type="submit">Submit Review</button>
+            <textarea
+              className="textarea textarea-bordered w-full"
+              value={comment}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
+              placeholder="Write a review"
+            />
+            <button className="btn btn-sm btn-primary transition-all duration-200" type="submit">
+              Submit Review
+            </button>
           </form>
         )}
       </div>

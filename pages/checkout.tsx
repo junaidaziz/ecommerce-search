@@ -1,11 +1,32 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { AppContext } from '../contexts/AppContext';
+import { AppContext, AppContextValue } from '../contexts/AppContext';
 
-export default function Checkout() {
+// Types for cart item and user
+type CartItem = {
+  ID: string | number;
+  TITLE: string;
+  MIN_PRICE?: string;
+  qty: number;
+};
+
+type User = {
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+
+type AppContextType = {
+  cart: CartItem[];
+  user: User | null;
+};
+
+const Checkout: React.FC = () => {
   const router = useRouter();
-  const { cart, user } = useContext(AppContext)!;
+  const context = useContext<AppContextValue | undefined>(AppContext);
+  const cart = context?.cart ?? [];
+  const user = context?.user ?? null;
   const [name, setName] = useState(
     user ? `${user.firstName} ${user.lastName}` : ''
   );
@@ -16,7 +37,14 @@ export default function Checkout() {
 
   const itemCount = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce(
-    (s, i) => s + i.qty * parseFloat(i.MIN_PRICE || 0),
+    (s, i) =>
+      s +
+      i.qty *
+        parseFloat(
+          typeof i.MIN_PRICE === 'number'
+            ? i.MIN_PRICE.toString()
+            : i.MIN_PRICE || '0'
+        ),
     0
   );
   const discountedTotal = totalPrice * (1 - discount / 100);
@@ -32,7 +60,7 @@ export default function Checkout() {
     );
   if (cart.length === 0) return <div className="p-4">Your cart is empty.</div>;
 
-  const submit = async (e) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     try {
@@ -50,7 +78,7 @@ export default function Checkout() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Checkout failed');
       window.location.href = data.url;
-    } catch (e) {
+    } catch (e: any) {
       setError(e.message || 'Order failed');
     }
   };
@@ -61,7 +89,11 @@ export default function Checkout() {
       <div className="mb-4 max-h-64 overflow-y-auto">
         <ul className="space-y-2">
           {cart.map((item) => {
-            const price = parseFloat(item.MIN_PRICE || 0);
+            const price = parseFloat(
+              typeof item.MIN_PRICE === 'number'
+                ? item.MIN_PRICE.toString()
+                : item.MIN_PRICE || '0'
+            );
             const subtotal = price * item.qty;
             return (
               <li key={item.ID} className="border p-2 flex justify-between">
@@ -73,8 +105,8 @@ export default function Checkout() {
                 </div>
                 <span>£{subtotal.toFixed(2)}</span>
               </li>
-          );
-        })}
+            );
+          })}
         </ul>
       </div>
       <div className="border-t pt-4 mb-4 flex justify-between">
@@ -91,7 +123,7 @@ export default function Checkout() {
               id="coupon"
               className="input input-bordered flex-1"
               value={coupon}
-              onChange={(e) => setCoupon(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setCoupon(e.target.value)}
             />
             <button
               type="button"
@@ -126,7 +158,7 @@ export default function Checkout() {
             id="name"
             className="input input-bordered w-full"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
             required
           />
         </div>
@@ -138,7 +170,7 @@ export default function Checkout() {
             id="address"
             className="textarea textarea-bordered w-full"
             value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)}
             required
           />
         </div>
@@ -149,4 +181,6 @@ export default function Checkout() {
       </form>
     </div>
   );
-}
+};
+
+export default Checkout;

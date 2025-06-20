@@ -1,9 +1,20 @@
-import { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
-export default function BrandAnalytics() {
+type TopProduct = {
+  id: string;
+  qty: number;
+};
+
+type AnalyticsData = {
+  totalOrders: number;
+  totalRevenue: number;
+  topProducts: TopProduct[];
+};
+
+const BrandAnalytics: React.FC = () => {
   const { user } = useContext(AppContext)!;
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<AnalyticsData | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -25,14 +36,18 @@ export default function BrandAnalytics() {
       <p>Total Revenue: £{data.totalRevenue.toFixed(2)}</p>
       <h2 className="text-xl font-semibold mt-4 mb-2">Top Products</h2>
       <ul className="list-disc list-inside">
-        {data.topProducts.map((p) => (
-          <li key={p.id}>
-            {p.id} - {p.qty} sold
-          </li>
-        ))}
-        {data.topProducts.length === 0 && <li>No sales yet.</li>}
+        {data.topProducts.length > 0 ? (
+          data.topProducts.map((p) => (
+            <li key={p.id}>
+              {p.id} - {p.qty} sold
+            </li>
+          ))
+        ) : (
+          <li>No sales yet.</li>
+        )}
       </ul>
     </div>
   );
-}
+};
 
+export default BrandAnalytics;

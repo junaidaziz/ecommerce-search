@@ -1,18 +1,33 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
-export default function UserOrders() {
+// Define types for order items and orders
+type OrderItem = {
+  ID: number | string;
+  TITLE: string;
+  qty: number;
+};
+
+type Order = {
+  id: number | string;
+  status: string;
+  shipping_name?: string;
+  shipping_address?: string;
+  items: OrderItem[];
+  total: number;
+};
+const UserOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
     setLoading(true);
     fetch('/api/user/orders')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data) => {
+      .then((data: Order[]) => {
         setOrders(data);
         setError(null);
       })
@@ -60,3 +75,5 @@ export default function UserOrders() {
     </div>
   );
 }
+
+export default UserOrders;

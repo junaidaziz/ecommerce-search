@@ -1,18 +1,37 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../contexts/AppContext';
 
-export default function Orders() {
+// Define types for order items and orders
+type OrderItem = {
+  ID: string | number;
+  TITLE: string;
+  qty: number;
+};
+
+type Order = {
+  id: string | number;
+  status: string;
+  shipping_name?: string;
+  shipping_address?: string;
+  user_email?: string;
+  items: OrderItem[];
+  total: number;
+};
+
+type OrdersProps = {};
+
+const Orders: React.FC<OrdersProps> = (_props) => {
   const { user } = useContext(AppContext)!;
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
     setLoading(true);
     fetch(`/api/orders?email=${encodeURIComponent(user.email)}`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data) => {
+      .then((data: Order[]) => {
         setOrders(data);
         setError(null);
       })
@@ -62,4 +81,6 @@ export default function Orders() {
       </ul>
     </div>
   );
-}
+};
+
+export default Orders;

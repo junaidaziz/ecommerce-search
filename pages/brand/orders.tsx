@@ -1,11 +1,13 @@
-import { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
+import { Order } from '../../types';
 
-export default function BrandOrders() {
+
+const BrandOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -14,7 +16,7 @@ export default function BrandOrders() {
       `/api/brand/orders?vendor=${encodeURIComponent(user.brandName || '')}`
     )
       .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data) => {
+      .then((data: Order[]) => {
         setOrders(data);
         setError(null);
       })
@@ -51,4 +53,6 @@ export default function BrandOrders() {
       </ul>
     </div>
   );
-}
+};
+
+export default BrandOrders;
