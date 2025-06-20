@@ -1,22 +1,25 @@
 import React from 'react';
+import Select from 'react-select';
 
 export interface SelectOption {
   label: string;
   value: string;
 }
 
-export interface SelectDropdownProps
-  extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectDropdownProps {
   label?: string;
   name: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  value?: SelectOption | SelectOption[] | null;
+  onChange?: (option: SelectOption | SelectOption[] | null) => void;
   options: SelectOption[];
   placeholder?: string;
+  isSearchable?: boolean;
+  isDisabled?: boolean;
+  isMulti?: boolean;
   error?: string;
-  required?: boolean;
-  disabled?: boolean;
   className?: string;
+  icon?: React.ReactNode;
+  [key: string]: any;
 }
 
 const SelectDropdown: React.FC<SelectDropdownProps> = ({
@@ -26,10 +29,12 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
   onChange,
   options,
   placeholder,
+  isSearchable = true,
+  isDisabled = false,
+  isMulti = false,
   error,
-  required = false,
-  disabled = false,
   className = '',
+  icon,
   ...rest
 }) => {
   const inputId = rest.id || name;
@@ -41,28 +46,35 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
           htmlFor={inputId}
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          {label} {required && <span className="text-red-500">*</span>}
+          {label}
         </label>
       )}
-      <select
-        id={inputId}
-        name={name}
-        value={value}
-        onChange={onChange}
-        disabled={disabled}
-        required={required}
-        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        } ${className}`}
-        {...rest}
-      >
-        {placeholder && <option value="">{placeholder}</option>}
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        {icon && (
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            {icon}
+          </span>
+        )}
+        <Select
+          inputId={inputId}
+          name={name}
+          value={value as any}
+          onChange={(val) => onChange?.(val as any)}
+          options={options}
+          placeholder={placeholder}
+          isSearchable={isSearchable}
+          isDisabled={isDisabled}
+          isMulti={isMulti}
+          className={`w-full ${className}`}
+          classNamePrefix="react-select"
+          styles={
+            icon
+              ? { control: (base) => ({ ...base, paddingLeft: '2rem' }) }
+              : undefined
+          }
+          {...rest}
+        />
+      </div>
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
     </div>
   );
