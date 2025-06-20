@@ -4,6 +4,14 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import { AppContext } from '../contexts/AppContext';
+import SearchIcon from './icons/SearchIcon';
+import CartIcon from './icons/CartIcon';
+import MoonIcon from './icons/MoonIcon';
+import SunIcon from './icons/SunIcon';
+import MenuIcon from './icons/MenuIcon';
+import ChevronDownIcon from './icons/ChevronDownIcon';
+import ElectronicsIcon from './icons/ElectronicsIcon';
+import FashionIcon from './icons/FashionIcon';
 
 export default function Header({ theme = 'light', setTheme }) {
   const router = useRouter();
@@ -24,38 +32,8 @@ export default function Header({ theme = 'light', setTheme }) {
   const [showHistory, setShowHistory] = useState(false);
   const searchRef = useRef(null);
   const iconMap = {
-    Electronics: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 mr-1"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M9 17v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2m-6 0V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0h6"
-        />
-      </svg>
-    ),
-    Fashion: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 mr-1"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M4 7l8-4 8 4M4 7v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7M4 7l8 4 8-4"
-        />
-      </svg>
-    ),
+    Electronics: <ElectronicsIcon className="h-5 w-5 mr-1" />,
+    Fashion: <FashionIcon className="h-5 w-5 mr-1" />,
   };
 
   useEffect(() => {
@@ -229,20 +207,7 @@ export default function Header({ theme = 'light', setTheme }) {
                 aria-expanded={menuOpen}
               >
                 Categories
-                <svg
-                  className="w-4 h-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                <ChevronDownIcon className="w-4 h-4" />
               </button>
               {menuOpen && (
                 <div
@@ -333,20 +298,7 @@ export default function Header({ theme = 'light', setTheme }) {
               aria-controls="search-suggestions"
               onFocus={() => setShowHistory(true)}
             />
-            <svg
-              className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1 0 3 10.5a7.5 7.5 0 0 0 13.65 6.15z"
-              />
-            </svg>
+            <SearchIcon className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
             {suggestions.length > 0 && (
               <ul
                 id="search-suggestions"
@@ -422,21 +374,7 @@ export default function Header({ theme = 'light', setTheme }) {
                 href="/cart"
                 className="p-2 rounded-full shadow-sm transition-colors duration-200 hover:bg-base-200"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  className="w-5 h-5"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                  />
-                </svg>
+                <CartIcon className="w-5 h-5" />
                 {itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
                     {itemCount}
@@ -452,21 +390,8 @@ export default function Header({ theme = 'light', setTheme }) {
                   onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                   aria-label="Toggle Dark Mode"
                 />
-                <svg
-                  className="swap-on fill-current w-5 h-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-                </svg>
-                <svg
-                  className="swap-off fill-current w-5 h-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M5.64 17.657l-1.414 1.414m0-13.242l1.414 1.414M12 3v2m0 14v2m7-9h2M3 12H1m15.364 5.657l1.414 1.414M6.343 6.343L4.929 4.929" />
-                  <circle cx="12" cy="12" r="5" />
-                </svg>
+                <MoonIcon className="swap-on fill-current w-5 h-5" />
+                <SunIcon className="swap-off fill-current w-5 h-5" />
               </label>
             </li>
             {user ? (
@@ -531,20 +456,7 @@ export default function Header({ theme = 'light', setTheme }) {
         <div className="md:hidden flex-none">
           <div className="dropdown dropdown-end">
             <label tabIndex={0} className="btn btn-square btn-ghost">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+              <MenuIcon className="h-5 w-5" />
             </label>
             <ul
               tabIndex={0}
@@ -555,21 +467,7 @@ export default function Header({ theme = 'light', setTheme }) {
                   href="/cart"
                   className="p-2 rounded-full shadow-sm transition-colors duration-200 hover:bg-base-200"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    className="w-5 h-5"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                    />
-                  </svg>
+                  <CartIcon className="w-5 h-5" />
                 </Link>
                 {itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
@@ -587,21 +485,8 @@ export default function Header({ theme = 'light', setTheme }) {
                     }
                     aria-label="Toggle Dark Mode"
                   />
-                  <svg
-                    className="swap-on fill-current w-5 h-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-                  </svg>
-                  <svg
-                    className="swap-off fill-current w-5 h-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M5.64 17.657l-1.414 1.414m0-13.242l1.414 1.414M12 3v2m0 14v2m7-9h2M3 12H1m15.364 5.657l1.414 1.414M6.343 6.343L4.929 4.929" />
-                    <circle cx="12" cy="12" r="5" />
-                  </svg>
+                  <MoonIcon className="swap-on fill-current w-5 h-5" />
+                  <SunIcon className="swap-off fill-current w-5 h-5" />
                 </label>
               </li>
               <li>
