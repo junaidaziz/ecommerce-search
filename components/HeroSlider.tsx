@@ -55,6 +55,7 @@ export default function HeroSlider() {
               alt=""
               fill
               className="object-cover"
+              priority={i === 0}
             />
             <div className="relative z-10 flex flex-col items-center justify-center h-full bg-black/40 text-center text-white px-4">
               <h2 className="text-4xl md:text-6xl font-extrabold mb-2">
