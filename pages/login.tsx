@@ -55,8 +55,8 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="w-full max-w-md px-4 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-4 -mt-8">
         <h1 className="text-2xl font-bold mb-4">Login</h1>
         <button
           type="button"
