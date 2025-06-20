@@ -184,8 +184,8 @@ export default function BrandSignup() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="w-full max-w-2xl px-4 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+      <div className="max-w-md mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold">Brand Sign Up</h1>
       </div>
@@ -516,8 +516,8 @@ export default function BrandSignup() {
       </p>
       <p className="text-sm text-center mt-4 text-gray-600">
         Not a brand?{' '}
-        <Link href="/signup/user" className="text-blue-600 hover:underline">
-          Sign up as a user
+        <Link href="/users/signup" className="text-blue-600 hover:underline">
+          Sign up as a user instead
         </Link>
       </p>
       </div>
