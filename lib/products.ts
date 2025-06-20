@@ -3,19 +3,40 @@ import { getDb } from './db';
 import type { Product } from '../types/product';
 import type { Category } from '../types/category';
 
+/**
+ * Simplified representation of a product row returned from the database.
+ * Only the fields that are accessed in this module are included.
+ */
+interface ProductDbRow {
+  id: number;
+  slug: string | null;
+  title: string;
+  vendorId?: number | null;
+  vendor?: { brandName: string | null } | null;
+  description: string | null;
+  productType: string | null;
+  tags: string | null;
+  category?: { name: string | null } | null;
+  images: string | null;
+  quantity: number;
+  minPrice: number;
+  maxPrice: number;
+  currency: string;
+}
+
 const stripHtml = (html: string | null | undefined): string => {
   if (!html) return '';
   try {
     const dom = new JSDOM(html);
     return dom.window.document.body.textContent || '';
-  } catch (e) {
+  } catch (e: unknown) {
     console.error('Error stripping HTML:', e);
-    return html;
+    return html ?? '';
   }
 };
 
-function processProductRow(row: Record<string, any>): Product {
-  const processed = { ...row };
+function processProductRow(row: Record<string, unknown>): Product {
+  const processed: Record<string, unknown> & Partial<Product> = { ...row };
   const jsonFields = [
     'SEO',
     'OPTIONS',
@@ -28,36 +49,32 @@ function processProductRow(row: Record<string, any>): Product {
       try {
         processed[field] =
           typeof processed[field] === 'string'
-            ? JSON.parse(processed[field])
+            ? JSON.parse(processed[field] as string)
             : processed[field];
-      } catch (e) {
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
         console.warn(
-          `Could not parse JSON for field '${field}' in row with ID: ${processed.ID || 'N/A'}. Error: ${e.message}`
+          `Could not parse JSON for field '${field}' in row with ID: ${String(processed.ID ?? 'N/A')}. Error: ${message}`
         );
         processed[field] = null;
       }
     }
   });
 
-  processed.DESCRIPTION_TEXT = stripHtml(processed.DESCRIPTION);
-  processed.BODY_HTML_TEXT = stripHtml(processed.BODY_HTML);
+  processed.DESCRIPTION_TEXT = stripHtml(processed.DESCRIPTION as string | null | undefined);
+  processed.BODY_HTML_TEXT = stripHtml(processed.BODY_HTML as string | null | undefined);
   processed.MIN_PRICE =
     processed.PRICE_RANGE_V2?.min_variant_price?.amount || 0;
   processed.MAX_PRICE =
     processed.PRICE_RANGE_V2?.max_variant_price?.amount || 0;
   processed.CURRENCY =
     processed.PRICE_RANGE_V2?.min_variant_price?.currency_code || 'GBP';
-  processed.SOLD_COUNT = parseInt(
-    processed.METAFIELDS?.stoked_inventory_sold_count?.value || '0',
-    10
-  );
-  processed.REVIEW_COUNT = parseInt(
-    processed.METAFIELDS?.yotpo_reviews_count?.value || '0',
-    10
-  );
-  processed.AVERAGE_RATING = parseFloat(
-    processed.METAFIELDS?.yotpo_reviews_average?.value || '0'
-  );
+  const meta = processed.METAFIELDS as
+    | { stoked_inventory_sold_count?: { value?: string }; yotpo_reviews_count?: { value?: string }; yotpo_reviews_average?: { value?: string } }
+    | undefined;
+  processed.SOLD_COUNT = parseInt(meta?.stoked_inventory_sold_count?.value ?? '0', 10);
+  processed.REVIEW_COUNT = parseInt(meta?.yotpo_reviews_count?.value ?? '0', 10);
+  processed.AVERAGE_RATING = parseFloat(meta?.yotpo_reviews_average?.value ?? '0');
   processed.ID = String(processed.ID);
   if (processed.SLUG) {
     processed.SLUG = String(processed.SLUG);
@@ -65,18 +82,18 @@ function processProductRow(row: Record<string, any>): Product {
   if (processed.IMAGES && processed.IMAGES.length > 0) {
     processed.FEATURED_IMAGE = { url: processed.IMAGES[0] };
   }
-  return processed;
+  return processed as Product;
 }
 
 async function loadProductsData(): Promise<Product[]> {
   const db = getDb();
   try {
-    const rows = await db.product.findMany({
+    const rows = (await db.product.findMany({
       where: { status: 'approved' },
       include: { category: true, vendor: true },
-    });
+    })) as ProductDbRow[];
 
-    return rows.map((row) =>
+    return rows.map((row: ProductDbRow) =>
       processProductRow({
         ID: row.id,
         SLUG: row.slug,
@@ -106,7 +123,7 @@ async function loadProductsData(): Promise<Product[]> {
   }
 }
 
-export function mapDbRowToProduct(row: Record<string, any>): Product {
+export function mapDbRowToProduct(row: Record<string, unknown>): Product {
   return processProductRow({
     ID: row.id,
     SLUG: row.slug,
@@ -116,7 +133,7 @@ export function mapDbRowToProduct(row: Record<string, any>): Product {
     PRODUCT_TYPE: row.product_type,
     TAGS: row.tags,
     CATEGORY: row.category,
-    IMAGES: row.images ? JSON.parse(row.images) : [],
+    IMAGES: row.images ? JSON.parse(row.images as string) : [],
     TOTAL_INVENTORY: row.quantity,
     PRICE_RANGE_V2: {
       min_variant_price: {
@@ -131,13 +148,13 @@ export function mapDbRowToProduct(row: Record<string, any>): Product {
   });
 }
 
-export async function loadAndIndexProducts() {
+export async function loadAndIndexProducts(): Promise<{ products: Product[]; productIndex: null }> {
   // Legacy function name preserved for API routes.
   const products = await loadProductsData();
   return { products, productIndex: null };
 }
 
-export async function addProduct(product: Record<string, any>): Promise<void> {
+export async function addProduct(product: Record<string, unknown>): Promise<void> {
   const db = getDb();
   const vendor = await db.user.findFirst({ where: { brandName: product.vendor } });
   const category = product.category
@@ -163,7 +180,7 @@ export async function addProduct(product: Record<string, any>): Promise<void> {
   });
 }
 
-export async function updateProduct(product: Record<string, any>): Promise<void> {
+export async function updateProduct(product: Record<string, unknown>): Promise<void> {
   const db = getDb();
   const vendor = product.vendor
     ? await db.user.findFirst({ where: { brandName: product.vendor } })
@@ -191,11 +208,11 @@ export async function updateProduct(product: Record<string, any>): Promise<void>
 
 export async function getPendingProducts(): Promise<Product[]> {
   const db = getDb();
-  const rows = await db.product.findMany({
+  const rows = (await db.product.findMany({
     where: { status: 'pending' },
     include: { category: true, vendor: true },
-  });
-  return rows.map((row) =>
+  })) as ProductDbRow[];
+  return rows.map((row: ProductDbRow) =>
     processProductRow({
       ID: row.id,
       SLUG: row.slug,
@@ -233,21 +250,23 @@ export async function getCategoriesFlat(): Promise<Category[]> {
 export async function getCategoryTree(): Promise<{ name: string; subcategories: string[]; image?: string }[]> {
   const flat = await getCategoriesFlat();
   if (flat.length > 0) {
-    const map = {};
+    const map: Record<number, { name: string; image?: string; subcategories: string[] }> = {};
     flat.forEach((c) => {
-      map[c.id] = { name: c.name, image: c.image, subcategories: [] };
+      if (typeof c.id === 'number') {
+        map[c.id] = { name: c.name, image: c.image, subcategories: [] };
+      }
     });
     flat.forEach((c) => {
-      if (c.parentId) {
+      if (typeof c.parentId === 'number') {
         map[c.parentId]?.subcategories.push(c.name);
       }
     });
     return flat
-      .filter((c) => !c.parentId)
+      .filter((c) => typeof c.id === 'number' && !c.parentId)
       .map((c) => ({
         name: c.name,
         image: c.image,
-        subcategories: map[c.id].subcategories.sort((a, b) =>
+        subcategories: (map[c.id as number]?.subcategories ?? []).sort((a, b) =>
           a.localeCompare(b)
         ),
       }))
