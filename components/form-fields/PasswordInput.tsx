@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UseFormFieldProps } from '../../types';
+import { UseFormRegister, RegisterOptions } from 'react-hook-form';
 
 export interface PasswordInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -14,7 +14,8 @@ export interface PasswordInputProps
   disabled?: boolean;
   className?: string;
   leftAddon?: React.ReactNode;
-  field?: UseFormFieldProps;
+  register?: UseFormRegister<any>;
+  rules?: RegisterOptions;
 }
 
 const PasswordInput: React.FC<PasswordInputProps> = ({
@@ -29,11 +30,13 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   disabled = false,
   className = '',
   leftAddon,
-  field,
+  register,
+  rules,
   ...rest
 }) => {
   const [show, setShow] = useState(false);
-  const inputId = rest.id || field?.id || name;
+  const inputId = rest.id || name;
+  const registration = register ? register(name, rules) : {};
   const toggle = () => setShow(!show);
 
   return (
@@ -55,17 +58,17 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
         <input
           type={show ? 'text' : 'password'}
           id={inputId}
-          name={field?.name ?? name}
+          name={name}
           placeholder={placeholder}
-          value={field?.value ?? value}
-          onChange={field?.onChange ?? onChange}
-          onBlur={field?.onBlur ?? onBlur}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
           disabled={disabled}
           required={required}
           className={`flex-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
             error ? 'border-red-500' : 'border-gray-300'
           } ${leftAddon ? 'rounded-l-none' : ''} rounded-r-none ${className}`}
-          ref={field?.ref as any}
+          {...registration}
           {...rest}
         />
         <button

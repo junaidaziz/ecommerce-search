@@ -1,5 +1,5 @@
 import React from 'react';
-import { UseFormFieldProps } from '../../types';
+import { UseFormRegister, RegisterOptions } from 'react-hook-form';
 
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -13,7 +13,8 @@ export interface TextareaProps
   required?: boolean;
   disabled?: boolean;
   className?: string;
-  field?: UseFormFieldProps;
+  register?: UseFormRegister<any>;
+  rules?: RegisterOptions;
 }
 
 const Textarea: React.FC<TextareaProps> = ({
@@ -27,10 +28,12 @@ const Textarea: React.FC<TextareaProps> = ({
   required = false,
   disabled = false,
   className = '',
-  field,
+  register,
+  rules,
   ...rest
 }) => {
-  const inputId = rest.id || field?.id || name;
+  const inputId = rest.id || name;
+  const registration = register ? register(name, rules) : {};
 
   return (
     <div className="mb-4 w-full">
@@ -44,17 +47,17 @@ const Textarea: React.FC<TextareaProps> = ({
       )}
       <textarea
         id={inputId}
-        name={field?.name ?? name}
+        name={name}
         placeholder={placeholder}
-        value={field?.value ?? value}
-        onChange={field?.onChange ?? onChange}
-        onBlur={field?.onBlur ?? onBlur}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
         disabled={disabled}
         required={required}
         className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
           error ? 'border-red-500' : 'border-gray-300'
         } ${className}`}
-        ref={field?.ref as any}
+        {...registration}
         {...rest}
       />
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
