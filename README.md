@@ -114,9 +114,9 @@ Link your GitHub project.
 
 In the Vercel dashboard:
 
-| Key                     | Value                              |
-| ----------------------- | ---------------------------------- |
-| `SKIP_INDEX_BUILD`      | `true` (to skip rebuild at deploy) |
+| Key                | Value                              |
+| ------------------ | ---------------------------------- |
+| `SKIP_INDEX_BUILD` | `true` (to skip rebuild at deploy) |
 
 4. **Deploy**
 
@@ -147,6 +147,19 @@ Returns matching products in enriched format.
 │       └── search.ts
 ├── .env.local
 └── package.json
+```
+
+## 🧩 Form Field Components
+
+Reusable form elements live in `/components/form-fields` and accept common props like `label`, `value` and `onChange`.
+
+Available components: `TextInput`, `EmailInput`, `PasswordInput`, `Textarea`, `SelectDropdown`, `Checkbox`, `RadioGroup`, `DatePicker` and `FileUpload`.
+
+```tsx
+import { TextInput, PasswordInput } from "@/components/form-fields";
+
+<TextInput label="First Name" name="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} />
+<PasswordInput label="Password" name="password" value={password} onChange={e => setPassword(e.target.value)} />
 ```
 
 ---
