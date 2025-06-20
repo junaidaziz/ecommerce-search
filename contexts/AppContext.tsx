@@ -14,7 +14,7 @@ export interface AppContextValue {
   cart: (Product & { qty: number })[];
   wishlist: Product[];
   login: (email: string, password: string) => Promise<void>;
-  signup: (url: string, payload: Record<string, unknown>) => Promise<any>;
+  signup: <T>(url: string, payload: Record<string, unknown>) => Promise<T>;
   logout: () => void;
   addToCart: (product: Product) => void;
   changeQty: (id: string, delta: number) => void;
@@ -27,7 +27,7 @@ export interface AppContextValue {
   }) => Promise<boolean>;
 }
 
-export const AppContext = createContext<AppContextValue>(undefined as any);
+export const AppContext = createContext<AppContextValue | undefined>(undefined);
 
 interface AppProviderProps {
   children: React.ReactNode;
@@ -69,7 +69,12 @@ export function AppProvider({ children }: AppProviderProps) {
 
   useEffect(() => {
     if (session?.user) {
-      const u = session.user as any;
+      const u = session.user as User & {
+        role?: string;
+        brandName?: string;
+        name?: string | null;
+        gender?: string;
+      };
       const { email, name, role, brandName, gender } = u;
       const [firstName = '', lastName = ''] = (name || '').split(' ');
       setUser({ email: email ?? '', firstName, lastName, brandName, gender, role });
@@ -108,7 +113,10 @@ export function AppProvider({ children }: AppProviderProps) {
     addNotification('Logged in', 'success');
   };
 
-  const signup = async (url: string, payload: Record<string, unknown>): Promise<any> => {
+  const signup = async <T,>(
+    url: string,
+    payload: Record<string, unknown>
+  ): Promise<T> => {
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -118,7 +126,7 @@ export function AppProvider({ children }: AppProviderProps) {
       addNotification('Signup failed', 'error');
       throw new Error('Signup failed');
     }
-    const data = await res.json();
+    const data: T = await res.json();
     addNotification('Signup successful', 'success');
     return data;
   };

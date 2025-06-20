@@ -2,7 +2,7 @@ import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function BrandProfile() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const [brandName, setBrandName] = useState(user?.brandName || '');
   const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
   const [businessAddress, setBusinessAddress] = useState(

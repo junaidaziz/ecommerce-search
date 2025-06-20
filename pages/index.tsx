@@ -16,6 +16,16 @@ interface SearchResult extends Product {
   highlights?: { field: string; snippet: string }[];
 }
 
+interface SearchApiResponse {
+  results: SearchResult[];
+  total: number;
+  page: number;
+  totalPages: number;
+  brands: string[];
+  categories: string[];
+  fallback: Product[];
+}
+
 export default function Home() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
@@ -81,8 +91,8 @@ export default function Home() {
       try {
         const res = await fetch('/api/categories');
         if (res.ok) {
-          const data = await res.json();
-          setAllCategories(['All', ...data.map((c: any) => c.name)]);
+          const data: { name: string }[] = await res.json();
+          setAllCategories(['All', ...data.map((c) => c.name)]);
         }
       } catch (err) {
         console.error('Failed to load categories', err);
@@ -147,7 +157,7 @@ export default function Home() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: any = await response.json();
+      const data: SearchApiResponse = await response.json();
       setProducts(data.results as SearchResult[]);
       setFallbackProducts(data.fallback || []);
       setTotalPages(data.totalPages || 1);
@@ -157,9 +167,9 @@ export default function Home() {
       if (allCategories.length === 0 && Array.isArray(data.categories)) {
         setAllCategories(['All', ...data.categories]);
       }
-    } catch (e: any) {
+    } catch (e) {
       // Check if the error is due to an aborted request
-      if (e.name === 'AbortError') {
+      if ((e as Error).name === 'AbortError') {
         console.log('Fetch aborted:', searchTerm);
         // Do not set error state for aborted requests
       } else {

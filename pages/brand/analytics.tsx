@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
 export default function BrandAnalytics() {
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext)!;
   const [data, setData] = useState(null);
 
   useEffect(() => {
