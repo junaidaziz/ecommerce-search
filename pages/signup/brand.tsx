@@ -184,8 +184,8 @@ export default function BrandSignup() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="w-full max-w-3xl px-4 sm:px-6 lg:px-8 py-6 bg-slate-100 shadow-lg rounded-lg fade-in">
+    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+      <div className="w-full max-w-3xl -mt-8 px-4 sm:px-6 lg:px-8 py-6 bg-slate-100 shadow-lg rounded-lg fade-in">
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold">Brand Sign Up</h1>
       </div>
