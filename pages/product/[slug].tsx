@@ -8,7 +8,7 @@ import { getProductBySlug, getReviewsForProduct, getAverageRating } from '../../
 import { mapDbRowToProduct } from '../../lib/products';
 
 export async function getServerSideProps({ params }) {
-  const row = getProductBySlug(params.slug);
+  const row = await getProductBySlug(params.slug);
   if (!row) {
     return { notFound: true };
   }
