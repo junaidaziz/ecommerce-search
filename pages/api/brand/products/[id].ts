@@ -2,19 +2,21 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { updateProduct, deleteProduct, loadAndIndexProducts } from '../../../../lib/products';
 import { getProductById } from '../../../../lib/db';
 import { hasOrdersForProduct } from '../../../../lib/orders';
+import { handleApiError } from '../../../../lib/utils/handleApiError';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { id } = req.query;
-  if (!id) return res.status(400).json({ message: 'id required' });
+  try {
+    const { id } = req.query;
+    if (!id) return res.status(400).json({ message: 'id required' });
 
-  if (req.method === 'PUT') {
-    const existing = await getProductById(String(id));
-    if (!existing) return res.status(404).json({ message: 'Not found' });
-    const {
-      title,
-      vendor,
-      description,
-      product_type,
+    if (req.method === 'PUT') {
+      const existing = await getProductById(String(id));
+      if (!existing) return res.status(404).json({ message: 'Not found' });
+      const {
+        title,
+        vendor,
+        description,
+        product_type,
       tags,
       category,
       quantity,
@@ -38,20 +40,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       status: existing.status,
       images: existing.images,
     });
-    await loadAndIndexProducts();
-    return res.status(200).json({ message: 'product updated' });
-  }
-
-  if (req.method === 'DELETE') {
-    const existing = await getProductById(String(id));
-    if (!existing) return res.status(404).json({ message: 'Not found' });
-    if (existing.quantity > 0 || hasOrdersForProduct(String(id))) {
-      return res.status(400).json({ message: 'cannot delete product with stock or orders' });
+      await loadAndIndexProducts();
+      return res.status(200).json({ message: 'product updated' });
     }
-    await deleteProduct(String(id));
-    await loadAndIndexProducts();
-    return res.status(200).json({ message: 'product deleted' });
-  }
 
-  return res.status(405).json({ message: 'Method Not Allowed' });
+    if (req.method === 'DELETE') {
+      const existing = await getProductById(String(id));
+      if (!existing) return res.status(404).json({ message: 'Not found' });
+      if (existing.quantity > 0 || hasOrdersForProduct(String(id))) {
+        return res.status(400).json({ message: 'cannot delete product with stock or orders' });
+      }
+      await deleteProduct(String(id));
+      await loadAndIndexProducts();
+      return res.status(200).json({ message: 'product deleted' });
+    }
+
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  } catch (error) {
+    return handleApiError(res, error, 'Failed to process product');
+  }
 }
