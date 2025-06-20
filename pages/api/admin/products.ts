@@ -1,11 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import {
-  addProduct,
-  updateProduct,
-  deleteProduct,
-  loadAndIndexProducts,
-} from '../../../lib/products';
-import { getProductById } from '../../../lib/db';
+import { getDb } from '../../../lib/db';
 import { hasOrdersForProduct } from '../../../lib/orders';
 import formidable from 'formidable';
 import fs from 'fs';
@@ -28,43 +22,57 @@ export const config = {
   },
 };
 
-function parseForm(req) {
-  return new Promise((resolve, reject) => {
-    const form = formidable({ multiples: true });
-    form.parse(req, (err, fields, files) => {
-      if (err) reject(err);
-      else resolve({ fields, files });
-    });
-  });
+async function parseBody(req: NextApiRequest) {
+  const type = req.headers['content-type'] || '';
+  if (type.includes('application/json')) {
+    const buffers: Uint8Array[] = [];
+    for await (const chunk of req) buffers.push(chunk);
+    const body = Buffer.concat(buffers).toString();
+    return { fields: JSON.parse(body || '{}'), files: {} } as {
+      fields: Record<string, any>;
+      files: formidable.Files;
+    };
+  }
+  return new Promise<{ fields: formidable.Fields; files: formidable.Files }>(
+    (resolve, reject) => {
+      const form = formidable({ multiples: true });
+      form.parse(req, (err, fields, files) => {
+        if (err) reject(err);
+        else resolve({ fields, files });
+      });
+    }
+  );
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const db = getDb();
+
     if (req.method === 'POST' || req.method === 'PUT') {
-      const { fields, files } = await parseForm(req);
-    const {
-      id,
-      title,
-      vendor,
-      description,
-      product_type,
+      const { fields, files } = await parseBody(req);
+      const {
+        id,
+        title,
+        vendor,
+        description,
+        product_type,
       tags,
       category,
       quantity,
       min_price,
       max_price,
       currency,
-    } = fields;
-    if (!id || !title) {
-      return res.status(400).json({ message: 'id and title are required' });
-    }
+      } = fields as Record<string, any>;
+      if (!id || !title) {
+        return res.status(400).json({ message: 'id and title are required' });
+      }
     const photos = files.photos
       ? Array.isArray(files.photos)
         ? files.photos
         : [files.photos]
       : [];
-    const destDir = path.join(process.cwd(), 'public', 'uploads', String(id));
-    fs.mkdirSync(destDir, { recursive: true });
+      const destDir = path.join(process.cwd(), 'public', 'uploads', String(id));
+      fs.mkdirSync(destDir, { recursive: true });
     const imagePaths = [];
     for (const file of photos) {
       const name = Date.now() + '-' + file.originalFilename;
@@ -72,69 +80,109 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       fs.renameSync(file.filepath, destPath);
       imagePaths.push(`/uploads/${id}/${name}`);
     }
-    let existing = null;
-    if (req.method === 'PUT') {
-      existing = getProductById(String(id));
-      const existingImages = existing?.images ? JSON.parse(existing.images) : [];
-      imagePaths.push(...existingImages);
-    }
-    const productData = {
-      id: String(id),
-      slug: slugify(title || existing?.title || String(id)),
-      title,
-      vendor,
-      description,
-      product_type,
-      tags,
-      category,
-      quantity: quantity ? parseInt(quantity, 10) : 0,
-      min_price: parseFloat(min_price || 0),
-      max_price: parseFloat(max_price || 0),
-      currency: currency || 'USD',
-      status: 'approved',
-      images: JSON.stringify(imagePaths),
-    };
+      let existing = null;
+      if (req.method === 'PUT') {
+        existing = await db.product.findUnique({ where: { id: Number(id) } });
+        if (!existing) {
+          return res.status(404).json({ message: 'Not found' });
+        }
+        const existingImages = existing.images ? JSON.parse(existing.images) : [];
+        imagePaths.push(...existingImages);
+      }
+      const slug = slugify(title || (existing?.title as string) || String(id));
+      const qty = quantity ? parseInt(String(quantity), 10) : 0;
+      const data = {
+        id: Number(id),
+        slug,
+        title,
+        description: description || '',
+        productType: product_type || '',
+        tags: tags || '',
+        quantity: qty,
+        minPrice: parseFloat(String(min_price || 0)),
+        maxPrice: parseFloat(String(max_price || 0)),
+        currency: (currency as string) || 'USD',
+        status: 'approved',
+        images: JSON.stringify(imagePaths),
+      } as any;
 
-    if (req.method === 'POST') {
-      addProduct(productData);
-    } else {
-      updateProduct(productData);
+      if (vendor) {
+        const vid = parseInt(String(vendor), 10);
+        if (!isNaN(vid)) data.vendorId = vid;
+        else {
+          const v = await db.user.findFirst({ where: { brandName: String(vendor) } });
+          if (v) data.vendorId = v.id;
+        }
+      }
+
+      if (category) {
+        const cid = parseInt(String(category), 10);
+        if (!isNaN(cid)) data.categoryId = cid;
+        else {
+          const c = await db.category.findFirst({ where: { name: String(category) } });
+          if (c) data.categoryId = c.id;
+        }
+      }
+
+      if (req.method === 'POST') {
+        await db.product.create({ data });
+        return res.status(201).json({ message: 'Product added' });
+      }
+
+      await db.product.update({ where: { id: Number(id) }, data });
+      return res.status(200).json({ message: 'Product updated' });
     }
-    await loadAndIndexProducts();
-    return res
-      .status(req.method === 'POST' ? 201 : 200)
-      .json({
-        message: req.method === 'POST' ? 'Product added' : 'Product updated',
+
+    if (req.method === 'DELETE') {
+      const { id } = req.query;
+      if (!id) {
+        return res.status(400).json({ message: 'id required' });
+      }
+      const existing = await db.product.findUnique({ where: { id: Number(id) } });
+      if (!existing) {
+        return res.status(404).json({ message: 'Not found' });
+      }
+      if (existing.quantity > 0 || (await hasOrdersForProduct(String(id)))) {
+        return res
+          .status(400)
+          .json({ message: 'cannot delete product with stock or orders' });
+      }
+      await db.product.delete({ where: { id: Number(id) } });
+      return res.status(200).json({ message: 'Product deleted' });
+    }
+
+    if (req.method === 'GET') {
+      const { vendor } = req.query;
+      const where: any = {};
+      if (vendor) where.vendor = { brandName: String(vendor) };
+      const rows = await db.product.findMany({
+        where,
+        include: { category: true, vendor: true },
       });
-  }
-
-  if (req.method === 'DELETE') {
-    const { id } = req.query;
-    if (!id) {
-      return res.status(400).json({ message: 'id required' });
+      const data = rows.map((p) => ({
+        ID: String(p.id),
+        SLUG: p.slug,
+        TITLE: p.title,
+        VENDOR: p.vendor?.brandName ?? String(p.vendorId),
+        DESCRIPTION: p.description,
+        PRODUCT_TYPE: p.productType,
+        TAGS: p.tags,
+        CATEGORY: p.category?.name,
+        IMAGES: p.images ? JSON.parse(p.images) : [],
+        TOTAL_INVENTORY: p.quantity,
+        PRICE_RANGE_V2: {
+          min_variant_price: { amount: p.minPrice, currency_code: p.currency },
+          max_variant_price: { amount: p.maxPrice, currency_code: p.currency },
+        },
+        MIN_PRICE: p.minPrice,
+        MAX_PRICE: p.maxPrice,
+        CURRENCY: p.currency,
+        SOLD_COUNT: 0,
+        REVIEW_COUNT: 0,
+        AVERAGE_RATING: 0,
+      }));
+      return res.status(200).json(data);
     }
-    const existing = getProductById(String(id));
-    if (!existing) {
-      return res.status(404).json({ message: 'Not found' });
-    }
-    if (existing.quantity > 0 || hasOrdersForProduct(String(id))) {
-      return res
-        .status(400)
-        .json({ message: 'cannot delete product with stock or orders' });
-    }
-    deleteProduct(String(id));
-    await loadAndIndexProducts();
-    return res.status(200).json({ message: 'Product deleted' });
-  }
-
-  if (req.method === 'GET') {
-    const { products } = await loadAndIndexProducts();
-    let filtered = products;
-    if (req.query.vendor) {
-      filtered = products.filter((p) => p.VENDOR === req.query.vendor);
-    }
-    return res.status(200).json(filtered);
-  }
 
     return res.status(405).json({ message: 'Method Not Allowed' });
   } catch (error) {
