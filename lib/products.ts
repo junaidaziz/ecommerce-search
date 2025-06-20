@@ -16,8 +16,8 @@ import {
   getCategoryByName,
   getCategoryById,
   countProductsForCategory,
+  getDb,
 } from './db';
-import { prisma } from './prisma';
 
 let products = [];
 let productIndex = null;
@@ -91,8 +91,9 @@ function processProductRow(row) {
 }
 
 async function loadProductsData() {
+  const db = getDb();
   try {
-    const rows = await prisma.product.findMany({
+    const rows = await db.product.findMany({
       where: { status: 'approved' },
       include: { category: true, vendor: true },
     });
@@ -339,7 +340,8 @@ export async function getCategoryTree() {
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  const rows = await prisma.product.findMany({ include: { category: true } });
+  const db = getDb();
+  const rows = await db.product.findMany({ include: { category: true } });
   const map = {} as Record<string, Set<string>>;
   for (const row of rows) {
     const categoryName = row.category?.name;

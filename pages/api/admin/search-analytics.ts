@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '../../../lib/prisma';
+import { getDb } from '../../../lib/db';
 import { withRole } from '../../../lib/withRole';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -7,7 +7,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  const logs = await prisma.searchLog.findMany();
+  const db = getDb();
+  const logs = await db.searchLog.findMany();
   const counts: Record<string, number> = {};
   const fails: Record<string, number> = {};
   for (const log of logs) {
