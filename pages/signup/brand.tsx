@@ -13,24 +13,20 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
 type CountryOptionType = { label: string; value: string };
 
-const CountryOption = (
-  props: OptionProps<CountryOptionType, false>
-) => (
+const CountryOption = (props: OptionProps<CountryOptionType, false>) => (
   <components.Option {...props}>
     <div className="flex items-center gap-2">
       <Flag code={props.data.value} style={{ width: 20, height: 15 }} />
-      <span>{props.data.label}</span>
+      <span aria-label={props.data.label}>{props.data.label}</span>
     </div>
   </components.Option>
 );
 
-const CountrySingleValue = (
-  props: SingleValueProps<CountryOptionType, false>
-) => (
+const CountrySingleValue = (props: SingleValueProps<CountryOptionType, false>) => (
   <components.SingleValue {...props}>
     <div className="flex items-center gap-2">
       <Flag code={props.data.value} style={{ width: 20, height: 15 }} />
-      <span>{props.data.label}</span>
+      <span aria-label={props.data.label}>{props.data.label}</span>
     </div>
   </components.SingleValue>
 );
@@ -59,7 +55,13 @@ export default function BrandSignup() {
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
-  const countryOptions = useMemo(() => countryList().getData(), []);
+  const countryOptions = useMemo(
+    () =>
+      countryList()
+        .getData()
+        .map((c) => ({ label: `${c.label} (${c.value})`, value: c.value })),
+    []
+  );
 
   useEffect(() => {
     if (user) {
