@@ -1,8 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { loadAndIndexProducts } from '../../../lib/products';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import type { Product, ApiMessage } from '../../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Product[] | ApiMessage>
+): Promise<void> {
   try {
     const { vendor } = req.query;
     if (!vendor) return res.status(400).json({ message: 'vendor required' });

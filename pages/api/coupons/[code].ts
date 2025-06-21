@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { handleApiError } from '../../../lib/utils/handleApiError';
-import type { Coupon } from '../../../types';
+import type { Coupon, ApiMessage } from '../../../types';
 
 const coupons: Record<string, Coupon> = {
   SAVE10: {
@@ -27,8 +27,8 @@ const coupons: Record<string, Coupon> = {
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Coupon | { message: string }>
-) {
+  res: NextApiResponse<Coupon | ApiMessage>
+): void {
   try {
     const { code } = req.query;
     const coupon = coupons[code?.toUpperCase() as string];

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import type { TrendingResponse } from '../../types';
 
 const trendingKeywords = [
   'iPhone 14',
@@ -11,8 +12,8 @@ const trendingKeywords = [
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<{ keywords: string[] }>
-) {
+  res: NextApiResponse<TrendingResponse>
+): void {
   try {
     if (req.method !== 'GET') {
       return res.status(405).json({ keywords: [] });

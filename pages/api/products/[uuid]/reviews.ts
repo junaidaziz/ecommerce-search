@@ -6,12 +6,17 @@ import {
   getAverageRating,
 } from '../../../../lib/db.js';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
-import type { Review, ReviewsResponse, ReviewAddedResponse } from '../../../../types/review';
+import type {
+  Review,
+  ReviewsResponse,
+  ReviewAddedResponse,
+} from '../../../../types/review';
+import type { ApiMessage } from '../../../../types';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ReviewsResponse | ReviewAddedResponse | { message: string }>
-) {
+  res: NextApiResponse<ReviewsResponse | ReviewAddedResponse | ApiMessage>
+): Promise<void> {
   const {
     query: { uuid },
     method,

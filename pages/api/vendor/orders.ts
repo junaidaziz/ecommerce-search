@@ -2,8 +2,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getOrdersForVendor } from '../../../lib/orders';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import type { Order, ApiMessage } from '../../../types';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Order[] | ApiMessage>
+): Promise<void> {
   try {
     if (req.method !== 'GET') {
       return res.status(405).json({ message: 'Method Not Allowed' });

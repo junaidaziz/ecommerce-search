@@ -3,12 +3,12 @@ import { getCart, setCart } from '../../lib/db';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import { handleApiError } from '../../lib/utils/handleApiError';
-import type { CartItem } from '../../types';
+import type { CartItem, ApiMessage } from '../../types';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<CartItem[] | { message: string }>
-) {
+  res: NextApiResponse<CartItem[] | ApiMessage>
+): Promise<void> {
   try {
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user) {
