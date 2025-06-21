@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import ProductCard from '../../../components/ProductCard';
 import Head from 'next/head';
 import React from 'react';
+import { getPageTitle } from '../../../lib/pageTitle';
 import { Category, Product } from '../../../types';
 
 
@@ -34,7 +35,7 @@ const CategoryPage: React.FC = () => {
   return (
     <div className="max-w-screen-2xl mx-auto min-h-screen p-4">
       <Head>
-        <title>Category: {slug}</title>
+        <title>{getPageTitle(slug && !Array.isArray(slug) ? `Category: ${slug}` : 'Category')}</title>
         <meta name="description" content={`Products for ${slug}`} />
         <script
           type="application/ld+json"

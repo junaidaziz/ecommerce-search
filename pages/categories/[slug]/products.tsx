@@ -1,5 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
+import { getPageTitle } from '../../../lib/pageTitle';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import ProductCard from '../../../components/ProductCard';
@@ -77,7 +78,7 @@ export default function CategoryProductsPage({
   return (
     <div className="max-w-screen-2xl mx-auto min-h-screen px-4 sm:px-6 lg:px-8 py-6">
       <Head>
-        <title>{category.name} Products</title>
+        <title>{getPageTitle(`${category.name} Products`)}</title>
         <meta name="description" content={`Products for ${category.name}`} />
       </Head>
       <h1 className="text-2xl font-bold mb-4">

@@ -7,6 +7,8 @@ import { signIn } from 'next-auth/react';
 import { components, OptionProps, SingleValueProps } from 'react-select';
 import countryList from 'react-select-country-list';
 import Flag from 'react-world-flags';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 import GoogleIcon from '../../components/icons/GoogleIcon';
 import GithubIcon from '../../components/icons/GithubIcon';
 import {
@@ -146,6 +148,9 @@ export default function UserSignup() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+      <Head>
+        <title>{getPageTitle('User Signup')}</title>
+      </Head>
       <div className="max-w-lg mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
         <h1 className="text-2xl font-bold mb-4">User Sign Up</h1>
       <div className="flex flex-col gap-6 mb-4">

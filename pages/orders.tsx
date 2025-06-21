@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import type { Order } from '../types';
+import Head from 'next/head';
+import { getPageTitle } from '../lib/pageTitle';
 
 type OrdersProps = {};
 
@@ -29,6 +31,9 @@ const Orders: React.FC<OrdersProps> = (_props) => {
 
   return (
     <div className="max-w-2xl mx-auto">
+      <Head>
+        <title>{getPageTitle('Orders')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">Orders</h1>
       {error && <div className="alert alert-error mb-2">{error}</div>}
       {loading && (

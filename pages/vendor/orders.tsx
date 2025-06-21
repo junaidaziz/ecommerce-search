@@ -7,6 +7,8 @@ import {
 import { AppContext } from '../../contexts/AppContext';
 import { NotificationContext } from '../../contexts/NotificationContext';
 import type { Order } from '../../types';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 export default function VendorOrders() {
   const { user } = useContext(AppContext)!;
@@ -57,6 +59,9 @@ export default function VendorOrders() {
 
   return (
     <div className="max-w-2xl mx-auto">
+      <Head>
+        <title>{getPageTitle('Vendor Orders')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">Order History</h1>
       {error && <div className="alert alert-error mb-2">{error}</div>}
       {loading && (

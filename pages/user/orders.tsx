@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import type { Order } from '../../types';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 const UserOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;
   const [orders, setOrders] = useState<Order[]>([]);
@@ -26,6 +28,9 @@ const UserOrders: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
+      <Head>
+        <title>{getPageTitle('My Orders')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">My Orders</h1>
       {error && <div className="alert alert-error mb-2">{error}</div>}
       {loading && (

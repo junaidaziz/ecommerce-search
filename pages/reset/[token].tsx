@@ -2,6 +2,8 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { PasswordInput } from '../../components/form-fields';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 const ResetToken: React.FC = () => {
   const router = useRouter();
@@ -25,6 +27,9 @@ const ResetToken: React.FC = () => {
 
   return (
     <div className="max-w-sm mx-auto">
+      <Head>
+        <title>{getPageTitle('Set New Password')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">Set New Password</h1>
       <form onSubmit={handleSubmit(submit)} className="space-y-2">
         <PasswordInput

@@ -3,6 +3,7 @@ import { useEffect, useState, useContext, FormEvent, ChangeEvent } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
 import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 import ProductImageSlider from '../../components/ProductImageSlider';
 import type { Product } from '../../types';
 import type {
@@ -66,7 +67,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
   return (
     <div className="max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md">
       <Head>
-        <title>{(product.title || 'Product') + ' - Product'}</title>
+        <title>{getPageTitle(product?.title || 'Product')}</title>
         <meta
           name="description"
           content={product.descriptionText?.slice(0, 150)}

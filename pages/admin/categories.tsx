@@ -3,6 +3,8 @@ import { AppContext } from '../../contexts/AppContext';
 import { Category, CategoryInput, ApiMessage } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
 import { TextInput } from '../../components/form-fields';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 export default function Categories() {
   const { user } = useContext(AppContext)!;
@@ -68,6 +70,9 @@ export default function Categories() {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
+      <Head>
+        <title>{getPageTitle('Manage Categories')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">Categories</h1>
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <div className="flex gap-2 mb-4">
