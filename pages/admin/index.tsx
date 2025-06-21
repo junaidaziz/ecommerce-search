@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useCallback } from 'react';
+import { useState, useEffect, useContext, useCallback, ChangeEvent } from 'react';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
 import { Product, ApiMessage } from '../../types';
