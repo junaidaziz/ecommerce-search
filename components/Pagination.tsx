@@ -12,7 +12,12 @@ const Pagination: FC<PaginationProps> = ({
   onPageChange,
 }) => {
   if (totalPages <= 1) return null;
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  let start = Math.max(1, currentPage - 2);
+  let end = Math.min(totalPages, start + 3);
+  if (end - start < 3) {
+    start = Math.max(1, end - 3);
+  }
+  const pages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
   return (
     <div className="flex justify-center my-4">
       <div className="join">
@@ -22,7 +27,7 @@ const Pagination: FC<PaginationProps> = ({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          Prev
+          Previous
         </button>
         {pages.map((p) => (
           <button
