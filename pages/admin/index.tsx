@@ -1,10 +1,24 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
+import { Product, ApiMessage } from '../../types';
+import { fetchJson } from '../../lib/utils/fetchJson';
 
 export default function Admin() {
   const { user } = useContext(AppContext)!;
-  const emptyForm = {
+  interface FormState {
+    id: string;
+    title: string;
+    vendor: string;
+    description: string;
+    product_type: string;
+    tags: string;
+    quantity: number;
+    min_price: number;
+    max_price: number;
+    currency: string;
+  }
+  const emptyForm: FormState = {
     id: '',
     title: '',
     vendor: '',
@@ -16,54 +30,52 @@ export default function Admin() {
     max_price: 0,
     currency: 'USD',
   };
-  const [form, setForm] = useState(emptyForm);
-  const [products, setProducts] = useState([]);
-  const [message, setMessage] = useState('');
-  const [editingId, setEditingId] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [photos, setPhotos] = useState([]);
+  const [form, setForm] = useState<FormState>(emptyForm);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [message, setMessage] = useState<string>('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const fetchProducts = useCallback(async () => {
     if (!user) return;
-    const res = await fetch(
+    const data = await fetchJson<Product[]>(
       `/api/admin/products?vendor=${encodeURIComponent(user.brandName || '')}`
     );
-    if (res.ok) {
-      setProducts(await res.json());
-    }
+    setProducts(data);
   }, [user]);
 
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const submit = async (e) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData();
     const payload = editingId ? { ...form, id: editingId } : form;
     Object.entries(payload).forEach(([k, v]) => fd.append(k, v));
     photos.forEach((file) => fd.append('photos', file));
-    const res = await fetch('/api/admin/products', {
-      method: editingId ? 'PUT' : 'POST',
-      body: fd,
-    });
-    if (res.ok) {
+    try {
+      await fetchJson<ApiMessage>('/api/admin/products', {
+        method: editingId ? 'PUT' : 'POST',
+        body: fd,
+      });
       setMessage(editingId ? 'Product updated' : 'Product added');
       setForm(emptyForm);
       setEditingId(null);
       setPhotos([]);
       fetchProducts();
-    } else {
-      const data = await res.json();
-      setMessage(data.message || 'Error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error';
+      setMessage(msg);
     }
   };
 
-  const handleEdit = (p) => {
+  const handleEdit = (p: Product) => {
     setForm({
       id: p.ID,
       title: p.TITLE || '',
@@ -161,7 +173,9 @@ export default function Admin() {
                 <input
                   type="file"
                   multiple
-                  onChange={(e) => setPhotos(Array.from(e.target.files))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setPhotos(e.target.files ? Array.from(e.target.files) : [])
+                  }
                   className="file-input file-input-bordered w-full"
                 />
               </div>
