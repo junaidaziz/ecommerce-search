@@ -5,49 +5,59 @@ import type { Brand } from './brand';
 import type { Image } from './image';
 import type { PriceRange } from './price';
 
-export interface Product {
-  id: string;
-  uuid?: string;
-  slug: string;
-  sku: PrismaProduct['sku'];
-  title: string;
-  description?: string;
-  productType?: string;
-  tags?: string;
-  quantity?: number;
-  priceRange?: PriceRange;
+export type ProductBase = Pick<
+  PrismaProduct,
+  | 'id'
+  | 'uuid'
+  | 'slug'
+  | 'sku'
+  | 'title'
+  | 'description'
+  | 'productType'
+  | 'tags'
+  | 'quantity'
+  | 'minPrice'
+  | 'maxPrice'
+  | 'currency'
+  | 'status'
+  | 'createdAt'
+  | 'updatedAt'
+>;
+
+export interface Product extends ProductBase {
+  vendor: Vendor;
+  category: Category;
+  brand?: Brand;
   images?: Image[];
+  priceRange?: PriceRange;
   soldCount: number;
   reviewCount: number;
   averageRating: number;
   featuredImage?: Image;
-  minPrice: number;
-  maxPrice: number;
-  currency: string;
   /** Total inventory quantity available */
   totalInventory?: number;
   descriptionText?: string;
   bodyHtmlText?: string;
-  status?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  vendor: Vendor;
-  brand?: Brand;
-  category: Category;
 }
 
 export type ProductResponse = Product;
 
-export interface ProductInput {
-  sku: PrismaProduct['sku'];
-  title: string;
-  description?: string;
-  vendor: Vendor;
-  productType?: string;
-  tags?: string;
-  category: Category;
-  images?: Image[];
-  quantity?: number;
-  price?: number;
-}
-
+export type ProductInput = Pick<
+  PrismaProduct,
+  | 'sku'
+  | 'title'
+  | 'description'
+  | 'productType'
+  | 'tags'
+  | 'quantity'
+  | 'minPrice'
+  | 'maxPrice'
+  | 'currency'
+  | 'status'
+> &
+  Partial<Pick<PrismaProduct, 'slug' | 'uuid'>> & {
+    vendor: Vendor;
+    category: Category;
+    brand?: Brand;
+    images?: Image[];
+  };
