@@ -1,14 +1,16 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { PasswordInput } from '../../components/form-fields';
 
-export default function ResetToken() {
+const ResetToken: React.FC = () => {
   const router = useRouter();
-  const { token } = router.query;
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const { token } = router.query as { token?: string };
+  type ResetForm = { password: string };
+  const { register, handleSubmit } = useForm<ResetForm>();
+  const [message, setMessage] = useState<string>('');
 
-  const submit = async (e) => {
-    e.preventDefault();
+  const submit: SubmitHandler<ResetForm> = async ({ password }) => {
     const res = await fetch('/api/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -24,13 +26,13 @@ export default function ResetToken() {
   return (
     <div className="max-w-sm mx-auto">
       <h1 className="text-2xl font-bold mb-4">Set New Password</h1>
-      <form onSubmit={submit} className="space-y-2">
-        <input
-          className="input input-bordered w-full"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+      <form onSubmit={handleSubmit(submit)} className="space-y-2">
+        <PasswordInput
+          className="w-full"
           placeholder="New Password"
+          register={register}
+          name="password"
+          rules={{ required: true }}
         />
         <button className="btn btn-primary w-full" type="submit">
           Reset Password
@@ -39,4 +41,6 @@ export default function ResetToken() {
       {message && <p className="mt-2">{message}</p>}
     </div>
   );
-}
+};
+
+export default ResetToken;

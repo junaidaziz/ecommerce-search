@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, FormEvent, ChangeEvent } from 'react';
+import { TextInput } from '../components/form-fields';
 
-export default function RequestReset() {
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
+const RequestReset: React.FC = () => {
+  const [email, setEmail] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
 
-  const submit = async (e) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const res = await fetch('/api/request-reset', {
       method: 'POST',
@@ -20,10 +21,12 @@ export default function RequestReset() {
     <div className="max-w-sm mx-auto">
       <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
       <form onSubmit={submit} className="space-y-2">
-        <input
-          className="input input-bordered w-full"
+        <TextInput
+          className="w-full"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
           placeholder="Email"
         />
         <button className="btn btn-primary w-full" type="submit">
@@ -33,4 +36,6 @@ export default function RequestReset() {
       {message && <p className="mt-2">{message}</p>}
     </div>
   );
-}
+};
+
+export default RequestReset;

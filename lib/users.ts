@@ -1,51 +1,53 @@
 import { getDb } from './db';
+import type { Prisma, Role } from '@prisma/client';
+import type { UserInput } from '../types/user';
 
 const prisma = getDb();
 
 export async function addUser({
   email,
   password,
-  first_name,
-  last_name,
-  brand_name,
-  gender,
-  phone_number,
+  firstName,
+  lastName,
+  brandName,
+  gender = 'OTHER',
+  phoneNumber,
   address,
   city,
   country,
-  business_address,
+  businessAddress,
   website,
-  business_description,
+  businessDescription,
   logo,
-  tax_id,
+  taxId,
   role = 'USER',
-  verification_token,
-}) {
+  verificationToken,
+}: UserInput): Promise<void> {
   await prisma.user.create({
     data: {
       email,
       password,
-      firstName: first_name,
-      lastName: last_name,
-      brandName: brand_name,
+      firstName,
+      lastName,
+      brandName,
       gender,
-      phoneNumber: phone_number,
+      phoneNumber,
       address,
       city,
       country,
-      businessAddress: business_address,
+      businessAddress,
       website,
-      businessDescription: business_description,
+      businessDescription,
       logo,
-      taxId: tax_id,
-      role,
+      taxId,
+      role: role as Role,
       disabled: false,
-      verificationToken: verification_token,
+      verificationToken,
     },
   });
 }
 
-export function findUser(email) {
+export function findUser(email: string) {
   return prisma.user.findUnique({ where: { email } });
 }
 
@@ -63,39 +65,43 @@ export function getAllUsers() {
   });
 }
 
-export function updateUserRole(email, role) {
+export function updateUserRole(email: string, role: Role) {
   return prisma.user.update({ where: { email }, data: { role } });
 }
 
-export function setUserDisabled(email, disabled) {
+export function setUserDisabled(email: string, disabled: boolean) {
   return prisma.user.update({ where: { email }, data: { disabled } });
 }
 
-export function deleteUser(email) {
+export function deleteUser(email: string) {
   return prisma.user.delete({ where: { email } });
 }
 
-export function verifyUser(token) {
+export function verifyUser(token: string) {
   return prisma.user.updateMany({
     where: { verificationToken: token },
     data: { verified: true, verificationToken: null },
   });
 }
 
-export function setResetToken(email, token, expires) {
+export function setResetToken(
+  email: string,
+  token: string,
+  expires: string | number | Date
+) {
   return prisma.user.update({
     where: { email },
     data: { resetToken: token, resetExpires: new Date(expires) },
   });
 }
 
-export function resetPassword(token, password) {
+export function resetPassword(token: string, password: string) {
   return prisma.user.updateMany({
     where: { resetToken: token, resetExpires: { gt: new Date() } },
     data: { password, resetToken: null, resetExpires: null },
   });
 }
 
-export function updateUserProfile(email, data) {
+export function updateUserProfile(email: string, data: Prisma.UserUpdateInput) {
   return prisma.user.update({ where: { email }, data });
 }

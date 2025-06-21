@@ -1,21 +1,31 @@
-import { useContext, useState, useEffect } from 'react';
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  ChangeEvent,
+  FormEvent,
+} from 'react';
 import { AppContext } from '../../contexts/AppContext';
+import type { User, Vendor } from '../../types';
+import { TextInput, Textarea } from '../../components/form-fields';
 
-export default function BrandProfile() {
-  const { user } = useContext(AppContext)!;
-  const [brandName, setBrandName] = useState(user?.brandName || '');
-  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
-  const [businessAddress, setBusinessAddress] = useState(
+export const BrandProfile: React.FC = () => {
+  const { user } = useContext(AppContext) as { user: User | null };
+  const [brandName, setBrandName] = useState<string>(user?.brandName || '');
+  const [phoneNumber, setPhoneNumber] = useState<string>(
+    user?.phoneNumber || ''
+  );
+  const [businessAddress, setBusinessAddress] = useState<string>(
     user?.businessAddress || ''
   );
-  const [city, setCity] = useState(user?.city || '');
-  const [country, setCountry] = useState(user?.country || '');
-  const [website, setWebsite] = useState(user?.website || '');
-  const [businessDescription, setBusinessDescription] = useState(
+  const [city, setCity] = useState<string>(user?.city || '');
+  const [country, setCountry] = useState<string>(user?.country || '');
+  const [website, setWebsite] = useState<string>(user?.website || '');
+  const [businessDescription, setBusinessDescription] = useState<string>(
     user?.businessDescription || ''
   );
-  const [taxId, setTaxId] = useState(user?.taxId || '');
-  const [message, setMessage] = useState('');
+  const [taxId, setTaxId] = useState<string>(user?.taxId || '');
+  const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
     if (user) {
@@ -30,7 +40,24 @@ export default function BrandProfile() {
     }
   }, [user]);
 
-  const submit = async (e) => {
+  useEffect(() => {
+    fetch('/api/brand/profile')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: Vendor | null) => {
+        if (!data) return;
+        setBrandName(data.brandName || '');
+        setPhoneNumber(data.phoneNumber || '');
+        setBusinessAddress(data.businessAddress || '');
+        setCity(data.city || '');
+        setCountry(data.country || '');
+        setWebsite(data.website || '');
+        setBusinessDescription(data.description || '');
+        setTaxId(data.taxId || '');
+      })
+      .catch(() => {});
+  }, []);
+
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage('');
     const res = await fetch('/api/brand/profile', {
@@ -60,52 +87,60 @@ export default function BrandProfile() {
       <h1 className="text-2xl font-bold mb-4">Brand Profile</h1>
       {message && <div className="mb-2 text-green-600">{message}</div>}
       <form onSubmit={submit} className="space-y-2">
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={brandName}
-          onChange={(e) => setBrandName(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setBrandName(e.target.value)
+          }
           placeholder="Brand Name"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setPhoneNumber(e.target.value)
+          }
           placeholder="Phone Number"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={businessAddress}
-          onChange={(e) => setBusinessAddress(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setBusinessAddress(e.target.value)
+          }
           placeholder="Business Address"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={city}
-          onChange={(e) => setCity(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setCity(e.target.value)
+          }
           placeholder="City"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={country}
-          onChange={(e) => setCountry(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setCountry(e.target.value)
+          }
           placeholder="Country"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={website}
-          onChange={(e) => setWebsite(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setWebsite(e.target.value)
+          }
           placeholder="Website"
         />
-        <textarea
-          className="textarea textarea-bordered w-full"
+        <Textarea
           value={businessDescription}
-          onChange={(e) => setBusinessDescription(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+            setBusinessDescription(e.target.value)
+          }
           placeholder="Business Description"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={taxId}
-          onChange={(e) => setTaxId(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setTaxId(e.target.value)
+          }
           placeholder="Tax ID"
         />
         <button className="btn btn-primary w-full" type="submit">
@@ -114,4 +149,6 @@ export default function BrandProfile() {
       </form>
     </div>
   );
-}
+};
+
+export default BrandProfile;

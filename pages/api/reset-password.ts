@@ -1,8 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { resetPassword } from '../../lib/users';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import type { ApiMessage } from '../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ApiMessage>
+): Promise<void> {
   if (req.method !== 'POST')
     return res.status(405).json({ message: 'Method Not Allowed' });
   const { token, password } = req.body;

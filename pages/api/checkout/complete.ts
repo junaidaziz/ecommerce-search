@@ -3,12 +3,16 @@ import Stripe from 'stripe';
 import { addOrder } from '../../../lib/orders';
 import { sendOrderConfirmation } from '../../../lib/email';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import type { OrderIdResponse, ApiMessage } from '../../../types';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2023-10-16',
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<OrderIdResponse | ApiMessage>
+): Promise<void> {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
@@ -21,12 +25,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     const metadata = session.metadata || {};
     const orderId = addOrder({
-      user_email: metadata.email,
+      userEmail: metadata.email,
       items: JSON.parse(metadata.items || '[]'),
       total: session.amount_total / 100,
       status: 'completed',
-      shipping_name: metadata.shippingName,
-      shipping_address: metadata.shippingAddress,
     });
     await sendOrderConfirmation(metadata.email, { id: orderId });
     return res.status(200).json({ id: orderId });

@@ -2,10 +2,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getBestSellingProducts } from '../../lib/orders';
 import { getDb } from '../../lib/db';
 import type { Product } from '../../types/product';
+import type { SearchApiResponse, ApiMessage } from '../../types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import client from '../../lib/typesenseClient';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import { getQueryParam } from '../../lib/utils/getQueryParam';
 
 interface SearchParams {
   q: string;
@@ -48,8 +50,8 @@ function buildSort(sort?: string) {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
-) {
+  res: NextApiResponse<SearchApiResponse | ApiMessage>
+): Promise<void> {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
@@ -65,16 +67,14 @@ export default async function handler(
     if (user) userId = user.id;
   }
 
-  const {
-    q = '',
-    category,
-    brand,
-    minPrice,
-    maxPrice,
-    sort,
-    page = '1',
-    perPage = '20',
-  } = req.query as { [key: string]: string };
+  const q = getQueryParam(req.query.q) ?? '';
+  const category = getQueryParam(req.query.category);
+  const brand = getQueryParam(req.query.brand);
+  const minPrice = getQueryParam(req.query.minPrice);
+  const maxPrice = getQueryParam(req.query.maxPrice);
+  const sort = getQueryParam(req.query.sort);
+  const page = getQueryParam(req.query.page) ?? '1';
+  const perPage = getQueryParam(req.query.perPage) ?? '20';
 
   const searchParams: SearchParams = {
     q: q || '*',

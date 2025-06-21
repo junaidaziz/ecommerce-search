@@ -1,0 +1,19 @@
+export interface Vendor {
+  id?: number | string;
+  uuid?: string;
+  /** Display name used for the brand */
+  brandName: string;
+  email: string;
+  phoneNumber?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  businessAddress?: string;
+  website?: string;
+  description?: string;
+  logo?: string;
+  taxId?: string;
+  status?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

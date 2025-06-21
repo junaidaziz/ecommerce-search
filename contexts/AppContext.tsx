@@ -6,11 +6,12 @@ import {
 } from 'next-auth/react';
 import { NotificationContext } from './NotificationContext';
 
-import type { User } from '@prisma/client';
+import type { UserInfo } from '../lib/types';
 import { Product } from '../types/product';
+import type { ShippingInfo } from '../types/shipping';
 
 export interface AppContextValue {
-  user: User | null;
+  user: UserInfo | null;
   cart: (Product & { qty: number })[];
   wishlist: Product[];
   login: (email: string, password: string) => Promise<void>;
@@ -21,10 +22,7 @@ export interface AppContextValue {
   removeFromCart: (id: string) => void;
   addToWishlist: (product: Product) => void;
   removeFromWishlist: (id: string) => void;
-  placeOrder: (payload: {
-    shippingName: string;
-    shippingAddress: string;
-  }) => Promise<boolean>;
+  placeOrder: (shipping: ShippingInfo) => Promise<boolean>;
 }
 
 export const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -35,7 +33,7 @@ interface AppProviderProps {
 
 export function AppProvider({ children }: AppProviderProps) {
   const { data: session } = useSession();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserInfo | null>(null);
   const [cart, setCart] = useState<(Product & { qty: number })[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const { addNotification } = useContext(NotificationContext);
@@ -69,7 +67,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
   useEffect(() => {
     if (session?.user) {
-      const u = session.user as User & {
+      const u = session.user as UserInfo & {
         role?: string;
         brandName?: string;
         name?: string | null;
@@ -77,7 +75,18 @@ export function AppProvider({ children }: AppProviderProps) {
       };
       const { email, name, role, brandName, gender } = u;
       const [firstName = '', lastName = ''] = (name || '').split(' ');
-      setUser({ email: email ?? '', firstName, lastName, brandName, gender, role });
+      setUser({
+        email: email ?? '',
+        firstName,
+        lastName,
+        brandName,
+        gender,
+        role,
+        phoneNumber: '',
+        address: '',
+        city: '',
+        country: '',
+      });
     } else {
       setUser(null);
     }
@@ -136,7 +145,7 @@ export function AppProvider({ children }: AppProviderProps) {
     addNotification('Logged out', 'info');
   };
 
-  const placeOrder = async ({ shippingName, shippingAddress }: { shippingName: string; shippingAddress: string }): Promise<boolean> => {
+  const placeOrder = async (shipping: ShippingInfo): Promise<boolean> => {
     if (!user || cart.length === 0) return false;
     const res = await fetch('/api/orders', {
       method: 'POST',
@@ -145,11 +154,10 @@ export function AppProvider({ children }: AppProviderProps) {
         email: user.email,
         items: cart,
         total: cart.reduce(
-          (s, i) => s + i.qty * (i.MIN_PRICE || 0),
+          (s, i) => s + i.qty * (i.minPrice || 0),
           0
         ),
-        shippingName,
-        shippingAddress,
+        shipping,
       }),
     });
     if (!res.ok) {
@@ -165,43 +173,39 @@ export function AppProvider({ children }: AppProviderProps) {
   const addToCart = (product: Product) => {
     let qty = 1;
     setCart((prev) => {
-      const existing = prev.find((p) => p.ID === product.ID);
+      const existing = prev.find((p) => p.id === product.id);
       if (existing) {
         qty = existing.qty + 1;
-        return prev.map((p) =>
-          p.ID === product.ID ? { ...p, qty } : p
-        );
+        return prev.map((p) => (p.id === product.id ? { ...p, qty } : p));
       }
       return [...prev, { ...product, qty }];
     });
-    addNotification(`Added ${product.TITLE} (x${qty}) to cart`, 'success', 'center');
+    addNotification(`Added ${product.title} (x${qty}) to cart`, 'success', 'center');
   };
 
   const changeQty = (id: string, delta: number) => {
     setCart((prev) => {
       return prev
-        .map((item) =>
-          item.ID === id ? { ...item, qty: item.qty + delta } : item
-        )
+        .map((item) => (item.id === id ? { ...item, qty: item.qty + delta } : item))
         .filter((item) => item.qty > 0);
     });
   };
 
   const removeFromCart = (id: string) => {
-    setCart((prev) => prev.filter((item) => item.ID !== id));
+    setCart((prev) => prev.filter((item) => item.id !== id));
     addNotification('Removed from cart', 'info');
   };
 
   const addToWishlist = (product: Product) => {
     setWishlist((prev) => {
-      if (prev.find((p) => p.ID === product.ID)) return prev;
+      if (prev.find((p) => p.id === product.id)) return prev;
       return [...prev, product];
     });
     addNotification('Added to wishlist', 'success');
   };
 
   const removeFromWishlist = (id: string) => {
-    setWishlist((prev) => prev.filter((item) => item.ID !== id));
+    setWishlist((prev) => prev.filter((item) => item.id !== id));
     addNotification('Removed from wishlist', 'info');
   };
 

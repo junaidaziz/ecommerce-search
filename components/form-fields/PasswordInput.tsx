@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-import { UseFormRegister, RegisterOptions } from 'react-hook-form';
+import {
+  UseFormRegister,
+  RegisterOptions,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 
-export interface PasswordInputProps
+export interface PasswordInputProps<T extends FieldValues>
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  name: string;
+  name: Path<T>;
   placeholder?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -14,26 +19,29 @@ export interface PasswordInputProps
   disabled?: boolean;
   className?: string;
   leftAddon?: React.ReactNode;
-  register?: UseFormRegister<any>;
-  rules?: RegisterOptions;
+  register?: UseFormRegister<T>;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const PasswordInput: React.FC<PasswordInputProps> = ({
-  label,
-  name,
-  placeholder,
-  value,
-  onChange,
-  onBlur,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  leftAddon,
-  register,
-  rules,
-  ...rest
-}) => {
+const PasswordInput = <T extends FieldValues>(
+  props: PasswordInputProps<T>
+) => {
+  const {
+    label,
+    name,
+    placeholder,
+    value,
+    onChange,
+    onBlur,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    leftAddon,
+    register,
+    rules,
+    ...rest
+  } = props;
   const [show, setShow] = useState(false);
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};

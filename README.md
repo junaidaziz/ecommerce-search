@@ -1,16 +1,15 @@
-# 🛍️ Product Search App (Next.js + FlexSearch)
+# 🛍️ Product Search App (Next.js + Typesense)
 
-A fast, scalable product search web app built with **Next.js** and **FlexSearch**. Product data is stored in **PostgreSQL** using **Prisma** and indexed for fast searching.
+A fast, scalable product search web app built with **Next.js** and **Typesense**. Product data is stored in **PostgreSQL** using **Prisma**.
 
 ---
 
 ## 🚀 Features
 
 - Full-text search on product fields (title, vendor, tags, etc.)
-- Extremely fast indexing via **FlexSearch.Document**
+- High-performance search powered by **Typesense**
 - Manage products via a simple admin panel with a PostgreSQL backend using Prisma
 - Public search API: `/api/search?q=...`
-- Optional `SKIP_INDEX_BUILD` flag to avoid rebuilding during deployment
 - Fully deployable on **Vercel** with CI/CD
 - Modern responsive UI built with **Tailwind CSS** and **DaisyUI**
 - User-selectable light or dark mode with automatic theme persistence
@@ -43,7 +42,6 @@ During postinstall your environment variables are read automatically so the data
 Next.js runtime variables go in `.env.local`:
 
 ```env
-SKIP_INDEX_BUILD=false
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 NEXTAUTH_SECRET=random-secret
@@ -110,17 +108,11 @@ git push -u origin main
 Go to [https://vercel.com/import](https://vercel.com/import)  
 Link your GitHub project.
 
-3. **Set environment variables**
-
-In the Vercel dashboard:
-
-| Key                | Value                              |
-| ------------------ | ---------------------------------- |
-| `SKIP_INDEX_BUILD` | `true` (to skip rebuild at deploy) |
+3. **Set environment variables** in the Vercel dashboard, then deploy.
 
 4. **Deploy**
 
-Vercel will auto-deploy. The frontend will fetch the search index from the generated index file.
+Vercel will auto-deploy.
 
 ---
 
@@ -181,22 +173,12 @@ const options = [
   isSearchable
 />;
 ```
+## 📊 Database ER Diagram
 
----
+Run `npm run generate:erd` to generate `docs/ERD.png` from the Prisma schema.
 
-## 🔎 FlexSearch Notes
+![ERD](docs/ERD.png)
 
-- `FlexSearch.Document` is used for field-based indexing
-- Indexed fields include:  
-  `TITLE`, `VENDOR`, `TAGS`, `DESCRIPTION_TEXT`, `BODY_HTML_TEXT`, `PRODUCT_TYPE`, `METAFIELDS.my_fields_ingredients.value`
-- Search supports partial and case-insensitive queries
-- During CSV load:
-  - HTML is stripped from body and description using `jsdom`
-  - JSON fields are parsed safely
-- The index is serialized to `public/index.json`
-- on next load, the app reads and deserializes the pre-built index for faster boot
-
----
 
 ## 👨‍💻 Author
 
