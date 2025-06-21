@@ -1,8 +1,7 @@
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useCallback, useState } from 'react';
-import Pagination from '../../components/Pagination';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ProductCard from '../../components/ProductCard';
 import { getPageTitle } from '../../lib/pageTitle';
 import {
@@ -72,14 +71,84 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   );
   const inStock = router.query.inStock === 'true';
   const totalPages = Math.ceil(total / 20);
+  const [items, setItems] = useState<Product[]>(products);
+  const [page, setPage] = useState(currentPage);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(products.length < total);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  const handlePageChange = useCallback(
-    (p: number) => {
-      const query = { ...router.query, page: String(p) } as Record<string, string>;
-      router.push({ pathname: router.pathname, query });
+  const fetchPage = useCallback(
+    async (p: number) => {
+      const params = new URLSearchParams();
+      params.set('page', String(p));
+      if (router.query.category) params.set('category', String(router.query.category));
+      if (router.query.q) params.set('q', String(router.query.q));
+      if (router.query.inStock) params.set('inStock', String(router.query.inStock));
+      if (router.query.minPrice) params.set('minPrice', String(router.query.minPrice));
+      if (router.query.maxPrice) params.set('maxPrice', String(router.query.maxPrice));
+      const res = await fetch(`/api/products?${params.toString()}`);
+      if (!res.ok) return null;
+      return (await res.json()) as { products: Product[]; total: number };
     },
-    [router]
+    [router.query]
   );
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const next = page + 1;
+    const data = await fetchPage(next);
+    if (data) {
+      setItems((prev) => {
+        const updated = [...prev, ...data.products];
+        setHasMore(updated.length < data.total);
+        return updated;
+      });
+      setPage(next);
+      router.replace(
+        { pathname: router.pathname, query: { ...router.query, page: String(next) } },
+        undefined,
+        { shallow: true }
+      );
+    }
+    setLoadingMore(false);
+  }, [fetchPage, hasMore, loadingMore, page, router, items.length]);
+
+  useEffect(() => {
+    if (currentPage > 1 && page === 1) {
+      (async () => {
+        let extra: Product[] = [];
+        for (let p = 2; p <= currentPage; p++) {
+          const data = await fetchPage(p);
+          if (data) {
+            extra = [...extra, ...data.products];
+          }
+        }
+        if (extra.length > 0) {
+          setItems((prev) => {
+            const updated = [...prev, ...extra];
+            setHasMore(updated.length < total);
+            return updated;
+          });
+        }
+        setPage(currentPage);
+      })();
+    }
+  }, [currentPage, fetchPage, page, total]);
+
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        loadMore();
+      }
+    });
+    const el = loadMoreRef.current;
+    observer.observe(el);
+    return () => {
+      observer.unobserve(el);
+    };
+  }, [loadMoreRef, loadMore]);
 
   const toggleInStock = useCallback(() => {
     const query = { ...router.query } as Record<string, string>;
@@ -258,22 +327,24 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                 ))}
               </div>
             )}
-            {products.length === 0 ? (
+            {items.length === 0 ? (
               <p className="text-gray-500">No products found.</p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {products.map((p) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {items.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
             )}
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
+            {loadingMore && (
+              <div className="flex justify-center my-4">
+                <span className="loading loading-spinner" />
+              </div>
             )}
+            {!hasMore && items.length > 0 && (
+              <p className="text-center text-sm text-gray-500 my-4">No more products.</p>
+            )}
+            <div ref={loadMoreRef} className="h-4" />
           </div>
         </div>
       </div>
