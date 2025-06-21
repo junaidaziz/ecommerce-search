@@ -17,6 +17,8 @@ import {
 } from '../../components/form-fields';
 import GoogleIcon from '../../components/icons/GoogleIcon';
 import GithubIcon from '../../components/icons/GithubIcon';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -191,7 +193,10 @@ export default function BrandSignup() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
+      <Head>
+        <title>{getPageTitle('Brand Signup')}</title>
+      </Head>
+      <div className="max-w-3xl mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-center">Brand Sign Up</h1>
       </div>

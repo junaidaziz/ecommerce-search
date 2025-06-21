@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 export default function Success() {
   const router = useRouter();
@@ -18,7 +20,30 @@ export default function Success() {
       .catch(() => setStatus('error'));
   }, [session_id]);
 
-  if (status === 'processing') return <p className="p-4">Processing payment...</p>;
-  if (status === 'error') return <p className="p-4">Payment failed.</p>;
-  return <p className="p-4">Payment successful! Check your email for confirmation.</p>;
+  if (status === 'processing')
+    return (
+      <p className="p-4">
+        <Head>
+          <title>{getPageTitle('Processing Payment')}</title>
+        </Head>
+        Processing payment...
+      </p>
+    );
+  if (status === 'error')
+    return (
+      <p className="p-4">
+        <Head>
+          <title>{getPageTitle('Payment Failed')}</title>
+        </Head>
+        Payment failed.
+      </p>
+    );
+  return (
+    <p className="p-4">
+      <Head>
+        <title>{getPageTitle('Payment Successful')}</title>
+      </Head>
+      Payment successful! Check your email for confirmation.
+    </p>
+  );
 }

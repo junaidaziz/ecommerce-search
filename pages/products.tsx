@@ -2,6 +2,8 @@ import { useState, useEffect, useContext, FormEvent } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import type { Product } from '../types/product';
 import ProductCard from '../components/ProductCard';
+import Head from 'next/head';
+import { getPageTitle } from '../lib/pageTitle';
 
 const Products: React.FC = () => {
   const { addToCart } = useContext(AppContext)!;
@@ -63,6 +65,9 @@ const Products: React.FC = () => {
 
   return (
     <div className="w-full bg-gradient-to-br from-base-200 to-base-100 min-h-screen">
+      <Head>
+        <title>{getPageTitle('Products')}</title>
+      </Head>
       <div className="max-w-screen-xl mx-auto px-4">
         <h1 className="text-3xl font-bold mb-4">Products</h1>
         <button

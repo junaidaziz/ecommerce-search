@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { getPageTitle } from '../lib/pageTitle';
 import HeroSlider from '../components/HeroSlider';
 import ProductCard from '../components/ProductCard';
 import DEFAULT_CATEGORIES from '../lib/defaultCategories';
@@ -286,7 +287,7 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
   return (
     <div className="min-h-screen bg-base-200 flex flex-col items-center py-10 font-sans">
       <Head>
-        <title>Product Search App</title>
+        <title>{getPageTitle('Home')}</title>
         <meta name="description" content="Search products from CSV data" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

@@ -1,5 +1,7 @@
 import { useContext } from 'react';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
+import { getPageTitle } from '../lib/pageTitle';
 import { AppContext, AppContextValue } from '../contexts/AppContext';
 
 // Define the type for a cart item
@@ -36,6 +38,9 @@ const Cart: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto min-h-screen p-4">
+      <Head>
+        <title>{getPageTitle('Cart')}</title>
+      </Head>
       <h1 className="text-3xl font-bold mb-4">Summary</h1>
       {cart.length === 0 && <p>Your cart is empty.</p>}
       <ul className="space-y-2 mb-4">
