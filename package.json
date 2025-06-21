@@ -12,7 +12,7 @@
     "test": "jest",
     "type-check": "tsc --noEmit",
     "setup-env": "node scripts/setupEnv.js",
-    "postinstall": "npm run setup-env && node scripts/setupPrisma.js && prisma generate",
+    "postinstall": "npm run setup-env && node scripts/setupPrisma.js && PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 prisma generate",
     "init:typesense": "ts-node scripts/initTypesense.ts",
     "generate:erd": "prisma generate --schema=prisma/schema.prisma"
   },

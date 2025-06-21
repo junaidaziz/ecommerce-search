@@ -4,7 +4,7 @@ import { handleApiError } from '../../../lib/utils/handleApiError';
 import type { CheckoutSessionResponse, ApiMessage } from '../../../types';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16',
+  apiVersion: '2022-11-15',
 });
 
 export default async function handler(
@@ -21,7 +21,7 @@ export default async function handler(
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: items.map((it) => ({
+      line_items: items.map((it: any) => ({
         price_data: {
           currency: 'usd',
           product_data: { name: it.title },
@@ -39,7 +39,7 @@ export default async function handler(
         items: JSON.stringify(items),
       },
     });
-    return res.status(200).json({ url: session.url, id: session.id });
+    return res.status(200).json({ url: session.url ?? '', id: session.id });
   } catch (e) {
     return handleApiError(res, e, 'stripe error');
   }

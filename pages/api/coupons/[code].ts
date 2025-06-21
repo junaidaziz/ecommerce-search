@@ -12,7 +12,7 @@ const coupons: Record<string, Coupon> = {
     expiresAt: '2099-12-31T23:59:59Z',
     minOrderAmount: 0,
     usageLimit: 100,
-    createdAt: '2023-01-01T00:00:00Z',
+    createdAt: new Date('2023-01-01T00:00:00Z'),
   },
   SAVE20: {
     id: '2',
@@ -22,7 +22,7 @@ const coupons: Record<string, Coupon> = {
     expiresAt: '2099-12-31T23:59:59Z',
     minOrderAmount: 0,
     usageLimit: 100,
-    createdAt: '2023-01-01T00:00:00Z',
+    createdAt: new Date('2023-01-01T00:00:00Z'),
   },
 };
 

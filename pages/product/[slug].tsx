@@ -217,7 +217,7 @@ export default function ProductDetail({
           </form>
         )}
       </div>
-      <RecommendedProducts category={product.category} excludeId={product.id} />
+      <RecommendedProducts category={product.category.name} excludeId={product.id} />
       <div className="mt-4">
         <Link href="/">&larr; Back to products</Link>
       </div>

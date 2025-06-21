@@ -17,4 +17,5 @@ declare module '@prisma/client' {
   export interface Product extends Record<string, any> {}
   export interface User extends Record<string, any> {}
   export interface Order extends Record<string, any> {}
+  export interface Category extends Record<string, any> {}
 }

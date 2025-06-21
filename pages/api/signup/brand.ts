@@ -60,22 +60,22 @@ export default async function handler(
     }
     const hashed = await bcrypt.hash(password, 10);
     const token = crypto.randomBytes(20).toString('hex');
-    await addUser({
-      email,
-      password: hashed,
-      firstName,
-      lastName,
-      brandName,
-      phoneNumber,
-      businessAddress,
-      city,
-      country,
-      website: website || null,
-      businessDescription: businessDescription || null,
-      taxId: taxId || null,
-      role: 'BRAND',
-      verificationToken: token,
-    });
+      await addUser({
+        email,
+        password: hashed,
+        firstName,
+        lastName,
+        brandName,
+        phoneNumber,
+        businessAddress,
+        city,
+        country,
+        website: website ?? undefined,
+        businessDescription: businessDescription ?? undefined,
+        taxId: taxId ?? undefined,
+        role: 'BRAND',
+        verificationToken: token,
+      });
     return res.status(201).json({ token });
   } catch (error) {
     return handleApiError(res, error, 'Failed to sign up brand');
