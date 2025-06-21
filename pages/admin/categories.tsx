@@ -118,10 +118,8 @@ export default function Categories() {
   );
 
   function buildTree(list: Category[]): (Category & { children: Category[] })[] {
-    const map: Record<number, Category & { children: Category[] }> = {} as Record<
-      number,
-      Category & { children: Category[] }
-    >;
+    const map: Record<number, Category & { children: Category[] }> =
+      {} as Record<number, Category & { children: Category[] }>;
     list.forEach((c) => {
       map[c.id!] = { ...c, children: [] };
     });
