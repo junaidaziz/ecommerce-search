@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { PasswordInput } from '../../components/form-fields';
 
 const ResetToken: React.FC = () => {
   const router = useRouter();
@@ -26,11 +27,12 @@ const ResetToken: React.FC = () => {
     <div className="max-w-sm mx-auto">
       <h1 className="text-2xl font-bold mb-4">Set New Password</h1>
       <form onSubmit={handleSubmit(submit)} className="space-y-2">
-        <input
-          className="input input-bordered w-full"
-          type="password"
+        <PasswordInput
+          className="w-full"
           placeholder="New Password"
-          {...register('password', { required: true })}
+          register={register}
+          name="password"
+          rules={{ required: true }}
         />
         <button className="btn btn-primary w-full" type="submit">
           Reset Password
