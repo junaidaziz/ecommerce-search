@@ -2,7 +2,11 @@ import Link from 'next/link';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
-import type { FC, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from 'react';
+import type {
+  FC,
+  KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
+} from 'react';
 import { AppContext, AppContextValue } from '../contexts/AppContext';
 import SearchIcon from './icons/SearchIcon';
 import CartIcon from './icons/CartIcon';
@@ -14,6 +18,7 @@ import ElectronicsIcon from './icons/ElectronicsIcon';
 import FashionIcon from './icons/FashionIcon';
 import { Theme } from 'react-select';
 import type { Category } from '../types/category';
+import DEFAULT_CATEGORIES from '../lib/defaultCategories';
 import type {
   CategoriesResponse,
   SuggestionsResponse,
@@ -60,10 +65,17 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
         const res = await fetch('/api/categories');
         if (res.ok) {
           const data: CategoriesResponse = await res.json();
-          setCategories(data.categories || data || []);
+          const list =
+            data.categories && data.categories.length > 0
+              ? data.categories
+              : DEFAULT_CATEGORIES;
+          setCategories(list);
+        } else {
+          setCategories(DEFAULT_CATEGORIES);
         }
       } catch (err) {
         console.error('Failed to load categories', err);
+        setCategories(DEFAULT_CATEGORIES);
       }
     }
     loadCategories();
@@ -104,8 +116,10 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
       if (
         searchRef.current &&
         !searchRef.current.contains(target) &&
-        !(typeof (target as Element).closest === 'function' &&
-          (target as Element).closest('#mega-menu'))
+        !(
+          typeof (target as Element).closest === 'function' &&
+          (target as Element).closest('#mega-menu')
+        )
       ) {
         setMenuOpen(false);
         setShowHistory(false);
@@ -180,7 +194,10 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
     setSearch(term);
     runSearch(term);
   };
-  const itemCount = cart.reduce((sum: number, item: CartItem) => sum + (item.qty || 0), 0);
+  const itemCount = cart.reduce(
+    (sum: number, item: CartItem) => sum + (item.qty || 0),
+    0
+  );
   const submitSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!search.trim()) return;
@@ -195,7 +212,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
 
   const renderCat = (cat: Category): JSX.Element => (
     <li key={cat.id}>
-      <Link href={`/categories/${encodeURIComponent(cat.name)}`}>{cat.name}</Link>
+      <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
+        {cat.name}
+      </Link>
     </li>
   );
   return (
@@ -206,155 +225,157 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
             Home
           </Link>
         </div>
-        <div
-          className="flex-1 flex items-center gap-x-4"
-          onMouseLeave={() => setMenuOpen(false)}
-        >
-          <ul className="menu menu-horizontal gap-2 hidden md:flex">
-            <li className="relative">
-              <button
-                type="button"
-                className="flex items-center gap-1 font-semibold transition-colors duration-200 hover:text-primary"
-                onMouseEnter={() => setMenuOpen(true)}
-                onClick={() => setMenuOpen((o) => !o)}
-                aria-expanded={menuOpen}
-              >
-                Categories
-                <ChevronDownIcon className="w-4 h-4" />
-              </button>
-              {menuOpen && (
-                <div
-                  id="mega-menu"
-                  className="absolute left-0 top-full mt-1 z-40 p-4 bg-base-100 shadow-lg rounded w-screen max-w-3xl"
-                >
-                  <div
-                    className="grid grid-cols-2 md:grid-cols-3 gap-4"
-                    role="menu"
-                  >
-                    {categories.length > 0 ? (
-                      categories.map((cat) => (
-                        <div
-                          key={cat.name}
-                          className="pb-2 border-b last:border-b-0"
-                          role="none"
-                        >
-                          <Link
-                            href={`/categories/${encodeURIComponent(cat.name)}`}
-                            className="flex items-center font-semibold mb-1 transition-colors duration-200 hover:text-primary"
-                          >
-                            {iconMap[cat.name] || null}
-                            {cat.name}
-                          </Link>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-gray-500">No categories found</p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </li>
-          </ul>
-          <form
-            onSubmit={submitSearch}
-            ref={searchRef}
-            className="relative flex-1 max-w-lg"
+        {!(isLoginRoute || isSignupRoute) && (
+          <div
+            className="flex-1 flex items-center gap-x-4"
+            onMouseLeave={() => setMenuOpen(false)}
           >
-            <input
-              className="input input-bordered w-full pr-10"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e: ReactKeyboardEvent<HTMLInputElement>) => {
-                if (suggestions.length === 0) return;
-                if (e.key === 'ArrowDown') {
-                  e.preventDefault();
-                  setActiveIdx((i) => (i + 1) % suggestions.length);
-                } else if (e.key === 'ArrowUp') {
-                  e.preventDefault();
-                  setActiveIdx(
-                    (i) => (i - 1 + suggestions.length) % suggestions.length
-                  );
-                } else if (e.key === 'Enter' && activeIdx >= 0) {
-                  e.preventDefault();
-                  selectSuggestion(suggestions[activeIdx]);
-                }
-              }}
-              placeholder="Search for products, brands..."
-              role="combobox"
-              aria-expanded={suggestions.length > 0 || showHistory}
-              aria-haspopup="listbox"
-              aria-controls="search-suggestions"
-              onFocus={() => setShowHistory(true)}
-            />
-            <SearchIcon className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
-            {suggestions.length > 0 && (
-              <ul
-                id="search-suggestions"
-                role="listbox"
-                className="absolute z-10 bg-white shadow rounded mt-1 w-full max-h-60 overflow-auto"
-              >
-                {suggestions.map((s, idx) => (
-                  <li key={s}>
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={idx === activeIdx}
-                      className={`block w-full text-left px-2 py-1 ${idx === activeIdx ? 'bg-indigo-100 text-indigo-600' : 'hover:bg-base-200'}`}
-                      onMouseEnter={() => setActiveIdx(idx)}
-                      onClick={() => selectSuggestion(s)}
+            <ul className="menu menu-horizontal gap-2 hidden md:flex">
+              <li className="relative">
+                <button
+                  type="button"
+                  className="flex items-center gap-1 font-semibold transition-colors duration-200 hover:text-primary"
+                  onMouseEnter={() => setMenuOpen(true)}
+                  onClick={() => setMenuOpen((o) => !o)}
+                  aria-expanded={menuOpen}
+                >
+                  Categories
+                  <ChevronDownIcon className="w-4 h-4" />
+                </button>
+                {menuOpen && (
+                  <div
+                    id="mega-menu"
+                    className="absolute left-0 top-full mt-1 z-40 p-4 bg-base-100 shadow-lg rounded w-screen max-w-3xl"
+                  >
+                    <div
+                      className="grid grid-cols-2 md:grid-cols-3 gap-4"
+                      role="menu"
                     >
-                      {s}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {showHistory && suggestions.length === 0 && (
-              <ul
-                id="search-suggestions"
-                role="listbox"
-                className="absolute z-10 bg-white shadow rounded mt-1 w-full max-h-60 overflow-auto"
-              >
-                {recentSearches.length > 0 && (
-                  <>
-                    <li className="px-2 py-1 text-xs text-gray-500">
-                      Recent Searches
-                    </li>
-                    {recentSearches.map((term) => (
-                      <li key={`recent-${term}`}>
-                        <button
-                          type="button"
-                          className="block w-full text-left px-2 py-1 hover:bg-base-200"
-                          onClick={() => chooseTerm(term)}
-                        >
-                          {term}
-                        </button>
-                      </li>
-                    ))}
-                  </>
+                      {categories.length > 0 ? (
+                        categories.map((cat) => (
+                          <div
+                            key={cat.name}
+                            className="pb-2 border-b last:border-b-0"
+                            role="none"
+                          >
+                            <Link
+                              href={`/categories/${encodeURIComponent(cat.name)}`}
+                              className="flex items-center font-semibold mb-1 transition-colors duration-200 hover:text-primary"
+                            >
+                              {iconMap[cat.name] || null}
+                              {cat.name}
+                            </Link>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500">No categories found</p>
+                      )}
+                    </div>
+                  </div>
                 )}
-                {trendingKeywords.length > 0 && (
-                  <>
-                    <li className="px-2 py-1 text-xs text-gray-500">
-                      Trending
+              </li>
+            </ul>
+            <form
+              onSubmit={submitSearch}
+              ref={searchRef}
+              className="relative flex-1 max-w-lg"
+            >
+              <input
+                className="input input-bordered w-full pr-10"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e: ReactKeyboardEvent<HTMLInputElement>) => {
+                  if (suggestions.length === 0) return;
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setActiveIdx((i) => (i + 1) % suggestions.length);
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setActiveIdx(
+                      (i) => (i - 1 + suggestions.length) % suggestions.length
+                    );
+                  } else if (e.key === 'Enter' && activeIdx >= 0) {
+                    e.preventDefault();
+                    selectSuggestion(suggestions[activeIdx]);
+                  }
+                }}
+                placeholder="Search for products, brands..."
+                role="combobox"
+                aria-expanded={suggestions.length > 0 || showHistory}
+                aria-haspopup="listbox"
+                aria-controls="search-suggestions"
+                onFocus={() => setShowHistory(true)}
+              />
+              <SearchIcon className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
+              {suggestions.length > 0 && (
+                <ul
+                  id="search-suggestions"
+                  role="listbox"
+                  className="absolute z-10 bg-white shadow rounded mt-1 w-full max-h-60 overflow-auto"
+                >
+                  {suggestions.map((s, idx) => (
+                    <li key={s}>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={idx === activeIdx}
+                        className={`block w-full text-left px-2 py-1 ${idx === activeIdx ? 'bg-indigo-100 text-indigo-600' : 'hover:bg-base-200'}`}
+                        onMouseEnter={() => setActiveIdx(idx)}
+                        onClick={() => selectSuggestion(s)}
+                      >
+                        {s}
+                      </button>
                     </li>
-                    {trendingKeywords.map((term) => (
-                      <li key={`trend-${term}`}>
-                        <button
-                          type="button"
-                          className="block w-full text-left px-2 py-1 hover:bg-base-200"
-                          onClick={() => chooseTerm(term)}
-                        >
-                          {term}
-                        </button>
+                  ))}
+                </ul>
+              )}
+              {showHistory && suggestions.length === 0 && (
+                <ul
+                  id="search-suggestions"
+                  role="listbox"
+                  className="absolute z-10 bg-white shadow rounded mt-1 w-full max-h-60 overflow-auto"
+                >
+                  {recentSearches.length > 0 && (
+                    <>
+                      <li className="px-2 py-1 text-xs text-gray-500">
+                        Recent Searches
                       </li>
-                    ))}
-                  </>
-                )}
-              </ul>
-            )}
-          </form>
-        </div>
+                      {recentSearches.map((term) => (
+                        <li key={`recent-${term}`}>
+                          <button
+                            type="button"
+                            className="block w-full text-left px-2 py-1 hover:bg-base-200"
+                            onClick={() => chooseTerm(term)}
+                          >
+                            {term}
+                          </button>
+                        </li>
+                      ))}
+                    </>
+                  )}
+                  {trendingKeywords.length > 0 && (
+                    <>
+                      <li className="px-2 py-1 text-xs text-gray-500">
+                        Trending
+                      </li>
+                      {trendingKeywords.map((term) => (
+                        <li key={`trend-${term}`}>
+                          <button
+                            type="button"
+                            className="block w-full text-left px-2 py-1 hover:bg-base-200"
+                            onClick={() => chooseTerm(term)}
+                          >
+                            {term}
+                          </button>
+                        </li>
+                      ))}
+                    </>
+                  )}
+                </ul>
+              )}
+            </form>
+          </div>
+        )}
         <nav className="flex flex-none items-center gap-x-2">
           <ul className="menu menu-horizontal gap-x-2 items-center">
             <li className="relative mr-1">
@@ -375,7 +396,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 <input
                   type="checkbox"
                   checked={theme === 'dark'}
-                  onChange={() => setTheme && setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  onChange={() =>
+                    setTheme && setTheme(theme === 'dark' ? 'light' : 'dark')
+                  }
                   aria-label="Toggle Dark Mode"
                 />
                 <MoonIcon className="swap-on fill-current w-5 h-5" />
@@ -486,7 +509,11 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                         <li key={cat.name}>
                           <div className="flex items-center gap-1">
                             {iconMap[cat.name] || null}
-                            <Link href={`/categories/${encodeURIComponent(cat.name)}`}>{cat.name}</Link>
+                            <Link
+                              href={`/categories/${encodeURIComponent(cat.name)}`}
+                            >
+                              {cat.name}
+                            </Link>
                           </div>
                         </li>
                       ))
