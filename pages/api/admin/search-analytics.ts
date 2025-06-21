@@ -6,7 +6,7 @@ import { handleApiError } from '../../../lib/utils/handleApiError';
 
 interface SearchLog {
   query: string;
-  noResults?: boolean | null;
+  noResults: boolean;
 }
 
 async function handler(
