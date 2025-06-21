@@ -29,6 +29,8 @@ export interface Product {
   IMAGES_URLS?: string[];
   IMAGES_ALT_TEXT?: string[];
   STATUS?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type ProductResponse = Product;
