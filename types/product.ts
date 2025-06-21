@@ -42,7 +42,7 @@ export interface Product extends ProductBase {
 
 type ProductResponse = Product;
 
-type ProductInput = Pick<
+export type ProductInput = Pick<
   PrismaProduct,
   | 'sku'
   | 'title'
