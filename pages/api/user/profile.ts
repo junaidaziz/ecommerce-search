@@ -3,8 +3,12 @@ import { updateUserProfile, findUser } from '../../../lib/users';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import type { User, ApiMessage } from '../../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<User | ApiMessage>
+): Promise<void> {
   try {
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user) {

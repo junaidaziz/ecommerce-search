@@ -1,11 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { findUser } from '../../lib/users';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import type { ApiMessage } from '../../types';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<{ exists: boolean } | { message: string }>
-) {
+  res: NextApiResponse<{ exists: boolean } | ApiMessage>
+): Promise<void> {
   try {
     const { email } = req.query;
     if (!email) {

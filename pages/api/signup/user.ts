@@ -3,11 +3,12 @@ import { addUser, findUser } from '../../../lib/users';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import type { SignupTokenResponse, ApiMessage } from '../../../types';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<{ token: string } | { message: string }>
-) {
+  res: NextApiResponse<SignupTokenResponse | ApiMessage>
+): Promise<void> {
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ message: 'Method Not Allowed' });
