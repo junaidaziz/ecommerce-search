@@ -1,14 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { updateUserProfile, findUser } from '../../../lib/users';
-import type { Vendor } from '../../../types';
+import type { Vendor, ApiMessage } from '../../../types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Vendor | { message: string }>
-) {
+  res: NextApiResponse<Vendor | ApiMessage>
+): Promise<void> {
   try {
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user) {

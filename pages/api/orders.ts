@@ -14,8 +14,12 @@ import {
 import { withRole } from '../../lib/withRole';
 import { sendOrderConfirmation } from '../../lib/email';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import type { Order, OrderPlacedResponse, ApiMessage } from '../../types';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Order[] | OrderPlacedResponse | ApiMessage>
+): Promise<void> {
   try {
     if (req.method === 'POST') {
       const { email, items, total, shippingName, shippingAddress } = req.body;

@@ -2,8 +2,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { findUser, setResetToken } from '../../lib/users';
 import crypto from 'crypto';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import type { ResetTokenResponse, ApiMessage } from '../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ResetTokenResponse | ApiMessage>
+): Promise<void> {
   try {
     if (req.method !== 'POST')
       return res.status(405).json({ message: 'Method Not Allowed' });

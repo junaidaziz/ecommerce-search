@@ -1,8 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { verifyUser } from '../../lib/users';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import type { ApiMessage } from '../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ApiMessage>
+): Promise<void> {
   const { token } = req.query;
   if (!token) return res.status(400).json({ message: 'token required' });
   try {

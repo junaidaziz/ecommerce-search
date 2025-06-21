@@ -3,8 +3,12 @@ import { getOrdersForUser } from '../../../lib/orders';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import type { Order, ApiMessage } from '../../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Order[] | ApiMessage>
+): Promise<void> {
   try {
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user) {
