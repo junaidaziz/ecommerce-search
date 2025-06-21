@@ -26,7 +26,7 @@ const ResetToken: React.FC = () => {
 
   return (
     <div className="max-w-sm mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Set New Password</h1>
+      <h1 className="text-2xl font-bold mb-4 text-center">Set New Password</h1>
       <form onSubmit={handleSubmit(submit)} className="space-y-2">
         <PasswordInput
           className="w-full"
