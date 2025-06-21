@@ -42,19 +42,19 @@ export default async function handler(
     }
     const hashed = await bcrypt.hash(password, 10);
     const token = crypto.randomBytes(20).toString('hex');
-    await addUser({
-      email,
-      password: hashed,
-      firstName,
-      lastName,
-      gender: gender || '',
-      phoneNumber: phoneNumber || null,
-      address: address || null,
-      city: city || null,
-      country: country || null,
-      role: 'USER',
-      verificationToken: token,
-    });
+      await addUser({
+        email,
+        password: hashed,
+        firstName,
+        lastName,
+        gender: gender || '',
+        phoneNumber: phoneNumber ?? undefined,
+        address: address ?? undefined,
+        city: city ?? undefined,
+        country: country ?? undefined,
+        role: 'USER',
+        verificationToken: token,
+      });
     return res.status(201).json({ token });
   } catch (error) {
     return handleApiError(res, error, 'Failed to sign up user');

@@ -21,7 +21,6 @@ export default async function handler(
       }
       const vendor: Vendor = {
         id: Number(userData.id),
-        name: `${userData.firstName} ${userData.lastName}`.trim(),
         email: userData.email,
         brandName: userData.brandName ?? '',
         phoneNumber: userData.phoneNumber ?? undefined,

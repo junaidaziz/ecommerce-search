@@ -88,6 +88,7 @@ export const BrandProfile: React.FC = () => {
       {message && <div className="mb-2 text-green-600">{message}</div>}
       <form onSubmit={submit} className="space-y-2">
         <TextInput
+          name="brandName"
           value={brandName}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setBrandName(e.target.value)
@@ -95,6 +96,7 @@ export const BrandProfile: React.FC = () => {
           placeholder="Brand Name"
         />
         <TextInput
+          name="phoneNumber"
           value={phoneNumber}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setPhoneNumber(e.target.value)
@@ -102,6 +104,7 @@ export const BrandProfile: React.FC = () => {
           placeholder="Phone Number"
         />
         <TextInput
+          name="businessAddress"
           value={businessAddress}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setBusinessAddress(e.target.value)
@@ -109,6 +112,7 @@ export const BrandProfile: React.FC = () => {
           placeholder="Business Address"
         />
         <TextInput
+          name="city"
           value={city}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setCity(e.target.value)
@@ -116,6 +120,7 @@ export const BrandProfile: React.FC = () => {
           placeholder="City"
         />
         <TextInput
+          name="country"
           value={country}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setCountry(e.target.value)
@@ -123,6 +128,7 @@ export const BrandProfile: React.FC = () => {
           placeholder="Country"
         />
         <TextInput
+          name="website"
           value={website}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setWebsite(e.target.value)
@@ -130,6 +136,7 @@ export const BrandProfile: React.FC = () => {
           placeholder="Website"
         />
         <Textarea
+          name="businessDescription"
           value={businessDescription}
           onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
             setBusinessDescription(e.target.value)
@@ -137,6 +144,7 @@ export const BrandProfile: React.FC = () => {
           placeholder="Business Description"
         />
         <TextInput
+          name="taxId"
           value={taxId}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setTaxId(e.target.value)

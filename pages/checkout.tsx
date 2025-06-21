@@ -116,6 +116,7 @@ const Checkout: React.FC = () => {
           </label>
           <div className="flex gap-2">
             <TextInput
+              name="coupon"
               id="coupon"
               className="flex-1"
               value={coupon}
@@ -158,8 +159,9 @@ const Checkout: React.FC = () => {
           <label className="label" htmlFor="name">
             Name
           </label>
-          <TextInput
-            id="name"
+            <TextInput
+              name="name"
+              id="name"
             className="w-full"
             value={name}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -172,8 +174,9 @@ const Checkout: React.FC = () => {
           <label className="label" htmlFor="address">
             Address
           </label>
-          <Textarea
-            id="address"
+            <Textarea
+              name="address"
+              id="address"
             className="w-full"
             value={address}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>

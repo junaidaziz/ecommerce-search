@@ -22,6 +22,7 @@ const RequestReset: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
       <form onSubmit={submit} className="space-y-2">
         <TextInput
+          name="email"
           className="w-full"
           value={email}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>

@@ -79,7 +79,7 @@ const Products: React.FC = () => {
                 className="bg-base-100 rounded-lg shadow-md p-4 flex flex-col hover:shadow-xl transition"
               >
                 <h2 className="font-semibold text-primary mb-1">{p.title}</h2>
-                <p className="mb-2 text-sm text-base-content/60">{p.vendor}</p>
+                <p className="mb-2 text-sm text-base-content/60">{p.vendor.brandName}</p>
                 <button
                   className="btn btn-sm btn-secondary mt-auto"
                   onClick={() => addToCart(p)}
