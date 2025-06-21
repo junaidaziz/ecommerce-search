@@ -1,22 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../contexts/AppContext';
-
-// Define types for order items and orders
-type OrderItem = {
-  id: string | number;
-  title: string;
-  qty: number;
-};
-
-type Order = {
-  id: string | number;
-  status: string;
-  shipping_name?: string;
-  shipping_address?: string;
-  user_email?: string;
-  items: OrderItem[];
-  total: number;
-};
+import type { Order } from '../types';
 
 type OrdersProps = {};
 
@@ -58,14 +42,8 @@ const Orders: React.FC<OrdersProps> = (_props) => {
             <p>
               Order #{o.id} - {o.status}
             </p>
-            {o.shipping_name && (
-              <p className="text-sm">Ship To: {o.shipping_name}</p>
-            )}
-            {o.shipping_address && (
-              <p className="text-sm">Address: {o.shipping_address}</p>
-            )}
-            {(user.role === 'super-admin' || user.role === 'brand') && (
-              <p className="text-sm text-gray-600">Customer: {o.user_email}</p>
+            {o.shippingAddress && (
+              <p className="text-sm">Address: {o.shippingAddress}</p>
             )}
             <ul className="list-disc pl-4 text-sm mb-1">
               {o.items.map((item) => (

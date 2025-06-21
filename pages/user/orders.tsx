@@ -1,21 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
-
-// Define types for order items and orders
-type OrderItem = {
-  id: number | string;
-  title: string;
-  qty: number;
-};
-
-type Order = {
-  id: number | string;
-  status: string;
-  shipping_name?: string;
-  shipping_address?: string;
-  items: OrderItem[];
-  total: number;
-};
+import type { Order } from '../../types';
 const UserOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;
   const [orders, setOrders] = useState<Order[]>([]);
@@ -54,11 +39,8 @@ const UserOrders: React.FC = () => {
             <p>
               Order #{o.id} - {o.status}
             </p>
-            {o.shipping_name && (
-              <p className="text-sm">Ship To: {o.shipping_name}</p>
-            )}
-            {o.shipping_address && (
-              <p className="text-sm">Address: {o.shipping_address}</p>
+            {o.shippingAddress && (
+              <p className="text-sm">Address: {o.shippingAddress}</p>
             )}
             <ul className="list-disc pl-4 text-sm mb-1">
               {o.items.map((item) => (
