@@ -196,7 +196,7 @@ export default function UserSignup() {
           }}
           error={errors.email?.message as string}
         />
-        <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-2">
           <PasswordInput
             name="password"
             placeholder="Password"
