@@ -6,6 +6,7 @@ import {
   getAverageRating,
 } from '../../../../lib/db.js';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
+import { getQueryParam } from '../../../../lib/utils/getQueryParam';
 import type {
   Review,
   ReviewsResponse,
@@ -18,9 +19,9 @@ export default async function handler(
   res: NextApiResponse<ReviewsResponse | ReviewAddedResponse | ApiMessage>
 ): Promise<void> {
   const {
-    query: { uuid },
     method,
   } = req;
+  const uuid = getQueryParam(req.query.uuid);
   try {
     if (!uuid) return res.status(400).json({ message: 'uuid required' });
 

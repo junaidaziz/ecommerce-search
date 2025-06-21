@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { findUser } from '../../lib/users';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import { getQueryParam } from '../../lib/utils/getQueryParam';
 import type { ApiMessage } from '../../types';
 
 export default async function handler(
@@ -8,7 +9,7 @@ export default async function handler(
   res: NextApiResponse<{ exists: boolean } | ApiMessage>
 ): Promise<void> {
   try {
-    const { email } = req.query;
+    const email = getQueryParam(req.query.email);
     if (!email) {
       return res.status(400).json({ message: 'email required' });
     }

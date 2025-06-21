@@ -8,6 +8,7 @@ import {
 import { withRole } from '../../../lib/withRole';
 import { logAudit } from '../../../lib/audit';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import { Category, CategoryInput, ApiMessage } from '../../../types';
 
 async function handler(
@@ -48,7 +49,7 @@ async function handler(
       return res.status(200).json({ message: 'category updated' });
     }
     if (req.method === 'DELETE') {
-      const { uuid } = req.query;
+      const uuid = getQueryParam(req.query.uuid);
       if (!uuid) return res.status(400).json({ message: 'uuid required' });
       try {
         await removeCategory(String(uuid));

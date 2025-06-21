@@ -9,6 +9,7 @@ import {
 import type { Role } from '@prisma/client';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import {
   AdminUser,
   UserRoleUpdateRequest,
@@ -41,9 +42,9 @@ async function handler(
       return res.status(200).json({ message: 'status updated' });
     }
     if (req.method === 'DELETE') {
-      const { email } = req.query;
-      if (!email) return res.status(400).json({ message: 'email required' });
-      await deleteUser(String(email));
+        const email = getQueryParam(req.query.email);
+        if (!email) return res.status(400).json({ message: 'email required' });
+        await deleteUser(email);
       return res.status(200).json({ message: 'user deleted' });
     }
     if (req.method === 'POST') {
