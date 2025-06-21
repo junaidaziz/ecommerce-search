@@ -3,8 +3,8 @@ import { AppContext } from '../../contexts/AppContext';
 
 // Define types for order items and orders
 type OrderItem = {
-  ID: number | string;
-  TITLE: string;
+  id: number | string;
+  title: string;
   qty: number;
 };
 
@@ -62,8 +62,8 @@ const UserOrders: React.FC = () => {
             )}
             <ul className="list-disc pl-4 text-sm mb-1">
               {o.items.map((item) => (
-                <li key={item.ID}>
-                  {item.TITLE} x {item.qty}
+                <li key={item.id}>
+                  {item.title} x {item.qty}
                 </li>
               ))}
             </ul>
