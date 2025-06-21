@@ -6,7 +6,7 @@ import {
 } from 'next-auth/react';
 import { NotificationContext } from './NotificationContext';
 
-import { User } from '../types/user';
+import type { User } from '@prisma/client';
 import { Product } from '../types/product';
 
 export interface AppContextValue {
