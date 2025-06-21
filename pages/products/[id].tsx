@@ -94,7 +94,9 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
           images={
             product.images && product.images.length > 0
               ? product.images
-              : [product.featuredImage?.url || '/placeholder.png']
+              : product.featuredImage
+              ? [product.featuredImage]
+              : []
           }
           imgClass="hover:scale-110 transition"
         />

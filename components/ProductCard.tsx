@@ -30,8 +30,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
           images={
             product.images && product.images.length > 0
               ? product.images
-              : product.featuredImage?.url
-              ? [product.featuredImage.url]
+              : product.featuredImage
+              ? [product.featuredImage]
               : []
           }
           placeholderSeed={Number(product.id)}

@@ -8,6 +8,7 @@ import { NotificationContext } from './NotificationContext';
 
 import type { UserInfo } from '../lib/types';
 import { Product } from '../types/product';
+import type { ShippingInfo } from '../types/shipping';
 
 export interface AppContextValue {
   user: UserInfo | null;
@@ -21,10 +22,7 @@ export interface AppContextValue {
   removeFromCart: (id: string) => void;
   addToWishlist: (product: Product) => void;
   removeFromWishlist: (id: string) => void;
-  placeOrder: (payload: {
-    shippingName: string;
-    shippingAddress: string;
-  }) => Promise<boolean>;
+  placeOrder: (shipping: ShippingInfo) => Promise<boolean>;
 }
 
 export const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -147,7 +145,7 @@ export function AppProvider({ children }: AppProviderProps) {
     addNotification('Logged out', 'info');
   };
 
-  const placeOrder = async ({ shippingName, shippingAddress }: { shippingName: string; shippingAddress: string }): Promise<boolean> => {
+  const placeOrder = async (shipping: ShippingInfo): Promise<boolean> => {
     if (!user || cart.length === 0) return false;
     const res = await fetch('/api/orders', {
       method: 'POST',
@@ -159,8 +157,7 @@ export function AppProvider({ children }: AppProviderProps) {
           (s, i) => s + i.qty * (i.minPrice || 0),
           0
         ),
-        shippingName,
-        shippingAddress,
+        shipping,
       }),
     });
     if (!res.ok) {
