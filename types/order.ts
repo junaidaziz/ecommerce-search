@@ -6,6 +6,7 @@ export interface OrderItem extends Product {
 
 export interface Order {
   id: number;
+  uuid?: string;
   userId: number;
   items: OrderItem[];
   total: number;
@@ -28,6 +29,7 @@ export interface OrderInput {
 
 export interface OrderRow {
   id: number;
+  uuid?: string;
   userId: number;
   user: {
     id: number;

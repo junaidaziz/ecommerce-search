@@ -40,19 +40,19 @@ async function handler(
       return res.status(201).json({ message: 'category created' });
     }
     if (req.method === 'PUT') {
-      const { id, name, parentId, image } = req.body as CategoryInput & { id: number };
-      if (!id || !name)
-        return res.status(400).json({ message: 'id and name required' });
-      await renameCategory(id, name, parentId || null, image || null);
-      logAudit('rename_category', { id, name, parentId, image });
+      const { uuid, name, parentId, image } = req.body as CategoryInput & { uuid: string };
+      if (!uuid || !name)
+        return res.status(400).json({ message: 'uuid and name required' });
+      await renameCategory(uuid, name, parentId || null, image || null);
+      logAudit('rename_category', { uuid, name, parentId, image });
       return res.status(200).json({ message: 'category updated' });
     }
     if (req.method === 'DELETE') {
-      const { id } = req.query;
-      if (!id) return res.status(400).json({ message: 'id required' });
+      const { uuid } = req.query;
+      if (!uuid) return res.status(400).json({ message: 'uuid required' });
       try {
-        await removeCategory(String(id));
-        logAudit('delete_category', { id });
+        await removeCategory(String(uuid));
+        logAudit('delete_category', { uuid });
         return res.status(200).json({ message: 'category deleted' });
       } catch (e: unknown) {
         if (e instanceof Error && e.message === 'category in use') {

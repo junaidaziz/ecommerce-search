@@ -1,16 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { updateProduct, deleteProduct, loadAndIndexProducts } from '../../../../lib/products';
-import { getProductById } from '../../../../lib/db';
+import { getProductByUuid } from '../../../../lib/db';
 import { hasOrdersForProduct } from '../../../../lib/orders';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { id } = req.query;
-    if (!id) return res.status(400).json({ message: 'id required' });
+    const { uuid } = req.query;
+    if (!uuid) return res.status(400).json({ message: 'uuid required' });
 
     if (req.method === 'PUT') {
-      const existing = await getProductById(String(id));
+      const existing = await getProductByUuid(String(uuid));
       if (!existing) return res.status(404).json({ message: 'Not found' });
       const {
         title,
@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       currency,
     } = req.body || {};
     await updateProduct({
-      id: String(id),
+      id: String(uuid),
       title: title ?? existing.title,
       vendor: vendor ?? existing.vendor,
       description: description ?? existing.description,
@@ -45,12 +45,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === 'DELETE') {
-      const existing = await getProductById(String(id));
+      const existing = await getProductByUuid(String(uuid));
       if (!existing) return res.status(404).json({ message: 'Not found' });
-      if (existing.quantity > 0 || hasOrdersForProduct(String(id))) {
+      if (existing.quantity > 0 || hasOrdersForProduct(String(uuid))) {
         return res.status(400).json({ message: 'cannot delete product with stock or orders' });
       }
-      await deleteProduct(String(id));
+      await deleteProduct(String(uuid));
       await loadAndIndexProducts();
       return res.status(200).json({ message: 'product deleted' });
     }

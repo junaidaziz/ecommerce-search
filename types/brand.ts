@@ -1,5 +1,6 @@
 export interface Brand {
   id?: number | string;
+  uuid?: string;
   name: string;
   slug?: string;
   logo?: string;

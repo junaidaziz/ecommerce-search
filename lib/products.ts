@@ -57,6 +57,9 @@ function processProductRow(row: Record<string, unknown>): Product {
   processed.reviewCount = parseInt(meta?.yotpo_reviews_count?.value ?? '0', 10);
   processed.averageRating = parseFloat(meta?.yotpo_reviews_average?.value ?? '0');
   processed.id = String(processed.id);
+  if (row.uuid) {
+    processed.uuid = String(row.uuid);
+  }
   if (processed.slug) {
     processed.slug = String(processed.slug);
   }
@@ -77,6 +80,7 @@ async function loadProductsData(): Promise<Product[]> {
     return rows.map((row: ProductDbRow) =>
       processProductRow({
         id: row.id,
+        uuid: row.uuid,
         slug: row.slug,
         title: row.title,
         vendor: row.vendor?.brandName ?? String(row.vendorId),
@@ -107,6 +111,7 @@ async function loadProductsData(): Promise<Product[]> {
 export function mapDbRowToProduct(row: Record<string, unknown>): Product {
   return processProductRow({
     id: row.id,
+    uuid: row.uuid,
     slug: row.slug,
     title: row.title,
     vendor: row.vendor,
@@ -142,7 +147,8 @@ export async function addProduct(product: Product): Promise<void> {
     ? await db.category.findFirst({ where: { name: product.category } })
     : null;
   const data: any = {
-    id: Number(product.id),
+    id: product.id ? Number(product.id) : undefined,
+    uuid: product.uuid ?? undefined,
     slug: product.slug,
     title: product.title,
     description: product.description ?? '',
@@ -174,7 +180,7 @@ export async function updateProduct(product: Product): Promise<void> {
     ? await db.category.findFirst({ where: { name: product.category } })
     : null;
   await db.product.update({
-    where: { id: Number(product.id) },
+    where: { uuid: product.uuid || String(product.id) },
     data: {
       title: product.title,
       description: product.description,
@@ -217,14 +223,14 @@ export async function getPendingProducts(): Promise<Product[]> {
   );
 }
 
-export async function approveProduct(id: string | number): Promise<void> {
+export async function approveProduct(uuid: string): Promise<void> {
   const db = getDb();
-  await db.product.update({ where: { id: Number(id) }, data: { status: 'approved' } });
+  await db.product.update({ where: { uuid }, data: { status: 'approved' } });
 }
 
-export async function rejectProduct(id: string | number): Promise<void> {
+export async function rejectProduct(uuid: string): Promise<void> {
   const db = getDb();
-  await db.product.update({ where: { id: Number(id) }, data: { status: 'rejected' } });
+  await db.product.update({ where: { uuid }, data: { status: 'rejected' } });
 }
 
 export async function getCategoriesFlat(): Promise<Category[]> {
@@ -284,26 +290,28 @@ export async function createCategory(
 }
 
 export async function renameCategory(
-  id: string | number,
+  uuid: string,
   name: string,
   _parentId: number | null = null,
   _image: string | null = null
 ): Promise<void> {
   const db = getDb();
-  await db.category.update({ where: { id: Number(id) }, data: { name } });
+  await db.category.update({ where: { uuid }, data: { name } });
 }
 
-export async function removeCategory(id: string | number): Promise<void> {
+export async function removeCategory(uuid: string): Promise<void> {
   const db = getDb();
-  const count = await db.product.count({ where: { categoryId: Number(id) } });
+  const category = await db.category.findUnique({ where: { uuid } });
+  if (!category) return;
+  const count = await db.product.count({ where: { categoryId: category.id } });
   if (count === 0) {
-    await db.category.delete({ where: { id: Number(id) } });
+    await db.category.delete({ where: { uuid } });
   } else {
     throw new Error('category in use');
   }
 }
 
-export async function deleteProduct(id: string | number): Promise<void> {
+export async function deleteProduct(uuid: string): Promise<void> {
   const db = getDb();
-  await db.product.delete({ where: { id: Number(id) } });
+  await db.product.delete({ where: { uuid } });
 }

@@ -138,20 +138,20 @@ async function handler(
     }
 
     if (req.method === 'DELETE') {
-      const { id } = req.query;
-      if (!id) {
-        return res.status(400).json({ message: 'id required' });
+      const { uuid } = req.query;
+      if (!uuid) {
+        return res.status(400).json({ message: 'uuid required' });
       }
-      const existing = await db.product.findUnique({ where: { id: Number(id) } });
+      const existing = await db.product.findUnique({ where: { uuid } });
       if (!existing) {
         return res.status(404).json({ message: 'Not found' });
       }
-      if (existing.quantity > 0 || (await hasOrdersForProduct(String(id)))) {
+      if (existing.quantity > 0 || (await hasOrdersForProduct(String(uuid)))) {
         return res
           .status(400)
           .json({ message: 'cannot delete product with stock or orders' });
       }
-      await db.product.delete({ where: { id: Number(id) } });
+      await db.product.delete({ where: { uuid } });
       return res.status(200).json({ message: 'Product deleted' });
     }
 

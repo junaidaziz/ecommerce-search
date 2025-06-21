@@ -1,7 +1,8 @@
 import type { Role } from '@prisma/client';
 
 export interface User {
-  id?: number;
+  id?: string | number;
+  uuid?: string;
   email: string;
   password?: string;
   firstName?: string;
