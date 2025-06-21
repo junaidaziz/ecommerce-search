@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { AppContext, AppContextValue } from '../contexts/AppContext';
 import type { User } from '../types/user';
 import type { Coupon } from '../types';
+import { TextInput, Textarea } from '../components/form-fields';
 
 // Types for cart item and user
 type CartItem = {
@@ -114,9 +115,9 @@ const Checkout: React.FC = () => {
             Coupon Code
           </label>
           <div className="flex gap-2">
-            <input
+            <TextInput
               id="coupon"
-              className="input input-bordered flex-1"
+              className="flex-1"
               value={coupon}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setCoupon(e.target.value)
@@ -157,9 +158,9 @@ const Checkout: React.FC = () => {
           <label className="label" htmlFor="name">
             Name
           </label>
-          <input
+          <TextInput
             id="name"
-            className="input input-bordered w-full"
+            className="w-full"
             value={name}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setName(e.target.value)
@@ -171,9 +172,9 @@ const Checkout: React.FC = () => {
           <label className="label" htmlFor="address">
             Address
           </label>
-          <textarea
+          <Textarea
             id="address"
-            className="textarea textarea-bordered w-full"
+            className="w-full"
             value={address}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
               setAddress(e.target.value)

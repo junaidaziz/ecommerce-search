@@ -10,6 +10,7 @@ import type {
   ReviewsResponse,
   ReviewAddedResponse,
 } from '../../types/review';
+import { SelectDropdown, Textarea } from '../../components/form-fields';
 
 interface ProductDetailProps {}
 
@@ -183,22 +184,21 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
           >
             <div>
               <label className="mr-2">Rating</label>
-              <select
-                value={myRating}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                  setMyRating(parseInt(e.target.value))
+              <SelectDropdown
+                name="rating"
+                value={{ label: String(myRating), value: String(myRating) }}
+                onChange={(opt) =>
+                  setMyRating(opt ? parseInt((opt as any).value) : 5)
                 }
-                className="select select-bordered"
-              >
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
+                options={[1, 2, 3, 4, 5].map((n) => ({
+                  label: String(n),
+                  value: String(n),
+                }))}
+                className="max-w-xs"
+              />
             </div>
-            <textarea
-              className="textarea textarea-bordered w-full"
+            <Textarea
+              className="w-full"
               value={comment}
               onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
                 setComment(e.target.value)

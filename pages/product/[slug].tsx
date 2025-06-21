@@ -13,6 +13,7 @@ import {
 } from '../../lib/db';
 import { mapDbRowToProduct } from '../../lib/products';
 import { Product, Review } from '../../types';
+import { SelectDropdown, Textarea } from '../../components/form-fields';
 
 type ProductDetailProps = {
   product: Product;
@@ -58,9 +59,11 @@ export default function ProductDetail({
   const [averageRating, setAverageRating] = useState<number>(initialAverage);
   const [reviewCount, setReviewCount] = useState<number>(initialCount);
   type ReviewForm = { rating: number; comment: string };
-  const { register, handleSubmit, reset, watch } = useForm<ReviewForm>({
-    defaultValues: { rating: 5, comment: '' },
-  });
+  const { register, handleSubmit, reset, watch, control } = useForm<ReviewForm>(
+    {
+      defaultValues: { rating: 5, comment: '' },
+    }
+  );
   const myRating = watch('rating');
   const id = product.id;
 
@@ -188,21 +191,22 @@ export default function ProductDetail({
           >
             <div>
               <label className="mr-2">Rating</label>
-              <select
-                className="select select-bordered"
-                {...register('rating', { valueAsNumber: true })}
-              >
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
+              <SelectDropdown
+                name="rating"
+                control={control}
+                options={[1, 2, 3, 4, 5].map((n) => ({
+                  label: String(n),
+                  value: String(n),
+                }))}
+                rules={{ valueAsNumber: true }}
+                className="max-w-xs"
+              />
             </div>
-            <textarea
-              className="textarea textarea-bordered w-full"
+            <Textarea
+              className="w-full"
               placeholder="Write a review"
-              {...register('comment')}
+              register={register}
+              name="comment"
             />
             <button
               className="btn btn-sm btn-primary transition-all duration-200"

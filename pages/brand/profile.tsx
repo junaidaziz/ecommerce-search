@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import type { User, Vendor } from '../../types';
+import { TextInput, Textarea } from '../../components/form-fields';
 
 export const BrandProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
@@ -86,64 +87,56 @@ export const BrandProfile: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4">Brand Profile</h1>
       {message && <div className="mb-2 text-green-600">{message}</div>}
       <form onSubmit={submit} className="space-y-2">
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={brandName}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setBrandName(e.target.value)
           }
           placeholder="Brand Name"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={phoneNumber}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setPhoneNumber(e.target.value)
           }
           placeholder="Phone Number"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={businessAddress}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setBusinessAddress(e.target.value)
           }
           placeholder="Business Address"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={city}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setCity(e.target.value)
           }
           placeholder="City"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={country}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setCountry(e.target.value)
           }
           placeholder="Country"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={website}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setWebsite(e.target.value)
           }
           placeholder="Website"
         />
-        <textarea
-          className="textarea textarea-bordered w-full"
+        <Textarea
           value={businessDescription}
           onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
             setBusinessDescription(e.target.value)
           }
           placeholder="Business Description"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={taxId}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setTaxId(e.target.value)
