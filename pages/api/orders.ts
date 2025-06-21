@@ -24,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     for (const item of items) {
-      const product = await getProductById(String(item.ID));
+      const product = await getProductById(String(item.id));
       if (!product) {
         return res.status(404).json({ message: 'Product not found' });
       }
@@ -36,7 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     for (const item of items) {
-      await decreaseProductQuantity(String(item.ID), item.qty);
+      await decreaseProductQuantity(String(item.id), item.qty);
     }
 
     const orderId = await addOrder({

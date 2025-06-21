@@ -145,7 +145,7 @@ export function AppProvider({ children }: AppProviderProps) {
         email: user.email,
         items: cart,
         total: cart.reduce(
-          (s, i) => s + i.qty * (i.MIN_PRICE || 0),
+          (s, i) => s + i.qty * (i.minPrice || 0),
           0
         ),
         shippingName,
@@ -165,43 +165,39 @@ export function AppProvider({ children }: AppProviderProps) {
   const addToCart = (product: Product) => {
     let qty = 1;
     setCart((prev) => {
-      const existing = prev.find((p) => p.ID === product.ID);
+      const existing = prev.find((p) => p.id === product.id);
       if (existing) {
         qty = existing.qty + 1;
-        return prev.map((p) =>
-          p.ID === product.ID ? { ...p, qty } : p
-        );
+        return prev.map((p) => (p.id === product.id ? { ...p, qty } : p));
       }
       return [...prev, { ...product, qty }];
     });
-    addNotification(`Added ${product.TITLE} (x${qty}) to cart`, 'success', 'center');
+    addNotification(`Added ${product.title} (x${qty}) to cart`, 'success', 'center');
   };
 
   const changeQty = (id: string, delta: number) => {
     setCart((prev) => {
       return prev
-        .map((item) =>
-          item.ID === id ? { ...item, qty: item.qty + delta } : item
-        )
+        .map((item) => (item.id === id ? { ...item, qty: item.qty + delta } : item))
         .filter((item) => item.qty > 0);
     });
   };
 
   const removeFromCart = (id: string) => {
-    setCart((prev) => prev.filter((item) => item.ID !== id));
+    setCart((prev) => prev.filter((item) => item.id !== id));
     addNotification('Removed from cart', 'info');
   };
 
   const addToWishlist = (product: Product) => {
     setWishlist((prev) => {
-      if (prev.find((p) => p.ID === product.ID)) return prev;
+      if (prev.find((p) => p.id === product.id)) return prev;
       return [...prev, product];
     });
     addNotification('Added to wishlist', 'success');
   };
 
   const removeFromWishlist = (id: string) => {
-    setWishlist((prev) => prev.filter((item) => item.ID !== id));
+    setWishlist((prev) => prev.filter((item) => item.id !== id));
     addNotification('Removed from wishlist', 'info');
   };
 

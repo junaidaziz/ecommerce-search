@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!id || !title || !vendor) {
       return res.status(400).json({ message: 'id, title, vendor required' });
     }
-    addProduct({
+    await addProduct({
       id: String(id),
       slug: slugify(title || String(id)),
       title,

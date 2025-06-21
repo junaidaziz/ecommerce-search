@@ -1,14 +1,15 @@
-import { useContext } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import React, { useContext } from 'react';
 import Link from 'next/link';
+import { AppContext, AppContextValue } from '../../contexts/AppContext';
 
-export default function UserWishlist() {
-  const { user, wishlist, addToCart, removeFromWishlist } =
-    useContext(AppContext)!;
+const UserWishlist: React.FC = () => {
+  const context = useContext<AppContextValue | undefined>(AppContext);
 
-  if (!user) {
+  if (!context || !context.user) {
     return <div className="p-4">Please log in to view wishlist.</div>;
   }
+
+  const { wishlist, addToCart, removeFromWishlist } = context;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -16,12 +17,12 @@ export default function UserWishlist() {
       <ul className="space-y-2">
         {wishlist.map((item) => (
           <li
-            key={item.ID}
+            key={item.id}
             className="border p-2 flex justify-between items-center"
           >
             <div>
-              <Link href={`/product/${item.SLUG}`} className="font-semibold">
-                {item.TITLE}
+              <Link href={`/product/${item.slug}`} className="font-semibold">
+                {item.title}
               </Link>
             </div>
             <div className="flex gap-2">
@@ -30,7 +31,7 @@ export default function UserWishlist() {
               </button>
               <button
                 className="btn btn-sm"
-                onClick={() => removeFromWishlist(item.ID)}
+                onClick={() => removeFromWishlist(item.id)}
               >
                 Remove
               </button>
@@ -41,4 +42,6 @@ export default function UserWishlist() {
       </ul>
     </div>
   );
-}
+};
+
+export default UserWishlist;

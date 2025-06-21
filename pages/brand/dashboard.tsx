@@ -1,26 +1,33 @@
-import { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback, ChangeEvent, FormEvent } from 'react';
 import { AppContext } from '../../contexts/AppContext';
+import type { User } from '../../types/user';
 
-export default function BrandDashboard() {
-  const { user } = useContext(AppContext)!;
-  const emptyForm = {
-    id: '',
-    title: '',
-    vendor: '',
-    description: '',
-    product_type: '',
-    tags: '',
-    category: '',
-    quantity: 0,
-    min_price: 0,
-    max_price: 0,
-    currency: 'USD',
-  };
-  const [form, setForm] = useState(emptyForm);
-  const [products, setProducts] = useState([]);
-  const [lowStock, setLowStock] = useState([]);
-  const [message, setMessage] = useState('');
-  const [editingId, setEditingId] = useState(null);
+type ProductForm = Partial<Product>;
+
+type ProductApi = Product;
+
+
+const emptyForm: ProductForm = {
+  id: '',
+  title: '',
+  vendor: '',
+  description: '',
+  productType: '',
+  tags: '',
+  category: '',
+  quantity: 0,
+  minPrice: 0,
+  maxPrice: 0,
+  currency: 'USD',
+};
+
+const BrandDashboard: React.FC = () => {
+  const { user } = useContext(AppContext) as { user: User | null };
+  const [form, setForm] = useState<ProductForm>(emptyForm);
+  const [products, setProducts] = useState<ProductApi[]>([]);
+  const [lowStock, setLowStock] = useState<ProductApi[]>([]);
+  const [message, setMessage] = useState<string>('');
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchProducts = useCallback(async () => {
     if (!user) return;
@@ -42,11 +49,18 @@ export default function BrandDashboard() {
     fetchProducts();
   }, [fetchProducts]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]:
+        name === 'quantity' || name === 'minPrice' || name === 'maxPrice'
+          ? Number(value)
+          : value,
+    }));
   };
 
-  const submit = async (e) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const payload = editingId ? { ...form, id: editingId } : form;
     const url = editingId
@@ -56,7 +70,19 @@ export default function BrandDashboard() {
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        id: payload.id,
+        title: payload.title,
+        vendor: payload.vendor,
+        description: payload.description,
+        product_type: payload.productType,
+        tags: payload.tags,
+        category: payload.category,
+        quantity: payload.quantity,
+        min_price: payload.minPrice,
+        max_price: payload.maxPrice,
+        currency: payload.currency,
+      }),
     });
     if (res.ok) {
       setMessage(editingId ? 'Product updated' : 'Product added');
@@ -69,21 +95,21 @@ export default function BrandDashboard() {
     }
   };
 
-  const handleEdit = (p) => {
+  const handleEdit = (p: ProductApi) => {
     setForm({
-      id: p.ID,
-      title: p.TITLE || '',
-      vendor: p.VENDOR || '',
-      description: p.DESCRIPTION || '',
-      product_type: p.PRODUCT_TYPE || '',
-      tags: p.TAGS || '',
-      category: p.CATEGORY || '',
-      quantity: p.TOTAL_INVENTORY || 0,
-      min_price: p.MIN_PRICE || 0,
-      max_price: p.MAX_PRICE || 0,
-      currency: p.CURRENCY || 'USD',
+      id: p.id,
+      title: p.title || '',
+      vendor: p.vendor || '',
+      description: p.description || '',
+      productType: p.productType || '',
+      tags: p.tags || '',
+      category: p.category || '',
+      quantity: p.totalInventory || 0,
+      minPrice: p.minPrice || 0,
+      maxPrice: p.maxPrice || 0,
+      currency: p.currency || 'USD',
     });
-    setEditingId(p.ID);
+    setEditingId(p.id);
   };
 
   const cancelEdit = () => {
@@ -91,8 +117,8 @@ export default function BrandDashboard() {
     setForm(emptyForm);
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Delete this product?')) return;
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this product?')) return;
     const res = await fetch(`/api/brand/products/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     });
@@ -119,19 +145,21 @@ export default function BrandDashboard() {
       )}
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <form onSubmit={submit} className="space-y-2 mb-6">
-        {[
-          'id',
-          'title',
-          'vendor',
-          'description',
-          'product_type',
-          'tags',
-          'category',
-          'quantity',
-          'min_price',
-          'max_price',
-          'currency',
-        ].map((field) => (
+        {(
+          [
+            'id',
+            'title',
+            'vendor',
+            'description',
+            'productType',
+            'tags',
+            'category',
+            'quantity',
+            'minPrice',
+            'maxPrice',
+            'currency',
+          ] as (keyof ProductForm)[]
+        ).map((field) => (
           <div key={field}>
             <label className="label capitalize">
               <span className="label-text">{field.replace('_', ' ')}</span>
@@ -142,6 +170,13 @@ export default function BrandDashboard() {
               onChange={handleChange}
               placeholder={field}
               className="input input-bordered w-full"
+              type={
+                field === 'quantity' ||
+                field === 'minPrice' ||
+                field === 'maxPrice'
+                  ? 'number'
+                  : 'text'
+              }
             />
           </div>
         ))}
@@ -159,9 +194,9 @@ export default function BrandDashboard() {
       <h2 className="text-xl font-semibold mb-2">Existing Products</h2>
       <ul className="space-y-1">
         {products.map((p) => (
-          <li key={p.ID} className="flex justify-between items-center gap-2">
+          <li key={p.id} className="flex justify-between items-center gap-2">
             <span>
-              {p.TITLE} - {p.CATEGORY || p.PRODUCT_TYPE}
+              {p.title} - {p.category || p.productType}
             </span>
             <div className="flex gap-2">
               <button
@@ -174,7 +209,7 @@ export default function BrandDashboard() {
               <button
                 type="button"
                 className="btn btn-sm btn-error"
-                onClick={() => handleDelete(p.ID)}
+                onClick={() => handleDelete(p.id)}
               >
                 Delete
               </button>
@@ -184,4 +219,6 @@ export default function BrandDashboard() {
       </ul>
     </div>
   );
-}
+};
+
+export default BrandDashboard;

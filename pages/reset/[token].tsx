@@ -1,13 +1,13 @@
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 
-export default function ResetToken() {
+const ResetToken: React.FC = () => {
   const router = useRouter();
-  const { token } = router.query;
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const { token } = router.query as { token?: string };
+  const [password, setPassword] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
 
-  const submit = async (e) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const res = await fetch('/api/reset-password', {
       method: 'POST',
@@ -29,7 +29,7 @@ export default function ResetToken() {
           className="input input-bordered w-full"
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
           placeholder="New Password"
         />
         <button className="btn btn-primary w-full" type="submit">
@@ -39,4 +39,6 @@ export default function ResetToken() {
       {message && <p className="mt-2">{message}</p>}
     </div>
   );
-}
+};
+
+export default ResetToken;

@@ -1,5 +1,43 @@
+import { OrderRow, Order } from '../types';
 import { getDb } from './db';
 import { mapDbRowToProduct } from './products';
+
+function mapOrderRow(row: OrderRow): Order {
+  return {
+    id: row.id,
+    userId: row.userId,
+    items: [
+      {
+        ...mapDbRowToProduct({
+          id: row.product.id,
+          slug: row.product.slug,
+          title: row.product.title,
+          vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
+          description: row.product.description,
+          product_type: row.product.productType,
+          tags: Array.isArray(row.product.tags)
+            ? row.product.tags
+            : typeof row.product.tags === 'string'
+            ? row.product.tags.split(',').map((t) => t.trim()).filter(Boolean)
+            : [],
+          category: row.product.category?.name,
+          images: row.product.images,
+          quantity: row.product.quantity,
+          min_price: row.product.minPrice,
+          max_price: row.product.maxPrice,
+          currency: row.product.currency,
+        }),
+        qty: row.quantity,
+      },
+    ],
+    total: row.total,
+    status: row.status,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+    paymentMethod: undefined,
+    shippingAddress: undefined,
+  };
+}
 
 export async function addOrder({
   user_email,
@@ -24,7 +62,7 @@ export async function addOrder({
     const created = await db.order.create({
       data: {
         user: { connect: { id: user.id } },
-        product: { connect: { id: Number(item.ID) } },
+        product: { connect: { id: Number(item.id) } },
         quantity: item.qty || 1,
         total,
         status,
@@ -44,35 +82,7 @@ export async function getOrdersForUser(email: string) {
     include: { product: { include: { vendor: true, category: true } } },
     orderBy: { createdAt: 'desc' },
   });
-  return rows.map((row) => ({
-    id: row.id,
-    user_email: email,
-    items: [
-      {
-        ...mapDbRowToProduct({
-          id: row.product.id,
-          slug: row.product.slug,
-          title: row.product.title,
-          vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
-          description: row.product.description,
-          product_type: row.product.productType,
-          tags: row.product.tags,
-          category: row.product.category?.name,
-          images: row.product.images,
-          quantity: row.product.quantity,
-          min_price: row.product.minPrice,
-          max_price: row.product.maxPrice,
-          currency: row.product.currency,
-        }),
-        qty: row.quantity,
-      },
-    ],
-    total: row.total,
-    status: row.status,
-    shipping_name: null,
-    shipping_address: null,
-    created_at: row.createdAt,
-  }));
+  return rows.map(mapOrderRow);
 }
 
 export async function getAllOrders() {
@@ -81,35 +91,7 @@ export async function getAllOrders() {
     include: { user: true, product: { include: { vendor: true, category: true } } },
     orderBy: { createdAt: 'desc' },
   });
-  return rows.map((row) => ({
-    id: row.id,
-    user_email: row.user.email,
-    items: [
-      {
-        ...mapDbRowToProduct({
-          id: row.product.id,
-          slug: row.product.slug,
-          title: row.product.title,
-          vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
-          description: row.product.description,
-          product_type: row.product.productType,
-          tags: row.product.tags,
-          category: row.product.category?.name,
-          images: row.product.images,
-          quantity: row.product.quantity,
-          min_price: row.product.minPrice,
-          max_price: row.product.maxPrice,
-          currency: row.product.currency,
-        }),
-        qty: row.quantity,
-      },
-    ],
-    total: row.total,
-    status: row.status,
-    shipping_name: null,
-    shipping_address: null,
-    created_at: row.createdAt,
-  }));
+  return rows.map(mapOrderRow);
 }
 
 export async function getOrdersForVendor(vendor: string) {
@@ -120,35 +102,7 @@ export async function getOrdersForVendor(vendor: string) {
   });
   return rows
     .filter((row) => row.product.vendor?.brandName === vendor)
-    .map((row) => ({
-      id: row.id,
-      user_email: row.user.email,
-      items: [
-        {
-          ...mapDbRowToProduct({
-            id: row.product.id,
-            slug: row.product.slug,
-            title: row.product.title,
-            vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
-            description: row.product.description,
-            product_type: row.product.productType,
-            tags: row.product.tags,
-            category: row.product.category?.name,
-            images: row.product.images,
-            quantity: row.product.quantity,
-            min_price: row.product.minPrice,
-            max_price: row.product.maxPrice,
-            currency: row.product.currency,
-          }),
-          qty: row.quantity,
-        },
-      ],
-      total: row.total,
-      status: row.status,
-      shipping_name: null,
-      shipping_address: null,
-      created_at: row.createdAt,
-    }));
+    .map(mapOrderRow);
 }
 
 export async function hasOrdersForProduct(productId: string | number) {
@@ -157,42 +111,15 @@ export async function hasOrdersForProduct(productId: string | number) {
   return count > 0;
 }
 
-export async function getOrderById(id: string | number) {
+export async function getOrderById(id: string | number): Promise<(Order & { userEmail: string }) | null> {
   const db = getDb();
   const row = await db.order.findUnique({
     where: { id: Number(id) },
     include: { user: true, product: { include: { vendor: true, category: true } } },
   });
   if (!row) return null;
-  return {
-    id: row.id,
-    user_email: row.user.email,
-    items: [
-      {
-        ...mapDbRowToProduct({
-          id: row.product.id,
-          slug: row.product.slug,
-          title: row.product.title,
-          vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
-          description: row.product.description,
-          product_type: row.product.productType,
-          tags: row.product.tags,
-          category: row.product.category?.name,
-          images: row.product.images,
-          quantity: row.product.quantity,
-          min_price: row.product.minPrice,
-          max_price: row.product.maxPrice,
-          currency: row.product.currency,
-        }),
-        qty: row.quantity,
-      },
-    ],
-    total: row.total,
-    status: row.status,
-    shipping_name: null,
-    shipping_address: null,
-    created_at: row.createdAt,
-  };
+  const order = mapOrderRow(row);
+  return { ...order, userEmail: row.user.email };
 }
 
 export async function updateOrderStatus(id: string | number, status: string) {
@@ -208,12 +135,12 @@ export async function getBestSellingProducts(limit = 8) {
     orderBy: { _sum: { quantity: 'desc' } },
     take: limit,
   });
-  const ids = grouped.map((g) => g.productId);
+  const ids = grouped.map((g: { productId: number }) => g.productId);
   const products = await db.product.findMany({
     where: { id: { in: ids } },
     include: { category: true, vendor: true },
   });
-  return products.map((p) =>
+  return products.map((p: any) =>
     mapDbRowToProduct({
       id: p.id,
       slug: p.slug,
