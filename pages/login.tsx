@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
 import { AppContext } from '../contexts/AppContext';
 import type { AppContextValue } from '../contexts/AppContext';
+import { NotificationContext } from '../contexts/NotificationContext';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -29,6 +30,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const router = useRouter();
   const appContext = useContext<AppContextValue | undefined>(AppContext);
   const { login, user } = appContext ?? {};
+  const { addNotification } = useContext(NotificationContext);
   const [formError, setFormError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -41,11 +43,12 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   useEffect(() => {
     if (user) {
       if (onLoginSuccess) onLoginSuccess(user);
-      if (user.role === 'brand') router.push('/brand/dashboard');
+      if (user.role === 'brand') router.push('/brand/profile');
       else if (user.role === 'super-admin') router.push('/admin');
-      else router.push('/user/dashboard');
+      else router.push('/user/profile');
+      addNotification('Please complete your profile.', 'info');
     }
-  }, [user, router, onLoginSuccess]);
+  }, [user, router, onLoginSuccess, addNotification]);
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async ({ email, password }) => {
     if (!login) return;

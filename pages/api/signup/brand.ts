@@ -14,45 +14,13 @@ export default async function handler(
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    const {
-      email,
-      password,
-      firstName,
-      lastName,
-      brandName,
-      phoneNumber,
-      businessAddress,
-      city,
-      country,
-      website,
-      businessDescription,
-      taxId,
-    } = req.body as {
+    const { email, password, firstName } = req.body as {
       email?: string;
       password?: string;
       firstName?: string;
-      lastName?: string;
-      brandName?: string;
-      phoneNumber?: string;
-      businessAddress?: string;
-      city?: string;
-      country?: string;
-      website?: string;
-      businessDescription?: string;
-      taxId?: string;
     };
 
-    if (
-      !email ||
-      !password ||
-      !firstName ||
-      !lastName ||
-      !brandName ||
-      !phoneNumber ||
-      !businessAddress ||
-      !city ||
-      !country
-    ) {
+    if (!email || !password || !firstName) {
       return res.status(400).json({ message: 'missing required fields' });
     }
     if (await findUser(email)) {
@@ -60,22 +28,14 @@ export default async function handler(
     }
     const hashed = await bcrypt.hash(password, 10);
     const token = crypto.randomBytes(20).toString('hex');
-      await addUser({
-        email,
-        password: hashed,
-        firstName,
-        lastName,
-        brandName,
-        phoneNumber,
-        businessAddress,
-        city,
-        country,
-        website: website ?? undefined,
-        businessDescription: businessDescription ?? undefined,
-        taxId: taxId ?? undefined,
-        role: 'BRAND',
-        verificationToken: token,
-      });
+    await addUser({
+      email,
+      password: hashed,
+      firstName,
+      lastName: '',
+      role: 'BRAND',
+      verificationToken: token,
+    });
     return res.status(201).json({ token });
   } catch (error) {
     return handleApiError(res, error, 'Failed to sign up brand');
