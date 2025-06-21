@@ -218,7 +218,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
     </li>
   );
   return (
-    <header className="bg-base-300 mb-6">
+    <header className="relative bg-base-300 mb-6">
       <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className="flex items-center gap-2">
           <Link href="/" className="btn btn-ghost normal-case text-xl">
@@ -234,7 +234,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
               <li className="relative">
                 <button
                   type="button"
-                  className="flex items-center gap-1 font-semibold transition-colors duration-200 hover:text-primary"
+                  className="flex items-center gap-1 font-semibold transition-colors duration-200 hover:text-primary hover:bg-base-200 px-2 py-1 rounded"
                   onMouseEnter={() => setMenuOpen(true)}
                   onClick={() => setMenuOpen((o) => !o)}
                   aria-expanded={menuOpen}
@@ -245,7 +245,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 {menuOpen && (
                   <div
                     id="mega-menu"
-                    className="absolute left-0 top-full mt-1 z-40 p-4 bg-base-100 shadow-lg rounded w-screen max-w-3xl"
+                    className="absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 shadow-lg rounded w-screen max-w-3xl"
                   >
                     <div
                       className="grid grid-cols-2 md:grid-cols-3 gap-4"
