@@ -39,15 +39,13 @@ const UserOrders: React.FC = () => {
             <p>
               Order #{o.id} - {o.status}
             </p>
-            {o.shippingAddress && (
-              <p className="text-sm">Address: {o.shippingAddress}</p>
+            {o.shipping?.address && (
+              <p className="text-sm">Address: {o.shipping.address}</p>
             )}
             <ul className="list-disc pl-4 text-sm mb-1">
-              {o.items.map((item) => (
-                <li key={item.id}>
-                  {item.title} x {item.qty}
-                </li>
-              ))}
+              <li>
+                {o.product.title} x {o.quantity}
+              </li>
             </ul>
             <p>Total: £{o.total}</p>
           </li>
