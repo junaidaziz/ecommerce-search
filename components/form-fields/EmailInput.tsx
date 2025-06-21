@@ -21,26 +21,29 @@ export interface EmailInputProps<T extends FieldValues>
   leftAddon?: React.ReactNode;
   rightAddon?: React.ReactNode;
   register?: UseFormRegister<T>;
-  rules?: RegisterOptions;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const EmailInput = <T extends FieldValues>({
-  label,
-  name,
-  placeholder,
-  value,
-  onChange,
-  onBlur,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  leftAddon,
-  rightAddon,
-  register,
-  rules,
-  ...rest
-}) => {
+const EmailInput = <T extends FieldValues>(
+  props: EmailInputProps<T>
+) => {
+  const {
+    label,
+    name,
+    placeholder,
+    value,
+    onChange,
+    onBlur,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    leftAddon,
+    rightAddon,
+    register,
+    rules,
+    ...rest
+  } = props;
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
 

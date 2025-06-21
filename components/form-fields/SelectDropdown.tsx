@@ -28,28 +28,31 @@ export interface SelectDropdownProps<T extends FieldValues> {
   icon?: React.ReactNode;
   components?: any;
   control?: Control<T>;
-  rules?: RegisterOptions;
+  rules?: RegisterOptions<T, Path<T>>;
   [key: string]: unknown;
 }
 
-const SelectDropdown = <T extends FieldValues>({
-  label,
-  name,
-  value,
-  onChange,
-  options,
-  placeholder,
-  isSearchable = true,
-  isDisabled = false,
-  isMulti = false,
-  error,
-  className = '',
-  icon,
-  components: selectComponents,
-  control,
-  rules,
-  ...rest
-}) => {
+const SelectDropdown = <T extends FieldValues>(
+  props: SelectDropdownProps<T>
+) => {
+  const {
+    label,
+    name,
+    value,
+    onChange,
+    options,
+    placeholder,
+    isSearchable = true,
+    isDisabled = false,
+    isMulti = false,
+    error,
+    className = '',
+    icon,
+    components: selectComponents,
+    control,
+    rules,
+    ...rest
+  } = props;
   const inputId: string = typeof rest.id === 'string' ? rest.id : String(name);
 
   return (

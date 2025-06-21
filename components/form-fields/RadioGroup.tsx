@@ -23,23 +23,26 @@ export interface RadioGroupProps<T extends FieldValues> {
   disabled?: boolean;
   className?: string;
   register?: UseFormRegister<T>;
-  rules?: RegisterOptions;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const RadioGroup = <T extends FieldValues>({
-  label,
-  name,
-  value,
-  onChange,
-  onBlur,
-  options,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  register,
-  rules,
-}) => {
+const RadioGroup = <T extends FieldValues>(
+  props: RadioGroupProps<T>
+) => {
+  const {
+    label,
+    name,
+    value,
+    onChange,
+    onBlur,
+    options,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    register,
+    rules,
+  } = props;
   const groupName = name;
   const registration = register ? register(name, rules) : {};
 

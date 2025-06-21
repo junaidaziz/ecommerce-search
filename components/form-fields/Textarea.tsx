@@ -19,24 +19,27 @@ export interface TextareaProps<T extends FieldValues>
   disabled?: boolean;
   className?: string;
   register?: UseFormRegister<T>;
-  rules?: RegisterOptions;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const Textarea = <T extends FieldValues>({
-  label,
-  name,
-  placeholder,
-  value,
-  onChange,
-  onBlur,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  register,
-  rules,
-  ...rest
-}) => {
+const Textarea = <T extends FieldValues>(
+  props: TextareaProps<T>
+) => {
+  const {
+    label,
+    name,
+    placeholder,
+    value,
+    onChange,
+    onBlur,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    register,
+    rules,
+    ...rest
+  } = props;
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
 
