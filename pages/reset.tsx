@@ -1,4 +1,5 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
+import { TextInput } from '../components/form-fields';
 
 const RequestReset: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -20,10 +21,12 @@ const RequestReset: React.FC = () => {
     <div className="max-w-sm mx-auto">
       <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
       <form onSubmit={submit} className="space-y-2">
-        <input
-          className="input input-bordered w-full"
+        <TextInput
+          className="w-full"
           value={email}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
           placeholder="Email"
         />
         <button className="btn btn-primary w-full" type="submit">
@@ -33,6 +36,6 @@ const RequestReset: React.FC = () => {
       {message && <p className="mt-2">{message}</p>}
     </div>
   );
-}
+};
 
 export default RequestReset;

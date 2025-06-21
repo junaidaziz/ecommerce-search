@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { AppContext } from '../../contexts/AppContext';
 import { Category, CategoryInput, ApiMessage } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
+import { TextInput } from '../../components/form-fields';
 
 export default function Categories() {
   const { user } = useContext(AppContext)!;
@@ -79,17 +80,17 @@ export default function Categories() {
       <h1 className="text-2xl font-bold mb-4">Categories</h1>
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <div className="flex gap-2 mb-4">
-        <input
+        <TextInput
           value={newCat}
           onChange={(e) => setNewCat(e.target.value)}
           placeholder="New category"
-          className="input input-bordered flex-1"
+          className="flex-1"
         />
-        <input
+        <TextInput
           value={newImage}
           onChange={(e) => setNewImage(e.target.value)}
           placeholder="Image URL (optional)"
-          className="input input-bordered flex-1"
+          className="flex-1"
         />
         <select
           className="select select-bordered"
@@ -117,7 +118,9 @@ export default function Categories() {
     </div>
   );
 
-  function buildTree(list: Category[]): (Category & { children: Category[] })[] {
+  function buildTree(
+    list: Category[]
+  ): (Category & { children: Category[] })[] {
     const map: Record<number, Category & { children: Category[] }> =
       {} as Record<number, Category & { children: Category[] }>;
     list.forEach((c) => {
@@ -141,13 +144,13 @@ export default function Categories() {
         <div className="flex items-center gap-2">
           {editing === cat.id ? (
             <>
-              <input
-                className="input input-bordered flex-1"
+              <TextInput
+                className="flex-1"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
               />
-              <input
-                className="input input-bordered flex-1"
+              <TextInput
+                className="flex-1"
                 value={editImage}
                 onChange={(e) => setEditImage(e.target.value)}
                 placeholder="Image URL (optional)"

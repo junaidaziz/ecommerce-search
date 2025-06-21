@@ -9,11 +9,11 @@ import React, {
 import { AppContext } from '../../contexts/AppContext';
 import type { User } from '../../types/user';
 import type { Product, ProductInput } from '../../types/product';
+import { TextInput } from '../../components/form-fields';
 
 type ProductForm = Partial<ProductInput> & { id?: string };
 
 type ProductApi = Product;
-
 
 const emptyForm: ProductForm = {
   id: '',
@@ -179,7 +179,7 @@ const BrandDashboard: React.FC = () => {
         {(
           [
             'id',
-              'sku',
+            'sku',
             'title',
             'vendor',
             'description',
@@ -192,31 +192,26 @@ const BrandDashboard: React.FC = () => {
             'currency',
           ] as (keyof ProductForm)[]
         ).map((field) => (
-          <div key={field}>
-            <label className="label capitalize">
-              <span className="label-text">{field.replace('_', ' ')}</span>
-            </label>
-            <input
-              name={field}
-              value={
-                field === 'vendor'
-                  ? form.vendor?.brandName || ''
-                  : field === 'category'
+          <TextInput
+            key={field}
+            name={field as keyof ProductForm}
+            value={
+              field === 'vendor'
+                ? form.vendor?.brandName || ''
+                : field === 'category'
                   ? form.category?.name || ''
                   : (form as any)[field]
-              }
-              onChange={handleChange}
-              placeholder={field}
-              className="input input-bordered w-full"
-              type={
-                field === 'quantity' ||
-                field === 'minPrice' ||
-                field === 'maxPrice'
-                  ? 'number'
-                  : 'text'
-              }
-            />
-          </div>
+            }
+            onChange={handleChange as any}
+            placeholder={field}
+            type={
+              field === 'quantity' ||
+              field === 'minPrice' ||
+              field === 'maxPrice'
+                ? 'number'
+                : 'text'
+            }
+          />
         ))}
         <div className="flex gap-2">
           {editingId && (
