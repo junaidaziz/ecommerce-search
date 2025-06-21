@@ -1,12 +1,9 @@
-export interface BrandProfile {
-  email: string;
-  brandName: string;
-  phoneNumber: string;
-  businessAddress: string;
-  city: string;
-  country: string;
-  website?: string;
-  businessDescription?: string;
+export interface Brand {
+  id?: number | string;
+  name: string;
+  slug?: string;
   logo?: string;
-  taxId?: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
