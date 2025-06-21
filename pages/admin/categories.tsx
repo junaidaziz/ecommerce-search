@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
-import Image from 'next/image';
 import { AppContext } from '../../contexts/AppContext';
 import { Category, CategoryInput, ApiMessage } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
@@ -9,12 +8,9 @@ export default function Categories() {
   const { user } = useContext(AppContext)!;
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCat, setNewCat] = useState<string>('');
-  const [newParent, setNewParent] = useState<string>('');
-  const [newImage, setNewImage] = useState<string>('');
   const [message, setMessage] = useState<string>('');
-  const [editing, setEditing] = useState<number | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
   const [editName, setEditName] = useState<string>('');
-  const [editImage, setEditImage] = useState<string>('');
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -30,8 +26,6 @@ export default function Categories() {
     if (!newCat.trim()) return;
     const payload: CategoryInput = {
       name: newCat,
-      parentId: newParent ? Number(newParent) : null,
-      image: newImage || undefined,
     };
     await fetchJson<ApiMessage>('/api/admin/categories', {
       method: 'POST',
@@ -39,16 +33,14 @@ export default function Categories() {
       body: JSON.stringify(payload),
     });
     setNewCat('');
-    setNewImage('');
     setMessage('Category added');
     load();
   };
 
   const update = async () => {
-    const payload: CategoryInput & { id: number } = {
-      id: editing as number,
+    const payload: CategoryInput & { uuid: string } = {
+      uuid: editing as string,
       name: editName,
-      image: editImage || undefined,
     };
     await fetchJson<ApiMessage>('/api/admin/categories', {
       method: 'PUT',
@@ -57,7 +49,6 @@ export default function Categories() {
     });
     setEditing(null);
     setEditName('');
-    setEditImage('');
     setMessage('Category updated');
     load();
   };
@@ -81,79 +72,50 @@ export default function Categories() {
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <div className="flex gap-2 mb-4">
         <TextInput
+          label=""
+          name="new-category"
           value={newCat}
-          onChange={(e) => setNewCat(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewCat(e.target.value)}
+          onBlur={() => {}}
+          error={undefined}
           placeholder="New category"
           className="flex-1"
+          leftAddon={undefined}
+          rightAddon={undefined}
+          register={undefined}
+          rules={undefined}
         />
-        <TextInput
-          value={newImage}
-          onChange={(e) => setNewImage(e.target.value)}
-          placeholder="Image URL (optional)"
-          className="flex-1"
-        />
-        <select
-          className="select select-bordered"
-          value={newParent}
-          onChange={(e) => setNewParent(e.target.value)}
-        >
-          <option value="">No parent</option>
-          {categories
-            .filter((c) => !c.parentId)
-            .map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-        </select>
         <button onClick={add} className="btn btn-primary">
           Add
         </button>
       </div>
       <ul className="space-y-2">
-        {buildTree(categories).map((c) => (
+        {categories.map((c) => (
           <CategoryItem key={c.id} cat={c} />
         ))}
       </ul>
     </div>
   );
 
-  function buildTree(
-    list: Category[]
-  ): (Category & { children: Category[] })[] {
-    const map: Record<number, Category & { children: Category[] }> =
-      {} as Record<number, Category & { children: Category[] }>;
-    list.forEach((c) => {
-      map[c.id!] = { ...c, children: [] };
-    });
-    const tree: (Category & { children: Category[] })[] = [];
-    list.forEach((c) => {
-      if (c.parentId) {
-        map[c.parentId]?.children.push(map[c.id!]);
-      } else {
-        tree.push(map[c.id!]);
-      }
-    });
-    return tree;
-  }
-
-  function CategoryItem({ cat }: { cat: Category & { children: Category[] } }) {
-    const hasChildren = cat.children && cat.children.length > 0;
+  function CategoryItem({ cat }: { cat: Category }) {
     return (
-      <li className={cat.parentId ? 'ml-4' : ''}>
+      <li>
         <div className="flex items-center gap-2">
           {editing === cat.id ? (
             <>
               <TextInput
                 className="flex-1"
+                label=""
+                name="edit-category"
+                placeholder="Edit category"
                 value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-              />
-              <TextInput
-                className="flex-1"
-                value={editImage}
-                onChange={(e) => setEditImage(e.target.value)}
-                placeholder="Image URL (optional)"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditName(e.target.value)}
+                onBlur={() => {}}
+                error={undefined}
+                leftAddon={undefined}
+                rightAddon={undefined}
+                register={undefined}
+                rules={undefined}
               />
               <button onClick={update} className="btn btn-sm">
                 Save
@@ -164,23 +126,11 @@ export default function Categories() {
             </>
           ) : (
             <>
-              <span className="flex-1 flex items-center gap-2">
-                {cat.image && (
-                  <Image
-                    src={cat.image}
-                    alt=""
-                    width={24}
-                    height={24}
-                    className="w-6 h-6 object-cover"
-                  />
-                )}
-                {cat.name}
-              </span>
+              <span className="flex-1">{cat.name}</span>
               <button
                 onClick={() => {
-                  setEditing(cat.id ?? null);
+                  setEditing(cat.uuid ?? null);
                   setEditName(cat.name);
-                  setEditImage(cat.image || '');
                 }}
                 className="btn btn-sm"
               >
@@ -192,13 +142,6 @@ export default function Categories() {
             </>
           )}
         </div>
-        {hasChildren && (
-          <ul className="ml-4 space-y-2">
-            {cat.children.map((child) => (
-              <CategoryItem key={child.id} cat={child} />
-            ))}
-          </ul>
-        )}
       </li>
     );
   }

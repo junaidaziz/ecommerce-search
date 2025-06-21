@@ -21,7 +21,7 @@ async function handler(
       return res.status(200).json(cats as Category[]);
     }
     if (req.method === 'POST') {
-      const { name, parentId, image } = req.body as CategoryInput;
+      const { name } = req.body as CategoryInput;
       if (!name) return res.status(400).json({ message: 'name required' });
       const exists = (await getCategoriesFlat()).find(
         (c) => c.name.toLowerCase() === name.toLowerCase()
@@ -29,23 +29,16 @@ async function handler(
       if (exists) {
         return res.status(409).json({ message: 'category exists' });
       }
-      try {
-        await createCategory(name, parentId || null, image || null);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === 'depth') {
-          return res.status(400).json({ message: 'max depth exceeded' });
-        }
-        throw e;
-      }
-      logAudit('create_category', { name, parentId, image });
+      await createCategory(name);
+      logAudit('create_category', { name });
       return res.status(201).json({ message: 'category created' });
     }
     if (req.method === 'PUT') {
-      const { uuid, name, parentId, image } = req.body as CategoryInput & { uuid: string };
+      const { uuid, name } = req.body as CategoryInput & { uuid: string };
       if (!uuid || !name)
         return res.status(400).json({ message: 'uuid and name required' });
-      await renameCategory(uuid, name, parentId || null, image || null);
-      logAudit('rename_category', { uuid, name, parentId, image });
+      await renameCategory(uuid, name);
+      logAudit('rename_category', { uuid, name });
       return res.status(200).json({ message: 'category updated' });
     }
     if (req.method === 'DELETE') {

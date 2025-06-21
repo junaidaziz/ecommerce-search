@@ -9,8 +9,8 @@ export default async function handler(
 ): Promise<void> {
   try {
     if (req.method === 'GET') {
-      const data = await getCategoryTree();
-      return res.status(200).json(data);
+      const categories = await getCategoryTree();
+      return res.status(200).json({ categories });
     }
     return res.status(405).json({ message: 'Method Not Allowed' });
   } catch (error) {

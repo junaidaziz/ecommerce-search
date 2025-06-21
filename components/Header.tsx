@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { useContext, useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import type { FC, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from 'react';
@@ -195,15 +194,8 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   };
 
   const renderCat = (cat: Category): JSX.Element => (
-    <li key={cat.id} className={cat.parentId ? 'ml-4' : ''}>
-      <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
-        {cat.name}
-      </Link>
-      {cat.children && cat.children.length > 0 && (
-        <ul className="ml-4">
-          {cat.children.map((child) => renderCat(child))}
-        </ul>
-      )}
+    <li key={cat.id}>
+      <Link href={`/categories/${encodeURIComponent(cat.name)}`}>{cat.name}</Link>
     </li>
   );
   return (
@@ -250,34 +242,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                             href={`/categories/${encodeURIComponent(cat.name)}`}
                             className="flex items-center font-semibold mb-1 transition-colors duration-200 hover:text-primary"
                           >
-                            {cat.image ? (
-                              <Image
-                                src={cat.image}
-                                alt=""
-                                width={16}
-                                height={16}
-                                className="w-4 h-4 mr-1 object-cover"
-                              />
-                            ) : (
-                              iconMap[cat.name] || null
-                            )}
+                            {iconMap[cat.name] || null}
                             {cat.name}
                           </Link>
-                          {cat.subcategories &&
-                            cat.subcategories.length > 0 && (
-                              <ul className="ml-4 space-y-1">
-                                {cat.subcategories.slice(0, 5).map((sub) => (
-                                  <li key={sub} className="text-sm">
-                                    <Link
-                                      href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub)}`}
-                                      className="transition-colors duration-200 hover:text-primary"
-                                    >
-                                      {sub}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
                         </div>
                       ))
                     ) : (
@@ -518,37 +485,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                       categories.map((cat) => (
                         <li key={cat.name}>
                           <div className="flex items-center gap-1">
-                            {cat.image ? (
-                              <Image
-                                src={cat.image}
-                                alt=""
-                                width={16}
-                                height={16}
-                                className="w-4 h-4 object-cover"
-                              />
-                            ) : (
-                              iconMap[cat.name] || null
-                            )}
-                            <Link
-                              href={`/categories/${encodeURIComponent(cat.name)}`}
-                            >
-                              {cat.name}
-                            </Link>
+                            {iconMap[cat.name] || null}
+                            <Link href={`/categories/${encodeURIComponent(cat.name)}`}>{cat.name}</Link>
                           </div>
-                          {cat.subcategories &&
-                            cat.subcategories.length > 0 && (
-                              <ul className="ml-4">
-                                {cat.subcategories.slice(0, 5).map((sub) => (
-                                  <li key={sub}>
-                                    <Link
-                                      href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub)}`}
-                                    >
-                                      {sub}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
                         </li>
                       ))
                     ) : (
