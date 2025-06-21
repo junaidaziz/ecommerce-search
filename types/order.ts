@@ -19,9 +19,9 @@ export interface Order {
   updatedAt: Date;
 }
 
-export type OrderResponse = Order;
+type OrderResponse = Order;
 
-export interface OrderInput {
+interface OrderInput {
   userId: number;
   productId: number;
   quantity: number;
@@ -30,7 +30,7 @@ export interface OrderInput {
   shipping?: ShippingInfo;
 }
 
-export interface OrderRow {
+interface OrderRow {
   id: number;
   uuid: string;
   userId: number;

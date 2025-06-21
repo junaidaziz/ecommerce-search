@@ -5,7 +5,7 @@ import type { Brand } from './brand';
 import type { Image } from './image';
 import type { PriceRange } from './price';
 
-export type ProductBase = Pick<
+type ProductBase = Pick<
   PrismaProduct,
   | 'id'
   | 'uuid'
@@ -40,9 +40,9 @@ export interface Product extends ProductBase {
   bodyHtmlText?: string;
 }
 
-export type ProductResponse = Product;
+type ProductResponse = Product;
 
-export type ProductInput = Pick<
+type ProductInput = Pick<
   PrismaProduct,
   | 'sku'
   | 'title'
