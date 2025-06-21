@@ -5,7 +5,12 @@ import Link from 'next/link';
 import Head from 'next/head';
 import ProductImageSlider from '../../components/ProductImageSlider';
 import type { Product } from '../../types';
-import type { Review, ReviewsResponse, ReviewAddedResponse } from '../../types/review';
+import type {
+  Review,
+  ReviewsResponse,
+  ReviewAddedResponse,
+} from '../../types/review';
+import { SelectDropdown, Textarea } from '../../components/form-fields';
 
 interface ProductDetailProps {}
 
@@ -22,7 +27,8 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
   const [myRating, setMyRating] = useState<number>(5);
   const [comment, setComment] = useState<string>('');
 
-  const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } = appContext ?? {};
+  const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } =
+    appContext ?? {};
 
   useEffect(() => {
     if (!id) return;
@@ -95,8 +101,8 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
             product.images && product.images.length > 0
               ? product.images
               : product.featuredImage
-              ? [product.featuredImage]
-              : []
+                ? [product.featuredImage]
+                : []
           }
           imgClass="hover:scale-110 transition"
         />
@@ -112,7 +118,9 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
         {product.currency || ''}{' '}
         {product.minPrice ? product.minPrice.toFixed(2) : 'N/A'}
       </p>
-      <p className="mb-2">Rating: {averageRating.toFixed(1)} ({reviewCount})</p>
+      <p className="mb-2">
+        Rating: {averageRating.toFixed(1)} ({reviewCount})
+      </p>
       <div className="flex gap-2">
         <button
           className="btn btn-primary"
@@ -129,7 +137,11 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
             Remove Wishlist
           </button>
         ) : (
-          <button className="btn" onClick={() => addToWishlist?.(product)} disabled={!addToWishlist}>
+          <button
+            className="btn"
+            onClick={() => addToWishlist?.(product)}
+            disabled={!addToWishlist}
+          >
             Add Wishlist
           </button>
         )}
@@ -172,20 +184,25 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
           >
             <div>
               <label className="mr-2">Rating</label>
-              <select
-                value={myRating}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) => setMyRating(parseInt(e.target.value))}
-                className="select select-bordered"
-              >
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
+              <SelectDropdown
+                name="rating"
+                value={{ label: String(myRating), value: String(myRating) }}
+                onChange={(opt) =>
+                  setMyRating(opt ? parseInt((opt as any).value) : 5)
+                }
+                options={[1, 2, 3, 4, 5].map((n) => ({
+                  label: String(n),
+                  value: String(n),
+                }))}
+                className="max-w-xs"
+              />
             </div>
-            <textarea
-              className="textarea textarea-bordered w-full"
+            <Textarea
+              className="w-full"
               value={comment}
-              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                setComment(e.target.value)
+              }
               placeholder="Write a review"
             />
             <button className="btn btn-sm btn-primary" type="submit">

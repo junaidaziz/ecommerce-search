@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import type { Product } from '../../types';
+import { TextInput } from '../../components/form-fields';
 
 export default function VendorDashboard() {
   const { user } = useContext(AppContext)!;
@@ -137,18 +138,13 @@ export default function VendorDashboard() {
           'maxPrice',
           'currency',
         ].map((field) => (
-          <div key={field}>
-            <label className="label capitalize">
-              <span className="label-text">{field.replace('_', ' ')}</span>
-            </label>
-            <input
-              name={field}
-              value={form[field]}
-              onChange={handleChange}
-              placeholder={field}
-              className="input input-bordered w-full"
-            />
-          </div>
+          <TextInput
+            key={field}
+            name={field as keyof FormState}
+            value={String(form[field] ?? '')}
+            onChange={handleChange}
+            placeholder={field}
+          />
         ))}
         <div className="flex gap-2">
           {editingId && (
