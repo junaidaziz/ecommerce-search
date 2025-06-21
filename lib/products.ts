@@ -3,6 +3,7 @@ import { getDb } from './db';
 import type { Product, ProductDbRow } from '../types/product';
 import type { Category } from '../types/category';
 import type { Prisma } from '@prisma/client';
+import { OrderProductRow } from '../types';
 
 /**
  * Simplified representation of a product row returned from the database.
@@ -61,7 +62,7 @@ function processProductRow(row: Record<string, unknown>): Product {
   }
   if (processed.images && processed.images.length > 0) {
     if (typeof processed.images[0] === 'string') {
-      processed.images = (processed.images as string[]).map((u) => ({ url: u }));
+      processed.images = (processed.images as unknown as string[]).map((u) => ({ url: u }));
     }
     processed.featuredImage = processed.images[0];
   }
@@ -109,7 +110,7 @@ async function loadProductsData(): Promise<Product[]> {
   }
 }
 
-export function mapDbRowToProduct(row: Record<string, unknown>): Product {
+export function mapDbRowToProduct(row: OrderProductRow): Product {
   return processProductRow({
     id: row.id,
     uuid: row.uuid,
@@ -118,20 +119,20 @@ export function mapDbRowToProduct(row: Record<string, unknown>): Product {
     title: row.title,
     vendor: row.vendor,
     description: row.description,
-    productType: row.product_type,
+    productType: row.productType,
     tags: row.tags,
     category: row.category,
     images: row.images
-      ? (JSON.parse(row.images as string) as string[]).map((u) => ({ url: u }))
+      ? (JSON.parse(row.images as unknown as string) as string[]).map((u) => ({ url: u }))
       : [],
     totalInventory: row.quantity,
     priceRange: {
       minVariantPrice: {
-        amount: row.min_price,
+        amount: row.minPrice,
         currencyCode: row.currency,
       },
       maxVariantPrice: {
-        amount: row.max_price,
+        amount: row.maxPrice,
         currencyCode: row.currency,
       },
     },
