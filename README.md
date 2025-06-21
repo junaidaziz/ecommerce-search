@@ -116,6 +116,15 @@ Vercel will auto-deploy.
 
 ---
 
+## ☁️ Typesense on Fly.io
+
+You can run a development Typesense server for free on Fly.io without any
+browser dependencies. Follow the steps in
+[docs/typesense-flyio.md](docs/typesense-flyio.md) to initialize a Fly app,
+create a persistent volume and deploy the container.
+
+---
+
 ## 🌐 API Usage
 
 **GET** `/api/search?q=vitamin`
