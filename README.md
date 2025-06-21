@@ -175,7 +175,7 @@ const options = [
 ```
 ## 📊 Database ER Diagram
 
-Run `npm run generate:erd` to generate `docs/ERD.png` from the Prisma schema.
+Run `npm run generate:erd` to generate `docs/ERD.png` using a remote rendering service.
 
 ![ERD](docs/ERD.png)
 
