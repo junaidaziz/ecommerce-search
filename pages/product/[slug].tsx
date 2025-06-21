@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 import Link from 'next/link';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { AppContext } from '../../contexts/AppContext';
@@ -89,7 +90,7 @@ export default function ProductDetail({
   return (
     <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md min-h-screen">
       <Head>
-        <title>{product.title} - Product</title>
+        <title>{getPageTitle(product.title || 'Product')}</title>
         <meta
           name="description"
           content={product.descriptionText?.slice(0, 150)}

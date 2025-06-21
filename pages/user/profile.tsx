@@ -2,6 +2,8 @@ import React, { useContext, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { AppContext } from '../../contexts/AppContext';
 import type { User } from '../../types/user';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 export const UserProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
@@ -54,6 +56,9 @@ export const UserProfile: React.FC = () => {
 
   return (
     <div className="max-w-sm mx-auto">
+      <Head>
+        <title>{getPageTitle('My Profile')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">My Profile</h1>
       {message && <div className="mb-2 text-green-600">{message}</div>}
       <form onSubmit={handleSubmit(submit)} className="space-y-2">

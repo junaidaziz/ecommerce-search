@@ -7,6 +7,8 @@ import {
   ApiMessage,
 } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 export default function ManageUsers() {
   const { user } = useContext(AppContext)!;
@@ -60,6 +62,9 @@ export default function ManageUsers() {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
+      <Head>
+        <title>{getPageTitle('Manage Users')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">Manage Users</h1>
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <ul className="space-y-2">

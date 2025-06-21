@@ -9,6 +9,8 @@ import {
 import { AppContext } from '../../contexts/AppContext';
 import type { Product } from '../../types';
 import { TextInput } from '../../components/form-fields';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 export default function VendorDashboard() {
   const { user } = useContext(AppContext)!;
@@ -135,6 +137,9 @@ export default function VendorDashboard() {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
+      <Head>
+        <title>{getPageTitle('Vendor Dashboard')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">Vendor Dashboard</h1>
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <form onSubmit={submit} className="space-y-2 mb-6">
