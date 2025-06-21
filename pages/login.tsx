@@ -43,9 +43,15 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   useEffect(() => {
     if (user) {
       if (onLoginSuccess) onLoginSuccess(user);
-      if (user.role === 'brand') router.push('/brand/dashboard');
-      else if (user.role === 'super-admin') router.push('/admin');
-      else router.push('/user/dashboard');
+      if (user.role === 'brand') {
+        if (!user.brandName) router.push('/brand/profile?complete=1');
+        else router.push('/brand/dashboard');
+      } else if (user.role === 'super-admin') {
+        router.push('/admin');
+      } else {
+        if (!user.lastName) router.push('/user/profile?complete=1');
+        else router.push('/');
+      }
     }
   }, [user, router, onLoginSuccess]);
 

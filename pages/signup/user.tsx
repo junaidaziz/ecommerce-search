@@ -1,45 +1,21 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useContext, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
 import { signIn } from 'next-auth/react';
-import { components, OptionProps, SingleValueProps } from 'react-select';
-import countryList from 'react-select-country-list';
-import Flag from 'react-world-flags';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 import GoogleIcon from '../../components/icons/GoogleIcon';
 import GithubIcon from '../../components/icons/GithubIcon';
 import {
-  TextInput,
   EmailInput,
   PasswordInput,
-  SelectDropdown,
+  TextInput,
 } from '../../components/form-fields';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-
-type CountryOptionType = { label: string; value: string };
-
-const CountryOption = (props: OptionProps<CountryOptionType, false>) => (
-  <components.Option {...props}>
-    <div className="flex items-center gap-2">
-      <Flag code={props.data.value} style={{ width: 20, height: 15 }} />
-      <span aria-label={props.data.label}>{props.data.label}</span>
-    </div>
-  </components.Option>
-);
-
-const CountrySingleValue = (props: SingleValueProps<CountryOptionType, false>) => (
-  <components.SingleValue {...props}>
-    <div className="flex items-center gap-2">
-      <Flag code={props.data.value} style={{ width: 20, height: 15 }} />
-      <span aria-label={props.data.label}>{props.data.label}</span>
-    </div>
-  </components.SingleValue>
-);
 
 export default function UserSignup() {
   const router = useRouter();
@@ -55,31 +31,18 @@ export default function UserSignup() {
     formState: { errors },
   } = useForm<{
     firstName: string;
-    lastName: string;
     email: string;
     password: string;
     confirm: string;
-    gender: string;
-    phone: string;
-    address: string;
-    city: string;
-    country: string;
   }>();
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [formError, setFormError] = useState('');
-  const countryOptions = useMemo(
-    () =>
-      countryList()
-        .getData()
-        .map((c: { label: string; value: string }) => ({ label: `${c.label} (${c.value})`, value: c.value })),
-    []
-  );
 
   useEffect(() => {
     if (user) {
-      if (user.role === 'brand') router.push('/brand/dashboard');
+      if (user.role === 'brand') router.push('/brand/profile?complete=1');
       else if (user.role === 'super-admin') router.push('/admin');
-      else router.push('/user/dashboard');
+      else router.push('/user/profile?complete=1');
     }
   }, [user, router]);
 
@@ -127,14 +90,8 @@ export default function UserSignup() {
     try {
       const data = await signup<{ token: string }>('/api/signup/user', {
         firstName: values.firstName,
-        lastName: values.lastName,
         email: values.email,
         password: values.password,
-        gender: values.gender,
-        phoneNumber: values.phone,
-        address: values.address,
-        city: values.city,
-        country: values.country,
       });
       router.push(`/confirm/${data.token}`);
     } catch (e) {
@@ -179,13 +136,6 @@ export default function UserSignup() {
           register={register}
           rules={{ required: 'First name is required' }}
           error={errors.firstName?.message as string}
-        />
-        <TextInput
-          name="lastName"
-          placeholder="Last Name"
-          register={register}
-          rules={{ required: 'Last name is required' }}
-          error={errors.lastName?.message as string}
         />
         <EmailInput
           name="email"
@@ -232,38 +182,6 @@ export default function UserSignup() {
             lowercase, number and special character
           </p>
         )}
-        <SelectDropdown
-          name="gender"
-          control={control}
-          options={[
-            { label: 'Male', value: 'male' },
-            { label: 'Female', value: 'female' },
-            { label: 'Other', value: 'other' },
-          ]}
-          placeholder="Select Gender"
-        />
-        <TextInput
-          name="phone"
-          placeholder="Phone Number"
-          register={register}
-        />
-        <TextInput
-          name="address"
-          placeholder="Address"
-          register={register}
-        />
-        <TextInput
-          name="city"
-          placeholder="City"
-          register={register}
-        />
-        <SelectDropdown
-          name="country"
-          control={control}
-          options={countryOptions}
-          placeholder="Country"
-          components={{ Option: CountryOption, SingleValue: CountrySingleValue }}
-        />
         <button className="btn btn-primary w-full" type="submit">
           Sign Up
         </button>
