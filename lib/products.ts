@@ -329,6 +329,75 @@ export async function getProductsByCategorySlug(
   );
 }
 
+export async function getProductsByCategorySlugPaginated(
+  slug: string,
+  limit: number,
+  offset = 0
+): Promise<Product[]> {
+  const db = getDb();
+  const rows: ProductWithRelations[] = await db.product.findMany({
+    where: { status: 'approved', category: { slug } },
+    include: { category: true, vendor: true },
+    take: limit,
+    skip: offset,
+    orderBy: { id: 'asc' },
+  });
+  return rows.map((row) =>
+    processProductRow({
+      id: row.id,
+      uuid: row.uuid,
+      slug: row.slug,
+      sku: row.sku,
+      title: row.title,
+      vendor: row.vendor ?? null,
+      description: row.description,
+      productType: row.productType,
+      tags: row.tags,
+      category: row.category ?? null,
+      images: parseImages(row.images),
+      totalInventory: row.quantity,
+      priceRange: {
+        minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
+        maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
+      },
+    })
+  );
+}
+
+export async function getApprovedProductsPaginated(
+  limit: number,
+  offset = 0
+): Promise<Product[]> {
+  const db = getDb();
+  const rows: ProductWithRelations[] = await db.product.findMany({
+    where: { status: 'approved' },
+    include: { category: true, vendor: true },
+    take: limit,
+    skip: offset,
+    orderBy: { id: 'asc' },
+  });
+  return rows.map((row) =>
+    processProductRow({
+      id: row.id,
+      uuid: row.uuid,
+      slug: row.slug,
+      sku: row.sku,
+      title: row.title,
+      vendor: row.vendor ?? null,
+      description: row.description,
+      productType: row.productType,
+      tags: row.tags,
+      category: row.category ?? null,
+      images: parseImages(row.images),
+      totalInventory: row.quantity,
+      priceRange: {
+        minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
+        maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
+      },
+    })
+  );
+}
+
 export async function getCategoryBySlug(
   slug: string
 ): Promise<Category | null> {
