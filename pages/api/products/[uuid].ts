@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getProductById, getAverageRating } from '../../../lib/db.js';
+import { getProductByUuid, getAverageRating } from '../../../lib/db.js';
 import { mapDbRowToProduct } from '../../../lib/products.js';
 import { Product } from '../../../types/product';
 import { handleApiError } from '../../../lib/utils/handleApiError';
@@ -13,17 +13,17 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ProductResponse | { message: string }>
 ) {
-  const { id } = req.query;
-  if (!id) {
-    return res.status(400).json({ message: 'id required' });
+  const { uuid } = req.query;
+  if (!uuid) {
+    return res.status(400).json({ message: 'uuid required' });
   }
   try {
-    const row = await getProductById(String(id));
+    const row = await getProductByUuid(String(uuid));
     if (!row) {
       return res.status(404).json({ message: 'Not found' });
     }
     const product = mapDbRowToProduct(row) as Product;
-    const stats = getAverageRating(String(id));
+    const stats = getAverageRating(String(uuid));
     res.status(200).json({
       ...product,
       AVERAGE_RATING: stats.average,

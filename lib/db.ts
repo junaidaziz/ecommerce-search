@@ -21,13 +21,20 @@ export async function getProductById(id: string | number) {
   });
 }
 
+export async function getProductByUuid(uuid: string) {
+  return prisma.product.findUnique({ where: { uuid } });
+}
+
 export async function getProductBySlug(slug: string) {
   return prisma.product.findUnique({ where: { slug } });
 }
 
-export async function decreaseProductQuantity(id: string | number, qty: number) {
+export async function decreaseProductQuantity(
+  uuid: string,
+  qty: number
+) {
   return prisma.product.update({
-    where: { id: Number(id) },
+    where: { uuid },
     data: { quantity: { decrement: qty } },
   });
 }

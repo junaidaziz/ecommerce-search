@@ -5,6 +5,7 @@ import { mapDbRowToProduct } from './products';
 function mapOrderRow(row: OrderRow): Order {
   return {
     id: row.id,
+    uuid: row.uuid,
     userId: row.userId,
     items: [
       {
@@ -62,7 +63,7 @@ export async function addOrder({
     const created = await db.order.create({
       data: {
         user: { connect: { id: user.id } },
-        product: { connect: { id: Number(item.id) } },
+        product: { connect: { uuid: item.uuid || String(item.id) } },
         quantity: item.qty || 1,
         total,
         status,
@@ -105,16 +106,18 @@ export async function getOrdersForVendor(vendor: string) {
     .map(mapOrderRow);
 }
 
-export async function hasOrdersForProduct(productId: string | number) {
+export async function hasOrdersForProduct(productUuid: string) {
   const db = getDb();
-  const count = await db.order.count({ where: { productId: Number(productId) } });
+  const product = await db.product.findUnique({ where: { uuid: productUuid } });
+  if (!product) return false;
+  const count = await db.order.count({ where: { productId: product.id } });
   return count > 0;
 }
 
-export async function getOrderById(id: string | number): Promise<(Order & { userEmail: string }) | null> {
+export async function getOrderByUuid(uuid: string): Promise<(Order & { userEmail: string }) | null> {
   const db = getDb();
   const row = await db.order.findUnique({
-    where: { id: Number(id) },
+    where: { uuid },
     include: { user: true, product: { include: { vendor: true, category: true } } },
   });
   if (!row) return null;
@@ -122,9 +125,9 @@ export async function getOrderById(id: string | number): Promise<(Order & { user
   return { ...order, userEmail: row.user.email };
 }
 
-export async function updateOrderStatus(id: string | number, status: string) {
+export async function updateOrderStatus(uuid: string, status: string) {
   const db = getDb();
-  await db.order.update({ where: { id: Number(id) }, data: { status } });
+  await db.order.update({ where: { uuid }, data: { status } });
 }
 
 export async function getBestSellingProducts(limit = 8) {

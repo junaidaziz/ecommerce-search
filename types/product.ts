@@ -1,5 +1,6 @@
 export interface Product {
   id: string;
+  uuid?: string;
   slug: string;
   title: string;
   vendor?: string;
@@ -49,6 +50,7 @@ export interface ProductInput {
 
 export interface ProductDbRow {
   id: number;
+  uuid?: string;
   slug: string | null;
   title: string;
   vendorId?: number | undefined;
