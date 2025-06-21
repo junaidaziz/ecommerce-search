@@ -35,16 +35,7 @@ export interface OrderInput {
   shippingAddress?: string;
 }
 
-export interface OrderProductRow extends ProductDbRow {
-  description: string;
-  productType: string;
-  tags: string[] | string;
-  images: string[];
-  quantity: number;
-  minPrice: number;
-  maxPrice: number;
-  currency: string;
-}
+export type OrderProductRow = ProductDbRow;
 
 export interface OrderRow {
   id: number;
