@@ -22,7 +22,7 @@ async function handler(
     orders.forEach((o) => {
       summary.totalRevenue += o.total || 0;
       o.items.forEach((i) => {
-        counts[i.ID] = (counts[i.ID] || 0) + i.qty;
+        counts[i.id] = (counts[i.id] || 0) + i.qty;
       });
     });
     summary.topProducts = Object.entries(counts)
