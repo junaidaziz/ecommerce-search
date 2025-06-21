@@ -2,6 +2,7 @@ import { useContext, useState, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { AppContext, AppContextValue } from '../contexts/AppContext';
+import type { User } from '../types/user';
 
 // Types for cart item and user
 type CartItem = {
@@ -9,12 +10,6 @@ type CartItem = {
   TITLE: string;
   MIN_PRICE?: string;
   qty: number;
-};
-
-type User = {
-  firstName: string;
-  lastName: string;
-  email: string;
 };
 
 type AppContextType = {
