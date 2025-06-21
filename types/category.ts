@@ -5,6 +5,7 @@ export interface Category {
   slug?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  subcategories?: string[];
 }
 
 export type CategoryInput = Pick<Category, 'name'>;

@@ -32,15 +32,22 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const isAuthRoute = ['/login', '/signup', '/user/signup', '/brand/signup'].includes(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [hoveredCat, setHoveredCat] = useState<Category | null>(null);
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     fetch('/api/categories')
       .then((res) => res.json())
-      .then((data) => setCategories(data.categories || DEFAULT_CATEGORIES))
+      .then((data) => setCategories(data.categories || data || DEFAULT_CATEGORIES))
       .catch(() => setCategories(DEFAULT_CATEGORIES));
   }, []);
+
+  useEffect(() => {
+    if (menuOpen && categories.length > 0) {
+      setHoveredCat(categories[0]);
+    }
+  }, [menuOpen, categories]);
 
   const itemCount = cart.reduce((sum, item) => sum + (item.qty || 0), 0);
   const logout = () => signOut({ redirect: false });
@@ -61,9 +68,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
       <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 gap-y-2">
         <Link href="/" className="btn btn-ghost text-xl">Home</Link>
 
-        <div className="flex-1 flex items-center gap-x-4" onMouseLeave={() => setMenuOpen(false)}>
+        <div className="flex-1 flex items-center gap-x-4">
           <ul className="menu menu-horizontal hidden md:flex">
-            <li>
+            <li className="relative" onMouseLeave={() => setMenuOpen(false)}>
               <button
                 type="button"
                 className="flex items-center gap-1"
@@ -73,14 +80,40 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 Categories <ChevronDownIcon className="w-4 h-4" />
               </button>
               {menuOpen && (
-                <div id="mega-menu" className="absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 shadow-lg rounded w-screen max-w-3xl">
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {categories.map((cat) => (
-                      <Link key={cat.name} href={`/categories/${encodeURIComponent(cat.name)}`} className="flex items-center gap-1 hover:text-primary">
-                        {iconMap[cat.name] || null}
-                        {cat.name}
-                      </Link>
-                    ))}
+                <div
+                  id="mega-menu"
+                  className="absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 bg-opacity-100 border border-base-200 shadow-lg rounded w-screen max-w-3xl"
+                >
+                  <div className="flex gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 flex-1">
+                      {categories.map((cat) => (
+                        <button
+                          key={cat.name}
+                          type="button"
+                          onFocus={() => setHoveredCat(cat)}
+                          onMouseEnter={() => setHoveredCat(cat)}
+                          className="flex items-center gap-1 text-left hover:text-primary focus:outline-none"
+                        >
+                          {iconMap[cat.name] || null}
+                          {cat.name}
+                        </button>
+                      ))}
+                      {categories.length === 0 && <span>No categories found</span>}
+                    </div>
+                    {hoveredCat?.subcategories && hoveredCat.subcategories.length > 0 && (
+                      <ul className="min-w-[150px] border-l border-base-200 pl-4 space-y-1">
+                        {hoveredCat.subcategories.map((sub) => (
+                          <li key={sub}>
+                            <Link
+                              href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub)}`}
+                              className="block hover:text-primary"
+                            >
+                              {sub}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
               )}
@@ -117,6 +150,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           <label className="swap swap-rotate">
             <input
               type="checkbox"
+              aria-label="Toggle dark mode"
               checked={theme === 'dark'}
               onChange={() => setTheme?.(theme === 'dark' ? 'light' : 'dark')}
             />
