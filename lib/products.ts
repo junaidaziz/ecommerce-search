@@ -398,6 +398,74 @@ export async function getApprovedProductsPaginated(
   );
 }
 
+export interface PaginatedOptions {
+  limit: number;
+  offset: number;
+  categorySlug?: string;
+  search?: string;
+  inStock?: boolean;
+}
+
+export interface PaginatedResult {
+  products: Product[];
+  total: number;
+}
+
+export async function getProductsPaginated(
+  options: PaginatedOptions
+): Promise<PaginatedResult> {
+  const db = getDb();
+  const where: Prisma.ProductWhereInput = { status: 'approved' };
+  if (options.categorySlug) {
+    where.category = { slug: options.categorySlug };
+  }
+  if (options.inStock) {
+    where.quantity = { gt: 0 };
+  }
+  if (options.search) {
+    const term = options.search.trim();
+    if (term) {
+      where.OR = [
+        { title: { contains: term, mode: 'insensitive' } },
+        { description: { contains: term, mode: 'insensitive' } },
+      ];
+    }
+  }
+  const [total, rows] = await Promise.all([
+    db.product.count({ where }),
+    db.product.findMany({
+      where,
+      include: { category: true, vendor: true },
+      take: options.limit,
+      skip: options.offset,
+      orderBy: { id: 'asc' },
+    }),
+  ]);
+  return {
+    total,
+    products: rows.map((row) =>
+      processProductRow({
+        id: row.id,
+        uuid: row.uuid,
+        slug: row.slug,
+        sku: row.sku,
+        title: row.title,
+        vendor: row.vendor ?? null,
+        description: row.description,
+        productType: row.productType,
+        tags: row.tags,
+        category: row.category ?? null,
+        images: parseImages(row.images),
+        totalInventory: row.quantity,
+        priceRange: {
+          minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
+          maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
+        },
+      })
+    ),
+  };
+}
+
 export async function getCategoryBySlug(
   slug: string
 ): Promise<Category | null> {
