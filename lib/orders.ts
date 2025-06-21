@@ -137,5 +137,7 @@ export async function getBestSellingProducts(limit = 8): Promise<Product[]> {
     include: { category: true, vendor: true },
   });
 
-  return products.map((p) => mapDbRowToProduct(p));
+  return products.map((p: Prisma.ProductGetPayload<{ include: { category: true; vendor: true } }>) =>
+    mapDbRowToProduct(p)
+  );
 }

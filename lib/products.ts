@@ -254,7 +254,7 @@ export async function getCategoryTree(): Promise<{ name: string; subcategories: 
     const map: Record<number, { name: string; image?: string; subcategories: string[] }> = {};
     flat.forEach((c) => {
       if (typeof c.id === 'number') {
-        map[c.id] = { name: c.name, image: c.image, subcategories: [] };
+        map[c.id] = { name: c.name, image: c.image ?? undefined, subcategories: [] };
       }
     });
     flat.forEach((c) => {
@@ -266,7 +266,7 @@ export async function getCategoryTree(): Promise<{ name: string; subcategories: 
       .filter((c) => typeof c.id === 'number' && !c.parentId)
       .map((c) => ({
         name: c.name,
-        image: c.image,
+        image: c.image ?? undefined,
         subcategories: (map[c.id as number]?.subcategories ?? []).sort((a, b) =>
           a.localeCompare(b)
         ),
