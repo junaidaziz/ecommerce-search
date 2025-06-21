@@ -1,16 +1,6 @@
 import React, { useContext, useState, useEffect, FormEvent } from 'react';
 import { AppContext } from '../../contexts/AppContext';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  phoneNumber?: string;
-  address?: string;
-  city?: string;
-  country?: string;
-}
+import type { User } from '../../types/user';
 
 export const UserProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };

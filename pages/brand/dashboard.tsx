@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback, ChangeEvent, FormEvent } from 'react';
 import { AppContext } from '../../contexts/AppContext';
+import type { User } from '../../types/user';
 
 type ProductForm = {
   id: string;
@@ -29,14 +30,6 @@ type ProductApi = {
   CURRENCY: string;
 };
 
-type User = {
-  brandName?: string;
-  role: string;
-};
-
-type AppContextType = {
-  user: User | null;
-};
 
 const emptyForm: ProductForm = {
   id: '',
@@ -53,7 +46,7 @@ const emptyForm: ProductForm = {
 };
 
 const BrandDashboard: React.FC = () => {
-  const { user } = useContext(AppContext) as AppContextType;
+  const { user } = useContext(AppContext) as { user: User | null };
   const [form, setForm] = useState<ProductForm>(emptyForm);
   const [products, setProducts] = useState<ProductApi[]>([]);
   const [lowStock, setLowStock] = useState<ProductApi[]>([]);

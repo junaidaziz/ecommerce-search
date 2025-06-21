@@ -29,16 +29,9 @@ interface Category extends PrismaCategory {
 }
 
 import type { Product } from '../types/product';
+import type { User } from '../types/user';
 
 type CartItem = Product & { qty: number };
-
-interface User {
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
-  role?: string;
-  firstName?: string;
-}
 
 interface HeaderProps {
   theme?: string;
