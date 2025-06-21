@@ -197,6 +197,12 @@ const options = [
 - on next load, the app reads and deserializes the pre-built index for faster boot
 
 ---
+## 📊 Database ER Diagram
+
+Run `npm run generate:erd` to generate `docs/ERD.png` from the Prisma schema.
+
+![ERD](docs/ERD.png)
+
 
 ## 👨‍💻 Author
 

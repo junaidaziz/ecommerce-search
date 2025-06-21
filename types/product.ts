@@ -1,3 +1,5 @@
+import type { Product as PrismaProduct } from '@prisma/client';
+
 export interface Product {
   id: string;
   uuid?: string;
@@ -25,13 +27,14 @@ export interface Product {
   bodyHtmlText?: string;
   quantity?: number;
   vendorId?: number;
+  categoryId?: number;
   vendorBrandName?: string | null;
   categoryName?: string | null;
   imagesUrls?: string[];
   imagesAltText?: string[];
   status?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 export type ProductResponse = Product;
@@ -55,13 +58,5 @@ export interface ProductDbRow {
   title: string;
   vendorId?: number | undefined;
   vendor?: { brandName: string | null } | null;
-  description: string | null;
-  productType: string | null;
-  tags: string | null;
   category?: { name: string | null } | null;
-  images: string | null;
-  quantity: number;
-  minPrice: number;
-  maxPrice: number;
-  currency: string;
-}
+};

@@ -2,12 +2,12 @@ export interface Category {
   id?: number;
   uuid?: string;
   name: string;
-  slug?: string;
+  slug: string;
   parentId?: number | null;
   description?: string | null;
   image?: string | null;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
   children?: Category[];
   subcategories?: string[];
 }
