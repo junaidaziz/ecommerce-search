@@ -20,25 +20,28 @@ export interface PasswordInputProps<T extends FieldValues>
   className?: string;
   leftAddon?: React.ReactNode;
   register?: UseFormRegister<T>;
-  rules?: RegisterOptions;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const PasswordInput = <T extends FieldValues>({
-  label,
-  name,
-  placeholder,
-  value,
-  onChange,
-  onBlur,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  leftAddon,
-  register,
-  rules,
-  ...rest
-}) => {
+const PasswordInput = <T extends FieldValues>(
+  props: PasswordInputProps<T>
+) => {
+  const {
+    label,
+    name,
+    placeholder,
+    value,
+    onChange,
+    onBlur,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    leftAddon,
+    register,
+    rules,
+    ...rest
+  } = props;
   const [show, setShow] = useState(false);
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
