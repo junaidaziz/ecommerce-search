@@ -269,51 +269,11 @@ export async function getCategoriesFlat(): Promise<Category[]> {
   return db.category.findMany({ orderBy: { name: 'asc' } });
 }
 
-export async function getCategoryTree(): Promise<{ name: string; subcategories: string[]; image?: string }[]> {
-  const flat = await getCategoriesFlat();
-  if (flat.length > 0) {
-    const map: Record<number, { name: string; image?: string; subcategories: string[] }> = {};
-    flat.forEach((c) => {
-      if (typeof c.id === 'number') {
-        map[c.id] = { name: c.name, image: c.image ?? undefined, subcategories: [] };
-      }
-    });
-    flat.forEach((c) => {
-      if (typeof c.parentId === 'number') {
-        map[c.parentId]?.subcategories.push(c.name);
-      }
-    });
-    return flat
-      .filter((c) => typeof c.id === 'number' && !c.parentId)
-      .map((c) => ({
-        name: c.name,
-        image: c.image ?? undefined,
-        subcategories: (map[c.id as number]?.subcategories ?? []).sort((a, b) =>
-          a.localeCompare(b)
-        ),
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }
-
-  const db = getDb();
-  const rows = await db.product.findMany({ include: { category: true } });
-  const map = {} as Record<string, Set<string>>;
-  for (const row of rows) {
-    const categoryName = row.category?.name;
-    if (!categoryName) continue;
-    if (!map[categoryName]) map[categoryName] = new Set();
-    if (row.productType) map[categoryName].add(row.productType);
-  }
-  return Object.entries(map)
-    .map(([name, set]) => ({ name, subcategories: Array.from(set).sort() }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+export async function getCategoryTree(): Promise<Category[]> {
+  return getCategoriesFlat();
 }
 
-export async function createCategory(
-  name: string,
-  parentId: number | null = null,
-  image: string | null = null
-): Promise<void> {
+export async function createCategory(name: string): Promise<void> {
   const db = getDb();
   const existing = await db.category.findFirst({ where: { name } });
   if (existing) return;
@@ -322,9 +282,7 @@ export async function createCategory(
 
 export async function renameCategory(
   uuid: string,
-  name: string,
-  _parentId: number | null = null,
-  _image: string | null = null
+  name: string
 ): Promise<void> {
   const db = getDb();
   await db.category.update({ where: { uuid }, data: { name } });
