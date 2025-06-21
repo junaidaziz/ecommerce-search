@@ -45,15 +45,15 @@ export default async function handler(
     await addUser({
       email,
       password: hashed,
-      first_name: firstName,
-      last_name: lastName,
+      firstName,
+      lastName,
       gender: gender || '',
-      phone_number: phoneNumber || null,
+      phoneNumber: phoneNumber || null,
       address: address || null,
       city: city || null,
       country: country || null,
       role: 'USER',
-      verification_token: token,
+      verificationToken: token,
     });
     return res.status(201).json({ token });
   } catch (error) {
