@@ -29,10 +29,6 @@ export default async function handler(
       items: JSON.parse(metadata.items || '[]'),
       total: session.amount_total / 100,
       status: 'completed',
-      shipping: {
-        name: metadata.shippingName || '',
-        address: metadata.shippingAddress || '',
-      },
     });
     await sendOrderConfirmation(metadata.email, { id: orderId });
     return res.status(200).json({ id: orderId });

@@ -42,9 +42,6 @@ const Orders: React.FC<OrdersProps> = (_props) => {
             <p>
               Order #{o.id} - {o.status}
             </p>
-            {o.shipping?.address && (
-              <p className="text-sm">Address: {o.shipping.address}</p>
-            )}
             <ul className="list-disc pl-4 text-sm mb-1">
               <li>
                 {o.product.title} x {o.quantity}
