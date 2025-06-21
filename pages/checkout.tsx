@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { AppContext, AppContextValue } from '../contexts/AppContext';
 import type { User } from '../types/user';
+import type { Coupon } from '../types';
 
 // Types for cart item and user
 type CartItem = {
@@ -118,7 +119,9 @@ const Checkout: React.FC = () => {
               id="coupon"
               className="input input-bordered flex-1"
               value={coupon}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setCoupon(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setCoupon(e.target.value)
+              }
             />
             <button
               type="button"
@@ -129,8 +132,14 @@ const Checkout: React.FC = () => {
                   `/api/coupons/${encodeURIComponent(coupon)}`
                 );
                 if (res.ok) {
-                  const data = await res.json();
-                  setDiscount(data.percent);
+                  const data: Coupon = await res.json();
+                  if (data.discountType === 'percent') {
+                    setDiscount(data.value);
+                  } else {
+                    setDiscount(
+                      totalPrice > 0 ? (data.value / totalPrice) * 100 : 0
+                    );
+                  }
                 } else {
                   setDiscount(0);
                 }
@@ -153,7 +162,9 @@ const Checkout: React.FC = () => {
             id="name"
             className="input input-bordered w-full"
             value={name}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setName(e.target.value)
+            }
             required
           />
         </div>
@@ -165,7 +176,9 @@ const Checkout: React.FC = () => {
             id="address"
             className="textarea textarea-bordered w-full"
             value={address}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+              setAddress(e.target.value)
+            }
             required
           />
         </div>
