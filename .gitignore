@@ -36,8 +36,6 @@ coverage/
 *.bak
 *.tmp
 
-# Search index
-public/index.json
 tsconfig.tsbuildinfo
 
 # Prisma
