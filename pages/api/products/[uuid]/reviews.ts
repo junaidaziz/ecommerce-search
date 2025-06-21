@@ -4,7 +4,7 @@ import {
   addReview,
   getReviewsForProduct,
   getAverageRating,
-} from '../../../../lib/db.js';
+} from '../../../../lib/db';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../../lib/utils/getQueryParam';
 import type {
