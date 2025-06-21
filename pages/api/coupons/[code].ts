@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import type { Coupon, ApiMessage } from '../../../types';
 
 const coupons: Record<string, Coupon> = {
@@ -30,8 +31,8 @@ export default function handler(
   res: NextApiResponse<Coupon | ApiMessage>
 ): void {
   try {
-    const { code } = req.query;
-    const coupon = coupons[code?.toUpperCase() as string];
+  const code = getQueryParam(req.query.code);
+  const coupon = code ? coupons[code.toUpperCase()] : undefined;
     if (!coupon) return res.status(404).json({ message: 'Invalid code' });
     res.status(200).json(coupon);
   } catch (error) {

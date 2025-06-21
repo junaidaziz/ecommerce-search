@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getOrdersForVendor } from '../../../lib/orders';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import type { AnalyticsData, ApiMessage } from '../../../types';
 
 export default async function handler(
@@ -11,11 +12,11 @@ export default async function handler(
     if (req.method !== 'GET') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
-    const { vendor } = req.query;
+    const vendor = getQueryParam(req.query.vendor);
     if (!vendor) {
       return res.status(400).json({ message: 'vendor required' });
     }
-    const orders = await getOrdersForVendor(vendor as string);
+    const orders = await getOrdersForVendor(vendor);
     const summary = {
       totalOrders: orders.length,
       totalRevenue: 0,

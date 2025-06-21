@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import { Product, ApiMessage } from '../../../types';
 import { parseImages } from '../../../lib/utils/parseImages';
 
@@ -143,7 +144,7 @@ async function handler(
     }
 
     if (req.method === 'DELETE') {
-      const { uuid } = req.query;
+      const uuid = getQueryParam(req.query.uuid);
       if (!uuid) {
         return res.status(400).json({ message: 'uuid required' });
       }
@@ -161,9 +162,9 @@ async function handler(
     }
 
     if (req.method === 'GET') {
-      const { vendor } = req.query;
+      const vendor = getQueryParam(req.query.vendor);
       const where: Record<string, unknown> = {};
-      if (vendor) where.vendor = { brandName: String(vendor) };
+      if (vendor) where.vendor = { brandName: vendor };
       const rows = await db.product.findMany({
         where,
         include: { category: true, vendor: true },
