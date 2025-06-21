@@ -66,8 +66,7 @@ const Checkout: React.FC = () => {
         body: JSON.stringify({
           items: cart,
           email: user.email,
-          shippingName: name,
-          shippingAddress: address,
+          shipping: { name, address },
           discount,
         }),
       });

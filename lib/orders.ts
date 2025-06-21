@@ -1,4 +1,4 @@
-import { Order, Product } from '../types';
+import { Order, Product, ShippingInfo } from '../types';
 import type { ProductDbRow } from '../types/product';
 import { getDb } from './db';
 import { mapDbRowToProduct } from './products';
@@ -22,8 +22,7 @@ export interface AddOrderParams {
   items: OrderItemInput[];
   total: number;
   status?: Order['status'];
-  shippingName?: string | null;
-  shippingAddress?: string | null;
+  shipping?: ShippingInfo | null;
 }
 
 function mapOrderRow(row: OrderWithRelations): Order {
@@ -37,6 +36,7 @@ function mapOrderRow(row: OrderWithRelations): Order {
     status: row.status as Order['status'],
     user: row.user,
     product: mapDbRowToProduct(row.product),
+    shipping: null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };

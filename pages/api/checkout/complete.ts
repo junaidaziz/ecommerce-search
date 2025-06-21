@@ -25,12 +25,14 @@ export default async function handler(
     }
     const metadata = session.metadata || {};
     const orderId = addOrder({
-      user_email: metadata.email,
+      userEmail: metadata.email,
       items: JSON.parse(metadata.items || '[]'),
       total: session.amount_total / 100,
       status: 'completed',
-      shipping_name: metadata.shippingName,
-      shipping_address: metadata.shippingAddress,
+      shipping: {
+        name: metadata.shippingName || '',
+        address: metadata.shippingAddress || '',
+      },
     });
     await sendOrderConfirmation(metadata.email, { id: orderId });
     return res.status(200).json({ id: orderId });

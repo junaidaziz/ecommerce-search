@@ -1,11 +1,7 @@
 import type { User } from './user';
-import type { Product, ProductDbRow } from './product';
+import type { Product } from './product';
 import type { Coupon } from './coupon';
-
-export interface ShippingInfo {
-  name: string;
-  address: string;
-}
+import type { ShippingInfo } from './shipping';
 
 export interface Order {
   id: number;
@@ -15,10 +11,10 @@ export interface Order {
   quantity: number;
   total: number;
   status: 'pending' | 'shipped' | 'completed';
-  user: User;
-  product: Product;
-  coupon?: Coupon;
-  shipping?: ShippingInfo;
+  user?: User;
+  product?: Product;
+  coupon?: Coupon | null;
+  shipping?: ShippingInfo | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,11 +27,9 @@ export interface OrderInput {
   quantity: number;
   total: number;
   couponId?: number;
-  shippingName?: string;
-  shippingAddress?: string;
+  shipping?: ShippingInfo;
 }
 
-export type OrderProductRow = ProductDbRow;
 
 export interface OrderRow {
   id: number;
@@ -47,7 +41,8 @@ export interface OrderRow {
   status: string;
   createdAt: Date;
   updatedAt: Date;
-  user: User;
-  product: OrderProductRow;
+  user?: User | null;
+  product?: Product | null;
   coupon?: Coupon | null;
+  shipping?: ShippingInfo | null;
 }

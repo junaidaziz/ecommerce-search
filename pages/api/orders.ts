@@ -22,7 +22,7 @@ async function handler(
 ): Promise<void> {
   try {
     if (req.method === 'POST') {
-      const { email, items, total, shippingName, shippingAddress } = req.body;
+      const { email, items, total, shipping } = req.body;
     if (!email || !items) {
       return res.status(400).json({ message: 'email and items required' });
     }
@@ -44,11 +44,10 @@ async function handler(
     }
 
     const orderId = await addOrder({
-      user_email: email,
+      userEmail: email,
       items,
       total: total || 0,
-      shipping_name: shippingName,
-      shipping_address: shippingAddress,
+      shipping,
     });
     await clearCart(email);
     await sendOrderConfirmation(email, { id: orderId });
