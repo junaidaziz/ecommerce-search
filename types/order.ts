@@ -1,5 +1,5 @@
 import type { User } from './user';
-import type { Product, ProductDbRow } from './product';
+import type { Product } from './product';
 import type { Coupon } from './coupon';
 
 export interface ShippingInfo {
@@ -35,7 +35,7 @@ export interface OrderInput {
   shippingAddress?: string;
 }
 
-export type OrderProductRow = ProductDbRow;
+export type OrderProductRow = Product;
 
 export interface OrderRow {
   id: number;
