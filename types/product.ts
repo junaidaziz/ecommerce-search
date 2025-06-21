@@ -24,6 +24,8 @@ export interface Product {
   minPrice: number;
   maxPrice: number;
   currency: string;
+  /** Total inventory quantity available */
+  totalInventory?: number;
   descriptionText?: string;
   bodyHtmlText?: string;
   status?: string;
