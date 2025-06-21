@@ -1,10 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { updateUserProfile, findUser } from '../../../lib/users';
+import type { Vendor } from '../../../types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Vendor | { message: string }>
+) {
   try {
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user) {
@@ -12,7 +16,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     if (req.method === 'GET') {
       const userData = await findUser(session.user.email);
-      return res.status(200).json(userData);
+      if (!userData) {
+        return res.status(404).json({ message: 'Not found' });
+      }
+      const vendor: Vendor = {
+        id: Number(userData.id),
+        name: `${userData.firstName} ${userData.lastName}`.trim(),
+        email: userData.email,
+        company: userData.brandName ?? '',
+        phoneNumber: userData.phoneNumber ?? undefined,
+        address: userData.businessAddress ?? undefined,
+        city: userData.city ?? undefined,
+        country: userData.country ?? undefined,
+        website: userData.website ?? undefined,
+        description: userData.businessDescription ?? undefined,
+        taxId: userData.taxId ?? undefined,
+        status: userData.disabled ? 'disabled' : 'active',
+        createdAt: userData.createdAt?.toISOString(),
+        updatedAt: userData.updatedAt?.toISOString(),
+      };
+      return res.status(200).json(vendor);
     }
     if (req.method === 'PUT') {
       const {

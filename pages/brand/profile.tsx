@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { AppContext } from '../../contexts/AppContext';
-import type { User } from '../../types/user';
+import type { User, Vendor } from '../../types';
 
 export const BrandProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
@@ -26,6 +26,23 @@ export const BrandProfile: React.FC = () => {
       setTaxId(user.taxId || '');
     }
   }, [user]);
+
+  useEffect(() => {
+    fetch('/api/brand/profile')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: Vendor | null) => {
+        if (!data) return;
+        setBrandName(data.company || '');
+        setPhoneNumber(data.phoneNumber || '');
+        setBusinessAddress(data.address || '');
+        setCity(data.city || '');
+        setCountry(data.country || '');
+        setWebsite(data.website || '');
+        setBusinessDescription(data.description || '');
+        setTaxId(data.taxId || '');
+      })
+      .catch(() => {});
+  }, []);
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
