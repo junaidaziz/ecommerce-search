@@ -1,6 +1,8 @@
 import { useContext, useState, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import Head from 'next/head';
+import { getPageTitle } from '../lib/pageTitle';
 import { AppContext, AppContextValue } from '../contexts/AppContext';
 import type { User } from '../types/user';
 import type { Coupon } from '../types';
@@ -81,6 +83,9 @@ const Checkout: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto">
+      <Head>
+        <title>{getPageTitle('Checkout')}</title>
+      </Head>
       <h1 className="text-3xl font-bold mb-4">Checkout</h1>
       <div className="mb-4 max-h-64 overflow-y-auto">
         <ul className="space-y-2">

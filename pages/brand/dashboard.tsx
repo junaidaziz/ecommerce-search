@@ -10,6 +10,8 @@ import { AppContext } from '../../contexts/AppContext';
 import type { User } from '../../types/user';
 import type { Product, ProductInput } from '../../types/product';
 import { TextInput } from '../../components/form-fields';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 type ProductForm = Partial<ProductInput> & { id?: string };
 
@@ -167,6 +169,9 @@ const BrandDashboard: React.FC = () => {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 min-h-screen py-6">
+      <Head>
+        <title>{getPageTitle('Brand Dashboard')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">Brand Dashboard</h1>
       {lowStock.length > 0 && (
         <div className="alert alert-warning mb-4">
