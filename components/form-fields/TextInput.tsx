@@ -21,26 +21,29 @@ export interface TextInputProps<T extends FieldValues>
   leftAddon?: React.ReactNode;
   rightAddon?: React.ReactNode;
   register?: UseFormRegister<T>;
-  rules?: RegisterOptions;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const TextInput = <T extends FieldValues>({
-  label,
-  name,
-  placeholder,
-  value,
-  onChange,
-  onBlur,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  leftAddon,
-  rightAddon,
-  register,
-  rules,
-  ...rest
-}) => {
+const TextInput = <T extends FieldValues>(
+  props: TextInputProps<T>
+) => {
+  const {
+    label,
+    name,
+    placeholder,
+    value,
+    onChange,
+    onBlur,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    leftAddon,
+    rightAddon,
+    register,
+    rules,
+    ...rest
+  } = props;
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
 

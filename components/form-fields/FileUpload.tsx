@@ -17,22 +17,25 @@ export interface FileUploadProps<T extends FieldValues>
   disabled?: boolean;
   className?: string;
   register?: UseFormRegister<T>;
-  rules?: RegisterOptions;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const FileUpload = <T extends FieldValues>({
-  label,
-  name,
-  onChange,
-  onBlur,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  register,
-  rules,
-  ...rest
-}) => {
+const FileUpload = <T extends FieldValues>(
+  props: FileUploadProps<T>
+) => {
+  const {
+    label,
+    name,
+    onChange,
+    onBlur,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    register,
+    rules,
+    ...rest
+  } = props;
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
 

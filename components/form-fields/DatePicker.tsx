@@ -18,23 +18,26 @@ export interface DatePickerProps<T extends FieldValues>
   disabled?: boolean;
   className?: string;
   register?: UseFormRegister<T>;
-  rules?: RegisterOptions;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const DatePicker = <T extends FieldValues>({
-  label,
-  name,
-  value,
-  onChange,
-  onBlur,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  register,
-  rules,
-  ...rest
-}) => {
+const DatePicker = <T extends FieldValues>(
+  props: DatePickerProps<T>
+) => {
+  const {
+    label,
+    name,
+    value,
+    onChange,
+    onBlur,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    register,
+    rules,
+    ...rest
+  } = props;
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
 
