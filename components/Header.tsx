@@ -14,19 +14,12 @@ import ChevronDownIcon from './icons/ChevronDownIcon';
 import ElectronicsIcon from './icons/ElectronicsIcon';
 import FashionIcon from './icons/FashionIcon';
 import { Theme } from 'react-select';
-import { Category as PrismaCategory } from '@prisma/client';
+import type { Category } from '../types/category';
 import type {
   CategoriesResponse,
   SuggestionsResponse,
   TrendingResponse,
 } from '../types/api';
-
-interface Category extends PrismaCategory {
-  parentId?: number | null;
-  children?: Category[];
-  image?: string | null;
-  subcategories?: string[];
-}
 
 import type { Product } from '../types/product';
 import type { User } from '../types/user';

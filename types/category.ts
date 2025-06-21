@@ -1,10 +1,14 @@
 export interface Category {
   id?: number;
   name: string;
+  slug?: string;
   parentId?: number | null;
+  description?: string | null;
+  image?: string | null;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
   children?: Category[];
   subcategories?: string[];
-  image?: string;
 }
 
 export interface CategoryInput {
