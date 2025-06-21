@@ -79,6 +79,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   const [hasMore, setHasMore] = useState(products.length < total);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver>();
+  const isFetchingRef = useRef(false);
   const priceTimer = useRef<NodeJS.Timeout>();
   const firstPriceRef = useRef(true);
 
@@ -99,7 +100,8 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   );
 
   const loadMore = useCallback(async () => {
-    if (loadingMore || !hasMore) return;
+    if (isFetchingRef.current || loadingMore || !hasMore) return;
+    isFetchingRef.current = true;
     setLoadingMore(true);
     const next = page + 1;
     const data = await fetchPage(next);
@@ -117,6 +119,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       );
     }
     setLoadingMore(false);
+    isFetchingRef.current = false;
   }, [fetchPage, hasMore, loadingMore, page, router]);
 
   const loadMoreFn = useRef(loadMore);
