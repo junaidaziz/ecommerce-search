@@ -3,6 +3,7 @@ import Link from 'next/link';
 import ProductImageSlider from './ProductImageSlider';
 import { AppContext, AppContextValue } from '../contexts/AppContext';
 import type { Product } from '../types/product';
+import { formatCurrency } from '../lib/utils/formatCurrency';
 
 interface ProductCardProps {
   product: Product;
@@ -67,7 +68,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </p>
         <div className="flex justify-between items-center mt-auto text-sm">
           <span className="font-bold">
-            {product.currency} {product.minPrice?.toFixed(2)}
+            {formatCurrency(product.minPrice ?? 0, product.currency)}
           </span>
           {product.reviewCount > 0 && (
             <span className="text-xs">

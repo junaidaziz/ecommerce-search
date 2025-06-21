@@ -16,6 +16,7 @@ interface CsvRow {
   TAGS?: string;
   IMAGES?: string;
   PRICE_RANGE_V2?: string;
+  TOTAL_INVENTORY?: string;
 }
 
 async function ensureVendor(name: string) {
@@ -89,7 +90,10 @@ async function processRow(row: CsvRow) {
         productType: row.PRODUCT_TYPE || '',
         tags: row.TAGS || '',
         images: row.IMAGES || null,
-        quantity: 0,
+        quantity:
+          typeof row.TOTAL_INVENTORY !== 'undefined'
+            ? parseInt(row.TOTAL_INVENTORY as any, 10) || 0
+            : Math.floor(Math.random() * 20),
         minPrice: price.min,
         maxPrice: price.max,
         currency: price.currency,
