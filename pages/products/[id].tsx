@@ -5,7 +5,11 @@ import Link from 'next/link';
 import Head from 'next/head';
 import ProductImageSlider from '../../components/ProductImageSlider';
 import type { Product } from '../../types';
-import type { Review, ReviewsResponse, ReviewAddedResponse } from '../../types/review';
+import type {
+  Review,
+  ReviewsResponse,
+  ReviewAddedResponse,
+} from '../../types/review';
 
 interface ProductDetailProps {}
 
@@ -22,7 +26,8 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
   const [myRating, setMyRating] = useState<number>(5);
   const [comment, setComment] = useState<string>('');
 
-  const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } = appContext ?? {};
+  const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } =
+    appContext ?? {};
 
   useEffect(() => {
     if (!id) return;
@@ -95,13 +100,13 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
             product.images && product.images.length > 0
               ? product.images
               : product.featuredImage
-              ? [product.featuredImage]
-              : []
+                ? [product.featuredImage]
+                : []
           }
           imgClass="hover:scale-110 transition"
         />
       </div>
-      <p className="mb-2">Vendor: {product.vendor}</p>
+      <p className="mb-2">Vendor: {product.vendor.brandName}</p>
       <p className="mb-2">Type: {product.productType}</p>
       <p className="mb-4">
         {product.descriptionText ||
@@ -112,7 +117,9 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
         {product.currency || ''}{' '}
         {product.minPrice ? product.minPrice.toFixed(2) : 'N/A'}
       </p>
-      <p className="mb-2">Rating: {averageRating.toFixed(1)} ({reviewCount})</p>
+      <p className="mb-2">
+        Rating: {averageRating.toFixed(1)} ({reviewCount})
+      </p>
       <div className="flex gap-2">
         <button
           className="btn btn-primary"
@@ -129,7 +136,11 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
             Remove Wishlist
           </button>
         ) : (
-          <button className="btn" onClick={() => addToWishlist?.(product)} disabled={!addToWishlist}>
+          <button
+            className="btn"
+            onClick={() => addToWishlist?.(product)}
+            disabled={!addToWishlist}
+          >
             Add Wishlist
           </button>
         )}
@@ -174,18 +185,24 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
               <label className="mr-2">Rating</label>
               <select
                 value={myRating}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) => setMyRating(parseInt(e.target.value))}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                  setMyRating(parseInt(e.target.value))
+                }
                 className="select select-bordered"
               >
                 {[1, 2, 3, 4, 5].map((n) => (
-                  <option key={n} value={n}>{n}</option>
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
                 ))}
               </select>
             </div>
             <textarea
               className="textarea textarea-bordered w-full"
               value={comment}
-              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                setComment(e.target.value)
+              }
               placeholder="Write a review"
             />
             <button className="btn btn-sm btn-primary" type="submit">
