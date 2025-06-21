@@ -36,9 +36,9 @@ function mapOrderRow(row: OrderWithRelations): Order {
     status: row.status as Order['status'],
     user: row.user,
     product: mapDbRowToProduct(row.product),
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
     shipping: null,
-    createdAt: row.createdAt.toISOString(),
-    updatedAt: row.updatedAt.toISOString(),
   };
 }
 

@@ -11,12 +11,12 @@ export interface Order {
   quantity: number;
   total: number;
   status: 'pending' | 'shipped' | 'completed';
-  user?: User;
-  product?: Product;
-  coupon?: Coupon | null;
-  shipping?: ShippingInfo | null;
-  createdAt: string;
-  updatedAt: string;
+  user: User;
+  product: Product;
+  coupon?: Coupon;
+  shipping?: ShippingInfo;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type OrderResponse = Order;

@@ -7,5 +7,5 @@ export interface Coupon {
   expiresAt?: string;
   minOrderAmount?: number;
   usageLimit?: number;
-  createdAt?: string;
+  createdAt?: Date;
 }

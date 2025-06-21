@@ -29,8 +29,8 @@ export interface Product {
   descriptionText?: string;
   bodyHtmlText?: string;
   status?: string;
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
+  createdAt?: Date;
+  updatedAt?: Date;
   vendor: Vendor;
   brand?: Brand;
   category: Category;

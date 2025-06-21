@@ -15,8 +15,8 @@ export interface User {
   gender?: string;
   verified?: boolean;
   disabled?: boolean;
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type UserResponse = User;
