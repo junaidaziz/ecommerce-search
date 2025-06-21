@@ -7,36 +7,28 @@ function mapOrderRow(row: OrderRow): Order {
     id: row.id,
     uuid: row.uuid,
     userId: row.userId,
-    items: [
-      {
-        ...mapDbRowToProduct({
-          id: row.product.id,
-          slug: row.product.slug,
-          title: row.product.title,
-          vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
-          description: row.product.description,
-          product_type: row.product.productType,
-          tags: Array.isArray(row.product.tags)
-            ? row.product.tags
-            : typeof row.product.tags === 'string'
-            ? row.product.tags.split(',').map((t) => t.trim()).filter(Boolean)
-            : [],
-          category: row.product.category?.name,
-          images: row.product.images,
-          quantity: row.product.quantity,
-          min_price: row.product.minPrice,
-          max_price: row.product.maxPrice,
-          currency: row.product.currency,
-        }),
-        qty: row.quantity,
-      },
-    ],
+    productId: row.productId,
+    quantity: row.quantity,
     total: row.total,
-    status: row.status,
+    status: row.status as Order['status'],
+    user: row.user,
+    product: mapDbRowToProduct({
+      id: row.product.id,
+      slug: row.product.slug,
+      title: row.product.title,
+      vendor: row.product.vendor?.brandName ?? String(row.product.vendorId),
+      description: row.product.description,
+      product_type: row.product.productType,
+      tags: row.product.tags,
+      category: row.product.category?.name,
+      images: row.product.images,
+      quantity: row.product.quantity,
+      min_price: row.product.minPrice,
+      max_price: row.product.maxPrice,
+      currency: row.product.currency,
+    }),
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
-    paymentMethod: undefined,
-    shippingAddress: undefined,
   };
 }
 
