@@ -15,9 +15,7 @@ export interface CheckoutSessionResponse {
   message?: string;
 }
 
-export interface CouponResponse {
-  percent: number;
-}
+export type CouponResponse = import('./coupon').Coupon;
 
 export interface CategoriesResponse {
   categories: import('./category').Category[];
