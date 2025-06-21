@@ -1,4 +1,5 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
+import Link from 'next/link';
 import { TextInput } from '../components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '../lib/pageTitle';
@@ -20,26 +21,35 @@ const RequestReset: React.FC = () => {
   };
 
   return (
-    <div className="max-w-sm mx-auto">
-      <Head>
+    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8 overflow-hidden">
+            <Head>
         <title>{getPageTitle('Reset Password')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
-      <form onSubmit={submit} className="space-y-2">
-        <TextInput
-          name="email"
-          className="w-full"
-          value={email}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setEmail(e.target.value)
-          }
-          placeholder="Email"
-        />
-        <button className="btn btn-primary w-full" type="submit">
-          Request Reset
-        </button>
-      </form>
-      {message && <p className="mt-2">{message}</p>}
+
+      <div className="max-w-sm mx-auto border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
+        <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
+        <form onSubmit={submit} className="space-y-2">
+          <TextInput
+            name="email"
+            className="w-full"
+            value={email}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setEmail(e.target.value)
+            }
+            placeholder="Email"
+          />
+          <button className="btn btn-primary w-full" type="submit">
+            Request Reset
+          </button>
+        </form>
+        <p className="text-center mt-4">
+          Already have an account?{' '}
+          <Link href="/login" className="link">
+            Login
+          </Link>
+        </p>
+        {message && <p className="mt-2">{message}</p>}
+      </div>
     </div>
   );
 };

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import EyeIcon from '../icons/EyeIcon';
+import EyeOffIcon from '../icons/EyeOffIcon';
 import {
   UseFormRegister,
   RegisterOptions,
@@ -82,9 +84,14 @@ const PasswordInput = <T extends FieldValues>(
         <button
           type="button"
           onClick={toggle}
-          className="inline-flex items-center px-3 border border-l-0 rounded-r-md bg-gray-100 hover:bg-gray-200"
+          className="inline-flex items-center px-3 border border-l-0 rounded-r-md bg-gray-100 hover:bg-gray-200 focus:outline-none"
+          aria-label={show ? 'Hide password' : 'Show password'}
         >
-          {show ? 'Hide' : 'Show'}
+          {show ? (
+            <EyeOffIcon className="h-5 w-5" />
+          ) : (
+            <EyeIcon className="h-5 w-5" />
+          )}
         </button>
       </div>
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
