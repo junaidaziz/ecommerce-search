@@ -13,7 +13,7 @@ export default async function handler(
     if (!vendor) return res.status(400).json({ message: 'vendor required' });
     const { products } = await loadAndIndexProducts();
     const low = products.filter(
-      (p) => p.VENDOR === vendor && p.TOTAL_INVENTORY <= 5
+      (p) => p.vendor.brandName === vendor && (p.totalInventory ?? 0) <= 5
     );
     res.status(200).json(low);
   } catch (error) {

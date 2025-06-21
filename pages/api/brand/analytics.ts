@@ -17,7 +17,7 @@ export default async function handler(
       return res.status(400).json({ message: 'vendor required' });
     }
     const orders = await getOrdersForVendor(vendor);
-    const summary = {
+    const summary: AnalyticsData = {
       totalOrders: orders.length,
       totalRevenue: 0,
       topProducts: [],
@@ -25,7 +25,7 @@ export default async function handler(
     const counts: Record<string, number> = {};
     orders.forEach((o) => {
       summary.totalRevenue += o.total || 0;
-      if (o.product.vendor === vendor) {
+      if (o.product.vendor.brandName === vendor) {
         counts[o.product.id] = (counts[o.product.id] || 0) + o.quantity;
       }
     });
