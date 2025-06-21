@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
 import { Product } from '../types/product';
+import type { SearchResults } from '../types/api';
 
 interface RecommendedProductsProps {
   category?: string;
@@ -18,10 +19,10 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
   useEffect(() => {
     if (!category) return;
     fetch(`/api/search?category=${encodeURIComponent(category)}&perPage=4`)
-      .then((res) => (res.ok ? res.json() : null))
+      .then((res) => (res.ok ? (res.json() as Promise<SearchResults>) : null))
       .then((data) => {
         if (data && Array.isArray(data.results)) {
-          const filtered = data.results.filter((p: Product) => p.ID !== excludeId);
+          const filtered = data.results.filter((p) => p.ID !== excludeId);
           setProducts(filtered);
         }
       })
