@@ -12,7 +12,19 @@ import { TextInput } from '../../components/form-fields';
 
 export default function VendorDashboard() {
   const { user } = useContext(AppContext)!;
-  type FormState = Partial<Product>;
+  interface FormState {
+    id: string;
+    title: string;
+    vendor: string;
+    description: string;
+    productType: string;
+    tags: string;
+    category: string;
+    quantity: number;
+    minPrice: number;
+    maxPrice: number;
+    currency: string;
+  }
   const emptyForm: FormState = {
     id: '',
     title: '',
@@ -46,7 +58,8 @@ export default function VendorDashboard() {
   }, [fetchProducts]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const key = e.target.name as keyof FormState;
+    setForm({ ...form, [key]: e.target.value });
   };
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
@@ -84,11 +97,11 @@ export default function VendorDashboard() {
     setForm({
       id: p.id,
       title: p.title || '',
-      vendor: p.vendor || '',
+      vendor: p.vendor?.brandName || '',
       description: p.description || '',
       productType: p.productType || '',
       tags: p.tags || '',
-      category: p.category || '',
+      category: p.category?.name || '',
       quantity: p.totalInventory || 0,
       minPrice: p.minPrice || 0,
       maxPrice: p.maxPrice || 0,
@@ -137,14 +150,14 @@ export default function VendorDashboard() {
           'minPrice',
           'maxPrice',
           'currency',
-        ].map((field) => (
-          <TextInput
-            key={field}
-            name={field as keyof FormState}
-            value={String(form[field] ?? '')}
-            onChange={handleChange}
-            placeholder={field}
-          />
+          ].map((field) => (
+            <TextInput
+              key={field}
+              name={field as keyof FormState}
+              value={String(form[field as keyof FormState] ?? '')}
+              onChange={handleChange}
+              placeholder={field}
+            />
         ))}
         <div className="flex gap-2">
           {editingId && (

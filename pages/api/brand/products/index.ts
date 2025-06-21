@@ -14,7 +14,7 @@ export default async function handler(
       const vendor = getQueryParam(req.query.vendor);
       if (!vendor) return res.status(400).json({ message: 'vendor required' });
       const { products } = await loadAndIndexProducts();
-      const filtered = products.filter((p) => p.VENDOR === vendor);
+      const filtered = products.filter((p) => p.vendor.brandName === vendor);
       return res.status(200).json(filtered);
     }
 

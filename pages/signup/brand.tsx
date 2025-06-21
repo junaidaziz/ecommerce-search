@@ -67,6 +67,7 @@ export default function BrandSignup() {
     website: string;
     businessDescription: string;
     taxId: string;
+    logo: FileList;
   }>();
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -77,7 +78,7 @@ export default function BrandSignup() {
     () =>
       countryList()
         .getData()
-        .map((c) => ({ label: `${c.label} (${c.value})`, value: c.value })),
+        .map((c: { label: string; value: string }) => ({ label: `${c.label} (${c.value})`, value: c.value })),
     []
   );
 
@@ -160,7 +161,7 @@ export default function BrandSignup() {
         businessDescription,
         taxId,
       } = values;
-      const data = await signup('/api/signup/brand', {
+      const data = await signup<{ token: string }>('/api/signup/brand', {
         brandName,
         firstName,
         lastName,
@@ -260,8 +261,8 @@ export default function BrandSignup() {
                       'Password must be at least 8 characters and include uppercase, lowercase, number and special character',
                   },
                   onBlur: handlePasswordBlur,
-                  onFocus: handlePasswordFocus,
                 }}
+                onFocus={handlePasswordFocus}
                 error={errors.password?.message as string}
               />
               <PasswordInput

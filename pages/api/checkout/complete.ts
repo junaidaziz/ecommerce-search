@@ -6,7 +6,7 @@ import { handleApiError } from '../../../lib/utils/handleApiError';
 import type { OrderIdResponse, ApiMessage } from '../../../types';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16',
+  apiVersion: '2022-11-15',
 });
 
 export default async function handler(
@@ -24,12 +24,13 @@ export default async function handler(
       return res.status(400).json({ message: 'payment not completed' });
     }
     const metadata = session.metadata || {};
-    const orderId = addOrder({
+    const orders = await addOrder({
       userEmail: metadata.email,
       items: JSON.parse(metadata.items || '[]'),
-      total: session.amount_total / 100,
+      total: (session.amount_total ?? 0) / 100,
       status: 'completed',
     });
+    const orderId = Array.isArray(orders) && orders.length > 0 ? orders[0].id : '';
     await sendOrderConfirmation(metadata.email, { id: orderId });
     return res.status(200).json({ id: orderId });
   } catch (e) {

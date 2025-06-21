@@ -136,7 +136,7 @@ export default function Categories() {
               >
                 Edit
               </button>
-              <button onClick={() => remove(cat.id)} className="btn btn-sm">
+              <button onClick={() => remove(Number(cat.id))} className="btn btn-sm">
                 Delete
               </button>
             </>

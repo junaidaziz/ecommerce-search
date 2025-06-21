@@ -198,6 +198,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
               />
             </div>
             <Textarea
+              name="comment"
               className="w-full"
               value={comment}
               onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
