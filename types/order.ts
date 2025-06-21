@@ -19,8 +19,8 @@ export interface Order {
   product: Product;
   coupon?: Coupon;
   shipping?: ShippingInfo;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type OrderResponse = Order;
