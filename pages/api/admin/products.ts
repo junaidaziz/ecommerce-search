@@ -1,23 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getDb } from '../../../lib/db';
 import { hasOrdersForProduct } from '../../../lib/orders';
-import formidable from 'formidable';
+import formidable, { type Fields, type Files } from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../lib/utils/getQueryParam';
+import { slugify } from '../../../lib/slugify';
 import { Product, ApiMessage } from '../../../types';
 import { parseImages } from '../../../lib/utils/parseImages';
-
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-}
 
 export const config = {
   api: {
@@ -25,7 +17,7 @@ export const config = {
   },
 };
 
-async function parseBody(req: NextApiRequest) {
+async function parseBody(req: NextApiRequest): Promise<{ fields: Fields; files: Files }> {
   const type = req.headers['content-type'] || '';
   if (type.includes('application/json')) {
     const buffers: Uint8Array[] = [];
@@ -33,10 +25,10 @@ async function parseBody(req: NextApiRequest) {
     const body = Buffer.concat(buffers).toString();
     return { fields: JSON.parse(body || '{}'), files: {} } as {
       fields: Record<string, any>;
-      files: formidable.Files;
+      files: Files;
     };
   }
-  return new Promise<{ fields: formidable.Fields; files: formidable.Files }>(
+  return new Promise<{ fields: Fields; files: Files }>(
     (resolve, reject) => {
       const form = formidable({ multiples: true });
       form.parse(req, (err, fields, files) => {
