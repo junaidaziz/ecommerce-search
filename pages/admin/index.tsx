@@ -1,8 +1,15 @@
-import { useState, useEffect, useContext, useCallback, ChangeEvent } from 'react';
+import {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  ChangeEvent,
+} from 'react';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
 import { Product, ProductInput, ApiMessage } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
+import { TextInput } from '../../components/form-fields';
 
 export default function Admin() {
   const { user } = useContext(AppContext)!;
@@ -178,26 +185,19 @@ export default function Admin() {
                 'maxPrice',
                 'currency',
               ].map((field) => (
-                <div key={field}>
-                  <label className="label capitalize">
-                    <span className="label-text">
-                      {field.replace('_', ' ')}
-                    </span>
-                  </label>
-                  <input
-                    name={field}
-                    value={
-                      field === 'vendor'
-                        ? form.vendor?.brandName || ''
-                        : field === 'category'
+                <TextInput
+                  key={field}
+                  name={field as keyof FormState}
+                  value={
+                    field === 'vendor'
+                      ? form.vendor?.brandName || ''
+                      : field === 'category'
                         ? form.category?.name || ''
                         : (form as any)[field]
-                    }
-                    onChange={handleChange}
-                    placeholder={field}
-                    className="input input-bordered w-full"
-                  />
-                </div>
+                  }
+                  onChange={handleChange}
+                  placeholder={field}
+                />
               ))}
               <div>
                 <label className="label">

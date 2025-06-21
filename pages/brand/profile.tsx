@@ -1,16 +1,29 @@
-import React, { useContext, useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  ChangeEvent,
+  FormEvent,
+} from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import type { User, Vendor } from '../../types';
+import { TextInput, Textarea } from '../../components/form-fields';
 
 export const BrandProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
   const [brandName, setBrandName] = useState<string>(user?.brandName || '');
-  const [phoneNumber, setPhoneNumber] = useState<string>(user?.phoneNumber || '');
-  const [businessAddress, setBusinessAddress] = useState<string>(user?.businessAddress || '');
+  const [phoneNumber, setPhoneNumber] = useState<string>(
+    user?.phoneNumber || ''
+  );
+  const [businessAddress, setBusinessAddress] = useState<string>(
+    user?.businessAddress || ''
+  );
   const [city, setCity] = useState<string>(user?.city || '');
   const [country, setCountry] = useState<string>(user?.country || '');
   const [website, setWebsite] = useState<string>(user?.website || '');
-  const [businessDescription, setBusinessDescription] = useState<string>(user?.businessDescription || '');
+  const [businessDescription, setBusinessDescription] = useState<string>(
+    user?.businessDescription || ''
+  );
   const [taxId, setTaxId] = useState<string>(user?.taxId || '');
   const [message, setMessage] = useState<string>('');
 
@@ -32,9 +45,9 @@ export const BrandProfile: React.FC = () => {
       .then((res) => (res.ok ? res.json() : null))
       .then((data: Vendor | null) => {
         if (!data) return;
-        setBrandName(data.company || '');
+        setBrandName(data.brandName || '');
         setPhoneNumber(data.phoneNumber || '');
-        setBusinessAddress(data.address || '');
+        setBusinessAddress(data.businessAddress || '');
         setCity(data.city || '');
         setCountry(data.country || '');
         setWebsite(data.website || '');
@@ -74,52 +87,60 @@ export const BrandProfile: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4">Brand Profile</h1>
       {message && <div className="mb-2 text-green-600">{message}</div>}
       <form onSubmit={submit} className="space-y-2">
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={brandName}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setBrandName(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setBrandName(e.target.value)
+          }
           placeholder="Brand Name"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={phoneNumber}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setPhoneNumber(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setPhoneNumber(e.target.value)
+          }
           placeholder="Phone Number"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={businessAddress}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setBusinessAddress(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setBusinessAddress(e.target.value)
+          }
           placeholder="Business Address"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={city}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setCity(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setCity(e.target.value)
+          }
           placeholder="City"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={country}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setCountry(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setCountry(e.target.value)
+          }
           placeholder="Country"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={website}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setWebsite(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setWebsite(e.target.value)
+          }
           placeholder="Website"
         />
-        <textarea
-          className="textarea textarea-bordered w-full"
+        <Textarea
           value={businessDescription}
-          onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setBusinessDescription(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+            setBusinessDescription(e.target.value)
+          }
           placeholder="Business Description"
         />
-        <input
-          className="input input-bordered w-full"
+        <TextInput
           value={taxId}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setTaxId(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setTaxId(e.target.value)
+          }
           placeholder="Tax ID"
         />
         <button className="btn btn-primary w-full" type="submit">

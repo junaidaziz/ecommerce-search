@@ -2,6 +2,7 @@ import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import { Category, CategoryInput, ApiMessage } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
+import { TextInput } from '../../components/form-fields';
 
 export default function Categories() {
   const { user } = useContext(AppContext)!;
@@ -70,11 +71,19 @@ export default function Categories() {
       <h1 className="text-2xl font-bold mb-4">Categories</h1>
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <div className="flex gap-2 mb-4">
-        <input
+        <TextInput
+          label=""
+          name="new-category"
           value={newCat}
-          onChange={(e) => setNewCat(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewCat(e.target.value)}
+          onBlur={() => {}}
+          error={undefined}
           placeholder="New category"
-          className="input input-bordered flex-1"
+          className="flex-1"
+          leftAddon={undefined}
+          rightAddon={undefined}
+          register={undefined}
+          rules={undefined}
         />
         <button onClick={add} className="btn btn-primary">
           Add
@@ -94,10 +103,19 @@ export default function Categories() {
         <div className="flex items-center gap-2">
           {editing === cat.id ? (
             <>
-              <input
-                className="input input-bordered flex-1"
+              <TextInput
+                className="flex-1"
+                label=""
+                name="edit-category"
+                placeholder="Edit category"
                 value={editName}
-                onChange={(e) => setEditName(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditName(e.target.value)}
+                onBlur={() => {}}
+                error={undefined}
+                leftAddon={undefined}
+                rightAddon={undefined}
+                register={undefined}
+                rules={undefined}
               />
               <button onClick={update} className="btn btn-sm">
                 Save

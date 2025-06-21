@@ -1,67 +1,48 @@
 import { getDb } from './db';
 import type { Prisma, Role } from '@prisma/client';
+import type { UserInput } from '../types/user';
 
 const prisma = getDb();
-
-interface AddUserInput {
-  email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-  brand_name?: string;
-  gender?: string;
-  phone_number?: string;
-  address?: string;
-  city?: string;
-  country?: string;
-  business_address?: string;
-  website?: string;
-  business_description?: string;
-  logo?: string;
-  tax_id?: string;
-  role?: Role;
-  verification_token?: string;
-}
 
 export async function addUser({
   email,
   password,
-  first_name,
-  last_name,
-  brand_name,
+  firstName,
+  lastName,
+  brandName,
   gender = 'OTHER',
-  phone_number,
+  phoneNumber,
   address,
   city,
   country,
-  business_address,
+  businessAddress,
   website,
-  business_description,
+  businessDescription,
   logo,
-  tax_id,
+  taxId,
   role = 'USER',
-  verification_token,
-}: AddUserInput): Promise<void> {
+  verificationToken,
+}: UserInput): Promise<void> {
   await prisma.user.create({
     data: {
       email,
       password,
-      firstName: first_name,
-      lastName: last_name,
-      brandName: brand_name,
+      firstName,
+      lastName,
+      brandName,
       gender,
-      phoneNumber: phone_number,
+      phoneNumber,
       address,
       city,
       country,
-      businessAddress: business_address,
+      businessAddress,
       website,
-      businessDescription: business_description,
+      businessDescription,
       logo,
-      taxId: tax_id,
+      taxId,
       role: role as Role,
       disabled: false,
-      verificationToken: verification_token,
+      verificationToken,
     },
   });
 }
@@ -103,7 +84,11 @@ export function verifyUser(token: string) {
   });
 }
 
-export function setResetToken(email: string, token: string, expires: string | number | Date) {
+export function setResetToken(
+  email: string,
+  token: string,
+  expires: string | number | Date
+) {
   return prisma.user.update({
     where: { email },
     data: { resetToken: token, resetExpires: new Date(expires) },

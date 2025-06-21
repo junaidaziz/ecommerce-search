@@ -63,18 +63,18 @@ export default async function handler(
     await addUser({
       email,
       password: hashed,
-      first_name: firstName,
-      last_name: lastName,
-      brand_name: brandName,
-      phone_number: phoneNumber,
-      business_address: businessAddress,
+      firstName,
+      lastName,
+      brandName,
+      phoneNumber,
+      businessAddress,
       city,
       country,
       website: website || null,
-      business_description: businessDescription || null,
-      tax_id: taxId || null,
+      businessDescription: businessDescription || null,
+      taxId: taxId || null,
       role: 'BRAND',
-      verification_token: token,
+      verificationToken: token,
     });
     return res.status(201).json({ token });
   } catch (error) {

@@ -23,9 +23,9 @@ export default async function handler(
         id: Number(userData.id),
         name: `${userData.firstName} ${userData.lastName}`.trim(),
         email: userData.email,
-        company: userData.brandName ?? '',
+        brandName: userData.brandName ?? '',
         phoneNumber: userData.phoneNumber ?? undefined,
-        address: userData.businessAddress ?? undefined,
+        businessAddress: userData.businessAddress ?? undefined,
         city: userData.city ?? undefined,
         country: userData.country ?? undefined,
         website: userData.website ?? undefined,
@@ -44,11 +44,11 @@ export default async function handler(
         businessAddress,
         city,
         country,
-      website,
-      businessDescription,
-      logo,
-      taxId,
-    } = req.body;
+        website,
+        businessDescription,
+        logo,
+        taxId,
+      } = req.body;
       await updateUserProfile(session.user.email, {
         brandName,
         phoneNumber,
