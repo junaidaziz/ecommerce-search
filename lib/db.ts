@@ -7,19 +7,7 @@ const wishlistStore = new Map<string, Product[]>();
 const reviewsStore = new Map<string, Review[]>();
 
 export const getDb = () => prisma;
-export default prisma;
 
-export async function dbGetCategories() {
-  return prisma.category.findMany({
-    orderBy: { name: 'asc' },
-  });
-}
-
-export async function getProductById(id: string | number) {
-  return prisma.product.findUnique({
-    where: { id: Number(id) },
-  });
-}
 
 export async function getProductByUuid(uuid: string) {
   return prisma.product.findUnique({ where: { uuid } });

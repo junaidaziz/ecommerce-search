@@ -1,10 +1,15 @@
 import React from 'react';
-import { UseFormRegister, RegisterOptions } from 'react-hook-form';
+import {
+  UseFormRegister,
+  RegisterOptions,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 
-export interface TextInputProps
+export interface TextInputProps<T extends FieldValues>
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  name: string;
+  name: Path<T>;
   placeholder?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -15,11 +20,11 @@ export interface TextInputProps
   className?: string;
   leftAddon?: React.ReactNode;
   rightAddon?: React.ReactNode;
-  register?: UseFormRegister<any>;
+  register?: UseFormRegister<T>;
   rules?: RegisterOptions;
 }
 
-const TextInput: React.FC<TextInputProps> = ({
+const TextInput = <T extends FieldValues>({
   label,
   name,
   placeholder,

@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { addProduct, loadAndIndexProducts } from '../../../../lib/products';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../../lib/utils/getQueryParam';
-import type { Product, ApiMessage } from '../../../../types';
+import type { Product, ProductInput, ApiMessage } from '../../../../types';
 
 function slugify(text) {
   return text
@@ -44,23 +44,24 @@ export default async function handler(
     if (!id || !sku || !title || !vendor) {
       return res.status(400).json({ message: 'id, sku, title, vendor required' });
     }
-    await addProduct({
-      id: String(id),
-      slug: slugify(title || String(id)),
+    const payload: ProductInput = {
       sku,
       title,
-      vendor,
+      slug: slugify(title || String(id)),
+      uuid: String(id),
+      vendor: { email: '', brandName: vendor },
       description,
-      product_type,
+      productType: product_type,
       tags,
-      category,
+      category: { name: category, slug: '' },
       quantity: quantity ? parseInt(quantity, 10) : 0,
-      min_price: parseFloat(min_price || 0),
-      max_price: parseFloat(max_price || 0),
+      minPrice: parseFloat(min_price || '0'),
+      maxPrice: parseFloat(max_price || '0'),
       currency: currency || 'USD',
       status: 'approved',
-      images: JSON.stringify([]),
-      });
+      images: [],
+    };
+    await addProduct(payload);
       await loadAndIndexProducts();
       return res.status(201).json({ message: 'product created' });
     }

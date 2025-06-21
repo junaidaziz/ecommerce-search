@@ -1,10 +1,15 @@
 import React from 'react';
-import { UseFormRegister, RegisterOptions } from 'react-hook-form';
+import {
+  UseFormRegister,
+  RegisterOptions,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 
-export interface TextareaProps
+export interface TextareaProps<T extends FieldValues>
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
-  name: string;
+  name: Path<T>;
   placeholder?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -13,11 +18,11 @@ export interface TextareaProps
   required?: boolean;
   disabled?: boolean;
   className?: string;
-  register?: UseFormRegister<any>;
+  register?: UseFormRegister<T>;
   rules?: RegisterOptions;
 }
 
-const Textarea: React.FC<TextareaProps> = ({
+const Textarea = <T extends FieldValues>({
   label,
   name,
   placeholder,
