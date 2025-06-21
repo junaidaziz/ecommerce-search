@@ -25,7 +25,11 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
 ) => {
   const page = parseInt((context.query.page as string) || '1', 10);
   const inStock = context.query.inStock === 'true';
-  const category = context.query.category as string | undefined;
+  const categoryParam = context.query.category;
+  let categoriesFilter: string[] | undefined;
+  if (Array.isArray(categoryParam)) categoriesFilter = categoryParam;
+  else if (typeof categoryParam === 'string')
+    categoriesFilter = categoryParam.split(',').filter(Boolean);
   const q = context.query.q as string | undefined;
   const minPrice = context.query.minPrice
     ? parseFloat(context.query.minPrice as string)
@@ -39,7 +43,7 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
   const result: PaginatedResult = await getProductsPaginated({
     limit,
     offset,
-    categorySlug: category,
+    categorySlugs: categoriesFilter,
     search: q,
     inStock,
     minPrice,
@@ -52,7 +56,11 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
   return { props: { products, total: result.total, categories } };
 };
 
-export default function ProductsPage({ products, total, categories }: ProductsProps) {
+export default function ProductsPage({
+  products,
+  total,
+  categories,
+}: ProductsProps) {
   const router = useRouter();
   const { addNotification } = useContext(NotificationContext);
   const pageParam = Array.isArray(router.query.page)
@@ -62,8 +70,12 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   const [keyword, setKeyword] = useState(
     typeof router.query.q === 'string' ? router.query.q : ''
   );
-  const [selectedCategory, setSelectedCategory] = useState(
-    typeof router.query.category === 'string' ? router.query.category : ''
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    Array.isArray(router.query.category)
+      ? (router.query.category as string[])
+      : typeof router.query.category === 'string'
+        ? router.query.category.split(',').filter(Boolean)
+        : []
   );
   const [minPrice, setMinPrice] = useState(
     typeof router.query.minPrice === 'string' ? router.query.minPrice : ''
@@ -85,11 +97,19 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     async (p: number) => {
       const params = new URLSearchParams();
       params.set('page', String(p));
-      if (router.query.category) params.set('category', String(router.query.category));
+      if (router.query.category) {
+        const cat = Array.isArray(router.query.category)
+          ? router.query.category.join(',')
+          : String(router.query.category);
+        params.set('category', cat);
+      }
       if (router.query.q) params.set('q', String(router.query.q));
-      if (router.query.inStock) params.set('inStock', String(router.query.inStock));
-      if (router.query.minPrice) params.set('minPrice', String(router.query.minPrice));
-      if (router.query.maxPrice) params.set('maxPrice', String(router.query.maxPrice));
+      if (router.query.inStock)
+        params.set('inStock', String(router.query.inStock));
+      if (router.query.minPrice)
+        params.set('minPrice', String(router.query.minPrice));
+      if (router.query.maxPrice)
+        params.set('maxPrice', String(router.query.maxPrice));
       const res = await fetch(`/api/products?${params.toString()}`);
       if (!res.ok) return null;
       return (await res.json()) as { products: Product[]; total: number };
@@ -110,7 +130,10 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       });
       setPage(next);
       router.replace(
-        { pathname: router.pathname, query: { ...router.query, page: String(next) } },
+        {
+          pathname: router.pathname,
+          query: { ...router.query, page: String(next) },
+        },
         undefined,
         { shallow: true }
       );
@@ -189,11 +212,14 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   }, [router, inStock]);
 
   const activeFilters: { label: string; clear: () => void }[] = [];
-  if (selectedCategory)
-    activeFilters.push({
-      label: categories.find((c) => c.slug === selectedCategory)?.name || '',
-      clear: () => setSelectedCategory(''),
-    });
+  if (selectedCategories.length)
+    activeFilters.push(
+      ...selectedCategories.map((slug) => ({
+        label: categories.find((c) => c.slug === slug)?.name || '',
+        clear: () =>
+          setSelectedCategories((prev) => prev.filter((s) => s !== slug)),
+      }))
+    );
   if (inStock)
     activeFilters.push({
       label: 'In Stock',
@@ -254,7 +280,8 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       } as Record<string, string>;
       if (keyword) query.q = keyword;
       else delete query.q;
-      if (selectedCategory) query.category = selectedCategory;
+      if (selectedCategories.length)
+        query.category = selectedCategories.join(',');
       else delete query.category;
       if (minPrice) query.minPrice = minPrice;
       else delete query.minPrice;
@@ -265,7 +292,10 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       const params = new URLSearchParams(query);
       const res = await fetch(`/api/products?${params.toString()}`);
       if (res.ok) {
-        const data = (await res.json()) as { products: Product[]; total: number };
+        const data = (await res.json()) as {
+          products: Product[];
+          total: number;
+        };
         setItems(data.products);
         setPage(1);
         setHasMore(data.products.length < data.total);
@@ -277,7 +307,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     [
       router,
       keyword,
-      selectedCategory,
+      selectedCategories,
       minPrice,
       maxPrice,
       inStock,
@@ -287,7 +317,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
 
   const clearAll = useCallback(async () => {
     setKeyword('');
-    setSelectedCategory('');
+    setSelectedCategories([]);
     setMinPrice('');
     setMaxPrice('');
     const query = { page: '1' } as Record<string, string>;
@@ -298,7 +328,9 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       setPage(1);
       setHasMore(data.products.length < data.total);
     }
-    router.replace({ pathname: router.pathname, query }, undefined, { shallow: true });
+    router.replace({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
+    });
   }, [router]);
 
   return (
@@ -311,29 +343,35 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
         <div className="flex flex-col md:flex-row gap-6">
           <aside className="md:w-60 w-full">
             <form onSubmit={applyFilters} className="space-y-4 sticky top-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  checked={inStock}
+                  onChange={toggleInStock}
+                />
+                <span>In Stock Only</span>
+              </label>
               <details open className="collapse bg-base-100 rounded-box">
-                <summary className="collapse-title font-medium">Category</summary>
+                <summary className="collapse-title font-medium">
+                  Category
+                </summary>
                 <div className="collapse-content max-h-48 overflow-y-auto">
-                  <label className="block mb-1">
-                    <input
-                      type="radio"
-                      name="category"
-                      className="radio mr-2"
-                      value=""
-                      checked={selectedCategory === ''}
-                      onChange={() => setSelectedCategory('')}
-                    />
-                    All
-                  </label>
                   {categories.map((c) => (
                     <label key={c.slug} className="block mb-1">
                       <input
-                        type="radio"
-                        name="category"
-                        className="radio mr-2"
+                        type="checkbox"
+                        className="checkbox mr-2"
                         value={c.slug}
-                        checked={selectedCategory === c.slug}
-                        onChange={() => setSelectedCategory(c.slug || '')}
+                        checked={selectedCategories.includes(c.slug)}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          setSelectedCategories((prev) =>
+                            checked
+                              ? [...prev, c.slug]
+                              : prev.filter((p) => p !== c.slug)
+                          );
+                        }}
                       />
                       {c.name}
                     </label>
@@ -341,7 +379,9 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                 </div>
               </details>
               <details className="collapse bg-base-100 rounded-box">
-                <summary className="collapse-title font-medium">Price Range</summary>
+                <summary className="collapse-title font-medium">
+                  Price Range
+                </summary>
                 <div className="collapse-content space-y-2">
                   <div className="flex items-center gap-2">
                     <input
@@ -363,7 +403,9 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                 </div>
               </details>
               <details className="collapse bg-base-100 rounded-box">
-                <summary className="collapse-title font-medium">Keyword</summary>
+                <summary className="collapse-title font-medium">
+                  Keyword
+                </summary>
                 <div className="collapse-content">
                   <input
                     type="text"
@@ -374,15 +416,6 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                   />
                 </div>
               </details>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  className="checkbox"
-                  checked={inStock}
-                  onChange={toggleInStock}
-                />
-                <span>In Stock Only</span>
-              </label>
               <div className="flex gap-2">
                 <button type="submit" className="btn btn-primary btn-sm flex-1">
                   Apply
@@ -420,7 +453,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
             {items.length === 0 ? (
               <p className="text-gray-500">No products found.</p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 gap-4">
                 {items.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
@@ -432,7 +465,9 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
               </div>
             )}
             {!hasMore && items.length > 0 && (
-              <p className="text-center text-sm text-gray-500 my-4">No more products.</p>
+              <p className="text-center text-sm text-gray-500 my-4">
+                No more products.
+              </p>
             )}
             <div ref={loadMoreRef} className="h-4" />
           </div>

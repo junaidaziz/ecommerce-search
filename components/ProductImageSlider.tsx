@@ -31,8 +31,6 @@ export default function ProductImageSlider({
       </div>
     );
   }
-  const next = () => setIdx((i) => (i + 1) % urls.length);
-  const prev = () => setIdx((i) => (i - 1 + urls.length) % urls.length);
   return (
     <div className={`relative aspect-[4/5] ${className}`}>
       <Image
@@ -43,22 +41,19 @@ export default function ProductImageSlider({
         onError={() => setErrorMap((m) => ({ ...m, [idx]: true }))}
       />
       {urls.length > 1 && (
-        <>
-          <button
-            type="button"
-            className="btn btn-xs absolute left-1 top-1/2 -translate-y-1/2"
-            onClick={prev}
-          >
-            Prev
-          </button>
-          <button
-            type="button"
-            className="btn btn-xs absolute right-1 top-1/2 -translate-y-1/2"
-            onClick={next}
-          >
-            Next
-          </button>
-        </>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+          {urls.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Show image ${i + 1}`}
+              className={`w-2 h-2 rounded-full border border-gray-400 ${
+                i === idx ? 'bg-white' : 'bg-gray-300'
+              }`}
+              onClick={() => setIdx(i)}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
