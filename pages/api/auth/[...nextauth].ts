@@ -68,7 +68,10 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account && (account.provider === 'google' || account.provider === 'github')) {
+      if (
+        account &&
+        (account.provider === 'google' || account.provider === 'github')
+      ) {
         if (!user.email) {
           return false;
         }
@@ -81,9 +84,9 @@ export const authOptions: AuthOptions = {
           await addUser({
             email: user.email,
             password: '',
-            first_name: nameParts[0] || '',
-            last_name: nameParts.slice(1).join(' ') || '',
-            brand_name: '',
+            firstName: nameParts[0] || '',
+            lastName: nameParts.slice(1).join(' ') || '',
+            brandName: '',
             gender: '',
             role: 'USER',
           });

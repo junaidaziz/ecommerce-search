@@ -45,9 +45,9 @@ export const BrandProfile: React.FC = () => {
       .then((res) => (res.ok ? res.json() : null))
       .then((data: Vendor | null) => {
         if (!data) return;
-        setBrandName(data.company || '');
+        setBrandName(data.brandName || '');
         setPhoneNumber(data.phoneNumber || '');
-        setBusinessAddress(data.address || '');
+        setBusinessAddress(data.businessAddress || '');
         setCity(data.city || '');
         setCountry(data.country || '');
         setWebsite(data.website || '');

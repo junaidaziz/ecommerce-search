@@ -107,7 +107,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
           imgClass="hover:scale-110 transition"
         />
       </div>
-      <p className="mb-2">Vendor: {product.vendor}</p>
+      <p className="mb-2">Vendor: {product.vendor.brandName}</p>
       <p className="mb-2">Type: {product.productType}</p>
       <p className="mb-4">
         {product.descriptionText ||
