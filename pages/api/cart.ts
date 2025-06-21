@@ -3,8 +3,12 @@ import { getCart, setCart } from '../../lib/db';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import type { CartItem } from '../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<CartItem[] | { message: string }>
+) {
   try {
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user) {
@@ -16,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json(items);
     }
     if (req.method === 'POST') {
-      const { items } = req.body || {};
+      const { items } = req.body as { items?: CartItem[] } || {};
       if (!Array.isArray(items)) {
         return res.status(400).json({ message: 'items required' });
       }
