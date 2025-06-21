@@ -5,6 +5,7 @@ import { parseImages } from './utils/parseImages';
 import type { Category } from '../types/category';
 import type { Vendor } from '../types/vendor';
 import type { Prisma } from '@prisma/client';
+import client from './typesenseClient';
 
 type ProductWithRelations = Prisma.ProductGetPayload<{
   include: { category: true; vendor: true };
@@ -168,8 +169,39 @@ export function mapDbRowToProduct(row: ProductRow): Product {
   });
 }
 
+export async function indexProductsToTypesense(
+  products: Product[]
+): Promise<void> {
+  if (products.length === 0) return;
+  const documents = products.map((p) => ({
+    id: String(p.id),
+    title: p.title,
+    name: p.title,
+    slug: p.slug,
+    description: p.descriptionText || p.description || '',
+    price: p.minPrice,
+    category: p.category.name.trim().toLowerCase(),
+    brand: p.vendor.brandName.trim(),
+    sold_count: p.soldCount,
+  }));
+
+  try {
+    await client
+      .collections('products')
+      .documents()
+      .import(documents, { action: 'upsert' });
+    const cats = Array.from(new Set(documents.map((d) => d.category))).join(
+      ', '
+    );
+    console.log(`Indexed ${documents.length} products. Categories: ${cats}`);
+  } catch (err) {
+    console.error('Failed to index products to Typesense', err);
+  }
+}
+
 export async function loadAndIndexProducts(): Promise<{ products: Product[] }> {
   const products = await loadProductsData();
+  await indexProductsToTypesense(products);
   return { products };
 }
 
