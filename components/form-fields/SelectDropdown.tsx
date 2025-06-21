@@ -1,5 +1,11 @@
 import React from 'react';
-import { Control, Controller, RegisterOptions } from 'react-hook-form';
+import {
+  Control,
+  Controller,
+  RegisterOptions,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 import Select from 'react-select';
 
 export interface SelectOption {
@@ -7,9 +13,9 @@ export interface SelectOption {
   value: string;
 }
 
-export interface SelectDropdownProps {
+export interface SelectDropdownProps<T extends FieldValues> {
   label?: string;
-  name: string;
+  name: Path<T>;
   value?: SelectOption | SelectOption[] | null;
   onChange?: (option: SelectOption | SelectOption[] | null) => void;
   options: SelectOption[];
@@ -21,12 +27,12 @@ export interface SelectDropdownProps {
   className?: string;
   icon?: React.ReactNode;
   components?: any;
-  control?: Control<any>;
+  control?: Control<T>;
   rules?: RegisterOptions;
   [key: string]: unknown;
 }
 
-const SelectDropdown: React.FC<SelectDropdownProps> = ({
+const SelectDropdown = <T extends FieldValues>({
   label,
   name,
   value,
