@@ -1,17 +1,23 @@
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import Pagination from '../../components/Pagination';
 import ProductCard from '../../components/ProductCard';
 import { getPageTitle } from '../../lib/pageTitle';
-import { getProductsPaginated, PaginatedResult } from '../../lib/products';
+import {
+  getProductsPaginated,
+  PaginatedResult,
+  getCategoriesFlat,
+} from '../../lib/products';
 import type { Product } from '../../types/product';
+import type { Category } from '../../types/category';
 import { serializeDates } from '../../lib/utils/serializeDates';
 
 interface ProductsProps {
   products: Product[];
   total: number;
+  categories: Category[];
 }
 
 export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
@@ -21,6 +27,12 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
   const inStock = context.query.inStock === 'true';
   const category = context.query.category as string | undefined;
   const q = context.query.q as string | undefined;
+  const minPrice = context.query.minPrice
+    ? parseFloat(context.query.minPrice as string)
+    : undefined;
+  const maxPrice = context.query.maxPrice
+    ? parseFloat(context.query.maxPrice as string)
+    : undefined;
 
   const limit = 20;
   const offset = (page - 1) * limit;
@@ -30,18 +42,34 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
     categorySlug: category,
     search: q,
     inStock,
+    minPrice,
+    maxPrice,
   });
 
+  const categories = serializeDates(await getCategoriesFlat());
+
   const products = serializeDates(result.products);
-  return { props: { products, total: result.total } };
+  return { props: { products, total: result.total, categories } };
 };
 
-export default function ProductsPage({ products, total }: ProductsProps) {
+export default function ProductsPage({ products, total, categories }: ProductsProps) {
   const router = useRouter();
   const pageParam = Array.isArray(router.query.page)
     ? router.query.page[0]
     : router.query.page;
   const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
+  const [keyword, setKeyword] = useState(
+    typeof router.query.q === 'string' ? router.query.q : ''
+  );
+  const [selectedCategory, setSelectedCategory] = useState(
+    typeof router.query.category === 'string' ? router.query.category : ''
+  );
+  const [minPrice, setMinPrice] = useState(
+    typeof router.query.minPrice === 'string' ? router.query.minPrice : ''
+  );
+  const [maxPrice, setMaxPrice] = useState(
+    typeof router.query.maxPrice === 'string' ? router.query.maxPrice : ''
+  );
   const inStock = router.query.inStock === 'true';
   const totalPages = Math.ceil(total / 20);
 
@@ -61,6 +89,59 @@ export default function ProductsPage({ products, total }: ProductsProps) {
     router.push({ pathname: router.pathname, query });
   }, [router, inStock]);
 
+  const activeFilters: { label: string; clear: () => void }[] = [];
+  if (selectedCategory)
+    activeFilters.push({
+      label: categories.find((c) => c.slug === selectedCategory)?.name || '',
+      clear: () => setSelectedCategory(''),
+    });
+  if (inStock)
+    activeFilters.push({
+      label: 'In Stock',
+      clear: () => {
+        const query = { ...router.query } as Record<string, string>;
+        delete query.inStock;
+        router.push({ pathname: router.pathname, query });
+      },
+    });
+  if (minPrice)
+    activeFilters.push({ label: `Min £${minPrice}`, clear: () => setMinPrice('') });
+  if (maxPrice)
+    activeFilters.push({ label: `Max £${maxPrice}`, clear: () => setMaxPrice('') });
+  if (keyword)
+    activeFilters.push({ label: keyword, clear: () => setKeyword('') });
+
+  const applyFilters = useCallback(
+    (e?: React.FormEvent) => {
+      e?.preventDefault();
+      const query = {
+        ...router.query,
+        page: '1',
+      } as Record<string, string>;
+      if (keyword) query.q = keyword;
+      else delete query.q;
+      if (selectedCategory) query.category = selectedCategory;
+      else delete query.category;
+      if (minPrice) query.minPrice = minPrice;
+      else delete query.minPrice;
+      if (maxPrice) query.maxPrice = maxPrice;
+      else delete query.maxPrice;
+      if (inStock) query.inStock = 'true';
+      else delete query.inStock;
+      router.push({ pathname: router.pathname, query });
+    },
+    [router, keyword, selectedCategory, minPrice, maxPrice, inStock]
+  );
+
+  const clearAll = useCallback(() => {
+    setKeyword('');
+    setSelectedCategory('');
+    setMinPrice('');
+    setMaxPrice('');
+    const query = { page: '1' } as Record<string, string>;
+    router.push({ pathname: router.pathname, query });
+  }, [router]);
+
   return (
     <div className="min-h-screen bg-base-200 py-10">
       <Head>
@@ -68,31 +149,133 @@ export default function ProductsPage({ products, total }: ProductsProps) {
       </Head>
       <div className="max-w-screen-xl mx-auto px-4">
         <h1 className="text-3xl font-bold mb-4">Products</h1>
-        <label className="flex items-center gap-2 mb-4">
-          <input
-            type="checkbox"
-            className="checkbox"
-            checked={inStock}
-            onChange={toggleInStock}
-          />
-          <span>In Stock Only</span>
-        </label>
-        {products.length === 0 ? (
-          <p className="text-gray-500">No products found.</p>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+        <div className="flex flex-col md:flex-row gap-6">
+          <aside className="md:w-60 w-full">
+            <form onSubmit={applyFilters} className="space-y-4 sticky top-4">
+              <details open className="collapse bg-base-100 rounded-box">
+                <summary className="collapse-title font-medium">Category</summary>
+                <div className="collapse-content max-h-48 overflow-y-auto">
+                  <label className="block mb-1">
+                    <input
+                      type="radio"
+                      name="category"
+                      className="radio mr-2"
+                      value=""
+                      checked={selectedCategory === ''}
+                      onChange={() => setSelectedCategory('')}
+                    />
+                    All
+                  </label>
+                  {categories.map((c) => (
+                    <label key={c.slug} className="block mb-1">
+                      <input
+                        type="radio"
+                        name="category"
+                        className="radio mr-2"
+                        value={c.slug}
+                        checked={selectedCategory === c.slug}
+                        onChange={() => setSelectedCategory(c.slug || '')}
+                      />
+                      {c.name}
+                    </label>
+                  ))}
+                </div>
+              </details>
+              <details className="collapse bg-base-100 rounded-box">
+                <summary className="collapse-title font-medium">Price Range</summary>
+                <div className="collapse-content space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      placeholder="Min"
+                      className="input input-sm input-bordered w-full"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(e.target.value)}
+                    />
+                    <span>-</span>
+                    <input
+                      type="number"
+                      placeholder="Max"
+                      className="input input-sm input-bordered w-full"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </details>
+              <details className="collapse bg-base-100 rounded-box">
+                <summary className="collapse-title font-medium">Keyword</summary>
+                <div className="collapse-content">
+                  <input
+                    type="text"
+                    placeholder="Search name"
+                    className="input input-sm input-bordered w-full"
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
+                  />
+                </div>
+              </details>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  checked={inStock}
+                  onChange={toggleInStock}
+                />
+                <span>In Stock Only</span>
+              </label>
+              <div className="flex gap-2">
+                <button type="submit" className="btn btn-primary btn-sm flex-1">
+                  Apply
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-ghost"
+                  onClick={clearAll}
+                >
+                  Clear All
+                </button>
+              </div>
+            </form>
+          </aside>
+          <div className="flex-1">
+            {activeFilters.length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {activeFilters.map((f, i) => (
+                  <span key={i} className="badge badge-outline gap-1">
+                    {f.label}
+                    <button
+                      type="button"
+                      className="ml-1"
+                      onClick={() => {
+                        f.clear();
+                        applyFilters();
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            {products.length === 0 ? (
+              <p className="text-gray-500">No products found.</p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {products.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            )}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            )}
           </div>
-        )}
-        {totalPages > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        )}
+        </div>
       </div>
     </div>
   );
