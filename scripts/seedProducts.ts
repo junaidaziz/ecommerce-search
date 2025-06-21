@@ -4,6 +4,7 @@ import csv from 'csv-parser';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../lib/prisma';
 import { slugify } from '../lib/slugify';
+import { loadAndIndexProducts } from '../lib/products';
 
 interface CsvRow {
   TITLE?: string;
@@ -121,6 +122,14 @@ async function main() {
     stream.on('end', resolve);
     stream.on('error', reject);
   });
+
+  // Re-index products in Typesense after seeding
+  try {
+    const { products } = await loadAndIndexProducts();
+    console.log(`Re-indexed ${products.length} products`);
+  } catch (err) {
+    console.error('Failed to re-index products', err);
+  }
 
   await prisma.$disconnect();
 }

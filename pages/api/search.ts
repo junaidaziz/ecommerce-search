@@ -68,7 +68,10 @@ export default async function handler(
   }
 
   const q = getQueryParam(req.query.q) ?? '';
-  const category = getQueryParam(req.query.category);
+  const category =
+    getQueryParam(req.query.filterByCategory) ??
+    getQueryParam(req.query.category);
+  const normalizedCategory = category?.trim().toLowerCase();
   const brand = getQueryParam(req.query.brand);
   const minPrice = getQueryParam(req.query.minPrice);
   const maxPrice = getQueryParam(req.query.maxPrice);
@@ -89,7 +92,8 @@ export default async function handler(
   };
 
   const filters: string[] = [];
-  if (category && category !== 'All') filters.push(`category:=${category}`);
+  if (normalizedCategory && normalizedCategory !== 'all')
+    filters.push(`category:=${normalizedCategory}`);
   if (brand && brand !== 'All') filters.push(`brand:=${brand}`);
   if (minPrice) filters.push(`price:>=${minPrice}`);
   if (maxPrice) filters.push(`price:<=${maxPrice}`);
@@ -120,6 +124,19 @@ export default async function handler(
           categories.push(...facet.counts.map((c) => c.value));
         }
       }
+    }
+    if (
+      normalizedCategory &&
+      normalizedCategory !== 'all' &&
+      !categories.includes(normalizedCategory)
+    ) {
+      console.warn('Category filter not matched', normalizedCategory);
+    }
+    if (hits.length === 0) {
+      console.warn('No products found for search', {
+        q,
+        category: normalizedCategory,
+      });
     }
     const fallback = result.found === 0 ? await getBestSellingProducts(8) : [];
     try {
