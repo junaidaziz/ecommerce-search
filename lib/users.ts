@@ -3,7 +3,7 @@ import type { Prisma, Role } from '@prisma/client';
 
 const prisma = getDb();
 
-export interface AddUserInput {
+interface AddUserInput {
   email: string;
   password: string;
   first_name: string;

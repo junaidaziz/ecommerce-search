@@ -16,7 +16,7 @@ interface OrderItemInput {
   qty?: number;
 }
 
-export interface AddOrderParams {
+interface AddOrderParams {
   userEmail: string;
   items: OrderItemInput[];
   total: number;
