@@ -67,7 +67,7 @@ export default function ProductDetail({
     }
   );
   const myRating = watch('rating');
-  const id = product.id;
+  const id = product?.id;
 
   useEffect(() => {
     try {
@@ -113,9 +113,11 @@ export default function ProductDetail({
         </div>
         <div className="md:w-1/2">
           <h1 className="text-2xl font-bold mb-4">{product.title}</h1>
-          <p className="mb-2">Vendor: {product.vendor.brandName}</p>
-          <p className="mb-2">SKU: {product.sku}</p>
-          <p className="mb-2">Type: {product.productType}</p>
+          <p className="mb-2">
+            Vendor: {product.vendor?.brandName ?? 'Unknown'}
+          </p>
+          <p className="mb-2">SKU: {product.sku || 'N/A'}</p>
+          <p className="mb-2">Type: {product.productType || 'N/A'}</p>
           <p className="mb-4">
             {product.descriptionText ||
               product.bodyHtmlText ||
@@ -139,7 +141,7 @@ export default function ProductDetail({
             >
               Add to Cart
             </button>
-            {wishlist.some((w) => w.id === product.id) ? (
+            {wishlist?.some((w) => w.id === product.id) ? (
               <button
                 className="btn transition-all duration-200"
                 onClick={() => removeFromWishlist(product.id)}
@@ -219,7 +221,12 @@ export default function ProductDetail({
           </form>
         )}
       </div>
-      <RecommendedProducts category={product.category.name} excludeId={product.id} />
+      {product.category && (
+        <RecommendedProducts
+          category={product.category.name}
+          excludeId={product.id}
+        />
+      )}
       <div className="mt-4">
         <Link href="/">&larr; Back to products</Link>
       </div>
