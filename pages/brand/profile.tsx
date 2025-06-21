@@ -5,6 +5,7 @@ import React, {
   ChangeEvent,
   FormEvent,
 } from 'react';
+import { useRouter } from 'next/router';
 import { AppContext } from '../../contexts/AppContext';
 import type { User, Vendor } from '../../types';
 import { TextInput, Textarea } from '../../components/form-fields';
@@ -13,6 +14,8 @@ import { getPageTitle } from '../../lib/pageTitle';
 
 export const BrandProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
+  const router = useRouter();
+  const showComplete = router.query.complete === '1';
   const [brandName, setBrandName] = useState<string>(user?.brandName || '');
   const [phoneNumber, setPhoneNumber] = useState<string>(
     user?.phoneNumber || ''
@@ -90,6 +93,9 @@ export const BrandProfile: React.FC = () => {
         <title>{getPageTitle('Brand Profile')}</title>
       </Head>
       <h1 className="text-2xl font-bold mb-4">Brand Profile</h1>
+      {showComplete && (
+        <div className="alert alert-info mb-2">Please complete your profile.</div>
+      )}
       {message && <div className="mb-2 text-green-600">{message}</div>}
       <form onSubmit={submit} className="space-y-2">
         <TextInput
