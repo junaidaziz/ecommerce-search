@@ -14,24 +14,26 @@ import { Category, CategoryInput, ApiMessage } from '../../../types';
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Category[] | ApiMessage>
-) {
+): Promise<void> {
   try {
     if (req.method === 'GET') {
-      const cats = await getCategoriesFlat();
-      return res.status(200).json(cats as Category[]);
+      const cats: Category[] = await getCategoriesFlat();
+      res.status(200).json(cats);
+      return;
     }
     if (req.method === 'POST') {
       const { name } = req.body as CategoryInput;
       if (!name) return res.status(400).json({ message: 'name required' });
       const exists = (await getCategoriesFlat()).find(
-        (c) => c.name.toLowerCase() === name.toLowerCase()
+        (c: Category) => c.name.toLowerCase() === name.toLowerCase()
       );
       if (exists) {
         return res.status(409).json({ message: 'category exists' });
       }
       await createCategory(name);
       logAudit('create_category', { name });
-      return res.status(201).json({ message: 'category created' });
+      res.status(201).json({ message: 'category created' });
+      return;
     }
     if (req.method === 'PUT') {
       const { uuid, name } = req.body as CategoryInput & { uuid: string };
@@ -39,7 +41,8 @@ async function handler(
         return res.status(400).json({ message: 'uuid and name required' });
       await renameCategory(uuid, name);
       logAudit('rename_category', { uuid, name });
-      return res.status(200).json({ message: 'category updated' });
+      res.status(200).json({ message: 'category updated' });
+      return;
     }
     if (req.method === 'DELETE') {
       const uuid = getQueryParam(req.query.uuid);
@@ -47,7 +50,8 @@ async function handler(
       try {
         await removeCategory(String(uuid));
         logAudit('delete_category', { uuid });
-        return res.status(200).json({ message: 'category deleted' });
+        res.status(200).json({ message: 'category deleted' });
+        return;
       } catch (e: unknown) {
         if (e instanceof Error && e.message === 'category in use') {
           return res
@@ -57,9 +61,10 @@ async function handler(
         throw e;
       }
     }
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: 'Method Not Allowed' });
+    return;
   } catch (error) {
-    return handleApiError(res, error, 'Failed to manage categories');
+    handleApiError(res, error, 'Failed to manage categories');
   }
 }
 

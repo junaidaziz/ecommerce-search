@@ -23,10 +23,7 @@ async function parseBody(req: NextApiRequest): Promise<{ fields: Fields; files: 
     const buffers: Uint8Array[] = [];
     for await (const chunk of req) buffers.push(chunk);
     const body = Buffer.concat(buffers).toString();
-    return { fields: JSON.parse(body || '{}'), files: {} } as {
-      fields: Record<string, any>;
-      files: Files;
-    };
+    return { fields: JSON.parse(body || '{}') as Fields, files: {} as Files };
   }
   return new Promise<{ fields: Fields; files: Files }>(
     (resolve, reject) => {
@@ -42,7 +39,7 @@ async function parseBody(req: NextApiRequest): Promise<{ fields: Fields; files: 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Product[] | ApiMessage>
-) {
+): Promise<void> {
   try {
     const db = getDb();
 
@@ -55,37 +52,37 @@ async function handler(
         vendor,
         description,
         product_type,
-      tags,
-      category,
-      quantity,
-      min_price,
-      max_price,
-      currency,
-      } = fields as Record<string, any>;
+        tags,
+        category,
+        quantity,
+        min_price,
+        max_price,
+        currency,
+      } = fields as Record<string, unknown>;
       if (!id || !title || !sku) {
-        return res
-          .status(400)
-          .json({ message: 'id, sku and title are required' });
+        res.status(400).json({ message: 'id, sku and title are required' });
+        return;
       }
-    const photos = files.photos
-      ? Array.isArray(files.photos)
-        ? files.photos
-        : [files.photos]
-      : [];
+      const photos: formidable.File[] = files.photos
+        ? Array.isArray(files.photos)
+          ? (files.photos as formidable.File[])
+          : [files.photos as formidable.File]
+        : [];
       const destDir = path.join(process.cwd(), 'public', 'uploads', String(id));
       fs.mkdirSync(destDir, { recursive: true });
-    const imagePaths = [];
-    for (const file of photos) {
-      const name = Date.now() + '-' + file.originalFilename;
-      const destPath = path.join(destDir, name);
-      fs.renameSync(file.filepath, destPath);
-      imagePaths.push(`/uploads/${id}/${name}`);
-    }
+      const imagePaths: string[] = [];
+      for (const file of photos) {
+        const name = Date.now() + '-' + file.originalFilename;
+        const destPath = path.join(destDir, name);
+        fs.renameSync(file.filepath, destPath);
+        imagePaths.push(`/uploads/${id}/${name}`);
+      }
       let existing = null;
       if (req.method === 'PUT') {
         existing = await db.product.findUnique({ where: { id: Number(id) } });
         if (!existing) {
-          return res.status(404).json({ message: 'Not found' });
+          res.status(404).json({ message: 'Not found' });
+          return;
         }
         const existingImages = existing.images ? JSON.parse(existing.images) : [];
         imagePaths.push(...existingImages);
@@ -128,29 +125,35 @@ async function handler(
 
       if (req.method === 'POST') {
         await db.product.create({ data });
-        return res.status(201).json({ message: 'Product added' });
+        res.status(201).json({ message: 'Product added' });
+        return;
       }
 
       await db.product.update({ where: { id: Number(id) }, data });
-      return res.status(200).json({ message: 'Product updated' });
+      res.status(200).json({ message: 'Product updated' });
+      return;
     }
 
     if (req.method === 'DELETE') {
       const uuid = getQueryParam(req.query.uuid);
       if (!uuid) {
-        return res.status(400).json({ message: 'uuid required' });
+        res.status(400).json({ message: 'uuid required' });
+        return;
       }
       const existing = await db.product.findUnique({ where: { uuid } });
       if (!existing) {
-        return res.status(404).json({ message: 'Not found' });
+        res.status(404).json({ message: 'Not found' });
+        return;
       }
       if (existing.quantity > 0 || (await hasOrdersForProduct(String(uuid)))) {
-        return res
+        res
           .status(400)
           .json({ message: 'cannot delete product with stock or orders' });
+        return;
       }
       await db.product.delete({ where: { uuid } });
-      return res.status(200).json({ message: 'Product deleted' });
+      res.status(200).json({ message: 'Product deleted' });
+      return;
     }
 
     if (req.method === 'GET') {
@@ -161,7 +164,7 @@ async function handler(
         where,
         include: { category: true, vendor: true },
       });
-      const data: Product[] = rows.map((p) => ({
+      const data: Product[] = rows.map((p): Product => ({
         ID: String(p.id),
         SLUG: p.slug,
         sku: p.sku,
@@ -184,12 +187,14 @@ async function handler(
         reviewCount: 0,
         averageRating: 0,
       }));
-      return res.status(200).json(data);
+      res.status(200).json(data);
+      return;
     }
 
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: 'Method Not Allowed' });
+    return;
   } catch (error) {
-    return handleApiError(res, error, 'Failed to process product');
+    handleApiError(res, error, 'Failed to process product');
   }
 }
 
