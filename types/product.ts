@@ -4,6 +4,7 @@ export interface Product {
   id: string;
   uuid?: string;
   slug: string;
+  sku: PrismaProduct['sku'];
   title: string;
   vendor?: string;
   description?: string;
@@ -40,6 +41,7 @@ export interface Product {
 export type ProductResponse = Product;
 
 export interface ProductInput {
+  sku: PrismaProduct['sku'];
   title: string;
   description?: string;
   vendor?: string;
@@ -55,6 +57,7 @@ export interface ProductDbRow {
   id: number;
   uuid?: string;
   slug: string | null;
+  sku: PrismaProduct['sku'] | null;
   title: string;
   vendorId?: number | undefined;
   vendor?: { brandName: string | null } | null;

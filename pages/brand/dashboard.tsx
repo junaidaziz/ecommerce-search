@@ -9,6 +9,7 @@ type ProductApi = Product;
 
 const emptyForm: ProductForm = {
   id: '',
+  sku: '',
   title: '',
   vendor: '',
   description: '',
@@ -72,6 +73,7 @@ const BrandDashboard: React.FC = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id: payload.id,
+        sku: payload.sku,
         title: payload.title,
         vendor: payload.vendor,
         description: payload.description,
@@ -98,6 +100,7 @@ const BrandDashboard: React.FC = () => {
   const handleEdit = (p: ProductApi) => {
     setForm({
       id: p.id,
+      sku: p.sku || '',
       title: p.title || '',
       vendor: p.vendor || '',
       description: p.description || '',
@@ -148,6 +151,7 @@ const BrandDashboard: React.FC = () => {
         {(
           [
             'id',
+              'sku',
             'title',
             'vendor',
             'description',
@@ -196,7 +200,7 @@ const BrandDashboard: React.FC = () => {
         {products.map((p) => (
           <li key={p.id} className="flex justify-between items-center gap-2">
             <span>
-              {p.title} - {p.category || p.productType}
+              {p.title} ({p.sku}) - {p.category || p.productType}
             </span>
             <div className="flex gap-2">
               <button

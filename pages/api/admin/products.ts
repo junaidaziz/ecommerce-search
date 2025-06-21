@@ -56,6 +56,7 @@ async function handler(
       const { fields, files } = await parseBody(req);
       const {
         id,
+        sku,
         title,
         vendor,
         description,
@@ -67,8 +68,10 @@ async function handler(
       max_price,
       currency,
       } = fields as Record<string, any>;
-      if (!id || !title) {
-        return res.status(400).json({ message: 'id and title are required' });
+      if (!id || !title || !sku) {
+        return res
+          .status(400)
+          .json({ message: 'id, sku and title are required' });
       }
     const photos = files.photos
       ? Array.isArray(files.photos)
@@ -98,6 +101,7 @@ async function handler(
       const data: Record<string, unknown> = {
         id: Number(id),
         slug,
+        sku,
         title,
         description: description || '',
         productType: product_type || '',
@@ -166,6 +170,7 @@ async function handler(
       const data: Product[] = rows.map((p) => ({
         ID: String(p.id),
         SLUG: p.slug,
+        sku: p.sku,
         TITLE: p.title,
         VENDOR: p.vendor?.brandName ?? String(p.vendorId),
         DESCRIPTION: p.description,
