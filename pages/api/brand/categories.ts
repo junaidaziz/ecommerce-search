@@ -11,20 +11,13 @@ export default async function handler(
     if (req.method !== 'POST') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
-    const { name, parentId } = req.body || {};
+    const { name } = req.body || {};
     if (!name) return res.status(400).json({ message: 'name required' });
     const exists = (await getCategoriesFlat()).find(
       (c) => c.name.toLowerCase() === name.toLowerCase()
     );
     if (!exists) {
-      try {
-        await createCategory(name, parentId || null);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === 'depth') {
-          return res.status(400).json({ message: 'max depth exceeded' });
-        }
-        throw e;
-      }
+      await createCategory(name);
     }
     return res.status(201).json({ message: 'ok' });
   } catch (error) {
