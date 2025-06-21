@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useContext } from 'react';
 import ProductCard from '../../components/ProductCard';
 import { getPageTitle } from '../../lib/pageTitle';
 import {
@@ -12,6 +12,7 @@ import {
 import type { Product } from '../../types/product';
 import type { Category } from '../../types/category';
 import { serializeDates } from '../../lib/utils/serializeDates';
+import { NotificationContext } from '../../contexts/NotificationContext';
 
 interface ProductsProps {
   products: Product[];
@@ -53,6 +54,7 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
 
 export default function ProductsPage({ products, total, categories }: ProductsProps) {
   const router = useRouter();
+  const { addNotification } = useContext(NotificationContext);
   const pageParam = Array.isArray(router.query.page)
     ? router.query.page[0]
     : router.query.page;
@@ -76,6 +78,8 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(products.length < total);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const priceTimer = useRef<NodeJS.Timeout>();
+  const firstPriceRef = useRef(true);
 
   const fetchPage = useCallback(
     async (p: number) => {
@@ -150,12 +154,38 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     };
   }, [loadMoreRef, loadMore]);
 
+  useEffect(() => {
+    if (firstPriceRef.current) {
+      firstPriceRef.current = false;
+      return;
+    }
+    if (priceTimer.current) clearTimeout(priceTimer.current);
+    priceTimer.current = setTimeout(() => {
+      applyFilters();
+    }, 500);
+    return () => {
+      if (priceTimer.current) clearTimeout(priceTimer.current);
+    };
+  }, [minPrice, maxPrice, applyFilters]);
+
   const toggleInStock = useCallback(() => {
     const query = { ...router.query } as Record<string, string>;
     if (inStock) delete query.inStock;
     else query.inStock = 'true';
     query.page = '1';
-    router.push({ pathname: router.pathname, query });
+    const params = new URLSearchParams(query);
+    fetch(`/api/products?${params.toString()}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) {
+          setItems(data.products);
+          setPage(1);
+          setHasMore(data.products.length < data.total);
+          router.replace({ pathname: router.pathname, query }, undefined, {
+            shallow: true,
+          });
+        }
+      });
   }, [router, inStock]);
 
   const activeFilters: { label: string; clear: () => void }[] = [];
@@ -170,19 +200,54 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       clear: () => {
         const query = { ...router.query } as Record<string, string>;
         delete query.inStock;
-        router.push({ pathname: router.pathname, query });
+        query.page = '1';
+        const params = new URLSearchParams(query);
+        fetch(`/api/products?${params.toString()}`)
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data) {
+              setItems(data.products);
+              setPage(1);
+              setHasMore(data.products.length < data.total);
+              router.replace({ pathname: router.pathname, query }, undefined, {
+                shallow: true,
+              });
+            }
+          });
       },
     });
   if (minPrice)
-    activeFilters.push({ label: `Min £${minPrice}`, clear: () => setMinPrice('') });
+    activeFilters.push({
+      label: `Min £${minPrice}`,
+      clear: () => {
+        setMinPrice('');
+      },
+    });
   if (maxPrice)
-    activeFilters.push({ label: `Max £${maxPrice}`, clear: () => setMaxPrice('') });
+    activeFilters.push({
+      label: `Max £${maxPrice}`,
+      clear: () => {
+        setMaxPrice('');
+      },
+    });
   if (keyword)
     activeFilters.push({ label: keyword, clear: () => setKeyword('') });
 
   const applyFilters = useCallback(
-    (e?: React.FormEvent) => {
+    async (e?: React.FormEvent) => {
       e?.preventDefault();
+      const min = minPrice ? parseFloat(minPrice) : undefined;
+      const max = maxPrice ? parseFloat(maxPrice) : undefined;
+      if (
+        typeof min === 'number' &&
+        typeof max === 'number' &&
+        !isNaN(min) &&
+        !isNaN(max) &&
+        min > max
+      ) {
+        addNotification('Min price cannot exceed Max price', 'error');
+        return;
+      }
       const query = {
         ...router.query,
         page: '1',
@@ -197,18 +262,43 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       else delete query.maxPrice;
       if (inStock) query.inStock = 'true';
       else delete query.inStock;
-      router.push({ pathname: router.pathname, query });
+      const params = new URLSearchParams(query);
+      const res = await fetch(`/api/products?${params.toString()}`);
+      if (res.ok) {
+        const data = (await res.json()) as { products: Product[]; total: number };
+        setItems(data.products);
+        setPage(1);
+        setHasMore(data.products.length < data.total);
+        router.replace({ pathname: router.pathname, query }, undefined, {
+          shallow: true,
+        });
+      }
     },
-    [router, keyword, selectedCategory, minPrice, maxPrice, inStock]
+    [
+      router,
+      keyword,
+      selectedCategory,
+      minPrice,
+      maxPrice,
+      inStock,
+      addNotification,
+    ]
   );
 
-  const clearAll = useCallback(() => {
+  const clearAll = useCallback(async () => {
     setKeyword('');
     setSelectedCategory('');
     setMinPrice('');
     setMaxPrice('');
     const query = { page: '1' } as Record<string, string>;
-    router.push({ pathname: router.pathname, query });
+    const res = await fetch('/api/products?page=1');
+    if (res.ok) {
+      const data = (await res.json()) as { products: Product[]; total: number };
+      setItems(data.products);
+      setPage(1);
+      setHasMore(data.products.length < data.total);
+    }
+    router.replace({ pathname: router.pathname, query }, undefined, { shallow: true });
   }, [router]);
 
   return (
