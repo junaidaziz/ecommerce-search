@@ -4,37 +4,44 @@ import { getDb } from '../../../lib/db';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 
+interface SearchLog {
+  query: string;
+  noResults?: boolean | null;
+}
+
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SearchAnalyticsResponse | ApiMessage>
-) {
+): Promise<void> {
   try {
     if (req.method !== 'GET') {
-      return res.status(405).json({ message: 'Method Not Allowed' });
+      res.status(405).json({ message: 'Method Not Allowed' });
+      return;
     }
 
     const db = getDb();
-    const logs = await db.searchLog.findMany();
+    const logs: SearchLog[] = await db.searchLog.findMany();
     const counts: Record<string, number> = {};
     const fails: Record<string, number> = {};
     for (const log of logs) {
-      counts[log.query] = (counts[log.query] || 0) + 1;
+      counts[log.query] = (counts[log.query] ?? 0) + 1;
       if (log.noResults) {
-        fails[log.query] = (fails[log.query] || 0) + 1;
+        fails[log.query] = (fails[log.query] ?? 0) + 1;
       }
     }
     const topSearches = Object.entries(counts)
-      .sort((a, b) => (b[1] as number) - (a[1] as number))
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
-      .map(([query, count]) => ({ query, count }));
+      .map(([query, count]): { query: string; count: number } => ({ query, count }));
     const failedSearches = Object.entries(fails)
-      .sort((a, b) => (b[1] as number) - (a[1] as number))
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
-      .map(([query, count]) => ({ query, count }));
+      .map(([query, count]): { query: string; count: number } => ({ query, count }));
 
-    return res.status(200).json({ topSearches, failedSearches });
+    res.status(200).json({ topSearches, failedSearches });
+    return;
   } catch (error) {
-    return handleApiError(res, error, 'Failed to load analytics');
+    handleApiError(res, error, 'Failed to load analytics');
   }
 }
 
