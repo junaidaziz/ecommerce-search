@@ -1,5 +1,6 @@
 export interface Vendor {
   id?: number;
+  uuid?: string;
   name?: string;
   email: string;
   company?: string;

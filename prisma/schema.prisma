@@ -20,6 +20,7 @@ enum Role {
 
 model User {
   id                Int       @id @default(autoincrement())
+  uuid              String    @unique @default(uuid())
   email             String    @unique
   password          String
   firstName         String
@@ -52,6 +53,7 @@ model User {
 
 model Category {
   id        Int       @id @default(autoincrement())
+  uuid      String    @unique @default(uuid())
   name      String
   slug      String    @unique
   createdAt DateTime  @default(now())
@@ -63,6 +65,7 @@ model Category {
 
 model Product {
   id          Int       @id @default(autoincrement())
+  uuid        String    @unique @default(uuid())
   slug        String    @unique
   title       String
   description String
@@ -86,6 +89,7 @@ model Product {
 
 model Order {
   id        Int       @id @default(autoincrement())
+  uuid      String    @unique @default(uuid())
   userId    Int
   productId Int
   quantity  Int
@@ -100,6 +104,7 @@ model Order {
 
 model DeletionRequest {
   id        Int       @id @default(autoincrement())
+  uuid      String    @unique @default(uuid())
   categoryId Int
   brandId   Int
   reason    String?
@@ -113,6 +118,7 @@ model DeletionRequest {
 
 model SearchLog {
   id        Int       @id @default(autoincrement())
+  uuid      String    @unique @default(uuid())
   userId    Int?
   query     String
   createdAt DateTime  @default(now())

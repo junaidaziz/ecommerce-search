@@ -13,15 +13,15 @@ export default async function handler(
   res: NextApiResponse<ReviewsResponse | ReviewAddedResponse | { message: string }>
 ) {
   const {
-    query: { id },
+    query: { uuid },
     method,
   } = req;
   try {
-    if (!id) return res.status(400).json({ message: 'id required' });
+    if (!uuid) return res.status(400).json({ message: 'uuid required' });
 
     if (method === 'GET') {
-      const reviews = getReviewsForProduct(String(id)) as Review[];
-      const stats = getAverageRating(String(id));
+      const reviews = getReviewsForProduct(String(uuid)) as Review[];
+      const stats = getAverageRating(String(uuid));
       return res.status(200).json({
         reviews,
         averageRating: stats.average,
@@ -43,12 +43,12 @@ export default async function handler(
         return res.status(400).json({ message: 'rating 1-5 required' });
       }
       addReview({
-        productId: String(id),
+        productId: String(uuid),
         userEmail: session.user.email!,
         rating: r,
         comment,
       });
-      const stats = getAverageRating(String(id));
+      const stats = getAverageRating(String(uuid));
       return res.status(201).json({
         message: 'review added',
         averageRating: stats.average,

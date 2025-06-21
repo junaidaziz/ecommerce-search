@@ -7,7 +7,7 @@ import {
 } from '../../lib/orders';
 import { findUser } from '../../lib/users';
 import {
-  getProductById,
+  getProductByUuid,
   decreaseProductQuantity,
   clearCart,
 } from '../../lib/db';
@@ -24,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     for (const item of items) {
-      const product = await getProductById(String(item.id));
+      const product = await getProductByUuid(String(item.uuid || item.id));
       if (!product) {
         return res.status(404).json({ message: 'Product not found' });
       }
@@ -36,7 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     for (const item of items) {
-      await decreaseProductQuantity(String(item.id), item.qty);
+      await decreaseProductQuantity(String(item.uuid || item.id), item.qty);
     }
 
     const orderId = await addOrder({

@@ -1,7 +1,8 @@
 import type { Product as PrismaProduct } from '@prisma/client';
 
 export interface Product {
-  id: string | number;
+  id: string;
+  uuid?: string;
   slug: string;
   title: string;
   vendor?: string;
@@ -50,7 +51,12 @@ export interface ProductInput {
   price?: number;
 }
 
-export type ProductDbRow = PrismaProduct & {
+export interface ProductDbRow {
+  id: number;
+  uuid?: string;
+  slug: string | null;
+  title: string;
+  vendorId?: number | undefined;
   vendor?: { brandName: string | null } | null;
   category?: { name: string | null } | null;
 };
