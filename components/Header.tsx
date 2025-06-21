@@ -70,53 +70,57 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
 
         <div className="flex-1 flex items-center gap-x-4">
           <ul className="menu menu-horizontal hidden md:flex">
-            <li className="relative" onMouseLeave={() => setMenuOpen(false)}>
-              <button
-                type="button"
-                className="flex items-center gap-1"
-                onMouseEnter={() => setMenuOpen(true)}
-                onClick={() => setMenuOpen((prev) => !prev)}
-              >
-                Categories <ChevronDownIcon className="w-4 h-4" />
-              </button>
-              {menuOpen && (
-                <div
-                  id="mega-menu"
-                  className="absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 bg-opacity-100 border border-base-200 shadow-lg rounded w-screen max-w-3xl"
+            <li className="relative">
+              <div onMouseEnter={() => setMenuOpen(true)} onMouseLeave={() => setMenuOpen(false)}>
+                <button
+                  type="button"
+                  className="flex items-center gap-1"
+                  onClick={() => setMenuOpen((prev) => !prev)}
                 >
-                  <div className="flex gap-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 flex-1">
-                      {categories.map((cat) => (
-                        <button
-                          key={cat.name}
-                          type="button"
-                          onFocus={() => setHoveredCat(cat)}
-                          onMouseEnter={() => setHoveredCat(cat)}
-                          className="flex items-center gap-1 text-left hover:text-primary focus:outline-none"
-                        >
-                          {iconMap[cat.name] || null}
-                          {cat.name}
-                        </button>
-                      ))}
-                      {categories.length === 0 && <span>No categories found</span>}
-                    </div>
-                    {hoveredCat?.subcategories && hoveredCat.subcategories.length > 0 && (
-                      <ul className="min-w-[150px] border-l border-base-200 pl-4 space-y-1">
-                        {hoveredCat.subcategories.map((sub) => (
-                          <li key={sub}>
-                            <Link
-                              href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub)}`}
-                              className="block hover:text-primary"
-                            >
-                              {sub}
-                            </Link>
-                          </li>
+                  Categories{' '}
+                  <ChevronDownIcon
+                    className={`w-4 h-4 transition-transform ${menuOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {menuOpen && (
+                  <div
+                    id="mega-menu"
+                    className="absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 bg-opacity-100 border border-base-200 shadow-lg rounded w-screen max-w-3xl"
+                  >
+                    <div className="flex gap-6">
+                      <div className="w-56 pr-4 space-y-1 border-r border-base-200">
+                        {categories.map((cat) => (
+                          <button
+                            key={cat.name}
+                            type="button"
+                            onFocus={() => setHoveredCat(cat)}
+                            onMouseEnter={() => setHoveredCat(cat)}
+                            className="w-full flex items-center gap-1 text-left hover:text-primary focus:outline-none"
+                          >
+                            {iconMap[cat.name] || null}
+                            {cat.name}
+                          </button>
                         ))}
-                      </ul>
-                    )}
+                        {categories.length === 0 && <span>No categories found</span>}
+                      </div>
+                      {hoveredCat?.subcategories && hoveredCat.subcategories.length > 0 && (
+                        <ul className="min-w-[200px] pl-4 space-y-1">
+                          {hoveredCat.subcategories.map((sub) => (
+                            <li key={sub}>
+                              <Link
+                                href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub)}`}
+                                className="block hover:text-primary"
+                              >
+                                {sub}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </li>
           </ul>
 
