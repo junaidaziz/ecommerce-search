@@ -9,6 +9,15 @@ html {
 body {
   @apply font-sans bg-base-200 text-base-content;
 }
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  overflow-y: auto;
+}
 /* Spinner styles */
 .loader {
   border: 4px solid #f3f3f3;

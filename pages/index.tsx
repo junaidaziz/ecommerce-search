@@ -8,6 +8,8 @@ import React, {
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import HeroSlider from '../components/HeroSlider';
+import ProductCard from '../components/ProductCard';
+import DEFAULT_CATEGORIES from '../lib/defaultCategories';
 import { Product } from '../types/product';
 
 interface SearchResult extends Product {
@@ -92,10 +94,16 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
         const res = await fetch('/api/categories');
         if (res.ok) {
           const data: { name: string }[] = await res.json();
-          setAllCategories(['All', ...data.map((c) => c.name)]);
+          const names = data.map((c) => c.name);
+          const list =
+            names.length > 0 ? names : DEFAULT_CATEGORIES.map((c) => c.name);
+          setAllCategories(['All', ...list]);
+        } else {
+          setAllCategories(['All', ...DEFAULT_CATEGORIES.map((c) => c.name)]);
         }
       } catch (err) {
         console.error('Failed to load categories', err);
+        setAllCategories(['All', ...DEFAULT_CATEGORIES.map((c) => c.name)]);
       }
     }
     loadCats();
@@ -103,7 +111,9 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
 
   useEffect(() => {
     try {
-      const hist: string[] = JSON.parse(localStorage.getItem('browse-history') || '[]');
+      const hist: string[] = JSON.parse(
+        localStorage.getItem('browse-history') || '[]'
+      );
       if (hist.length > 0) {
         fetch(`/api/products/${hist[0]}`)
           .then((res) => (res.ok ? res.json() : null))
@@ -280,7 +290,28 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
         <meta name="description" content="Search products from CSV data" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {/* ...rest of your JSX remains unchanged... */}
+      {loading ? (
+        <div className="flex justify-center my-4 w-full">
+          <span className="loading loading-spinner"></span>
+        </div>
+      ) : products.length === 0 ? (
+        <p className="text-gray-500">No products found</p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full">
+          {products.map((p) => (
+            <ProductCard
+              key={p.id}
+              product={p}
+              highlightTitle={
+                p.highlights?.find((h) => h.field === 'title')?.snippet
+              }
+              highlightDescription={
+                p.highlights?.find((h) => h.field === 'description')?.snippet
+              }
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
