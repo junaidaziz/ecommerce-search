@@ -6,11 +6,11 @@ import {
 } from 'next-auth/react';
 import { NotificationContext } from './NotificationContext';
 
-import { User } from '../types/user';
+import type { UserInfo } from '../lib/types';
 import { Product } from '../types/product';
 
 export interface AppContextValue {
-  user: User | null;
+  user: UserInfo | null;
   cart: (Product & { qty: number })[];
   wishlist: Product[];
   login: (email: string, password: string) => Promise<void>;
@@ -35,7 +35,7 @@ interface AppProviderProps {
 
 export function AppProvider({ children }: AppProviderProps) {
   const { data: session } = useSession();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserInfo | null>(null);
   const [cart, setCart] = useState<(Product & { qty: number })[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const { addNotification } = useContext(NotificationContext);
@@ -69,7 +69,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
   useEffect(() => {
     if (session?.user) {
-      const u = session.user as User & {
+      const u = session.user as UserInfo & {
         role?: string;
         brandName?: string;
         name?: string | null;
