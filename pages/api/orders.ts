@@ -14,7 +14,8 @@ import {
 import { withRole } from '../../lib/withRole';
 import { sendOrderConfirmation } from '../../lib/email';
 import { handleApiError } from '../../lib/utils/handleApiError';
-import { getQueryParam } from '../../lib/utils/getQueryParam';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from './auth/[...nextauth]';
 import type { Order, OrderPlacedResponse, ApiMessage } from '../../types';
 
 async function handler(
@@ -56,8 +57,9 @@ async function handler(
   }
 
   if (req.method === 'GET') {
-    const email = getQueryParam(req.query.email);
-    if (!email) return res.status(400).json({ message: 'email required' });
+    const session = await getServerSession(req, res, authOptions);
+    const email = session?.user?.email;
+    if (!email) return res.status(401).json({ message: 'Unauthorized' });
     const user = await findUser(email);
     if (!user) return res.status(404).json({ message: 'user not found' });
     if (user.role === 'SUPER_ADMIN') {
