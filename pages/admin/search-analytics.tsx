@@ -1,24 +1,18 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
-
-interface SearchCount {
-  query: string;
-  count: number;
-}
+import { SearchAnalyticsResponse } from '../../types';
+import { fetchJson } from '../../lib/utils/fetchJson';
 
 export default function SearchAnalytics() {
   const { user } = useContext(AppContext)!;
-  const [data, setData] = useState<{
-    topSearches: SearchCount[];
-    failedSearches: SearchCount[];
-  } | null>(null);
+  const [data, setData] = useState<SearchAnalyticsResponse | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    fetch('/api/admin/search-analytics')
-      .then((res) => (res.ok ? res.json() : null))
-      .then(setData);
+    fetchJson<SearchAnalyticsResponse>('/api/admin/search-analytics')
+      .then(setData)
+      .catch(() => setData(null));
   }, [user]);
 
   if (!user) return <div className="p-4">Please log in to view analytics.</div>;

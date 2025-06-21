@@ -8,21 +8,32 @@ import {
 } from '../../../lib/users';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import {
+  AdminUser,
+  UserRoleUpdateRequest,
+  UserDisabledUpdateRequest,
+  CreateUserRequest,
+  ApiMessage,
+} from '../../../types';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<AdminUser[] | ApiMessage>
+) {
   try {
     if (req.method === 'GET') {
-      return res.status(200).json(await getAllUsers());
+      const users = await getAllUsers();
+      return res.status(200).json(users as AdminUser[]);
     }
     if (req.method === 'PUT') {
-      const { email, role } = req.body || {};
+      const { email, role } = req.body as UserRoleUpdateRequest;
       if (!email || !role)
         return res.status(400).json({ message: 'email and role required' });
-      await updateUserRole(email, role);
+      await updateUserRole(email, role as any);
       return res.status(200).json({ message: 'role updated' });
     }
     if (req.method === 'PATCH') {
-      const { email, disabled } = req.body || {};
+      const { email, disabled } = req.body as UserDisabledUpdateRequest;
       if (typeof disabled !== 'boolean' || !email)
         return res.status(400).json({ message: 'email and disabled required' });
       await setUserDisabled(email, disabled);
@@ -31,12 +42,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'DELETE') {
       const { email } = req.query;
       if (!email) return res.status(400).json({ message: 'email required' });
-      await deleteUser(email);
+      await deleteUser(String(email));
       return res.status(200).json({ message: 'user deleted' });
     }
     if (req.method === 'POST') {
-      const { email, password, firstName, lastName, brandName, gender, role } =
-        req.body || {};
+      const {
+        email,
+        password,
+        firstName,
+        lastName,
+        brandName,
+        gender,
+        role,
+      } = req.body as CreateUserRequest;
       if (!email || !password || !firstName || !lastName || !gender) {
         return res.status(400).json({ message: 'missing required fields' });
       }
@@ -47,7 +65,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         last_name: lastName,
         brand_name: brandName,
         gender,
-        role: role || 'USER',
+        role: (role || 'USER') as any,
       });
       return res.status(201).json({ message: 'user created' });
     }
