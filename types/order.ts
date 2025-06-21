@@ -43,8 +43,6 @@ export interface OrderProductRow extends ProductDbRow {
   minPrice: number;
   maxPrice: number;
   currency: string;
-  vendor?: { brandName: string | null } | null;
-  category?: { name: string | null } | null;
 }
 
 export interface OrderRow {
