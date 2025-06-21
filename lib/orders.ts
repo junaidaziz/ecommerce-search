@@ -1,5 +1,4 @@
 import { Order, Product, ShippingInfo } from '../types';
-import type { ProductDbRow } from '../types/product';
 import { getDb } from './db';
 import { mapDbRowToProduct } from './products';
 import type { Prisma } from '@prisma/client';
@@ -38,7 +37,7 @@ function mapOrderRow(row: OrderWithRelations): Order {
     product: mapDbRowToProduct(row.product),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
-    shipping: null,
+    shipping: row.shipping || null,
   };
 }
 

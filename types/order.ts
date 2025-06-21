@@ -30,8 +30,6 @@ export interface OrderInput {
   shipping?: ShippingInfo;
 }
 
-export type OrderProductRow = Product;
-
 export interface OrderRow {
   id: number;
   uuid: string;
