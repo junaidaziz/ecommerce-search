@@ -45,13 +45,7 @@ const stripHtml = (html: string | null | undefined): string => {
 
 function processProductRow(row: Record<string, unknown>): Product {
   const processed: Record<string, unknown> & Partial<Product> = { ...row };
-  const jsonFields = [
-    'SEO',
-    'OPTIONS',
-    'VARIANTS',
-    'priceRange',
-    'METAFIELDS',
-  ];
+  const jsonFields = ['SEO', 'OPTIONS', 'VARIANTS', 'priceRange', 'METAFIELDS'];
   jsonFields.forEach((field) => {
     if (processed[field]) {
       try {
@@ -65,17 +59,31 @@ function processProductRow(row: Record<string, unknown>): Product {
     }
   });
 
-  processed.descriptionText = stripHtml(processed.description as string | null | undefined);
-  processed.bodyHtmlText = stripHtml(processed.bodyHtml as string | null | undefined);
+  processed.descriptionText = stripHtml(
+    processed.description as string | null | undefined
+  );
+  processed.bodyHtmlText = stripHtml(
+    processed.bodyHtml as string | null | undefined
+  );
   processed.minPrice = processed.priceRange?.minVariantPrice?.amount || 0;
   processed.maxPrice = processed.priceRange?.maxVariantPrice?.amount || 0;
-  processed.currency = processed.priceRange?.minVariantPrice?.currencyCode || 'GBP';
+  processed.currency =
+    processed.priceRange?.minVariantPrice?.currencyCode || 'GBP';
   const meta = processed.METAFIELDS as
-    | { stoked_inventory_sold_count?: { value?: string }; yotpo_reviews_count?: { value?: string }; yotpo_reviews_average?: { value?: string } }
+    | {
+        stoked_inventory_sold_count?: { value?: string };
+        yotpo_reviews_count?: { value?: string };
+        yotpo_reviews_average?: { value?: string };
+      }
     | undefined;
-  processed.soldCount = parseInt(meta?.stoked_inventory_sold_count?.value ?? '0', 10);
+  processed.soldCount = parseInt(
+    meta?.stoked_inventory_sold_count?.value ?? '0',
+    10
+  );
   processed.reviewCount = parseInt(meta?.yotpo_reviews_count?.value ?? '0', 10);
-  processed.averageRating = parseFloat(meta?.yotpo_reviews_average?.value ?? '0');
+  processed.averageRating = parseFloat(
+    meta?.yotpo_reviews_average?.value ?? '0'
+  );
   processed.id = String(processed.id);
   if (row.uuid) {
     processed.uuid = String(row.uuid);
@@ -85,7 +93,9 @@ function processProductRow(row: Record<string, unknown>): Product {
   }
   if (processed.images && processed.images.length > 0) {
     if (typeof processed.images[0] === 'string') {
-      processed.images = (processed.images as unknown as string[]).map((u) => ({ url: u }));
+      processed.images = (processed.images as unknown as string[]).map((u) => ({
+        url: u,
+      }));
     }
     processed.featuredImage = processed.images[0];
   }
@@ -166,7 +176,9 @@ export async function loadAndIndexProducts(): Promise<{ products: Product[] }> {
 export async function addProduct(product: ProductInput): Promise<void> {
   const db = getDb();
   const vendor = product.vendor?.brandName
-    ? await db.user.findFirst({ where: { brandName: product.vendor.brandName } })
+    ? await db.user.findFirst({
+        where: { brandName: product.vendor.brandName },
+      })
     : null;
   const category = product.category?.name
     ? await db.category.findFirst({ where: { name: product.category.name } })
@@ -201,7 +213,9 @@ export async function updateProduct(
 ): Promise<void> {
   const db = getDb();
   const vendor = product.vendor?.brandName
-    ? await db.user.findFirst({ where: { brandName: product.vendor.brandName } })
+    ? await db.user.findFirst({
+        where: { brandName: product.vendor.brandName },
+      })
     : null;
   const category = product.category?.name
     ? await db.category.findFirst({ where: { name: product.category.name } })
@@ -254,6 +268,43 @@ export async function getPendingProducts(): Promise<Product[]> {
   );
 }
 
+export async function getProductsByCategorySlug(
+  slug: string
+): Promise<Product[]> {
+  const db = getDb();
+  const rows: ProductWithRelations[] = await db.product.findMany({
+    where: { status: 'approved', category: { slug } },
+    include: { category: true, vendor: true },
+  });
+  return rows.map((row) =>
+    processProductRow({
+      id: row.id,
+      uuid: row.uuid,
+      slug: row.slug,
+      sku: row.sku,
+      title: row.title,
+      vendor: row.vendor ?? null,
+      description: row.description,
+      productType: row.productType,
+      tags: row.tags,
+      category: row.category ?? null,
+      images: parseImages(row.images),
+      totalInventory: row.quantity,
+      priceRange: {
+        minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
+        maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
+      },
+    })
+  );
+}
+
+export async function getCategoryBySlug(
+  slug: string
+): Promise<Category | null> {
+  const db = getDb();
+  return db.category.findFirst({ where: { slug } });
+}
+
 export async function approveProduct(uuid: string): Promise<void> {
   const db = getDb();
   await db.product.update({ where: { uuid }, data: { status: 'approved' } });
@@ -277,7 +328,9 @@ export async function createCategory(name: string): Promise<void> {
   const db = getDb();
   const existing = await db.category.findFirst({ where: { name } });
   if (existing) return;
-  await db.category.create({ data: { name, slug: name.toLowerCase().replace(/\s+/g, '-') } });
+  await db.category.create({
+    data: { name, slug: name.toLowerCase().replace(/\s+/g, '-') },
+  });
 }
 
 export async function renameCategory(
