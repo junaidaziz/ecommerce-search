@@ -2,6 +2,7 @@ import { JSDOM } from 'jsdom';
 import { getDb } from './db';
 import type { Product, ProductDbRow } from '../types/product';
 import type { Category } from '../types/category';
+import type { Prisma } from '@prisma/client';
 
 /**
  * Simplified representation of a product row returned from the database.
@@ -13,8 +14,7 @@ const stripHtml = (html: string | null | undefined): string => {
   try {
     const dom = new JSDOM(html);
     return dom.window.document.body.textContent || '';
-  } catch (e: unknown) {
-    console.error('Error stripping HTML:', e);
+  } catch {
     return html ?? '';
   }
 };
@@ -35,11 +35,7 @@ function processProductRow(row: Record<string, unknown>): Product {
           typeof processed[field] === 'string'
             ? JSON.parse(processed[field] as string)
             : processed[field];
-      } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : String(e);
-        console.warn(
-          `Could not parse JSON for field '${field}' in row with id: ${String(processed.id ?? 'N/A')}. Error: ${message}`
-        );
+      } catch {
         processed[field] = null;
       }
     }
@@ -109,7 +105,6 @@ async function loadProductsData(): Promise<Product[]> {
       })
     );
   } catch (error) {
-    console.error('Failed to load products from database:', error);
     throw error;
   }
 }
@@ -143,10 +138,9 @@ export function mapDbRowToProduct(row: Record<string, unknown>): Product {
   });
 }
 
-export async function loadAndIndexProducts(): Promise<{ products: Product[]; productIndex: null }> {
-  // Legacy function name preserved for API routes.
+export async function loadAndIndexProducts(): Promise<{ products: Product[] }> {
   const products = await loadProductsData();
-  return { products, productIndex: null };
+  return { products };
 }
 
 export async function addProduct(product: Product): Promise<void> {
@@ -157,9 +151,13 @@ export async function addProduct(product: Product): Promise<void> {
   const category = product.category?.name
     ? await db.category.findFirst({ where: { name: product.category.name } })
     : null;
-  const data: any = {
-    id: product.id ? Number(product.id) : undefined,
-    uuid: product.uuid ?? undefined,
+
+  if (!vendor || !category) {
+    throw new Error('Invalid vendor or category');
+  }
+
+  const data: Prisma.ProductCreateInput = {
+    uuid: product.uuid,
     slug: product.slug,
     sku: product.sku,
     title: product.title,
@@ -171,16 +169,11 @@ export async function addProduct(product: Product): Promise<void> {
     maxPrice: product.maxPrice ?? 0,
     currency: product.currency ?? 'USD',
     status: product.status ?? 'approved',
+    vendor: { connect: { id: vendor.id } },
+    category: { connect: { id: category.id } },
   };
-  if (vendor) {
-    data.vendor = { connect: { id: vendor.id } };
-  }
-  if (category) {
-    data.category = { connect: { id: category.id } };
-  }
-  await db.product.create({
-    data,
-  });
+
+  await db.product.create({ data });
 }
 
 export async function updateProduct(product: Product): Promise<void> {
@@ -191,6 +184,9 @@ export async function updateProduct(product: Product): Promise<void> {
   const category = product.category?.name
     ? await db.category.findFirst({ where: { name: product.category.name } })
     : null;
+  if (!vendor || !category) {
+    throw new Error('Invalid vendor or category');
+  }
   await db.product.update({
     where: { uuid: product.uuid || String(product.id) },
     data: {
@@ -203,10 +199,9 @@ export async function updateProduct(product: Product): Promise<void> {
       minPrice: product.minPrice,
       maxPrice: product.maxPrice,
       currency: product.currency,
-      images: undefined,
-      vendor: vendor ? { connect: { id: vendor.id } } : undefined,
-      category: category ? { connect: { id: category.id } } : undefined,
-    },
+      vendor: { connect: { id: vendor.id } },
+      category: { connect: { id: category.id } },
+    } as Prisma.ProductUpdateInput,
   });
 }
 
