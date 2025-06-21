@@ -14,6 +14,6 @@ export interface Vendor {
   description?: string;
   taxId?: string;
   status?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

@@ -5,6 +5,6 @@ export interface Brand {
   slug?: string;
   logo?: string;
   description?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
