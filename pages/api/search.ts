@@ -104,7 +104,7 @@ export default async function handler(
       .documents()
       .search(searchParams);
     const hits =
-      result.hits?.map((h: TypesenseHit) => ({
+      result.hits?.map((h: any) => ({
         ...h.document,
         highlights: h.highlights,
       })) || [];
@@ -121,7 +121,7 @@ export default async function handler(
         }
       }
     }
-    const fallback = result.found === 0 ? getBestSellingProducts(8) : [];
+    const fallback = result.found === 0 ? await getBestSellingProducts(8) : [];
     try {
       await db.searchLog.create({
         data: {

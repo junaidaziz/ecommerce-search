@@ -45,14 +45,15 @@ async function handler(
       await decreaseProductQuantity(String(item.uuid || item.id), item.qty);
     }
 
-      const orderId = await addOrder({
+      const orders = await addOrder({
         userEmail: email,
         items,
         total: total || 0,
       });
-    await clearCart(email);
-    await sendOrderConfirmation(email, { id: orderId });
-    return res.status(201).json({ message: 'order placed', id: orderId });
+      const orderId = Array.isArray(orders) && orders.length > 0 ? orders[0].id : '';
+      await clearCart(email);
+      await sendOrderConfirmation(email, { id: orderId });
+      return res.status(201).json({ message: 'order placed', id: orderId });
   }
 
   if (req.method === 'GET') {

@@ -32,7 +32,7 @@ async function handler(
       const result = await getOrderByUuid(String(uuid));
       if (!result) return res.status(404).json({ message: 'Not found' });
       const { userEmail, ...order } = result;
-      await sendOrderStatusUpdate(userEmail, order);
+      await sendOrderStatusUpdate(userEmail, { id: order.id, status: order.status });
       return res.status(200).json(order);
     }
 

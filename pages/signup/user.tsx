@@ -69,7 +69,7 @@ export default function UserSignup() {
     () =>
       countryList()
         .getData()
-        .map((c) => ({ label: `${c.label} (${c.value})`, value: c.value })),
+        .map((c: { label: string; value: string }) => ({ label: `${c.label} (${c.value})`, value: c.value })),
     []
   );
 
@@ -115,14 +115,15 @@ export default function UserSignup() {
     const confirm = getValues('confirm');
     if (password && confirm && password !== confirm) {
       setError('confirm', { type: 'manual', message: 'Passwords do not match' });
-    } else {
-      clearErrors('confirm');
+      return 'Passwords do not match';
     }
+    clearErrors('confirm');
+    return true;
   };
 
   const submit = async (values: any) => {
     try {
-      const data = await signup('/api/signup/user', {
+      const data = await signup<{ token: string }>('/api/signup/user', {
         firstName: values.firstName,
         lastName: values.lastName,
         email: values.email,
@@ -200,18 +201,18 @@ export default function UserSignup() {
             name="password"
             placeholder="Password"
             register={register}
-            rules={{
-              required: 'Password is required',
-              pattern: {
-                value: passwordRegex,
-                message:
-                  'Password must be at least 8 characters and include uppercase, lowercase, number and special character',
-              },
-              onBlur: handlePasswordBlur,
-              onFocus: handlePasswordFocus,
-            }}
-            error={errors.password?.message as string}
-          />
+              rules={{
+                required: 'Password is required',
+                pattern: {
+                  value: passwordRegex,
+                  message:
+                    'Password must be at least 8 characters and include uppercase, lowercase, number and special character',
+                },
+                onBlur: handlePasswordBlur,
+              }}
+              onFocus={handlePasswordFocus}
+              error={errors.password?.message as string}
+            />
           <PasswordInput
             name="confirm"
             placeholder="Confirm Password"

@@ -1,5 +1,10 @@
-import type { Category as PrismaCategory } from '@prisma/client';
+export interface Category {
+  id?: number | string;
+  uuid?: string;
+  name: string;
+  slug?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
-export type Category = PrismaCategory;
-
-export type CategoryInput = Pick<PrismaCategory, 'name'>;
+export type CategoryInput = Pick<Category, 'name'>;
