@@ -85,7 +85,6 @@ function processProductRow(row: Record<string, unknown>): Product {
   processed.averageRating = parseFloat(
     meta?.yotpo_reviews_average?.value ?? '0'
   );
-  processed.id = String(processed.id);
   if (row.uuid) {
     processed.uuid = String(row.uuid);
   }
@@ -222,7 +221,7 @@ export async function addProduct(product: ProductInput): Promise<void> {
 
   const data: Prisma.ProductCreateInput = {
     uuid: product.uuid,
-    slug: product.slug,
+    slug: product.slug ?? '',
     sku: product.sku,
     title: product.title,
     description: product.description ?? '',
