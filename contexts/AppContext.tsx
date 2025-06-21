@@ -77,7 +77,18 @@ export function AppProvider({ children }: AppProviderProps) {
       };
       const { email, name, role, brandName, gender } = u;
       const [firstName = '', lastName = ''] = (name || '').split(' ');
-      setUser({ email: email ?? '', firstName, lastName, brandName, gender, role });
+      setUser({
+        email: email ?? '',
+        firstName,
+        lastName,
+        brandName,
+        gender,
+        role,
+        phoneNumber: '',
+        address: '',
+        city: '',
+        country: '',
+      });
     } else {
       setUser(null);
     }
