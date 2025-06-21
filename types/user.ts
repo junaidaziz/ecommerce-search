@@ -13,6 +13,14 @@ export interface User {
   country?: string;
   brandName?: string;
   gender?: string;
+  businessAddress?: string;
+  website?: string;
+  businessDescription?: string;
+  logo?: string;
+  taxId?: string;
+  verificationToken?: string;
+  resetToken?: string;
+  resetExpires?: Date;
   verified?: boolean;
   disabled?: boolean;
   createdAt?: Date;
@@ -28,4 +36,15 @@ export interface UserInput {
   lastName?: string;
   brandName?: string;
   gender?: string;
+  phoneNumber?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  businessAddress?: string;
+  website?: string;
+  businessDescription?: string;
+  logo?: string;
+  taxId?: string;
+  role?: Role;
+  verificationToken?: string;
 }
