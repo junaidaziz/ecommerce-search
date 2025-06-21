@@ -57,47 +57,60 @@ async function handler(
       const {
         id,
         title,
+        sku,
         vendor,
         description,
         product_type,
-      tags,
-      category,
-      quantity,
-      min_price,
-      max_price,
-      currency,
+        tags,
+        category,
+        quantity,
+        min_price,
+        max_price,
+        currency,
       } = fields as Record<string, any>;
-      if (!id || !title) {
-        return res.status(400).json({ message: 'id and title are required' });
+      if (!id || !title || !sku) {
+        return res
+          .status(400)
+          .json({ message: 'id, title and sku are required' });
       }
-    const photos = files.photos
-      ? Array.isArray(files.photos)
-        ? files.photos
-        : [files.photos]
-      : [];
+      const photos = files.photos
+        ? Array.isArray(files.photos)
+          ? files.photos
+          : [files.photos]
+        : [];
       const destDir = path.join(process.cwd(), 'public', 'uploads', String(id));
       fs.mkdirSync(destDir, { recursive: true });
-    const imagePaths = [];
-    for (const file of photos) {
-      const name = Date.now() + '-' + file.originalFilename;
-      const destPath = path.join(destDir, name);
-      fs.renameSync(file.filepath, destPath);
-      imagePaths.push(`/uploads/${id}/${name}`);
-    }
+      const imagePaths = [];
+      for (const file of photos) {
+        const name = Date.now() + '-' + file.originalFilename;
+        const destPath = path.join(destDir, name);
+        fs.renameSync(file.filepath, destPath);
+        imagePaths.push(`/uploads/${id}/${name}`);
+      }
       let existing = null;
       if (req.method === 'PUT') {
         existing = await db.product.findUnique({ where: { id: Number(id) } });
         if (!existing) {
           return res.status(404).json({ message: 'Not found' });
         }
-        const existingImages = existing.images ? JSON.parse(existing.images) : [];
+        const existingImages = existing.images
+          ? JSON.parse(existing.images)
+          : [];
         imagePaths.push(...existingImages);
+      }
+      const existingSku = await db.product.findUnique({ where: { sku } });
+      if (
+        existingSku &&
+        (req.method === 'POST' || existingSku.id !== Number(id))
+      ) {
+        return res.status(400).json({ message: 'sku must be unique' });
       }
       const slug = slugify(title || (existing?.title as string) || String(id));
       const qty = quantity ? parseInt(String(quantity), 10) : 0;
       const data: Record<string, unknown> = {
         id: Number(id),
         slug,
+        sku,
         title,
         description: description || '',
         productType: product_type || '',
@@ -114,7 +127,9 @@ async function handler(
         const vid = parseInt(String(vendor), 10);
         if (!isNaN(vid)) data.vendorId = vid;
         else {
-          const v = await db.user.findFirst({ where: { brandName: String(vendor) } });
+          const v = await db.user.findFirst({
+            where: { brandName: String(vendor) },
+          });
           if (v) data.vendorId = v.id;
         }
       }
@@ -123,7 +138,9 @@ async function handler(
         const cid = parseInt(String(category), 10);
         if (!isNaN(cid)) data.categoryId = cid;
         else {
-          const c = await db.category.findFirst({ where: { name: String(category) } });
+          const c = await db.category.findFirst({
+            where: { name: String(category) },
+          });
           if (c) data.categoryId = c.id;
         }
       }
@@ -142,7 +159,9 @@ async function handler(
       if (!id) {
         return res.status(400).json({ message: 'id required' });
       }
-      const existing = await db.product.findUnique({ where: { id: Number(id) } });
+      const existing = await db.product.findUnique({
+        where: { id: Number(id) },
+      });
       if (!existing) {
         return res.status(404).json({ message: 'Not found' });
       }
@@ -166,6 +185,7 @@ async function handler(
       const data: Product[] = rows.map((p) => ({
         ID: String(p.id),
         SLUG: p.slug,
+        SKU: p.sku,
         TITLE: p.title,
         VENDOR: p.vendor?.brandName ?? String(p.vendorId),
         DESCRIPTION: p.description,
@@ -194,5 +214,4 @@ async function handler(
   }
 }
 
-
-export default withRole(['BRAND','SUPER_ADMIN'])(handler);
+export default withRole(['BRAND', 'SUPER_ADMIN'])(handler);

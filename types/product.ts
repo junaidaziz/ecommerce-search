@@ -1,6 +1,7 @@
 export interface Product {
   id: string;
   slug: string;
+  sku: string;
   title: string;
   vendor?: string;
   description?: string;
@@ -36,6 +37,7 @@ export interface Product {
 export type ProductResponse = Product;
 
 export interface ProductInput {
+  sku?: string;
   title: string;
   description?: string;
   vendor?: string;
@@ -50,6 +52,7 @@ export interface ProductInput {
 export interface ProductDbRow {
   id: number;
   slug: string | null;
+  sku: string | null;
   title: string;
   vendorId?: number | undefined;
   vendor?: { brandName: string | null } | null;

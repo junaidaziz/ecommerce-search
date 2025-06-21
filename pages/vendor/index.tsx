@@ -14,6 +14,7 @@ export default function VendorDashboard() {
   type FormState = Partial<Product>;
   const emptyForm: FormState = {
     id: '',
+    sku: '',
     title: '',
     vendor: '',
     description: '',
@@ -57,6 +58,7 @@ export default function VendorDashboard() {
       body: JSON.stringify({
         id: payload.id,
         title: payload.title,
+        sku: payload.sku,
         vendor: payload.vendor,
         description: payload.description,
         product_type: payload.productType,
@@ -82,6 +84,7 @@ export default function VendorDashboard() {
   const handleEdit = (p: Product) => {
     setForm({
       id: p.id,
+      sku: p.sku || '',
       title: p.title || '',
       vendor: p.vendor || '',
       description: p.description || '',
@@ -126,6 +129,7 @@ export default function VendorDashboard() {
       <form onSubmit={submit} className="space-y-2 mb-6">
         {[
           'id',
+          'sku',
           'title',
           'vendor',
           'description',
@@ -166,7 +170,7 @@ export default function VendorDashboard() {
         {products.map((p) => (
           <li key={p.id} className="flex justify-between items-center gap-2">
             <span>
-              {p.title} - {p.category || p.productType}
+              {p.title} - {p.category || p.productType} (SKU: {p.sku})
             </span>
             <div className="flex gap-2">
               <button

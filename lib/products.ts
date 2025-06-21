@@ -21,13 +21,7 @@ const stripHtml = (html: string | null | undefined): string => {
 
 function processProductRow(row: Record<string, unknown>): Product {
   const processed: Record<string, unknown> & Partial<Product> = { ...row };
-  const jsonFields = [
-    'SEO',
-    'OPTIONS',
-    'VARIANTS',
-    'priceRange',
-    'METAFIELDS',
-  ];
+  const jsonFields = ['SEO', 'OPTIONS', 'VARIANTS', 'priceRange', 'METAFIELDS'];
   jsonFields.forEach((field) => {
     if (processed[field]) {
       try {
@@ -45,20 +39,37 @@ function processProductRow(row: Record<string, unknown>): Product {
     }
   });
 
-  processed.descriptionText = stripHtml(processed.description as string | null | undefined);
-  processed.bodyHtmlText = stripHtml(processed.bodyHtml as string | null | undefined);
+  processed.descriptionText = stripHtml(
+    processed.description as string | null | undefined
+  );
+  processed.bodyHtmlText = stripHtml(
+    processed.bodyHtml as string | null | undefined
+  );
   processed.minPrice = processed.priceRange?.minVariantPrice?.amount || 0;
   processed.maxPrice = processed.priceRange?.maxVariantPrice?.amount || 0;
-  processed.currency = processed.priceRange?.minVariantPrice?.currencyCode || 'GBP';
+  processed.currency =
+    processed.priceRange?.minVariantPrice?.currencyCode || 'GBP';
   const meta = processed.METAFIELDS as
-    | { stoked_inventory_sold_count?: { value?: string }; yotpo_reviews_count?: { value?: string }; yotpo_reviews_average?: { value?: string } }
+    | {
+        stoked_inventory_sold_count?: { value?: string };
+        yotpo_reviews_count?: { value?: string };
+        yotpo_reviews_average?: { value?: string };
+      }
     | undefined;
-  processed.soldCount = parseInt(meta?.stoked_inventory_sold_count?.value ?? '0', 10);
+  processed.soldCount = parseInt(
+    meta?.stoked_inventory_sold_count?.value ?? '0',
+    10
+  );
   processed.reviewCount = parseInt(meta?.yotpo_reviews_count?.value ?? '0', 10);
-  processed.averageRating = parseFloat(meta?.yotpo_reviews_average?.value ?? '0');
+  processed.averageRating = parseFloat(
+    meta?.yotpo_reviews_average?.value ?? '0'
+  );
   processed.id = String(processed.id);
   if (processed.slug) {
     processed.slug = String(processed.slug);
+  }
+  if (processed.sku) {
+    processed.sku = String(processed.sku);
   }
   if (processed.images && processed.images.length > 0) {
     processed.featuredImage = { url: processed.images[0] };
@@ -78,6 +89,7 @@ async function loadProductsData(): Promise<Product[]> {
       processProductRow({
         id: row.id,
         slug: row.slug,
+        sku: row.sku,
         title: row.title,
         vendor: row.vendor?.brandName ?? String(row.vendorId),
         description: row.description,
@@ -108,6 +120,7 @@ export function mapDbRowToProduct(row: Record<string, unknown>): Product {
   return processProductRow({
     id: row.id,
     slug: row.slug,
+    sku: row.sku,
     title: row.title,
     vendor: row.vendor,
     description: row.description,
@@ -129,7 +142,10 @@ export function mapDbRowToProduct(row: Record<string, unknown>): Product {
   });
 }
 
-export async function loadAndIndexProducts(): Promise<{ products: Product[]; productIndex: null }> {
+export async function loadAndIndexProducts(): Promise<{
+  products: Product[];
+  productIndex: null;
+}> {
   // Legacy function name preserved for API routes.
   const products = await loadProductsData();
   return { products, productIndex: null };
@@ -137,13 +153,16 @@ export async function loadAndIndexProducts(): Promise<{ products: Product[]; pro
 
 export async function addProduct(product: Product): Promise<void> {
   const db = getDb();
-  const vendor = await db.user.findFirst({ where: { brandName: String(product.vendor) } });
+  const vendor = await db.user.findFirst({
+    where: { brandName: String(product.vendor) },
+  });
   const category = product.category
     ? await db.category.findFirst({ where: { name: product.category } })
     : null;
   const data: any = {
     id: Number(product.id),
     slug: product.slug,
+    sku: product.sku,
     title: product.title,
     description: product.description ?? '',
     productType: product.productType ?? '',
@@ -176,6 +195,7 @@ export async function updateProduct(product: Product): Promise<void> {
   await db.product.update({
     where: { id: Number(product.id) },
     data: {
+      sku: product.sku,
       title: product.title,
       description: product.description,
       productType: product.productType,
@@ -201,6 +221,7 @@ export async function getPendingProducts(): Promise<Product[]> {
     processProductRow({
       id: row.id,
       slug: row.slug,
+      sku: row.sku,
       title: row.title,
       vendor: row.vendor?.brandName ?? String(row.vendorId),
       description: row.description,
@@ -219,12 +240,18 @@ export async function getPendingProducts(): Promise<Product[]> {
 
 export async function approveProduct(id: string | number): Promise<void> {
   const db = getDb();
-  await db.product.update({ where: { id: Number(id) }, data: { status: 'approved' } });
+  await db.product.update({
+    where: { id: Number(id) },
+    data: { status: 'approved' },
+  });
 }
 
 export async function rejectProduct(id: string | number): Promise<void> {
   const db = getDb();
-  await db.product.update({ where: { id: Number(id) }, data: { status: 'rejected' } });
+  await db.product.update({
+    where: { id: Number(id) },
+    data: { status: 'rejected' },
+  });
 }
 
 export async function getCategoriesFlat(): Promise<Category[]> {
@@ -232,10 +259,15 @@ export async function getCategoriesFlat(): Promise<Category[]> {
   return db.category.findMany({ orderBy: { name: 'asc' } });
 }
 
-export async function getCategoryTree(): Promise<{ name: string; subcategories: string[]; image?: string }[]> {
+export async function getCategoryTree(): Promise<
+  { name: string; subcategories: string[]; image?: string }[]
+> {
   const flat = await getCategoriesFlat();
   if (flat.length > 0) {
-    const map: Record<number, { name: string; image?: string; subcategories: string[] }> = {};
+    const map: Record<
+      number,
+      { name: string; image?: string; subcategories: string[] }
+    > = {};
     flat.forEach((c) => {
       if (typeof c.id === 'number') {
         map[c.id] = { name: c.name, image: c.image, subcategories: [] };
@@ -280,7 +312,9 @@ export async function createCategory(
   const db = getDb();
   const existing = await db.category.findFirst({ where: { name } });
   if (existing) return;
-  await db.category.create({ data: { name, slug: name.toLowerCase().replace(/\s+/g, '-') } });
+  await db.category.create({
+    data: { name, slug: name.toLowerCase().replace(/\s+/g, '-') },
+  });
 }
 
 export async function renameCategory(

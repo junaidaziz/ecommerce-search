@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useContext, useCallback, ChangeEvent, FormEvent } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  ChangeEvent,
+  FormEvent,
+} from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import type { User } from '../../types/user';
 
@@ -6,9 +13,9 @@ type ProductForm = Partial<Product>;
 
 type ProductApi = Product;
 
-
 const emptyForm: ProductForm = {
   id: '',
+  sku: '',
   title: '',
   vendor: '',
   description: '',
@@ -73,6 +80,7 @@ const BrandDashboard: React.FC = () => {
       body: JSON.stringify({
         id: payload.id,
         title: payload.title,
+        sku: payload.sku,
         vendor: payload.vendor,
         description: payload.description,
         product_type: payload.productType,
@@ -98,6 +106,7 @@ const BrandDashboard: React.FC = () => {
   const handleEdit = (p: ProductApi) => {
     setForm({
       id: p.id,
+      sku: p.sku || '',
       title: p.title || '',
       vendor: p.vendor || '',
       description: p.description || '',
@@ -148,6 +157,7 @@ const BrandDashboard: React.FC = () => {
         {(
           [
             'id',
+            'sku',
             'title',
             'vendor',
             'description',
@@ -196,7 +206,7 @@ const BrandDashboard: React.FC = () => {
         {products.map((p) => (
           <li key={p.id} className="flex justify-between items-center gap-2">
             <span>
-              {p.title} - {p.category || p.productType}
+              {p.title} - {p.category || p.productType} (SKU: {p.sku})
             </span>
             <div className="flex gap-2">
               <button
