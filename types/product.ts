@@ -31,9 +31,9 @@ export interface Product {
   status?: string;
   createdAt?: Date | string;
   updatedAt?: Date | string;
-  vendor?: Vendor | string;
-  brand?: Brand | string;
-  category?: Category | string;
+  vendor: Vendor;
+  brand?: Brand;
+  category: Category;
 }
 
 export type ProductResponse = Product;
@@ -42,10 +42,10 @@ export interface ProductInput {
   sku: PrismaProduct['sku'];
   title: string;
   description?: string;
-  vendor?: Vendor;
+  vendor: Vendor;
   productType?: string;
   tags?: string;
-  category?: Category;
+  category: Category;
   images?: Image[];
   quantity?: number;
   price?: number;
@@ -65,6 +65,6 @@ export interface ProductDbRow {
   minPrice: number;
   maxPrice: number;
   currency: string;
-  vendor: Vendor | null;
-  category: Category | null;
+  vendor: Vendor;
+  category: Category;
 }
