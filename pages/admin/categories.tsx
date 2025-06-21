@@ -175,7 +175,7 @@ export default function Categories() {
               </span>
               <button
                 onClick={() => {
-                  setEditing(cat.id);
+                  setEditing(cat.id ?? null);
                   setEditName(cat.name);
                   setEditImage(cat.image || '');
                 }}
