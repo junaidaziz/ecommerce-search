@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getDb } from '../../../lib/db';
 import { hasOrdersForProduct } from '../../../lib/orders';
-import formidable, { type Fields, type Files } from 'formidable';
+import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import { withRole } from '../../../lib/withRole';
@@ -63,10 +63,10 @@ async function handler(
         res.status(400).json({ message: 'id, sku and title are required' });
         return;
       }
-      const photos: formidable.File[] = files.photos
+      const photos: File[] = files.photos
         ? Array.isArray(files.photos)
-          ? (files.photos as formidable.File[])
-          : [files.photos as formidable.File]
+          ? (files.photos as File[])
+          : [files.photos as File]
         : [];
       const destDir = path.join(process.cwd(), 'public', 'uploads', String(id));
       fs.mkdirSync(destDir, { recursive: true });
@@ -87,7 +87,7 @@ async function handler(
         const existingImages = existing.images ? JSON.parse(existing.images) : [];
         imagePaths.push(...existingImages);
       }
-      const slug = slugify(title || (existing?.title as string) || String(id));
+      const slug = slugify(String(title || existing?.title || id));
       const qty = quantity ? parseInt(String(quantity), 10) : 0;
       const data: Record<string, unknown> = {
         id: Number(id),
@@ -164,13 +164,13 @@ async function handler(
         where,
         include: { category: true, vendor: true },
       });
-      const data: Product[] = rows.map((p): Product => ({
-        ID: String(p.id),
-        SLUG: p.slug,
+      const data: Product[] = rows.map((p: any): Product => ({
+        id: String(p.id),
+        slug: p.slug,
         sku: p.sku,
-        TITLE: p.title,
-        VENDOR: p.vendor?.brandName ?? String(p.vendorId),
-        DESCRIPTION: p.description,
+        title: p.title,
+        vendor: p.vendor?.brandName ?? String(p.vendorId),
+        description: p.description,
         productType: p.productType,
         tags: p.tags,
         category: p.category?.name,
@@ -186,6 +186,11 @@ async function handler(
         soldCount: 0,
         reviewCount: 0,
         averageRating: 0,
+        quantity: p.quantity,
+        status: p.status,
+        uuid: p.uuid,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
       }));
       res.status(200).json(data);
       return;
