@@ -154,6 +154,58 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     };
   }, [loadMoreRef, loadMore]);
 
+  const applyFilters = useCallback(
+    async (e?: React.FormEvent) => {
+      e?.preventDefault();
+      const min = minPrice ? parseFloat(minPrice) : undefined;
+      const max = maxPrice ? parseFloat(maxPrice) : undefined;
+      if (
+        typeof min === 'number' &&
+        typeof max === 'number' &&
+        !isNaN(min) &&
+        !isNaN(max) &&
+        min > max
+      ) {
+        addNotification('Min price cannot exceed Max price', 'error');
+        return;
+      }
+      const query = {
+        ...router.query,
+        page: '1',
+      } as Record<string, string>;
+      if (keyword) query.q = keyword;
+      else delete query.q;
+      if (selectedCategory) query.category = selectedCategory;
+      else delete query.category;
+      if (minPrice) query.minPrice = minPrice;
+      else delete query.minPrice;
+      if (maxPrice) query.maxPrice = maxPrice;
+      else delete query.maxPrice;
+      if (inStock) query.inStock = 'true';
+      else delete query.inStock;
+      const params = new URLSearchParams(query);
+      const res = await fetch(`/api/products?${params.toString()}`);
+      if (res.ok) {
+        const data = (await res.json()) as { products: Product[]; total: number };
+        setItems(data.products);
+        setPage(1);
+        setHasMore(data.products.length < data.total);
+        router.replace({ pathname: router.pathname, query }, undefined, {
+          shallow: true,
+        });
+      }
+    },
+    [
+      router,
+      keyword,
+      selectedCategory,
+      minPrice,
+      maxPrice,
+      inStock,
+      addNotification,
+    ]
+  );
+
   useEffect(() => {
     if (firstPriceRef.current) {
       firstPriceRef.current = false;
@@ -233,57 +285,6 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   if (keyword)
     activeFilters.push({ label: keyword, clear: () => setKeyword('') });
 
-  const applyFilters = useCallback(
-    async (e?: React.FormEvent) => {
-      e?.preventDefault();
-      const min = minPrice ? parseFloat(minPrice) : undefined;
-      const max = maxPrice ? parseFloat(maxPrice) : undefined;
-      if (
-        typeof min === 'number' &&
-        typeof max === 'number' &&
-        !isNaN(min) &&
-        !isNaN(max) &&
-        min > max
-      ) {
-        addNotification('Min price cannot exceed Max price', 'error');
-        return;
-      }
-      const query = {
-        ...router.query,
-        page: '1',
-      } as Record<string, string>;
-      if (keyword) query.q = keyword;
-      else delete query.q;
-      if (selectedCategory) query.category = selectedCategory;
-      else delete query.category;
-      if (minPrice) query.minPrice = minPrice;
-      else delete query.minPrice;
-      if (maxPrice) query.maxPrice = maxPrice;
-      else delete query.maxPrice;
-      if (inStock) query.inStock = 'true';
-      else delete query.inStock;
-      const params = new URLSearchParams(query);
-      const res = await fetch(`/api/products?${params.toString()}`);
-      if (res.ok) {
-        const data = (await res.json()) as { products: Product[]; total: number };
-        setItems(data.products);
-        setPage(1);
-        setHasMore(data.products.length < data.total);
-        router.replace({ pathname: router.pathname, query }, undefined, {
-          shallow: true,
-        });
-      }
-    },
-    [
-      router,
-      keyword,
-      selectedCategory,
-      minPrice,
-      maxPrice,
-      inStock,
-      addNotification,
-    ]
-  );
 
   const clearAll = useCallback(async () => {
     setKeyword('');
