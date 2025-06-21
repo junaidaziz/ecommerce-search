@@ -7,13 +7,13 @@ import { fetchJson } from '../../lib/utils/fetchJson';
 export default function Categories() {
   const { user } = useContext(AppContext)!;
   const [categories, setCategories] = useState<Category[]>([]);
-  const [newCat, setNewCat] = useState('');
-  const [newParent, setNewParent] = useState('');
-  const [newImage, setNewImage] = useState('');
-  const [message, setMessage] = useState('');
+  const [newCat, setNewCat] = useState<string>('');
+  const [newParent, setNewParent] = useState<string>('');
+  const [newImage, setNewImage] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
   const [editing, setEditing] = useState<number | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editImage, setEditImage] = useState('');
+  const [editName, setEditName] = useState<string>('');
+  const [editImage, setEditImage] = useState<string>('');
 
   const load = useCallback(async () => {
     if (!user) return;
