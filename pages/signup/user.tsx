@@ -152,7 +152,7 @@ export default function UserSignup() {
         <title>{getPageTitle('User Signup')}</title>
       </Head>
       <div className="max-w-lg mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
-        <h1 className="text-2xl font-bold mb-4">User Sign Up</h1>
+        <h1 className="text-2xl font-bold mb-4 text-center">User Sign Up</h1>
       <div className="flex flex-col gap-6 mb-4">
         <button
           type="button"

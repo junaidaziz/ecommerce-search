@@ -27,7 +27,7 @@ const ResetToken: React.FC = () => {
   if (!token) return <div className="p-4">Invalid token</div>;
 
   return (
-    <div className="max-w-sm mx-auto">
+    <div className="max-w-sm mx-auto text-center">
       <Head>
         <title>{getPageTitle('Set New Password')}</title>
       </Head>
