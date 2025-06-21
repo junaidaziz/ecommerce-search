@@ -60,10 +60,10 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
   return (
     <div className="max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md">
       <Head>
-        <title>{(product.TITLE || 'Product') + ' - Product'}</title>
+        <title>{(product.title || 'Product') + ' - Product'}</title>
         <meta
           name="description"
-          content={product.DESCRIPTION_TEXT?.slice(0, 150)}
+          content={product.descriptionText?.slice(0, 150)}
         />
         <script
           type="application/ld+json"
@@ -71,15 +71,15 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Product',
-              name: product.TITLE,
-              description: product.DESCRIPTION_TEXT,
-              image: product.FEATURED_IMAGE?.url,
+              name: product.title,
+              description: product.descriptionText,
+              image: product.featuredImage?.url,
               offers: {
                 '@type': 'Offer',
-                priceCurrency: product.CURRENCY,
-                price: product.MIN_PRICE,
+                priceCurrency: product.currency,
+                price: product.minPrice,
                 availability:
-                  product.TOTAL_INVENTORY && product.TOTAL_INVENTORY > 0
+                  product.totalInventory && product.totalInventory > 0
                     ? 'https://schema.org/InStock'
                     : 'https://schema.org/OutOfStock',
               },
@@ -87,28 +87,28 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
           }}
         />
       </Head>
-      <h1 className="text-2xl font-bold mb-4">{product.TITLE || 'Product'}</h1>
+      <h1 className="text-2xl font-bold mb-4">{product.title || 'Product'}</h1>
       <div className="mb-4 w-full flex flex-col items-center">
         <ProductImageSlider
           className="w-full max-w-md aspect-[4/5]"
           images={
-            product.IMAGES && product.IMAGES.length > 0
-              ? product.IMAGES
-              : [product.FEATURED_IMAGE?.url || '/placeholder.png']
+            product.images && product.images.length > 0
+              ? product.images
+              : [product.featuredImage?.url || '/placeholder.png']
           }
           imgClass="hover:scale-110 transition"
         />
       </div>
-      <p className="mb-2">Vendor: {product.VENDOR}</p>
-      <p className="mb-2">Type: {product.PRODUCT_TYPE}</p>
+      <p className="mb-2">Vendor: {product.vendor}</p>
+      <p className="mb-2">Type: {product.productType}</p>
       <p className="mb-4">
-        {product.DESCRIPTION_TEXT ||
-          product.BODY_HTML_TEXT ||
+        {product.descriptionText ||
+          product.bodyHtmlText ||
           'No description available.'}
       </p>
       <p className="text-lg font-bold mb-4">
-        {product.CURRENCY || ''}{' '}
-        {product.MIN_PRICE ? product.MIN_PRICE.toFixed(2) : 'N/A'}
+        {product.currency || ''}{' '}
+        {product.minPrice ? product.minPrice.toFixed(2) : 'N/A'}
       </p>
       <p className="mb-2">Rating: {averageRating.toFixed(1)} ({reviewCount})</p>
       <div className="flex gap-2">
@@ -119,10 +119,10 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
         >
           Add to Cart
         </button>
-        {(wishlist ?? []).some((w: Product) => w.ID === product.ID) ? (
+        {(wishlist ?? []).some((w: Product) => w.id === product.id) ? (
           <button
             className="btn"
-            onClick={() => removeFromWishlist?.(product.ID)}
+            onClick={() => removeFromWishlist?.(product.id)}
           >
             Remove Wishlist
           </button>

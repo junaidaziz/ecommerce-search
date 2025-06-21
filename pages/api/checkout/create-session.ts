@@ -20,8 +20,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       line_items: items.map((it) => ({
         price_data: {
           currency: 'usd',
-          product_data: { name: it.TITLE },
-          unit_amount: Math.round(parseFloat(it.MIN_PRICE || 0) * 100),
+          product_data: { name: it.title },
+          unit_amount: Math.round(parseFloat(it.minPrice || 0) * 100),
         },
         quantity: it.qty,
       })),
