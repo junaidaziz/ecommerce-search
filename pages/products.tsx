@@ -25,7 +25,7 @@ const Products: React.FC = () => {
   }, []);
 
   const filteredProducts = products.filter((p) => {
-    const price = typeof p.MIN_PRICE === 'number' ? p.MIN_PRICE : parseFloat(p.MIN_PRICE) || 0;
+    const price = typeof p.minPrice === 'number' ? p.minPrice : parseFloat(p.minPrice as any) || 0;
     if (minPrice && price < parseFloat(minPrice)) return false;
     if (maxPrice && price > parseFloat(maxPrice)) return false;
     return true;
@@ -75,11 +75,11 @@ const Products: React.FC = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
             {filteredProducts.map((p) => (
               <div
-                key={p.ID}
+                key={p.id}
                 className="bg-base-100 rounded-lg shadow-md p-4 flex flex-col hover:shadow-xl transition"
               >
-                <h2 className="font-semibold text-primary mb-1">{p.TITLE}</h2>
-                <p className="mb-2 text-sm text-base-content/60">{p.VENDOR}</p>
+                <h2 className="font-semibold text-primary mb-1">{p.title}</h2>
+                <p className="mb-2 text-sm text-base-content/60">{p.vendor}</p>
                 <button
                   className="btn btn-sm btn-secondary mt-auto"
                   onClick={() => addToCart(p)}

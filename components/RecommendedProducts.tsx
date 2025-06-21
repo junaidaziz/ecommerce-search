@@ -22,7 +22,7 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
       .then((res) => (res.ok ? (res.json() as Promise<SearchResults>) : null))
       .then((data) => {
         if (data && Array.isArray(data.results)) {
-          const filtered = data.results.filter((p) => p.ID !== excludeId);
+          const filtered = data.results.filter((p) => p.id !== excludeId);
           setProducts(filtered);
         }
       })
@@ -36,7 +36,7 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
       <h3 className="font-semibold mb-4">{title}</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
         {products.map((p) => (
-          <ProductCard key={p.ID} product={p} />
+          <ProductCard key={p.id} product={p} />
         ))}
       </div>
     </div>

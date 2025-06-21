@@ -11,30 +11,18 @@ import type { Product } from '../../types';
 
 export default function VendorDashboard() {
   const { user } = useContext(AppContext)!;
-  interface FormState {
-    id: string;
-    title: string;
-    vendor: string;
-    description: string;
-    product_type: string;
-    tags: string;
-    category: string;
-    quantity: number;
-    min_price: number;
-    max_price: number;
-    currency: string;
-  }
+  type FormState = Partial<Product>;
   const emptyForm: FormState = {
     id: '',
     title: '',
     vendor: '',
     description: '',
-    product_type: '',
+    productType: '',
     tags: '',
     category: '',
     quantity: 0,
-    min_price: 0,
-    max_price: 0,
+    minPrice: 0,
+    maxPrice: 0,
     currency: 'USD',
   };
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -62,10 +50,23 @@ export default function VendorDashboard() {
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const payload = editingId ? { ...form, id: editingId } : form;
     const res = await fetch('/api/admin/products', {
       method: editingId ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editingId ? { ...form, id: editingId } : form),
+      body: JSON.stringify({
+        id: payload.id,
+        title: payload.title,
+        vendor: payload.vendor,
+        description: payload.description,
+        product_type: payload.productType,
+        tags: payload.tags,
+        category: payload.category,
+        quantity: payload.quantity,
+        min_price: payload.minPrice,
+        max_price: payload.maxPrice,
+        currency: payload.currency,
+      }),
     });
     if (res.ok) {
       setMessage(editingId ? 'Product updated' : 'Product added');
@@ -80,19 +81,19 @@ export default function VendorDashboard() {
 
   const handleEdit = (p: Product) => {
     setForm({
-      id: p.ID,
-      title: p.TITLE || '',
-      vendor: p.VENDOR || '',
-      description: p.DESCRIPTION || '',
-      product_type: p.PRODUCT_TYPE || '',
-      tags: p.TAGS || '',
-      category: p.CATEGORY || '',
-      quantity: p.TOTAL_INVENTORY || 0,
-      min_price: p.MIN_PRICE || 0,
-      max_price: p.MAX_PRICE || 0,
-      currency: p.CURRENCY || 'USD',
+      id: p.id,
+      title: p.title || '',
+      vendor: p.vendor || '',
+      description: p.description || '',
+      productType: p.productType || '',
+      tags: p.tags || '',
+      category: p.category || '',
+      quantity: p.totalInventory || 0,
+      minPrice: p.minPrice || 0,
+      maxPrice: p.maxPrice || 0,
+      currency: p.currency || 'USD',
     });
-    setEditingId(p.ID);
+    setEditingId(p.id);
   };
 
   const cancelEdit = () => {
@@ -128,12 +129,12 @@ export default function VendorDashboard() {
           'title',
           'vendor',
           'description',
-          'product_type',
+          'productType',
           'tags',
           'category',
           'quantity',
-          'min_price',
-          'max_price',
+          'minPrice',
+          'maxPrice',
           'currency',
         ].map((field) => (
           <div key={field}>
@@ -163,9 +164,9 @@ export default function VendorDashboard() {
       <h2 className="text-xl font-semibold mb-2">Existing Products</h2>
       <ul className="space-y-1">
         {products.map((p) => (
-          <li key={p.ID} className="flex justify-between items-center gap-2">
+          <li key={p.id} className="flex justify-between items-center gap-2">
             <span>
-              {p.TITLE} - {p.CATEGORY || p.PRODUCT_TYPE}
+              {p.title} - {p.category || p.productType}
             </span>
             <div className="flex gap-2">
               <button
@@ -178,7 +179,7 @@ export default function VendorDashboard() {
               <button
                 type="button"
                 className="btn btn-sm btn-error"
-                onClick={() => handleDelete(p.ID)}
+                onClick={() => handleDelete(p.id)}
               >
                 Delete
               </button>

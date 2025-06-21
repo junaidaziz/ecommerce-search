@@ -78,7 +78,7 @@ const CategoryPage: React.FC = () => {
       {loading && <div>Loading...</div>}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
         {products.map((p) => (
-          <ProductCard key={p.ID} product={p} />
+          <ProductCard key={p.id} product={p} />
         ))}
       </div>
       {products.length === 0 && !loading && (

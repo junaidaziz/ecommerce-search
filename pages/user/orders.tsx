@@ -44,8 +44,8 @@ const UserOrders: React.FC = () => {
             )}
             <ul className="list-disc pl-4 text-sm mb-1">
               {o.items.map((item) => (
-                <li key={item.ID}>
-                  {item.TITLE} x {item.qty}
+                <li key={item.id}>
+                  {item.title} x {item.qty}
                 </li>
               ))}
             </ul>

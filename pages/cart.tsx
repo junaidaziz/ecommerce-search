@@ -4,9 +4,9 @@ import { AppContext, AppContextValue } from '../contexts/AppContext';
 
 // Define the type for a cart item
 type CartItem = {
-  ID: string | number;
-  TITLE: string;
-  MIN_PRICE?: string;
+  id: string | number;
+  title: string;
+  minPrice?: string;
   qty: number;
 };
 
@@ -27,9 +27,9 @@ const Cart: React.FC = () => {
       sum +
       item.qty *
         parseFloat(
-          typeof item.MIN_PRICE === 'number'
-            ? item.MIN_PRICE.toString()
-            : item.MIN_PRICE || '0'
+          typeof item.minPrice === 'number'
+            ? item.minPrice.toString()
+            : item.minPrice || '0'
         ),
     0
   );
@@ -41,38 +41,38 @@ const Cart: React.FC = () => {
       <ul className="space-y-2 mb-4">
         {cart.map((item) => {
           const price = parseFloat(
-            typeof item.MIN_PRICE === 'number'
-              ? item.MIN_PRICE.toString()
-              : item.MIN_PRICE || '0'
+            typeof item.minPrice === 'number'
+              ? item.minPrice.toString()
+              : item.minPrice || '0'
           );
           const subtotal = price * item.qty;
           return (
             <li
-              key={item.ID}
+              key={item.id}
               className="border p-2 flex justify-between items-center"
             >
               <div>
-                <p className="font-medium">{item.TITLE}</p>
+                <p className="font-medium">{item.title}</p>
                 <p className="text-sm">£{price.toFixed(2)} each</p>
               </div>
               <div className="flex items-center space-x-2">
                 <button
                   className="btn btn-xs"
-                  onClick={() => changeQty(item.ID, -1)}
+                  onClick={() => changeQty(item.id, -1)}
                 >
                   -
                 </button>
                 <span>{item.qty}</span>
                 <button
                   className="btn btn-xs"
-                  onClick={() => changeQty(item.ID, 1)}
+                  onClick={() => changeQty(item.id, 1)}
                 >
                   +
                 </button>
                 <span className="ml-2">£{subtotal.toFixed(2)}</span>
                 <button
                   className="btn btn-xs btn-error"
-                  onClick={() => removeFromCart(item.ID)}
+                  onClick={() => removeFromCart(item.id)}
                 >
                   Remove
                 </button>
