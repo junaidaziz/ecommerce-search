@@ -81,8 +81,8 @@ export default function ProductDetail({
             images={
               product.images && product.images.length > 0
                 ? product.images
-                : product.featuredImage?.url
-                ? [product.featuredImage.url]
+                : product.featuredImage
+                ? [product.featuredImage]
                 : []
             }
             imgClass="hover:scale-110 transition"

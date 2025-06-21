@@ -1,4 +1,4 @@
-import { Order, Product } from '../types';
+import { Order, Product, ShippingInfo } from '../types';
 import type { ProductDbRow } from '../types/product';
 import { getDb } from './db';
 import { mapDbRowToProduct } from './products';
@@ -22,8 +22,7 @@ export interface AddOrderParams {
   items: OrderItemInput[];
   total: number;
   status?: Order['status'];
-  shippingName?: string | null;
-  shippingAddress?: string | null;
+  shipping?: ShippingInfo | null;
 }
 
 function mapOrderRow(row: OrderWithRelations): Order {
@@ -39,6 +38,7 @@ function mapOrderRow(row: OrderWithRelations): Order {
     product: mapDbRowToProduct(row.product),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
+    shipping: null,
   };
 }
 
@@ -138,23 +138,5 @@ export async function getBestSellingProducts(limit = 8): Promise<Product[]> {
     include: { category: true, vendor: true },
   });
 
-  return products.map((p) =>
-    mapDbRowToProduct({
-      id: p.id,
-      uuid: p.uuid,
-      slug: p.slug,
-      sku: p.sku,
-      title: p.title,
-      vendor: p.vendor ?? null,
-      description: p.description,
-      productType: p.productType,
-      tags: p.tags,
-      category: p.category ?? null,
-      images: p.images,
-      quantity: p.quantity,
-      minPrice: p.minPrice,
-      maxPrice: p.maxPrice,
-      currency: p.currency,
-    } as ProductDbRow)
-  );
+  return products.map((p) => mapDbRowToProduct(p));
 }

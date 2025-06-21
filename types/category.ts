@@ -15,5 +15,5 @@ export interface Category {
 export interface CategoryInput {
   name: string;
   parentId?: number | null;
-  image?: string;
+  image?: string | null;
 }

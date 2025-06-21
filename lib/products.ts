@@ -1,6 +1,7 @@
 import { JSDOM } from 'jsdom';
 import { getDb } from './db';
-import type { Product, ProductDbRow } from '../types/product';
+import type { Product } from '../types/product';
+import { parseImages } from './utils/parseImages';
 import type { Category } from '../types/category';
 import type { Prisma } from '@prisma/client';
 
@@ -92,9 +93,7 @@ async function loadProductsData(): Promise<Product[]> {
         productType: row.productType,
         tags: row.tags,
         category: row.category ?? null,
-        images: row.images
-          ? (JSON.parse(row.images) as string[]).map((u) => ({ url: u }))
-          : [],
+        images: parseImages(row.images),
         totalInventory: row.quantity,
         priceRange: {
           minVariantPrice: {
@@ -113,7 +112,7 @@ async function loadProductsData(): Promise<Product[]> {
   }
 }
 
-export function mapDbRowToProduct(row: ProductDbRow): Product {
+export function mapDbRowToProduct(row: { images: string | null } & Record<string, any>): Product {
   return processProductRow({
     id: row.id,
     uuid: row.uuid,
@@ -125,9 +124,7 @@ export function mapDbRowToProduct(row: ProductDbRow): Product {
     productType: row.productType,
     tags: row.tags,
     category: row.category,
-    images: row.images
-      ? (JSON.parse(row.images as unknown as string) as string[]).map((u) => ({ url: u }))
-      : [],
+    images: parseImages(row.images),
     totalInventory: row.quantity,
     priceRange: {
       minVariantPrice: {
@@ -226,9 +223,7 @@ export async function getPendingProducts(): Promise<Product[]> {
       productType: row.productType,
       tags: row.tags,
       category: row.category ?? null,
-      images: row.images
-        ? (JSON.parse(row.images) as string[]).map((u) => ({ url: u }))
-        : [],
+      images: parseImages(row.images),
       totalInventory: row.quantity,
       priceRange: {
         minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
