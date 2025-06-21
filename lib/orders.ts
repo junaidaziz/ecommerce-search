@@ -62,7 +62,7 @@ export async function addOrder({
     const created = await db.order.create({
       data: {
         user: { connect: { id: user.id } },
-        product: { connect: { id: Number(item.ID) } },
+        product: { connect: { id: Number(item.id) } },
         quantity: item.qty || 1,
         total,
         status,

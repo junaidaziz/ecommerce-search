@@ -53,7 +53,7 @@ export default function ProductDetail({
   const [reviewCount, setReviewCount] = useState<number>(initialCount);
   const [myRating, setMyRating] = useState<number>(5);
   const [comment, setComment] = useState<string>('');
-  const id = product.ID;
+  const id = product.id;
 
   useEffect(() => {
     try {
@@ -71,36 +71,36 @@ export default function ProductDetail({
   return (
     <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md min-h-screen">
       <Head>
-        <title>{product.TITLE} - Product</title>
-        <meta name="description" content={product.DESCRIPTION_TEXT?.slice(0, 150)} />
+        <title>{product.title} - Product</title>
+        <meta name="description" content={product.descriptionText?.slice(0, 150)} />
       </Head>
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/2 flex justify-center">
           <ProductImageSlider
             className="w-full max-w-md aspect-[4/5]"
             images={
-              product.IMAGES && product.IMAGES.length > 0
-                ? product.IMAGES
-                : product.FEATURED_IMAGE?.url
-                ? [product.FEATURED_IMAGE.url]
+              product.images && product.images.length > 0
+                ? product.images
+                : product.featuredImage?.url
+                ? [product.featuredImage.url]
                 : []
             }
             imgClass="hover:scale-110 transition"
           />
         </div>
         <div className="md:w-1/2">
-          <h1 className="text-2xl font-bold mb-4">{product.TITLE}</h1>
-          <p className="mb-2">Vendor: {product.VENDOR}</p>
-          <p className="mb-2">Type: {product.PRODUCT_TYPE}</p>
+          <h1 className="text-2xl font-bold mb-4">{product.title}</h1>
+          <p className="mb-2">Vendor: {product.vendor}</p>
+          <p className="mb-2">Type: {product.productType}</p>
           <p className="mb-4">
-            {product.DESCRIPTION_TEXT || product.BODY_HTML_TEXT || 'No description available.'}
+            {product.descriptionText || product.bodyHtmlText || 'No description available.'}
           </p>
           <p className="text-lg font-bold mb-4">
-            {product.CURRENCY}{' '}
+            {product.currency}{' '}
             {parseFloat(
-              typeof product.MIN_PRICE === 'number'
-                ? product.MIN_PRICE.toString()
-                : product.MIN_PRICE || '0'
+              typeof product.minPrice === 'number'
+                ? product.minPrice.toString()
+                : product.minPrice || '0'
             ).toFixed(2)}
           </p>
           <p className="mb-2">
@@ -113,10 +113,10 @@ export default function ProductDetail({
             >
               Add to Cart
             </button>
-            {wishlist.some((w) => w.ID === product.ID) ? (
+            {wishlist.some((w) => w.id === product.id) ? (
               <button
                 className="btn transition-all duration-200"
-                onClick={() => removeFromWishlist(product.ID)}
+                onClick={() => removeFromWishlist(product.id)}
               >
                 Remove Wishlist
               </button>
@@ -193,7 +193,7 @@ export default function ProductDetail({
           </form>
         )}
       </div>
-      <RecommendedProducts category={product.CATEGORY} excludeId={product.ID} />
+      <RecommendedProducts category={product.category} excludeId={product.id} />
       <div className="mt-4">
         <Link href="/">&larr; Back to products</Link>
       </div>

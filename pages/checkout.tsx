@@ -3,12 +3,13 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { AppContext, AppContextValue } from '../contexts/AppContext';
 import type { User } from '../types/user';
+import type { Coupon } from '../types';
 
 // Types for cart item and user
 type CartItem = {
-  ID: string | number;
-  TITLE: string;
-  MIN_PRICE?: string;
+  id: string | number;
+  title: string;
+  minPrice?: string;
   qty: number;
 };
 
@@ -36,9 +37,9 @@ const Checkout: React.FC = () => {
       s +
       i.qty *
         parseFloat(
-          typeof i.MIN_PRICE === 'number'
-            ? i.MIN_PRICE.toString()
-            : i.MIN_PRICE || '0'
+          typeof i.minPrice === 'number'
+            ? i.minPrice.toString()
+            : i.minPrice || '0'
         ),
     0
   );
@@ -85,15 +86,15 @@ const Checkout: React.FC = () => {
         <ul className="space-y-2">
           {cart.map((item) => {
             const price = parseFloat(
-              typeof item.MIN_PRICE === 'number'
-                ? item.MIN_PRICE.toString()
-                : item.MIN_PRICE || '0'
+              typeof item.minPrice === 'number'
+                ? item.minPrice.toString()
+                : item.minPrice || '0'
             );
             const subtotal = price * item.qty;
             return (
-              <li key={item.ID} className="border p-2 flex justify-between">
+              <li key={item.id} className="border p-2 flex justify-between">
                 <div>
-                  <p className="font-medium">{item.TITLE}</p>
+                  <p className="font-medium">{item.title}</p>
                   <p className="text-sm">
                     £{price.toFixed(2)} x {item.qty}
                   </p>
@@ -118,7 +119,9 @@ const Checkout: React.FC = () => {
               id="coupon"
               className="input input-bordered flex-1"
               value={coupon}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setCoupon(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setCoupon(e.target.value)
+              }
             />
             <button
               type="button"
@@ -129,8 +132,14 @@ const Checkout: React.FC = () => {
                   `/api/coupons/${encodeURIComponent(coupon)}`
                 );
                 if (res.ok) {
-                  const data = await res.json();
-                  setDiscount(data.percent);
+                  const data: Coupon = await res.json();
+                  if (data.discountType === 'percent') {
+                    setDiscount(data.value);
+                  } else {
+                    setDiscount(
+                      totalPrice > 0 ? (data.value / totalPrice) * 100 : 0
+                    );
+                  }
                 } else {
                   setDiscount(0);
                 }
@@ -153,7 +162,9 @@ const Checkout: React.FC = () => {
             id="name"
             className="input input-bordered w-full"
             value={name}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setName(e.target.value)
+            }
             required
           />
         </div>
@@ -165,7 +176,9 @@ const Checkout: React.FC = () => {
             id="address"
             className="textarea textarea-bordered w-full"
             value={address}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+              setAddress(e.target.value)
+            }
             required
           />
         </div>

@@ -17,12 +17,12 @@ const UserWishlist: React.FC = () => {
       <ul className="space-y-2">
         {wishlist.map((item) => (
           <li
-            key={item.ID}
+            key={item.id}
             className="border p-2 flex justify-between items-center"
           >
             <div>
-              <Link href={`/product/${item.SLUG}`} className="font-semibold">
-                {item.TITLE}
+              <Link href={`/product/${item.slug}`} className="font-semibold">
+                {item.title}
               </Link>
             </div>
             <div className="flex gap-2">
@@ -31,7 +31,7 @@ const UserWishlist: React.FC = () => {
               </button>
               <button
                 className="btn btn-sm"
-                onClick={() => removeFromWishlist(item.ID)}
+                onClick={() => removeFromWishlist(item.id)}
               >
                 Remove
               </button>

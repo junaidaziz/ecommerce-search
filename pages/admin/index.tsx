@@ -6,28 +6,17 @@ import { fetchJson } from '../../lib/utils/fetchJson';
 
 export default function Admin() {
   const { user } = useContext(AppContext)!;
-  interface FormState {
-    id: string;
-    title: string;
-    vendor: string;
-    description: string;
-    product_type: string;
-    tags: string;
-    quantity: number;
-    min_price: number;
-    max_price: number;
-    currency: string;
-  }
+  type FormState = Partial<Product>;
   const emptyForm: FormState = {
     id: '',
     title: '',
     vendor: '',
     description: '',
-    product_type: '',
+    productType: '',
     tags: '',
     quantity: 0,
-    min_price: 0,
-    max_price: 0,
+    minPrice: 0,
+    maxPrice: 0,
     currency: 'USD',
   };
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -77,19 +66,19 @@ export default function Admin() {
 
   const handleEdit = (p: Product) => {
     setForm({
-      id: p.ID,
-      title: p.TITLE || '',
-      vendor: p.VENDOR || '',
-      description: p.DESCRIPTION || '',
-      product_type: p.PRODUCT_TYPE || '',
-      tags: p.TAGS || '',
-      quantity: p.TOTAL_INVENTORY || 0,
-      min_price: p.MIN_PRICE || 0,
-      max_price: p.MAX_PRICE || 0,
-      currency: p.CURRENCY || 'USD',
+      id: p.id,
+      title: p.title || '',
+      vendor: p.vendor || '',
+      description: p.description || '',
+      productType: p.productType || '',
+      tags: p.tags || '',
+      quantity: p.totalInventory || 0,
+      minPrice: p.minPrice || 0,
+      maxPrice: p.maxPrice || 0,
+      currency: p.currency || 'USD',
     });
     setPhotos([]);
-    setEditingId(p.ID);
+    setEditingId(p.id);
     setShowModal(true);
   };
 
@@ -144,11 +133,11 @@ export default function Admin() {
                 'title',
                 'vendor',
                 'description',
-                'product_type',
+                'productType',
                 'tags',
                 'quantity',
-                'min_price',
-                'max_price',
+                'minPrice',
+                'maxPrice',
                 'currency',
               ].map((field) => (
                 <div key={field}>
@@ -206,9 +195,9 @@ export default function Admin() {
       <h2 className="text-xl font-semibold mb-2">Existing Products</h2>
       <ul className="space-y-1">
         {products.map((p) => (
-          <li key={p.ID} className="flex justify-between items-center">
+          <li key={p.id} className="flex justify-between items-center">
             <span>
-              {p.TITLE} - {p.PRODUCT_TYPE}
+              {p.title} - {p.productType}
             </span>
             <button
               type="button"

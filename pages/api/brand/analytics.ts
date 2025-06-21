@@ -21,9 +21,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     orders.forEach((o) => {
       summary.totalRevenue += o.total || 0;
       o.items
-        .filter((i) => i.VENDOR === vendor)
+        .filter((i) => i.vendor === vendor)
         .forEach((i) => {
-          counts[i.ID] = (counts[i.ID] || 0) + i.qty;
+          counts[i.id] = (counts[i.id] || 0) + i.qty;
         });
     });
     summary.topProducts = Object.entries(counts)

@@ -25,7 +25,7 @@ function processProductRow(row: Record<string, unknown>): Product {
     'SEO',
     'OPTIONS',
     'VARIANTS',
-    'PRICE_RANGE_V2',
+    'priceRange',
     'METAFIELDS',
   ];
   jsonFields.forEach((field) => {
@@ -38,33 +38,30 @@ function processProductRow(row: Record<string, unknown>): Product {
       } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
         console.warn(
-          `Could not parse JSON for field '${field}' in row with ID: ${String(processed.ID ?? 'N/A')}. Error: ${message}`
+          `Could not parse JSON for field '${field}' in row with id: ${String(processed.id ?? 'N/A')}. Error: ${message}`
         );
         processed[field] = null;
       }
     }
   });
 
-  processed.DESCRIPTION_TEXT = stripHtml(processed.DESCRIPTION as string | null | undefined);
-  processed.BODY_HTML_TEXT = stripHtml(processed.BODY_HTML as string | null | undefined);
-  processed.MIN_PRICE =
-    processed.PRICE_RANGE_V2?.min_variant_price?.amount || 0;
-  processed.MAX_PRICE =
-    processed.PRICE_RANGE_V2?.max_variant_price?.amount || 0;
-  processed.CURRENCY =
-    processed.PRICE_RANGE_V2?.min_variant_price?.currency_code || 'GBP';
+  processed.descriptionText = stripHtml(processed.description as string | null | undefined);
+  processed.bodyHtmlText = stripHtml(processed.bodyHtml as string | null | undefined);
+  processed.minPrice = processed.priceRange?.minVariantPrice?.amount || 0;
+  processed.maxPrice = processed.priceRange?.maxVariantPrice?.amount || 0;
+  processed.currency = processed.priceRange?.minVariantPrice?.currencyCode || 'GBP';
   const meta = processed.METAFIELDS as
     | { stoked_inventory_sold_count?: { value?: string }; yotpo_reviews_count?: { value?: string }; yotpo_reviews_average?: { value?: string } }
     | undefined;
-  processed.SOLD_COUNT = parseInt(meta?.stoked_inventory_sold_count?.value ?? '0', 10);
-  processed.REVIEW_COUNT = parseInt(meta?.yotpo_reviews_count?.value ?? '0', 10);
-  processed.AVERAGE_RATING = parseFloat(meta?.yotpo_reviews_average?.value ?? '0');
-  processed.ID = String(processed.ID);
-  if (processed.SLUG) {
-    processed.SLUG = String(processed.SLUG);
+  processed.soldCount = parseInt(meta?.stoked_inventory_sold_count?.value ?? '0', 10);
+  processed.reviewCount = parseInt(meta?.yotpo_reviews_count?.value ?? '0', 10);
+  processed.averageRating = parseFloat(meta?.yotpo_reviews_average?.value ?? '0');
+  processed.id = String(processed.id);
+  if (processed.slug) {
+    processed.slug = String(processed.slug);
   }
-  if (processed.IMAGES && processed.IMAGES.length > 0) {
-    processed.FEATURED_IMAGE = { url: processed.IMAGES[0] };
+  if (processed.images && processed.images.length > 0) {
+    processed.featuredImage = { url: processed.images[0] };
   }
   return processed as Product;
 }
@@ -79,24 +76,24 @@ async function loadProductsData(): Promise<Product[]> {
 
     return rows.map((row: ProductDbRow) =>
       processProductRow({
-        ID: row.id,
-        SLUG: row.slug,
-        TITLE: row.title,
-        VENDOR: row.vendor?.brandName ?? String(row.vendorId),
-        DESCRIPTION: row.description,
-        PRODUCT_TYPE: row.productType,
-        TAGS: row.tags,
-        CATEGORY: row.category?.name,
-        IMAGES: row.images ? JSON.parse(row.images) : [],
-        TOTAL_INVENTORY: row.quantity,
-        PRICE_RANGE_V2: {
-          min_variant_price: {
+        id: row.id,
+        slug: row.slug,
+        title: row.title,
+        vendor: row.vendor?.brandName ?? String(row.vendorId),
+        description: row.description,
+        productType: row.productType,
+        tags: row.tags,
+        category: row.category?.name,
+        images: row.images ? JSON.parse(row.images) : [],
+        totalInventory: row.quantity,
+        priceRange: {
+          minVariantPrice: {
             amount: row.minPrice,
-            currency_code: row.currency,
+            currencyCode: row.currency,
           },
-          max_variant_price: {
+          maxVariantPrice: {
             amount: row.maxPrice,
-            currency_code: row.currency,
+            currencyCode: row.currency,
           },
         },
       })
@@ -109,24 +106,24 @@ async function loadProductsData(): Promise<Product[]> {
 
 export function mapDbRowToProduct(row: Record<string, unknown>): Product {
   return processProductRow({
-    ID: row.id,
-    SLUG: row.slug,
-    TITLE: row.title,
-    VENDOR: row.vendor,
-    DESCRIPTION: row.description,
-    PRODUCT_TYPE: row.product_type,
-    TAGS: row.tags,
-    CATEGORY: row.category,
-    IMAGES: row.images ? JSON.parse(row.images as string) : [],
-    TOTAL_INVENTORY: row.quantity,
-    PRICE_RANGE_V2: {
-      min_variant_price: {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    vendor: row.vendor,
+    description: row.description,
+    productType: row.product_type,
+    tags: row.tags,
+    category: row.category,
+    images: row.images ? JSON.parse(row.images as string) : [],
+    totalInventory: row.quantity,
+    priceRange: {
+      minVariantPrice: {
         amount: row.min_price,
-        currency_code: row.currency,
+        currencyCode: row.currency,
       },
-      max_variant_price: {
+      maxVariantPrice: {
         amount: row.max_price,
-        currency_code: row.currency,
+        currencyCode: row.currency,
       },
     },
   });
@@ -140,22 +137,22 @@ export async function loadAndIndexProducts(): Promise<{ products: Product[]; pro
 
 export async function addProduct(product: Product): Promise<void> {
   const db = getDb();
-  const vendor = await db.user.findFirst({ where: { brandName: String(product.VENDOR) } });
-  const category = product.CATEGORY
-    ? await db.category.findFirst({ where: { name: product.CATEGORY } })
+  const vendor = await db.user.findFirst({ where: { brandName: String(product.vendor) } });
+  const category = product.category
+    ? await db.category.findFirst({ where: { name: product.category } })
     : null;
   const data: any = {
-    id: Number(product.ID),
-    slug: product.SLUG,
-    title: product.TITLE,
-    description: product.DESCRIPTION ?? '',
-    productType: product.PRODUCT_TYPE ?? '',
-    tags: product.TAGS ?? '',
-    quantity: product.QUANTITY ?? 0,
-    minPrice: product.MIN_PRICE ?? 0,
-    maxPrice: product.MAX_PRICE ?? 0,
-    currency: product.CURRENCY ?? 'USD',
-    status: product.STATUS ?? 'approved',
+    id: Number(product.id),
+    slug: product.slug,
+    title: product.title,
+    description: product.description ?? '',
+    productType: product.productType ?? '',
+    tags: product.tags ?? '',
+    quantity: product.quantity ?? 0,
+    minPrice: product.minPrice ?? 0,
+    maxPrice: product.maxPrice ?? 0,
+    currency: product.currency ?? 'USD',
+    status: product.status ?? 'approved',
   };
   if (vendor) {
     data.vendor = { connect: { id: vendor.id } };
@@ -170,23 +167,23 @@ export async function addProduct(product: Product): Promise<void> {
 
 export async function updateProduct(product: Product): Promise<void> {
   const db = getDb();
-  const vendor = product.VENDOR
-    ? await db.user.findFirst({ where: { brandName: product.VENDOR } })
+  const vendor = product.vendor
+    ? await db.user.findFirst({ where: { brandName: product.vendor } })
     : null;
-  const category = product.CATEGORY
-    ? await db.category.findFirst({ where: { name: product.CATEGORY } })
+  const category = product.category
+    ? await db.category.findFirst({ where: { name: product.category } })
     : null;
   await db.product.update({
-    where: { id: Number(product.ID) },
+    where: { id: Number(product.id) },
     data: {
-      title: product.TITLE,
-      description: product.DESCRIPTION,
-      productType: product.PRODUCT_TYPE,
-      tags: product.TAGS,
-      quantity: product.QUANTITY,
-      minPrice: product.MIN_PRICE,
-      maxPrice: product.MAX_PRICE,
-      currency: product.CURRENCY,
+      title: product.title,
+      description: product.description,
+      productType: product.productType,
+      tags: product.tags,
+      quantity: product.quantity,
+      minPrice: product.minPrice,
+      maxPrice: product.maxPrice,
+      currency: product.currency,
       images: undefined,
       vendor: vendor ? { connect: { id: vendor.id } } : undefined,
       category: category ? { connect: { id: category.id } } : undefined,
@@ -202,19 +199,19 @@ export async function getPendingProducts(): Promise<Product[]> {
   })) as ProductDbRow[];
   return rows.map((row: ProductDbRow) =>
     processProductRow({
-      ID: row.id,
-      SLUG: row.slug,
-      TITLE: row.title,
-      VENDOR: row.vendor?.brandName ?? String(row.vendorId),
-      DESCRIPTION: row.description,
-      PRODUCT_TYPE: row.productType,
-      TAGS: row.tags,
-      CATEGORY: row.category?.name,
-      IMAGES: row.images ? JSON.parse(row.images) : [],
-      TOTAL_INVENTORY: row.quantity,
-      PRICE_RANGE_V2: {
-        min_variant_price: { amount: row.minPrice, currency_code: row.currency },
-        max_variant_price: { amount: row.maxPrice, currency_code: row.currency },
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      vendor: row.vendor?.brandName ?? String(row.vendorId),
+      description: row.description,
+      productType: row.productType,
+      tags: row.tags,
+      category: row.category?.name,
+      images: row.images ? JSON.parse(row.images) : [],
+      totalInventory: row.quantity,
+      priceRange: {
+        minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
+        maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
       },
     })
   );

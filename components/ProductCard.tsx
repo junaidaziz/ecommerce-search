@@ -18,23 +18,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const context = useContext(AppContext) as AppContextValue;
   const addToCart = context?.addToCart;
 
-  const isOut = product.TOTAL_INVENTORY !== undefined && product.TOTAL_INVENTORY <= 0;
-  const onSale = product.MAX_PRICE > product.MIN_PRICE;
-  const isNew = product.TAGS?.toLowerCase().includes('new');
-  const rating = Math.round(product.AVERAGE_RATING || 0);
+  const isOut = product.totalInventory !== undefined && product.totalInventory <= 0;
+  const onSale = product.maxPrice > product.minPrice;
+  const isNew = product.tags?.toLowerCase().includes('new');
+  const rating = Math.round(product.averageRating || 0);
 
   return (
     <div className="group relative flex flex-col h-full bg-base-100 border border-base-300 rounded-xl overflow-hidden shadow hover:shadow-lg transition-shadow duration-200">
-      <Link href={`/product/${product.SLUG}`} className="block overflow-hidden">
+      <Link href={`/product/${product.slug}`} className="block overflow-hidden">
         <ProductImageSlider
           images={
-            product.IMAGES && product.IMAGES.length > 0
-              ? product.IMAGES
-              : product.FEATURED_IMAGE?.url
-              ? [product.FEATURED_IMAGE.url]
+            product.images && product.images.length > 0
+              ? product.images
+              : product.featuredImage?.url
+              ? [product.featuredImage.url]
               : []
           }
-          placeholderSeed={Number(product.ID)}
+          placeholderSeed={Number(product.id)}
           className="w-full bg-gray-200 flex items-center justify-center aspect-[4/5]"
           imgClass="transition-transform duration-200 group-hover:scale-105"
         />
@@ -47,10 +47,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       )}
       <div className="p-3 flex flex-col gap-1">
-        <Link href={`/product/${product.SLUG}`} className="font-semibold text-base line-clamp-2 hover:underline">
+        <Link href={`/product/${product.slug}`} className="font-semibold text-base line-clamp-2 hover:underline">
           <span
             dangerouslySetInnerHTML={{
-              __html: highlightTitle || product.TITLE || 'Untitled Product',
+              __html: highlightTitle || product.title || 'Untitled Product',
             }}
           />
         </Link>
@@ -59,17 +59,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
             dangerouslySetInnerHTML={{
               __html:
                 highlightDescription ||
-                product.DESCRIPTION_TEXT ||
-                product.BODY_HTML_TEXT ||
+                product.descriptionText ||
+                product.bodyHtmlText ||
                 'No description available.',
             }}
           />
         </p>
         <div className="flex justify-between items-center mt-auto text-sm">
           <span className="font-bold">
-            {product.CURRENCY} {product.MIN_PRICE.toFixed(2)}
+            {product.currency} {product.minPrice.toFixed(2)}
           </span>
-          {product.REVIEW_COUNT > 0 && (
+          {product.reviewCount > 0 && (
             <span className="text-xs">
               {'★'.repeat(rating)}{'☆'.repeat(5 - rating)}
             </span>
