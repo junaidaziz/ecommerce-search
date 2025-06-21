@@ -42,7 +42,13 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const cart = appContext?.cart ?? [];
   const user = session?.user as User | undefined;
   const pathname = router.pathname || '';
-  const isSignupRoute = pathname.startsWith('/signup');
+  // paths where the search bar should be hidden
+  const hideSearchRoutes = ['/login', '/signup', '/user/signup', '/brand/signup'];
+  const hideSearch = hideSearchRoutes.includes(pathname);
+
+  // determine if we're on a signup or login route for auth link visibility
+  const isSignupRoute =
+    pathname.startsWith('/signup') || pathname === '/user/signup' || pathname === '/brand/signup';
   const isLoginRoute = pathname === '/login';
   const logout = () => signOut({ redirect: false });
   const [categories, setCategories] = useState<Category[]>([]);
@@ -225,13 +231,12 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
             Home
           </Link>
         </div>
-        {!(isLoginRoute || isSignupRoute) && (
-          <div
-            className="flex-1 flex items-center gap-x-4"
-            onMouseLeave={() => setMenuOpen(false)}
-          >
-            <ul className="menu menu-horizontal gap-2 hidden md:flex">
-              <li className="relative">
+        <div
+          className="flex-1 flex items-center gap-x-4"
+          onMouseLeave={() => setMenuOpen(false)}
+        >
+          <ul className="menu menu-horizontal gap-2 hidden md:flex">
+            <li className="relative">
                 <button
                   type="button"
                   className="flex items-center gap-1 font-semibold transition-colors duration-200 hover:text-primary"
@@ -275,11 +280,12 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 )}
               </li>
             </ul>
-            <form
-              onSubmit={submitSearch}
-              ref={searchRef}
-              className="relative flex-1 max-w-lg"
-            >
+            {!hideSearch && (
+              <form
+                onSubmit={submitSearch}
+                ref={searchRef}
+                className="relative flex-1 max-w-lg"
+              >
               <input
                 className="input input-bordered w-full pr-10"
                 value={search}
@@ -374,8 +380,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 </ul>
               )}
             </form>
+            )}
           </div>
-        )}
+        </div>
         <nav className="flex flex-none items-center gap-x-2">
           <ul className="menu menu-horizontal gap-x-2 items-center">
             <li className="relative mr-1">
