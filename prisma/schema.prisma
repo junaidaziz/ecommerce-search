@@ -67,6 +67,7 @@ model Product {
   id          Int       @id @default(autoincrement())
   uuid        String    @unique @default(uuid())
   slug        String    @unique
+  sku         String    @unique
   title       String
   description String
   productType String

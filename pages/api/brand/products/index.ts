@@ -24,6 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'POST') {
       const {
         id,
+        sku,
         title,
         vendor,
         description,
@@ -35,12 +36,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       max_price,
       currency,
     } = req.body || {};
-    if (!id || !title || !vendor) {
-      return res.status(400).json({ message: 'id, title, vendor required' });
+    if (!id || !sku || !title || !vendor) {
+      return res.status(400).json({ message: 'id, sku, title, vendor required' });
     }
     await addProduct({
       id: String(id),
       slug: slugify(title || String(id)),
+      sku,
       title,
       vendor,
       description,

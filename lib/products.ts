@@ -82,6 +82,7 @@ async function loadProductsData(): Promise<Product[]> {
         id: row.id,
         uuid: row.uuid,
         slug: row.slug,
+        sku: row.sku,
         title: row.title,
         vendor: row.vendor?.brandName ?? String(row.vendorId),
         description: row.description,
@@ -113,6 +114,7 @@ export function mapDbRowToProduct(row: Record<string, unknown>): Product {
     id: row.id,
     uuid: row.uuid,
     slug: row.slug,
+    sku: row.sku,
     title: row.title,
     vendor: row.vendor,
     description: row.description,
@@ -150,6 +152,7 @@ export async function addProduct(product: Product): Promise<void> {
     id: product.id ? Number(product.id) : undefined,
     uuid: product.uuid ?? undefined,
     slug: product.slug,
+    sku: product.sku,
     title: product.title,
     description: product.description ?? '',
     productType: product.productType ?? '',
@@ -182,6 +185,7 @@ export async function updateProduct(product: Product): Promise<void> {
   await db.product.update({
     where: { uuid: product.uuid || String(product.id) },
     data: {
+      sku: product.sku,
       title: product.title,
       description: product.description,
       productType: product.productType,
@@ -207,6 +211,7 @@ export async function getPendingProducts(): Promise<Product[]> {
     processProductRow({
       id: row.id,
       slug: row.slug,
+      sku: row.sku,
       title: row.title,
       vendor: row.vendor?.brandName ?? String(row.vendorId),
       description: row.description,

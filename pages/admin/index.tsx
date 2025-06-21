@@ -9,6 +9,7 @@ export default function Admin() {
   type FormState = Partial<Product>;
   const emptyForm: FormState = {
     id: '',
+    sku: '',
     title: '',
     vendor: '',
     description: '',
@@ -65,8 +66,9 @@ export default function Admin() {
   };
 
   const handleEdit = (p: Product) => {
-    setForm({
+      setForm({
       id: p.id,
+      sku: p.sku || '',
       title: p.title || '',
       vendor: p.vendor || '',
       description: p.description || '',
@@ -130,6 +132,7 @@ export default function Admin() {
             <form onSubmit={submit} className="space-y-2">
               {[
                 'id',
+                'sku',
                 'title',
                 'vendor',
                 'description',
@@ -197,7 +200,7 @@ export default function Admin() {
         {products.map((p) => (
           <li key={p.id} className="flex justify-between items-center">
             <span>
-              {p.title} - {p.productType}
+              {p.title} ({p.sku}) - {p.productType}
             </span>
             <button
               type="button"
