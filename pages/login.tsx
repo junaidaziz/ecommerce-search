@@ -100,6 +100,11 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             rules={{ required: 'Password is required' }}
             error={errors.password?.message as string}
           />
+          <div className="text-right -mt-2 mb-2">
+            <Link href="/auth/forgot-password" className="link text-sm">
+              Forgot Password?
+            </Link>
+          </div>
           <button
             className="btn btn-primary w-full"
             type="submit"
