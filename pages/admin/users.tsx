@@ -1,22 +1,27 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '../../contexts/AppContext';
+import type { UsersResponse } from '../../types/api';
+import type { User } from '../../types/user';
 
 export default function ManageUsers() {
   const { user } = useContext(AppContext)!;
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<(User & { disabled?: boolean })[]>([]);
   const [message, setMessage] = useState('');
 
   const fetchUsers = useCallback(async () => {
     if (!user) return;
     const res = await fetch('/api/admin/users');
-    if (res.ok) setUsers(await res.json());
+    if (res.ok) {
+      const data: UsersResponse = await res.json();
+      setUsers(data.users || data);
+    }
   }, [user]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const changeRole = async (email, role) => {
+  const changeRole = async (email: string, role: string) => {
     const res = await fetch('/api/admin/users', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -28,7 +33,7 @@ export default function ManageUsers() {
     }
   };
 
-  const toggleDisabled = async (email, disabled) => {
+  const toggleDisabled = async (email: string, disabled: boolean) => {
     const res = await fetch('/api/admin/users', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -40,7 +45,7 @@ export default function ManageUsers() {
     }
   };
 
-  const remove = async (email) => {
+  const remove = async (email: string) => {
     const res = await fetch(
       `/api/admin/users?email=${encodeURIComponent(email)}`,
       { method: 'DELETE' }

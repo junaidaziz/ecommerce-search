@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import type { FC, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from 'react';
-import { AppContext } from '../contexts/AppContext';
+import { AppContext, AppContextValue } from '../contexts/AppContext';
 import SearchIcon from './icons/SearchIcon';
 import CartIcon from './icons/CartIcon';
 import MoonIcon from './icons/MoonIcon';
@@ -15,6 +15,11 @@ import ElectronicsIcon from './icons/ElectronicsIcon';
 import FashionIcon from './icons/FashionIcon';
 import { Theme } from 'react-select';
 import { Category as PrismaCategory } from '@prisma/client';
+import type {
+  CategoriesResponse,
+  SuggestionsResponse,
+  TrendingResponse,
+} from '../types/api';
 
 interface Category extends PrismaCategory {
   parentId?: number | null;
@@ -23,16 +28,9 @@ interface Category extends PrismaCategory {
   subcategories?: string[];
 }
 
-interface CartItem {
-  id: string | number;
-  qty: number;
-  [key: string]: any;
-}
+import type { Product } from '../types/product';
 
-interface AppContextValue {
-  cart: CartItem[];
-  [key: string]: any;
-}
+type CartItem = Product & { qty: number };
 
 interface User {
   name?: string | null;
@@ -76,8 +74,8 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
       try {
         const res = await fetch('/api/categories');
         if (res.ok) {
-          const data = await res.json();
-          setCategories(data || []);
+          const data: CategoriesResponse = await res.json();
+          setCategories(data.categories || data || []);
         }
       } catch (err) {
         console.error('Failed to load categories', err);
@@ -102,7 +100,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
       try {
         const res = await fetch('/api/trending');
         if (res.ok) {
-          const data = await res.json();
+          const data: TrendingResponse = await res.json();
           setTrendingKeywords(data.keywords || []);
         }
       } catch {
@@ -121,7 +119,8 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
       if (
         searchRef.current &&
         !searchRef.current.contains(target) &&
-        !(typeof (target as any).closest === 'function' && (target as any).closest('#mega-menu'))
+        !(typeof (target as Element).closest === 'function' &&
+          (target as Element).closest('#mega-menu'))
       ) {
         setMenuOpen(false);
         setShowHistory(false);
@@ -149,7 +148,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           { signal: controller.signal }
         );
         if (res.ok) {
-          const data = await res.json();
+          const data: SuggestionsResponse = await res.json();
           setSuggestions(data.suggestions || []);
           setActiveIdx(-1);
         }

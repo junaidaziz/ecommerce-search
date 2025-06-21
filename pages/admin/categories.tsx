@@ -1,22 +1,27 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { AppContext } from '../../contexts/AppContext';
+import type { Category } from '../../types/category';
+import type { CategoriesResponse } from '../../types/api';
 
 export default function Categories() {
   const { user } = useContext(AppContext)!;
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [newCat, setNewCat] = useState('');
   const [newParent, setNewParent] = useState('');
   const [newImage, setNewImage] = useState('');
   const [message, setMessage] = useState('');
-  const [editing, setEditing] = useState(null);
+  const [editing, setEditing] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
   const [editImage, setEditImage] = useState('');
 
   const load = useCallback(async () => {
     if (!user) return;
     const res = await fetch('/api/admin/categories');
-    if (res.ok) setCategories(await res.json());
+    if (res.ok) {
+      const data: CategoriesResponse | Category[] = await res.json();
+      setCategories(Array.isArray(data) ? data : data.categories);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -53,7 +58,7 @@ export default function Categories() {
     }
   };
 
-  const remove = async (id) => {
+  const remove = async (id: number) => {
     const res = await fetch(`/api/admin/categories?id=${id}`, {
       method: 'DELETE',
     });
@@ -111,23 +116,23 @@ export default function Categories() {
     </div>
   );
 
-  function buildTree(list) {
-    const map = {};
+  function buildTree(list: Category[]): Category[] {
+    const map: Record<number, Category & { children: Category[] }> = {};
     list.forEach((c) => {
-      map[c.id] = { ...c, children: [] };
+      map[c.id!] = { ...c, children: [] };
     });
-    const tree = [];
+    const tree: Category[] = [];
     list.forEach((c) => {
       if (c.parentId) {
-        map[c.parentId]?.children.push(map[c.id]);
+        map[c.parentId]?.children.push(map[c.id!]);
       } else {
-        tree.push(map[c.id]);
+        tree.push(map[c.id!]);
       }
     });
     return tree;
   }
 
-  function CategoryItem({ cat }) {
+  function CategoryItem({ cat }: { cat: Category }) {
     const hasChildren = cat.children && cat.children.length > 0;
     return (
       <li className={cat.parentId ? 'ml-4' : ''}>
