@@ -31,7 +31,8 @@ export interface OrderInput {
   quantity: number;
   total: number;
   couponId?: number;
-  shipping?: ShippingInfo;
+  shippingName?: string;
+  shippingAddress?: string;
 }
 
 export interface OrderProductRow extends ProductDbRow {
