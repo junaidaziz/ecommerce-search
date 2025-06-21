@@ -27,7 +27,7 @@ const RequestReset: React.FC = () => {
       </Head>
 
       <div className="max-w-sm mx-auto border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
-        <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
+        <h1 className="text-2xl font-bold mb-4 text-center">Reset Password</h1>
         <form onSubmit={submit} className="space-y-2">
           <TextInput
             name="email"

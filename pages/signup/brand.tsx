@@ -198,7 +198,7 @@ export default function BrandSignup() {
       </Head>
       <div className="max-w-3xl mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold">Brand Sign Up</h1>
+        <h1 className="text-2xl font-bold text-center">Brand Sign Up</h1>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <button
