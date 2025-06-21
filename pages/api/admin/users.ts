@@ -42,30 +42,23 @@ async function handler(
       return res.status(200).json({ message: 'status updated' });
     }
     if (req.method === 'DELETE') {
-        const email = getQueryParam(req.query.email);
-        if (!email) return res.status(400).json({ message: 'email required' });
-        await deleteUser(email);
+      const email = getQueryParam(req.query.email);
+      if (!email) return res.status(400).json({ message: 'email required' });
+      await deleteUser(email);
       return res.status(200).json({ message: 'user deleted' });
     }
     if (req.method === 'POST') {
-      const {
-        email,
-        password,
-        firstName,
-        lastName,
-        brandName,
-        gender,
-        role,
-      } = req.body as CreateUserRequest;
+      const { email, password, firstName, lastName, brandName, gender, role } =
+        req.body as CreateUserRequest;
       if (!email || !password || !firstName || !lastName || !gender) {
         return res.status(400).json({ message: 'missing required fields' });
       }
       await addUser({
         email,
         password,
-        first_name: firstName,
-        last_name: lastName,
-        brand_name: brandName,
+        firstName,
+        lastName,
+        brandName,
         gender,
         role: (role || 'USER') as Role,
       });
