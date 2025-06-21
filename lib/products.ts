@@ -64,7 +64,10 @@ function processProductRow(row: Record<string, unknown>): Product {
     processed.slug = String(processed.slug);
   }
   if (processed.images && processed.images.length > 0) {
-    processed.featuredImage = { url: processed.images[0] };
+    if (typeof processed.images[0] === 'string') {
+      processed.images = (processed.images as string[]).map((u) => ({ url: u }));
+    }
+    processed.featuredImage = processed.images[0];
   }
   return processed as Product;
 }
@@ -84,12 +87,14 @@ async function loadProductsData(): Promise<Product[]> {
         slug: row.slug,
         sku: row.sku,
         title: row.title,
-        vendor: row.vendor?.brandName ?? String(row.vendorId),
+        vendor: row.vendor ?? null,
         description: row.description,
         productType: row.productType,
         tags: row.tags,
-        category: row.category?.name,
-        images: row.images ? JSON.parse(row.images) : [],
+        category: row.category ?? null,
+        images: row.images
+          ? (JSON.parse(row.images) as string[]).map((u) => ({ url: u }))
+          : [],
         totalInventory: row.quantity,
         priceRange: {
           minVariantPrice: {
@@ -121,7 +126,9 @@ export function mapDbRowToProduct(row: Record<string, unknown>): Product {
     productType: row.product_type,
     tags: row.tags,
     category: row.category,
-    images: row.images ? JSON.parse(row.images as string) : [],
+    images: row.images
+      ? (JSON.parse(row.images as string) as string[]).map((u) => ({ url: u }))
+      : [],
     totalInventory: row.quantity,
     priceRange: {
       minVariantPrice: {
@@ -144,9 +151,11 @@ export async function loadAndIndexProducts(): Promise<{ products: Product[]; pro
 
 export async function addProduct(product: Product): Promise<void> {
   const db = getDb();
-  const vendor = await db.user.findFirst({ where: { brandName: String(product.vendor) } });
-  const category = product.category
-    ? await db.category.findFirst({ where: { name: product.category } })
+  const vendor = product.vendor?.brandName
+    ? await db.user.findFirst({ where: { brandName: product.vendor.brandName } })
+    : null;
+  const category = product.category?.name
+    ? await db.category.findFirst({ where: { name: product.category.name } })
     : null;
   const data: any = {
     id: product.id ? Number(product.id) : undefined,
@@ -176,11 +185,11 @@ export async function addProduct(product: Product): Promise<void> {
 
 export async function updateProduct(product: Product): Promise<void> {
   const db = getDb();
-  const vendor = product.vendor
-    ? await db.user.findFirst({ where: { brandName: product.vendor } })
+  const vendor = product.vendor?.brandName
+    ? await db.user.findFirst({ where: { brandName: product.vendor.brandName } })
     : null;
-  const category = product.category
-    ? await db.category.findFirst({ where: { name: product.category } })
+  const category = product.category?.name
+    ? await db.category.findFirst({ where: { name: product.category.name } })
     : null;
   await db.product.update({
     where: { uuid: product.uuid || String(product.id) },
@@ -213,12 +222,14 @@ export async function getPendingProducts(): Promise<Product[]> {
       slug: row.slug,
       sku: row.sku,
       title: row.title,
-      vendor: row.vendor?.brandName ?? String(row.vendorId),
+      vendor: row.vendor ?? null,
       description: row.description,
       productType: row.productType,
       tags: row.tags,
-      category: row.category?.name,
-      images: row.images ? JSON.parse(row.images) : [],
+      category: row.category ?? null,
+      images: row.images
+        ? (JSON.parse(row.images) as string[]).map((u) => ({ url: u }))
+        : [],
       totalInventory: row.quantity,
       priceRange: {
         minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
