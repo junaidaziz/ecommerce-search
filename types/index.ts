@@ -7,3 +7,4 @@ export * from './admin';
 export * from './api';
 export * from './brand';
 export * from './cart';
+export * from './vendor';
