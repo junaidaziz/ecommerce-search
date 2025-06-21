@@ -16,7 +16,10 @@ export default function ProductImageSlider({
   placeholderSeed = 1,
 }: ProductImageSliderProps) {
   const [idx, setIdx] = useState(0);
-  if (!images || images.length === 0) {
+  const urls = images.map((img) =>
+    typeof img === 'string' ? img : img.url
+  );
+  if (!urls || urls.length === 0) {
     return (
       <div className={`relative aspect-[4/5] ${className}`}>
         <Image
@@ -28,8 +31,8 @@ export default function ProductImageSlider({
       </div>
     );
   }
-  const next = () => setIdx((i) => (i + 1) % images.length);
-  const prev = () => setIdx((i) => (i - 1 + images.length) % images.length);
+  const next = () => setIdx((i) => (i + 1) % urls.length);
+  const prev = () => setIdx((i) => (i - 1 + urls.length) % urls.length);
   return (
     <div className={`relative aspect-[4/5] ${className}`}>
       <Image
@@ -38,7 +41,7 @@ export default function ProductImageSlider({
         fill
         className={`object-cover ${imgClass}`}
       />
-      {images.length > 1 && (
+      {urls.length > 1 && (
         <>
           <button
             type="button"
