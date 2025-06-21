@@ -6,13 +6,17 @@ import { handleApiError } from '../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import type { ApiMessage } from '../../../types';
 
+export interface ProductParams {
+  uuid?: string | string[];
+}
+
 export type ProductResponse = Product & {
   AVERAGE_RATING: number;
   REVIEW_COUNT: number;
 };
 
 export default async function handler(
-  req: NextApiRequest,
+  req: NextApiRequest & { query: ProductParams },
   res: NextApiResponse<ProductResponse | ApiMessage>
 ): Promise<void> {
   const uuid = getQueryParam(req.query.uuid);
