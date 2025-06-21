@@ -14,7 +14,7 @@ export default async function handler(
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
-  const { items, email, shippingName, shippingAddress } = req.body || {};
+  const { items, email, shipping } = req.body || {};
   if (!items || !email) {
     return res.status(400).json({ message: 'items and email required' });
   }
@@ -34,8 +34,8 @@ export default async function handler(
       cancel_url: `${req.headers.origin}/checkout/cancel`,
       metadata: {
         email,
-        shippingName: shippingName || '',
-        shippingAddress: shippingAddress || '',
+        shippingName: shipping?.name || '',
+        shippingAddress: shipping?.address || '',
         items: JSON.stringify(items),
       },
     });
