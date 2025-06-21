@@ -404,6 +404,8 @@ export interface PaginatedOptions {
   categorySlug?: string;
   search?: string;
   inStock?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export interface PaginatedResult {
@@ -430,6 +432,12 @@ export async function getProductsPaginated(
         { description: { contains: term, mode: 'insensitive' } },
       ];
     }
+  }
+  if (typeof options.minPrice === 'number') {
+    where.maxPrice = { gte: options.minPrice };
+  }
+  if (typeof options.maxPrice === 'number') {
+    where.minPrice = { ...(where.minPrice as any), lte: options.maxPrice };
   }
   const [total, rows] = await Promise.all([
     db.product.count({ where }),
