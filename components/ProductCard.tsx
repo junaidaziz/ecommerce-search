@@ -67,7 +67,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </p>
         <div className="flex justify-between items-center mt-auto text-sm">
           <span className="font-bold">
-            {product.currency} {product.minPrice.toFixed(2)}
+            {product.currency} {product.minPrice?.toFixed(2)}
           </span>
           {product.reviewCount > 0 && (
             <span className="text-xs">
