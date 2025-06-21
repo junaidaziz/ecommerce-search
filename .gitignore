@@ -44,3 +44,4 @@ prisma/dev.db-journal
 prisma/*.sqlite
 prisma/*.sqlite-journal
 prisma/.schema_hash
+docs/ERD.png
