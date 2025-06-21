@@ -1,4 +1,4 @@
-import { Order, Product, ShippingInfo } from '../types';
+import { Order, Product } from '../types';
 import { getDb } from './db';
 import { mapDbRowToProduct } from './products';
 import type { Prisma } from '@prisma/client';
@@ -21,7 +21,6 @@ interface AddOrderParams {
   items: OrderItemInput[];
   total: number;
   status?: Order['status'];
-  shipping?: ShippingInfo | null;
 }
 
 function mapOrderRow(row: OrderWithRelations): Order {
@@ -37,7 +36,6 @@ function mapOrderRow(row: OrderWithRelations): Order {
     product: mapDbRowToProduct(row.product),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
-    shipping: row.shipping || null,
   };
 }
 

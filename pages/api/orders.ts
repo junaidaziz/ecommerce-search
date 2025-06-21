@@ -24,7 +24,7 @@ async function handler(
 ): Promise<void> {
   try {
     if (req.method === 'POST') {
-      const { email, items, total, shipping } = req.body;
+      const { email, items, total } = req.body;
     if (!email || !items) {
       return res.status(400).json({ message: 'email and items required' });
     }
@@ -45,12 +45,11 @@ async function handler(
       await decreaseProductQuantity(String(item.uuid || item.id), item.qty);
     }
 
-    const orderId = await addOrder({
-      userEmail: email,
-      items,
-      total: total || 0,
-      shipping,
-    });
+      const orderId = await addOrder({
+        userEmail: email,
+        items,
+        total: total || 0,
+      });
     await clearCart(email);
     await sendOrderConfirmation(email, { id: orderId });
     return res.status(201).json({ message: 'order placed', id: orderId });
