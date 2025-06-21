@@ -1,6 +1,8 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import Link from 'next/link';
 import { TextInput } from '../components/form-fields';
+import Head from 'next/head';
+import { getPageTitle } from '../lib/pageTitle';
 
 const RequestReset: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -20,6 +22,10 @@ const RequestReset: React.FC = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8 overflow-hidden">
+            <Head>
+        <title>{getPageTitle('Reset Password')}</title>
+      </Head>
+
       <div className="max-w-sm mx-auto border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
         <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
         <form onSubmit={submit} className="space-y-2">

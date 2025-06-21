@@ -2,6 +2,8 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import { PendingProduct, ApiMessage } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 export default function Approvals() {
   const { user } = useContext(AppContext)!;
@@ -35,6 +37,9 @@ export default function Approvals() {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
+      <Head>
+        <title>{getPageTitle('Vendor Approvals')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">Vendor Product Approvals</h1>
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <ul className="space-y-2">

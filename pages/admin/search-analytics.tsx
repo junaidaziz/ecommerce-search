@@ -3,6 +3,8 @@ import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
 import { SearchAnalyticsResponse } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 export default function SearchAnalytics() {
   const { user } = useContext(AppContext)!;
@@ -22,6 +24,9 @@ export default function SearchAnalytics() {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
+      <Head>
+        <title>{getPageTitle('Search Analytics')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">Search Analytics</h1>
       <div className="mb-4 space-x-2">
         <Link href="/admin/analytics" className="btn btn-sm">
