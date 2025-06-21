@@ -1,16 +1,17 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
+import { PendingProduct, ApiMessage } from '../../types';
+import { fetchJson } from '../../lib/utils/fetchJson';
 
 export default function Approvals() {
   const { user } = useContext(AppContext)!;
-  type PendingProduct = { id: string; title: string };
   const [pending, setPending] = useState<PendingProduct[]>([]);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<string>('');
 
   const load = useCallback(async () => {
     if (!user) return;
-    const res = await fetch('/api/admin/vendor-products');
-    if (res.ok) setPending(await res.json());
+    const data = await fetchJson<PendingProduct[]>('/api/admin/vendor-products');
+    setPending(data);
   }, [user]);
 
   useEffect(() => {
@@ -18,15 +19,13 @@ export default function Approvals() {
   }, [load]);
 
   const act = async (id: string, action: 'approve' | 'reject') => {
-    const res = await fetch('/api/admin/vendor-products', {
+    await fetchJson<ApiMessage>('/api/admin/vendor-products', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, action }),
     });
-    if (res.ok) {
-      setMessage('Updated');
-      load();
-    }
+    setMessage('Updated');
+    load();
   };
 
   if (!user)

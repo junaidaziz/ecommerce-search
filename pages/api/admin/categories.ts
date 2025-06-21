@@ -8,14 +8,19 @@ import {
 import { withRole } from '../../../lib/withRole';
 import { logAudit } from '../../../lib/audit';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { Category, CategoryInput, ApiMessage } from '../../../types';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Category[] | ApiMessage>
+) {
   try {
     if (req.method === 'GET') {
-      return res.status(200).json(await getCategoriesFlat());
+      const cats = await getCategoriesFlat();
+      return res.status(200).json(cats as Category[]);
     }
     if (req.method === 'POST') {
-      const { name, parentId, image } = req.body || {};
+      const { name, parentId, image } = req.body as CategoryInput;
       if (!name) return res.status(400).json({ message: 'name required' });
       const exists = (await getCategoriesFlat()).find(
         (c) => c.name.toLowerCase() === name.toLowerCase()
@@ -35,7 +40,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(201).json({ message: 'category created' });
     }
     if (req.method === 'PUT') {
-      const { id, name, parentId, image } = req.body || {};
+      const { id, name, parentId, image } = req.body as CategoryInput & { id: number };
       if (!id || !name)
         return res.status(400).json({ message: 'id and name required' });
       await renameCategory(id, name, parentId || null, image || null);
@@ -46,7 +51,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const { id } = req.query;
       if (!id) return res.status(400).json({ message: 'id required' });
       try {
-        await removeCategory(id);
+        await removeCategory(String(id));
         logAudit('delete_category', { id });
         return res.status(200).json({ message: 'category deleted' });
       } catch (e: unknown) {

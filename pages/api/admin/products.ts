@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { Product, ApiMessage } from '../../../types';
 
 function slugify(text) {
   return text
@@ -44,7 +45,10 @@ async function parseBody(req: NextApiRequest) {
   );
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Product[] | ApiMessage>
+) {
   try {
     const db = getDb();
 
@@ -153,13 +157,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     if (req.method === 'GET') {
       const { vendor } = req.query;
-      const where: any = {};
+      const where: Record<string, unknown> = {};
       if (vendor) where.vendor = { brandName: String(vendor) };
       const rows = await db.product.findMany({
         where,
         include: { category: true, vendor: true },
       });
-      const data = rows.map((p) => ({
+      const data: Product[] = rows.map((p) => ({
         ID: String(p.id),
         SLUG: p.slug,
         TITLE: p.title,

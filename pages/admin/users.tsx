@@ -1,54 +1,57 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '../../contexts/AppContext';
+import {
+  AdminUser,
+  UserRoleUpdateRequest,
+  UserDisabledUpdateRequest,
+  ApiMessage,
+} from '../../types';
+import { fetchJson } from '../../lib/utils/fetchJson';
 
 export default function ManageUsers() {
   const { user } = useContext(AppContext)!;
-  const [users, setUsers] = useState([]);
-  const [message, setMessage] = useState('');
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [message, setMessage] = useState<string>('');
 
   const fetchUsers = useCallback(async () => {
     if (!user) return;
-    const res = await fetch('/api/admin/users');
-    if (res.ok) setUsers(await res.json());
+    const data = await fetchJson<AdminUser[]>('/api/admin/users');
+    setUsers(data);
   }, [user]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const changeRole = async (email, role) => {
-    const res = await fetch('/api/admin/users', {
+  const changeRole = async (email: string, role: string) => {
+    const payload: UserRoleUpdateRequest = { email, role };
+    await fetchJson<ApiMessage>('/api/admin/users', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, role }),
+      body: JSON.stringify(payload),
     });
-    if (res.ok) {
-      setMessage('Role updated');
-      fetchUsers();
-    }
+    setMessage('Role updated');
+    fetchUsers();
   };
 
-  const toggleDisabled = async (email, disabled) => {
-    const res = await fetch('/api/admin/users', {
+  const toggleDisabled = async (email: string, disabled: boolean) => {
+    const payload: UserDisabledUpdateRequest = { email, disabled };
+    await fetchJson<ApiMessage>('/api/admin/users', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, disabled }),
+      body: JSON.stringify(payload),
     });
-    if (res.ok) {
-      setMessage('Status updated');
-      fetchUsers();
-    }
+    setMessage('Status updated');
+    fetchUsers();
   };
 
-  const remove = async (email) => {
-    const res = await fetch(
+  const remove = async (email: string) => {
+    await fetchJson<ApiMessage>(
       `/api/admin/users?email=${encodeURIComponent(email)}`,
       { method: 'DELETE' }
     );
-    if (res.ok) {
-      setMessage('User deleted');
-      fetchUsers();
-    }
+    setMessage('User deleted');
+    fetchUsers();
   };
 
   if (!user) return <div className="p-4">Please log in to view users.</div>;
