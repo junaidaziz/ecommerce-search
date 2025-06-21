@@ -7,10 +7,10 @@ import React, {
 } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import Link from 'next/link';
 import { getPageTitle } from '../lib/pageTitle';
 import HeroSlider from '../components/HeroSlider';
 import ProductCard from '../components/ProductCard';
-import Pagination from '../components/Pagination';
 import DEFAULT_CATEGORIES from '../lib/defaultCategories';
 import { Product } from '../types/product';
 
@@ -51,7 +51,7 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const pageSize = 20;
+  const pageSize = 12;
 
   const [allVendors, setAllVendors] = useState<string[]>([]);
   const [allProductTypes, setAllProductTypes] = useState<string[]>([]);
@@ -336,11 +336,11 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
               />
             ))}
           </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+          <div className="flex justify-center mt-4">
+            <Link href="/products" className="btn btn-primary">
+              See More
+            </Link>
+          </div>
         </>
       )}
     </div>
