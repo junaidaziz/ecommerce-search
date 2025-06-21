@@ -1,16 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-interface SearchAnalyticsResponse {
-  topSearches: { query: string; count: number }[];
-  failedSearches: { query: string; count: number }[];
-}
+import { SearchAnalyticsResponse, ApiMessage } from '../../../types';
 import { getDb } from '../../../lib/db';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 
 async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<SearchAnalyticsResponse | { message: string }>
+  res: NextApiResponse<SearchAnalyticsResponse | ApiMessage>
 ) {
   try {
     if (req.method !== 'GET') {

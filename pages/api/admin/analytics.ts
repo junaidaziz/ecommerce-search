@@ -2,14 +2,18 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getAllOrders } from '../../../lib/orders';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { AnalyticsData, ApiMessage } from '../../../types';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<AnalyticsData | ApiMessage>
+) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
   try {
     const orders = await getAllOrders();
-    const summary = {
+    const summary: AnalyticsData = {
       totalOrders: orders.length,
       totalRevenue: 0,
       topProducts: [],

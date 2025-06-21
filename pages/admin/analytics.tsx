@@ -1,12 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
-
-type AnalyticsData = {
-  totalOrders: number;
-  totalRevenue: number;
-  topProducts: { id: string; qty: number }[];
-};
+import { AnalyticsData } from '../../types';
+import { fetchJson } from '../../lib/utils/fetchJson';
 
 export default function AdminAnalytics() {
   const { user } = useContext(AppContext)!;
@@ -14,9 +10,9 @@ export default function AdminAnalytics() {
 
   useEffect(() => {
     if (!user) return;
-    fetch('/api/admin/analytics')
-      .then((res) => (res.ok ? res.json() : null))
-      .then(setData);
+    fetchJson<AnalyticsData>('/api/admin/analytics')
+      .then(setData)
+      .catch(() => setData(null));
   }, [user]);
 
   if (!user) return <div className="p-4">Please log in to view analytics.</div>;
