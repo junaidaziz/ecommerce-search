@@ -1,27 +1,36 @@
 export interface Product {
-  ID: string;
-  SLUG: string;
-  TITLE: string;
-  VENDOR?: string;
-  DESCRIPTION?: string;
-  PRODUCT_TYPE?: string;
-  TAGS?: string;
-  CATEGORY?: string;
-  IMAGES?: string[];
-  TOTAL_INVENTORY?: number;
-  PRICE_RANGE_V2?: {
-    min_variant_price: { amount: number; currency_code: string };
-    max_variant_price: { amount: number; currency_code: string };
+  id: string;
+  slug: string;
+  title: string;
+  vendor?: string;
+  description?: string;
+  productType?: string;
+  tags?: string;
+  category?: string;
+  images?: string[];
+  totalInventory?: number;
+  priceRange?: {
+    minVariantPrice: { amount: number; currencyCode: string };
+    maxVariantPrice: { amount: number; currencyCode: string };
   };
-  SOLD_COUNT: number;
-  REVIEW_COUNT: number;
-  AVERAGE_RATING: number;
-  FEATURED_IMAGE?: { url: string };
-  MIN_PRICE: number;
-  MAX_PRICE: number;
-  CURRENCY: string;
-  DESCRIPTION_TEXT?: string;
-  BODY_HTML_TEXT?: string;
+  soldCount: number;
+  reviewCount: number;
+  averageRating: number;
+  featuredImage?: { url: string };
+  minPrice: number;
+  maxPrice: number;
+  currency: string;
+  descriptionText?: string;
+  bodyHtmlText?: string;
+  quantity?: number;
+  vendorId?: number;
+  vendorBrandName?: string | null;
+  categoryName?: string | null;
+  imagesUrls?: string[];
+  imagesAltText?: string[];
+  status?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type ProductResponse = Product;
@@ -36,4 +45,21 @@ export interface ProductInput {
   images?: string[];
   quantity?: number;
   price?: number;
+}
+
+export interface ProductDbRow {
+  id: number;
+  slug: string | null;
+  title: string;
+  vendorId?: number | undefined;
+  vendor?: { brandName: string | null } | null;
+  description: string | null;
+  productType: string | null;
+  tags: string | null;
+  category?: { name: string | null } | null;
+  images: string | null;
+  quantity: number;
+  minPrice: number;
+  maxPrice: number;
+  currency: string;
 }

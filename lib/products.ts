@@ -1,48 +1,31 @@
 import { JSDOM } from 'jsdom';
-import FlexSearch from 'flexsearch';
-const { Document } = FlexSearch;
-import path from 'path';
-import fs from 'fs';
-import {
-  addProduct as dbAddProduct,
-  updateProduct as dbUpdateProduct,
-  deleteProduct as dbDeleteProduct,
-  getPendingFromDb,
-  setProductStatus,
-  dbGetCategories,
-  addCategory as dbAddCategory,
-  updateCategory as dbUpdateCategory,
-  deleteCategory as dbDeleteCategory,
-  getCategoryByName,
-  getCategoryById,
-  countProductsForCategory,
-  getDb,
-} from './db';
+import { getDb } from './db';
+import type { Product, ProductDbRow } from '../types/product';
+import type { Category } from '../types/category';
 
-let products = [];
-let productIndex = null;
-let isDataLoaded = false;
+/**
+ * Simplified representation of a product row returned from the database.
+ * Only the fields that are accessed in this module are included.
+ */
 
-const INDEX_FILE_PATH = path.join(process.cwd(), 'public', 'index.json');
-
-const stripHtml = (html) => {
+const stripHtml = (html: string | null | undefined): string => {
   if (!html) return '';
   try {
     const dom = new JSDOM(html);
     return dom.window.document.body.textContent || '';
-  } catch (e) {
+  } catch (e: unknown) {
     console.error('Error stripping HTML:', e);
-    return html;
+    return html ?? '';
   }
 };
 
-function processProductRow(row) {
-  const processed = { ...row };
+function processProductRow(row: Record<string, unknown>): Product {
+  const processed: Record<string, unknown> & Partial<Product> = { ...row };
   const jsonFields = [
     'SEO',
     'OPTIONS',
     'VARIANTS',
-    'PRICE_RANGE_V2',
+    'priceRange',
     'METAFIELDS',
   ];
   jsonFields.forEach((field) => {
@@ -50,74 +33,67 @@ function processProductRow(row) {
       try {
         processed[field] =
           typeof processed[field] === 'string'
-            ? JSON.parse(processed[field])
+            ? JSON.parse(processed[field] as string)
             : processed[field];
-      } catch (e) {
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
         console.warn(
-          `Could not parse JSON for field '${field}' in row with ID: ${processed.ID || 'N/A'}. Error: ${e.message}`
+          `Could not parse JSON for field '${field}' in row with id: ${String(processed.id ?? 'N/A')}. Error: ${message}`
         );
         processed[field] = null;
       }
     }
   });
 
-  processed.DESCRIPTION_TEXT = stripHtml(processed.DESCRIPTION);
-  processed.BODY_HTML_TEXT = stripHtml(processed.BODY_HTML);
-  processed.MIN_PRICE =
-    processed.PRICE_RANGE_V2?.min_variant_price?.amount || 0;
-  processed.MAX_PRICE =
-    processed.PRICE_RANGE_V2?.max_variant_price?.amount || 0;
-  processed.CURRENCY =
-    processed.PRICE_RANGE_V2?.min_variant_price?.currency_code || 'GBP';
-  processed.SOLD_COUNT = parseInt(
-    processed.METAFIELDS?.stoked_inventory_sold_count?.value || '0',
-    10
-  );
-  processed.REVIEW_COUNT = parseInt(
-    processed.METAFIELDS?.yotpo_reviews_count?.value || '0',
-    10
-  );
-  processed.AVERAGE_RATING = parseFloat(
-    processed.METAFIELDS?.yotpo_reviews_average?.value || '0'
-  );
-  processed.ID = String(processed.ID);
-  if (processed.SLUG) {
-    processed.SLUG = String(processed.SLUG);
+  processed.descriptionText = stripHtml(processed.description as string | null | undefined);
+  processed.bodyHtmlText = stripHtml(processed.bodyHtml as string | null | undefined);
+  processed.minPrice = processed.priceRange?.minVariantPrice?.amount || 0;
+  processed.maxPrice = processed.priceRange?.maxVariantPrice?.amount || 0;
+  processed.currency = processed.priceRange?.minVariantPrice?.currencyCode || 'GBP';
+  const meta = processed.METAFIELDS as
+    | { stoked_inventory_sold_count?: { value?: string }; yotpo_reviews_count?: { value?: string }; yotpo_reviews_average?: { value?: string } }
+    | undefined;
+  processed.soldCount = parseInt(meta?.stoked_inventory_sold_count?.value ?? '0', 10);
+  processed.reviewCount = parseInt(meta?.yotpo_reviews_count?.value ?? '0', 10);
+  processed.averageRating = parseFloat(meta?.yotpo_reviews_average?.value ?? '0');
+  processed.id = String(processed.id);
+  if (processed.slug) {
+    processed.slug = String(processed.slug);
   }
-  if (processed.IMAGES && processed.IMAGES.length > 0) {
-    processed.FEATURED_IMAGE = { url: processed.IMAGES[0] };
+  if (processed.images && processed.images.length > 0) {
+    processed.featuredImage = { url: processed.images[0] };
   }
-  return processed;
+  return processed as Product;
 }
 
-async function loadProductsData() {
+async function loadProductsData(): Promise<Product[]> {
   const db = getDb();
   try {
-    const rows = await db.product.findMany({
+    const rows = (await db.product.findMany({
       where: { status: 'approved' },
       include: { category: true, vendor: true },
-    });
+    })) as ProductDbRow[];
 
-    return rows.map((row) =>
+    return rows.map((row: ProductDbRow) =>
       processProductRow({
-        ID: row.id,
-        SLUG: row.slug,
-        TITLE: row.title,
-        VENDOR: row.vendor?.brandName ?? String(row.vendorId),
-        DESCRIPTION: row.description,
-        PRODUCT_TYPE: row.productType,
-        TAGS: row.tags,
-        CATEGORY: row.category?.name,
-        IMAGES: row.images ? JSON.parse(row.images) : [],
-        TOTAL_INVENTORY: row.quantity,
-        PRICE_RANGE_V2: {
-          min_variant_price: {
+        id: row.id,
+        slug: row.slug,
+        title: row.title,
+        vendor: row.vendor?.brandName ?? String(row.vendorId),
+        description: row.description,
+        productType: row.productType,
+        tags: row.tags,
+        category: row.category?.name,
+        images: row.images ? JSON.parse(row.images) : [],
+        totalInventory: row.quantity,
+        priceRange: {
+          minVariantPrice: {
             amount: row.minPrice,
-            currency_code: row.currency,
+            currencyCode: row.currency,
           },
-          max_variant_price: {
+          maxVariantPrice: {
             amount: row.maxPrice,
-            currency_code: row.currency,
+            currencyCode: row.currency,
           },
         },
       })
@@ -128,212 +104,154 @@ async function loadProductsData() {
   }
 }
 
-export function mapDbRowToProduct(row) {
+export function mapDbRowToProduct(row: Record<string, unknown>): Product {
   return processProductRow({
-    ID: row.id,
-    SLUG: row.slug,
-    TITLE: row.title,
-    VENDOR: row.vendor,
-    DESCRIPTION: row.description,
-    PRODUCT_TYPE: row.product_type,
-    TAGS: row.tags,
-    CATEGORY: row.category,
-    IMAGES: row.images ? JSON.parse(row.images) : [],
-    TOTAL_INVENTORY: row.quantity,
-    PRICE_RANGE_V2: {
-      min_variant_price: {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    vendor: row.vendor,
+    description: row.description,
+    productType: row.product_type,
+    tags: row.tags,
+    category: row.category,
+    images: row.images ? JSON.parse(row.images as string) : [],
+    totalInventory: row.quantity,
+    priceRange: {
+      minVariantPrice: {
         amount: row.min_price,
-        currency_code: row.currency,
+        currencyCode: row.currency,
       },
-      max_variant_price: {
+      maxVariantPrice: {
         amount: row.max_price,
-        currency_code: row.currency,
+        currencyCode: row.currency,
       },
     },
   });
 }
 
-function createFlexDoc() {
-  return new Document({
-    document: {
-      id: 'ID',
-      index: [
-        'TITLE',
-        'VENDOR',
-        'DESCRIPTION_TEXT',
-        'BODY_HTML_TEXT',
-        'TAGS',
-        'PRODUCT_TYPE',
-        'CATEGORY',
-        'METAFIELDS.my_fields_ingredients.value',
-      ],
-      store: true,
-    },
-    preset: 'match',
-    tokenize: 'forward',
-    resolution: 9,
-  });
+export async function loadAndIndexProducts(): Promise<{ products: Product[]; productIndex: null }> {
+  // Legacy function name preserved for API routes.
+  const products = await loadProductsData();
+  return { products, productIndex: null };
 }
 
-export async function loadAndIndexProducts() {
-  if (isDataLoaded) {
-    console.log('Products already loaded and indexed.');
-    return { products, productIndex };
-  }
-
-  console.log('Attempting to load pre-built index from file...');
-
-  productIndex = createFlexDoc();
-
-  try {
-    if (fs.existsSync(INDEX_FILE_PATH)) {
-      const indexData = JSON.parse(fs.readFileSync(INDEX_FILE_PATH, 'utf8'));
-      const { serializedIndex, loadedProducts } = indexData;
-
-      if (loadedProducts && loadedProducts.length > 0) {
-        products = loadedProducts;
-
-        Object.keys(serializedIndex).forEach((key) => {
-          productIndex.import(key, serializedIndex[key]);
-        });
-
-        console.log('Index loaded from file.');
-        isDataLoaded = true;
-        return { products, productIndex };
-      } else {
-        console.warn('Index file missing product data. Rebuilding from database.');
-      }
-    } else {
-      console.warn('No index file found. Building from database.');
-    }
-  } catch (e) {
-    console.error('Failed to load index file, rebuilding from database:', e);
-  }
-
-  console.log('Building index from database...');
-  products = [];
-  await forceBuildAndSaveIndexToFile();
-  return { products, productIndex };
-}
-
-export async function forceBuildAndSaveIndexToFile() {
-  console.log('Building index from data source and writing to file...');
-  try {
-    products = await loadProductsData();
-    products = products.filter((p) => p.TOTAL_INVENTORY > 0);
-    productIndex = createFlexDoc();
-    products.forEach((p) => productIndex.add(p));
-    console.log('Products indexed with FlexSearch.');
-    isDataLoaded = true;
-    await saveIndexToFile(productIndex, products);
-  } catch (error) {
-    console.error('Failed to load product data:', error);
-    isDataLoaded = false;
-    throw error;
-  }
-}
-
-async function saveIndexToFile(indexToSave, productsToSave) {
-  if (!indexToSave || productsToSave.length === 0) {
-    console.warn('No index or products to save.');
-    return;
-  }
-
-  const serializedIndex = {};
-  await indexToSave.export((key, data) => {
-    serializedIndex[key] = data;
-  });
-
-  const dataToSave = {
-    serializedIndex,
-    loadedProducts: productsToSave,
+export async function addProduct(product: Product): Promise<void> {
+  const db = getDb();
+  const vendor = await db.user.findFirst({ where: { brandName: String(product.vendor) } });
+  const category = product.category
+    ? await db.category.findFirst({ where: { name: product.category } })
+    : null;
+  const data: any = {
+    id: Number(product.id),
+    slug: product.slug,
+    title: product.title,
+    description: product.description ?? '',
+    productType: product.productType ?? '',
+    tags: product.tags ?? '',
+    quantity: product.quantity ?? 0,
+    minPrice: product.minPrice ?? 0,
+    maxPrice: product.maxPrice ?? 0,
+    currency: product.currency ?? 'USD',
+    status: product.status ?? 'approved',
   };
-
-  console.log('Writing FlexSearch index to file...');
-  try {
-    fs.writeFileSync(INDEX_FILE_PATH, JSON.stringify(dataToSave, null, 2));
-    console.log(`FlexSearch index saved to ${INDEX_FILE_PATH}`);
-  } catch (e) {
-    console.error('Failed to save FlexSearch index to file:', e);
-    throw e;
+  if (vendor) {
+    data.vendor = { connect: { id: vendor.id } };
   }
-}
-
-export function getAllProducts() {
-  return products;
-}
-
-export function searchProducts(query) {
-  if (!productIndex) {
-    console.warn('Product index not initialized for searchProducts.');
-    return [];
+  if (category) {
+    data.category = { connect: { id: category.id } };
   }
-
-  if (!query || query.trim() === '') {
-    return [];
-  }
-
-  const searchResults = productIndex.search(query.trim(), {
-    enrich: true,
-    suggest: true,
+  await db.product.create({
+    data,
   });
+}
 
-  const uniqueResults = new Map();
-  searchResults.forEach((fieldResult) => {
-    fieldResult.result.forEach((item) => {
-      uniqueResults.set(item.doc.ID, item.doc);
-    });
+export async function updateProduct(product: Product): Promise<void> {
+  const db = getDb();
+  const vendor = product.vendor
+    ? await db.user.findFirst({ where: { brandName: product.vendor } })
+    : null;
+  const category = product.category
+    ? await db.category.findFirst({ where: { name: product.category } })
+    : null;
+  await db.product.update({
+    where: { id: Number(product.id) },
+    data: {
+      title: product.title,
+      description: product.description,
+      productType: product.productType,
+      tags: product.tags,
+      quantity: product.quantity,
+      minPrice: product.minPrice,
+      maxPrice: product.maxPrice,
+      currency: product.currency,
+      images: undefined,
+      vendor: vendor ? { connect: { id: vendor.id } } : undefined,
+      category: category ? { connect: { id: category.id } } : undefined,
+    },
   });
-
-  return Array.from(uniqueResults.values());
 }
 
-export function addProduct(product) {
-  dbAddProduct(product);
-  isDataLoaded = false;
+export async function getPendingProducts(): Promise<Product[]> {
+  const db = getDb();
+  const rows = (await db.product.findMany({
+    where: { status: 'pending' },
+    include: { category: true, vendor: true },
+  })) as ProductDbRow[];
+  return rows.map((row: ProductDbRow) =>
+    processProductRow({
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      vendor: row.vendor?.brandName ?? String(row.vendorId),
+      description: row.description,
+      productType: row.productType,
+      tags: row.tags,
+      category: row.category?.name,
+      images: row.images ? JSON.parse(row.images) : [],
+      totalInventory: row.quantity,
+      priceRange: {
+        minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
+        maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
+      },
+    })
+  );
 }
 
-export function updateProduct(product) {
-  dbUpdateProduct(product);
-  isDataLoaded = false;
+export async function approveProduct(id: string | number): Promise<void> {
+  const db = getDb();
+  await db.product.update({ where: { id: Number(id) }, data: { status: 'approved' } });
 }
 
-export function getPendingProducts() {
-  return getPendingFromDb();
+export async function rejectProduct(id: string | number): Promise<void> {
+  const db = getDb();
+  await db.product.update({ where: { id: Number(id) }, data: { status: 'rejected' } });
 }
 
-export function approveProduct(id) {
-  setProductStatus(id, 'approved');
-  isDataLoaded = false;
+export async function getCategoriesFlat(): Promise<Category[]> {
+  const db = getDb();
+  return db.category.findMany({ orderBy: { name: 'asc' } });
 }
 
-export function rejectProduct(id) {
-  setProductStatus(id, 'rejected');
-  isDataLoaded = false;
-}
-
-export function getCategoriesFlat() {
-  return dbGetCategories();
-}
-
-export async function getCategoryTree() {
-  const flat = await dbGetCategories();
+export async function getCategoryTree(): Promise<{ name: string; subcategories: string[]; image?: string }[]> {
+  const flat = await getCategoriesFlat();
   if (flat.length > 0) {
-    const map = {};
+    const map: Record<number, { name: string; image?: string; subcategories: string[] }> = {};
     flat.forEach((c) => {
-      map[c.id] = { name: c.name, image: c.image, subcategories: [] };
+      if (typeof c.id === 'number') {
+        map[c.id] = { name: c.name, image: c.image, subcategories: [] };
+      }
     });
     flat.forEach((c) => {
-      if (c.parentId) {
+      if (typeof c.parentId === 'number') {
         map[c.parentId]?.subcategories.push(c.name);
       }
     });
     return flat
-      .filter((c) => !c.parentId)
+      .filter((c) => typeof c.id === 'number' && !c.parentId)
       .map((c) => ({
         name: c.name,
         image: c.image,
-        subcategories: map[c.id].subcategories.sort((a, b) =>
+        subcategories: (map[c.id as number]?.subcategories ?? []).sort((a, b) =>
           a.localeCompare(b)
         ),
       }))
@@ -354,35 +272,38 @@ export async function getCategoryTree() {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export function createCategory(name, parentId = null, image = null) {
-  const existing = getCategoryByName(name);
-  if (!existing) {
-    if (parentId) {
-      const parent = getCategoryById(parentId);
-      if (parent?.parentId) {
-        throw new Error('depth');
-      }
-    }
-    dbAddCategory(name, parentId, image);
-  }
+export async function createCategory(
+  name: string,
+  parentId: number | null = null,
+  image: string | null = null
+): Promise<void> {
+  const db = getDb();
+  const existing = await db.category.findFirst({ where: { name } });
+  if (existing) return;
+  await db.category.create({ data: { name, slug: name.toLowerCase().replace(/\s+/g, '-') } });
 }
 
-export function renameCategory(id, name, parentId = null, image = null) {
-  dbUpdateCategory(id, name, parentId, image);
+export async function renameCategory(
+  id: string | number,
+  name: string,
+  _parentId: number | null = null,
+  _image: string | null = null
+): Promise<void> {
+  const db = getDb();
+  await db.category.update({ where: { id: Number(id) }, data: { name } });
 }
 
-export function removeCategory(id) {
-  const cat = getCategoryById(id);
-  if (!cat) return;
-  const count = countProductsForCategory(cat.name);
+export async function removeCategory(id: string | number): Promise<void> {
+  const db = getDb();
+  const count = await db.product.count({ where: { categoryId: Number(id) } });
   if (count === 0) {
-    dbDeleteCategory(id);
+    await db.category.delete({ where: { id: Number(id) } });
   } else {
     throw new Error('category in use');
   }
 }
 
-export function deleteProduct(id) {
-  dbDeleteProduct(id);
-  isDataLoaded = false;
+export async function deleteProduct(id: string | number): Promise<void> {
+  const db = getDb();
+  await db.product.delete({ where: { id: Number(id) } });
 }

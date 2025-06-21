@@ -3,8 +3,8 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
-import type { FC, KeyboardEvent, MouseEvent } from 'react';
-import { AppContext } from '../contexts/AppContext';
+import type { FC, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from 'react';
+import { AppContext, AppContextValue } from '../contexts/AppContext';
 import SearchIcon from './icons/SearchIcon';
 import CartIcon from './icons/CartIcon';
 import MoonIcon from './icons/MoonIcon';
@@ -14,18 +14,29 @@ import ChevronDownIcon from './icons/ChevronDownIcon';
 import ElectronicsIcon from './icons/ElectronicsIcon';
 import FashionIcon from './icons/FashionIcon';
 import { Theme } from 'react-select';
-import { Category } from '@prisma/client';
+import type { Category } from '../types/category';
+import type {
+  CategoriesResponse,
+  SuggestionsResponse,
+  TrendingResponse,
+} from '../types/api';
+
+import type { Product } from '../types/product';
+import type { User } from '../types/user';
+
+type CartItem = Product & { qty: number };
 
 interface HeaderProps {
-  theme?: Theme;
-  setTheme?: React.Dispatch<React.SetStateAction<Theme>>;
+  theme?: string;
+  setTheme?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const router = useRouter();
   const { data: session } = useSession();
-  const { cart } = useContext(AppContext);
-  const user = session?.user;
+  const appContext = useContext(AppContext) as AppContextValue | undefined;
+  const cart = appContext?.cart ?? [];
+  const user = session?.user as User | undefined;
   const pathname = router.pathname || '';
   const isSignupRoute = pathname.startsWith('/signup');
   const isLoginRoute = pathname === '/login';
@@ -39,7 +50,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const [trendingKeywords, setTrendingKeywords] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const searchRef = useRef<HTMLFormElement | null>(null);
-  const iconMap = {
+  const iconMap: Record<string, JSX.Element> = {
     Electronics: <ElectronicsIcon className="h-5 w-5 mr-1" />,
     Fashion: <FashionIcon className="h-5 w-5 mr-1" />,
   };
@@ -49,8 +60,8 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
       try {
         const res = await fetch('/api/categories');
         if (res.ok) {
-          const data = await res.json();
-          setCategories(data || []);
+          const data: CategoriesResponse = await res.json();
+          setCategories(data.categories || data || []);
         }
       } catch (err) {
         console.error('Failed to load categories', err);
@@ -75,7 +86,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
       try {
         const res = await fetch('/api/trending');
         if (res.ok) {
-          const data = await res.json();
+          const data: TrendingResponse = await res.json();
           setTrendingKeywords(data.keywords || []);
         }
       } catch {
@@ -90,20 +101,22 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
       if (e.key === 'Escape') setMenuOpen(false);
     }
     function handleClick(e: MouseEvent) {
+      const target = e.target as Node;
       if (
         searchRef.current &&
-        !searchRef.current.contains(e.target) &&
-        !(e.target.closest && e.target.closest('#mega-menu'))
+        !searchRef.current.contains(target) &&
+        !(typeof (target as Element).closest === 'function' &&
+          (target as Element).closest('#mega-menu'))
       ) {
         setMenuOpen(false);
         setShowHistory(false);
       }
     }
-    document.addEventListener('keydown', handleKey);
-    document.addEventListener('click', handleClick);
+    document.addEventListener('keydown', handleKey as EventListener);
+    document.addEventListener('click', handleClick as EventListener);
     return () => {
-      document.removeEventListener('keydown', handleKey);
-      document.removeEventListener('click', handleClick);
+      document.removeEventListener('keydown', handleKey as EventListener);
+      document.removeEventListener('click', handleClick as EventListener);
     };
   }, []);
 
@@ -121,7 +134,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           { signal: controller.signal }
         );
         if (res.ok) {
-          const data = await res.json();
+          const data: SuggestionsResponse = await res.json();
           setSuggestions(data.suggestions || []);
           setActiveIdx(-1);
         }
@@ -168,7 +181,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
     setSearch(term);
     runSearch(term);
   };
-  const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
+  const itemCount = cart.reduce((sum: number, item: CartItem) => sum + (item.qty || 0), 0);
   const submitSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!search.trim()) return;
@@ -181,7 +194,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
     setSearch(text);
   };
 
-  const renderCat = (cat: Category) => (
+  const renderCat = (cat: Category): JSX.Element => (
     <li key={cat.id} className={cat.parentId ? 'ml-4' : ''}>
       <Link href={`/categories/${encodeURIComponent(cat.name)}`}>
         {cat.name}
@@ -284,7 +297,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
               className="input input-bordered w-full pr-10"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
+              onKeyDown={(e: ReactKeyboardEvent<HTMLInputElement>) => {
                 if (suggestions.length === 0) return;
                 if (e.key === 'ArrowDown') {
                   e.preventDefault();
@@ -395,7 +408,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 <input
                   type="checkbox"
                   checked={theme === 'dark'}
-                  onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  onChange={() => setTheme && setTheme(theme === 'dark' ? 'light' : 'dark')}
                   aria-label="Toggle Dark Mode"
                 />
                 <MoonIcon className="swap-on fill-current w-5 h-5" />
@@ -489,7 +502,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                     type="checkbox"
                     checked={theme === 'dark'}
                     onChange={() =>
-                      setTheme(theme === 'dark' ? 'light' : 'dark')
+                      setTheme && setTheme(theme === 'dark' ? 'light' : 'dark')
                     }
                     aria-label="Toggle Dark Mode"
                   />

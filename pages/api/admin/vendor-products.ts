@@ -6,22 +6,27 @@ import {
 } from '../../../lib/products';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { PendingProduct, ApiMessage } from '../../../types';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<PendingProduct[] | ApiMessage>
+) {
   try {
     if (req.method === 'GET') {
-      return res.status(200).json(getPendingProducts());
+      const list = await getPendingProducts();
+      return res.status(200).json(list as PendingProduct[]);
     }
     if (req.method === 'PUT') {
-      const { id, action } = req.body || {};
+      const { id, action } = req.body as { id?: string; action?: string };
       if (!id || !action)
         return res.status(400).json({ message: 'id and action required' });
       if (action === 'approve') {
-        approveProduct(id);
+        await approveProduct(id);
         return res.status(200).json({ message: 'approved' });
       }
       if (action === 'reject') {
-        rejectProduct(id);
+        await rejectProduct(id);
         return res.status(200).json({ message: 'rejected' });
       }
       return res.status(400).json({ message: 'invalid action' });

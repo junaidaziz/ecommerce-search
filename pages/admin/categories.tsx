@@ -1,22 +1,24 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { AppContext } from '../../contexts/AppContext';
+import { Category, CategoryInput, ApiMessage } from '../../types';
+import { fetchJson } from '../../lib/utils/fetchJson';
 
 export default function Categories() {
   const { user } = useContext(AppContext)!;
-  const [categories, setCategories] = useState([]);
-  const [newCat, setNewCat] = useState('');
-  const [newParent, setNewParent] = useState('');
-  const [newImage, setNewImage] = useState('');
-  const [message, setMessage] = useState('');
-  const [editing, setEditing] = useState(null);
-  const [editName, setEditName] = useState('');
-  const [editImage, setEditImage] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [newCat, setNewCat] = useState<string>('');
+  const [newParent, setNewParent] = useState<string>('');
+  const [newImage, setNewImage] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+  const [editing, setEditing] = useState<number | null>(null);
+  const [editName, setEditName] = useState<string>('');
+  const [editImage, setEditImage] = useState<string>('');
 
   const load = useCallback(async () => {
     if (!user) return;
-    const res = await fetch('/api/admin/categories');
-    if (res.ok) setCategories(await res.json());
+    const data = await fetchJson<Category[]>('/api/admin/categories');
+    setCategories(data);
   }, [user]);
 
   useEffect(() => {
@@ -25,42 +27,46 @@ export default function Categories() {
 
   const add = async () => {
     if (!newCat.trim()) return;
-    const res = await fetch('/api/admin/categories', {
+    const payload: CategoryInput = {
+      name: newCat,
+      parentId: newParent ? Number(newParent) : null,
+      image: newImage || undefined,
+    };
+    await fetchJson<ApiMessage>('/api/admin/categories', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newCat, parentId: newParent || null, image: newImage || null }),
+      body: JSON.stringify(payload),
     });
-    if (res.ok) {
-      setNewCat('');
-      setNewImage('');
-      setMessage('Category added');
-      load();
-    }
+    setNewCat('');
+    setNewImage('');
+    setMessage('Category added');
+    load();
   };
 
   const update = async () => {
-    const res = await fetch('/api/admin/categories', {
+    const payload: CategoryInput & { id: number } = {
+      id: editing as number,
+      name: editName,
+      image: editImage || undefined,
+    };
+    await fetchJson<ApiMessage>('/api/admin/categories', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: editing, name: editName, image: editImage || null }),
+      body: JSON.stringify(payload),
     });
-    if (res.ok) {
-      setEditing(null);
-      setEditName('');
-      setEditImage('');
-      setMessage('Category updated');
-      load();
-    }
+    setEditing(null);
+    setEditName('');
+    setEditImage('');
+    setMessage('Category updated');
+    load();
   };
 
-  const remove = async (id) => {
-    const res = await fetch(`/api/admin/categories?id=${id}`, {
+  const remove = async (id: number) => {
+    await fetchJson<ApiMessage>(`/api/admin/categories?id=${id}`, {
       method: 'DELETE',
     });
-    if (res.ok) {
-      setMessage('Category deleted');
-      load();
-    }
+    setMessage('Category deleted');
+    load();
   };
 
   if (!user)
@@ -111,23 +117,24 @@ export default function Categories() {
     </div>
   );
 
-  function buildTree(list) {
-    const map = {};
+  function buildTree(list: Category[]): (Category & { children: Category[] })[] {
+    const map: Record<number, Category & { children: Category[] }> =
+      {} as Record<number, Category & { children: Category[] }>;
     list.forEach((c) => {
-      map[c.id] = { ...c, children: [] };
+      map[c.id!] = { ...c, children: [] };
     });
-    const tree = [];
+    const tree: (Category & { children: Category[] })[] = [];
     list.forEach((c) => {
       if (c.parentId) {
-        map[c.parentId]?.children.push(map[c.id]);
+        map[c.parentId]?.children.push(map[c.id!]);
       } else {
-        tree.push(map[c.id]);
+        tree.push(map[c.id!]);
       }
     });
     return tree;
   }
 
-  function CategoryItem({ cat }) {
+  function CategoryItem({ cat }: { cat: Category & { children: Category[] } }) {
     const hasChildren = cat.children && cat.children.length > 0;
     return (
       <li className={cat.parentId ? 'ml-4' : ''}>
