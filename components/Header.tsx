@@ -12,6 +12,9 @@ import MenuIcon from './icons/MenuIcon';
 import ChevronDownIcon from './icons/ChevronDownIcon';
 import ElectronicsIcon from './icons/ElectronicsIcon';
 import FashionIcon from './icons/FashionIcon';
+import HomeIcon from './icons/HomeIcon';
+import ToysIcon from './icons/ToysIcon';
+import SportsIcon from './icons/SportsIcon';
 import DEFAULT_CATEGORIES from '../lib/defaultCategories';
 import type { Category } from '../types/category';
 import type { Product } from '../types/product';
@@ -31,6 +34,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const pathname = router.pathname;
   const isAuthRoute = ['/login', '/signup', '/user/signup', '/brand/signup'].includes(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [hoveredCat, setHoveredCat] = useState<Category | null>(null);
   const [search, setSearch] = useState('');
@@ -66,8 +70,11 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const logout = () => signOut({ redirect: false });
 
   const iconMap: Record<string, JSX.Element> = {
-    Electronics: <ElectronicsIcon className="h-5 w-5 mr-1" />,
-    Fashion: <FashionIcon className="h-5 w-5 mr-1" />,
+    Electronics: <ElectronicsIcon className="h-5 w-5 mr-1" />, 
+    Fashion: <FashionIcon className="h-5 w-5 mr-1" />, 
+    Home: <HomeIcon className="h-5 w-5 mr-1" />,
+    Toys: <ToysIcon className="h-5 w-5 mr-1" />,
+    Sports: <SportsIcon className="h-5 w-5 mr-1" />,
   };
 
   const submitSearch = (e: React.FormEvent<HTMLFormElement>) => {
@@ -81,8 +88,18 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
       <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 gap-y-2">
         <Link href="/" className="btn btn-ghost text-xl">Home</Link>
 
-        <div className="flex-1 flex items-center gap-x-4">
-          <ul className="menu menu-horizontal hidden md:flex">
+        <div className="flex-1 flex items-center gap-x-4 relative">
+          <button
+            type="button"
+            className="md:hidden btn btn-ghost"
+            aria-controls="mobile-cat-menu"
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((p) => !p)}
+          >
+            <span className="sr-only">Categories</span>
+            <MenuIcon className="w-5 h-5" />
+          </button>
+          <ul className="menu menu-horizontal hidden md:flex" role="menubar">
             <li className="relative">
               <div onMouseEnter={handleMenuEnter} onMouseLeave={handleMenuLeave}>
                 <button
@@ -96,35 +113,45 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                     className={`w-4 h-4 transition-transform ${menuOpen ? 'rotate-180' : ''}`}
                   />
                 </button>
-                {menuOpen && (
-                  <div
-                    id="mega-menu"
-                    onMouseEnter={handleMenuEnter}
-                    onMouseLeave={handleMenuLeave}
-                    className="absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 bg-opacity-100 border border-base-200 shadow-lg rounded w-screen max-w-3xl"
-                  >
+                <div
+                  id="mega-menu"
+                  role="menu"
+                  onMouseEnter={handleMenuEnter}
+                  onMouseLeave={handleMenuLeave}
+                  className={`absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 bg-opacity-100 border border-base-200 shadow-lg rounded w-screen max-w-3xl transition-all transform ${menuOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 -translate-y-2'}`}
+                  aria-hidden={!menuOpen}
+                >
                     <div className="flex gap-6">
                       <div className="w-56 pr-4 space-y-2 border-r border-base-200">
                         {categories.map((cat) => (
                           <button
                             key={cat.name}
                             type="button"
+                            role="menuitem"
+                            aria-haspopup={!!cat.subcategories?.length}
+                            aria-expanded={hoveredCat?.name === cat.name}
                             onFocus={() => setHoveredCat(cat)}
                             onMouseEnter={() => setHoveredCat(cat)}
                             className="w-full flex items-center gap-1 text-left font-medium text-gray-800 tracking-wide hover:text-primary transition-colors focus:outline-none capitalize whitespace-nowrap truncate"
                           >
                             {iconMap[cat.name] || null}
                             {cat.name}
+                            {cat.subcategories?.length ? (
+                              <ChevronDownIcon
+                                className={`w-3 h-3 ml-auto transition-transform ${hoveredCat?.name === cat.name ? 'rotate-180' : ''}`}
+                              />
+                            ) : null}
                           </button>
                         ))}
                         {categories.length === 0 && <span>No categories found</span>}
                       </div>
                       {hoveredCat?.subcategories && hoveredCat.subcategories.length > 0 && (
-                        <ul className="min-w-[200px] pl-4 space-y-1">
+                        <ul className="min-w-[200px] pl-4 space-y-1" role="menu">
                           {hoveredCat.subcategories.map((sub) => (
-                            <li key={sub} className="capitalize">
+                            <li key={sub} className="capitalize" role="none">
                               <Link
                                 href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub)}`}
+                                role="menuitem"
                                 className="block font-medium text-gray-800 tracking-wide hover:text-primary transition-colors whitespace-nowrap truncate"
                               >
                                 {sub}
@@ -135,10 +162,39 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                       )}
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
             </li>
           </ul>
+          <div
+            id="mobile-cat-menu"
+            className={`md:hidden absolute left-0 top-full w-full z-40 bg-base-100 border border-base-200 shadow-lg rounded p-4 transition-all ${mobileOpen ? 'max-h-[80vh] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
+          >
+            <ul className="space-y-2">
+              {categories.map((cat) => (
+                <details key={cat.name} className="border-b border-base-200 last:border-none">
+                  <summary className="flex items-center gap-2 py-2 cursor-pointer list-none">
+                    {iconMap[cat.name] || null}
+                    <span className="capitalize">{cat.name}</span>
+                  </summary>
+                  {cat.subcategories?.length && (
+                    <ul className="pl-4 py-2 space-y-1">
+                      {cat.subcategories.map((sub) => (
+                        <li key={sub} className="capitalize">
+                          <Link
+                            href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub)}`}
+                            className="block py-1"
+                          >
+                            {sub}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </details>
+              ))}
+              {categories.length === 0 && <li>No categories found</li>}
+            </ul>
+          </div>
 
           {!isAuthRoute && (
             <form
