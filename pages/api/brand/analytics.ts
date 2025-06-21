@@ -20,11 +20,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const counts: Record<string, number> = {};
     orders.forEach((o) => {
       summary.totalRevenue += o.total || 0;
-      o.items
-        .filter((i) => i.vendor === vendor)
-        .forEach((i) => {
-          counts[i.id] = (counts[i.id] || 0) + i.qty;
-        });
+      if (o.product.vendor === vendor) {
+        counts[o.product.id] = (counts[o.product.id] || 0) + o.quantity;
+      }
     });
     summary.topProducts = Object.entries(counts)
       .sort((a, b) => (b[1] as number) - (a[1] as number))

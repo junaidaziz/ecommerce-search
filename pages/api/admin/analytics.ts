@@ -21,9 +21,7 @@ async function handler(
     const counts: Record<string, number> = {};
     orders.forEach((o) => {
       summary.totalRevenue += o.total || 0;
-      o.items.forEach((i) => {
-        counts[i.id] = (counts[i.id] || 0) + i.qty;
-      });
+      counts[o.product.id] = (counts[o.product.id] || 0) + o.quantity;
     });
     summary.topProducts = Object.entries(counts)
       .sort((a, b) => (b[1] as number) - (a[1] as number))

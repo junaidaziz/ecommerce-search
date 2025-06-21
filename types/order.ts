@@ -1,18 +1,24 @@
-import { Product } from './product';
+import type { User } from './user';
+import type { Product, ProductDbRow } from './product';
+import type { Coupon } from './coupon';
 
-export interface OrderItem extends Product {
-  qty: number;
+export interface ShippingInfo {
+  name: string;
+  address: string;
 }
 
 export interface Order {
   id: number;
-  uuid?: string;
+  uuid: string;
   userId: number;
-  items: OrderItem[];
+  productId: number;
+  quantity: number;
   total: number;
-  status: string;
-  paymentMethod?: string;
-  shippingAddress?: string;
+  status: 'pending' | 'shipped' | 'completed';
+  user: User;
+  product: Product;
+  coupon?: Coupon;
+  shipping?: ShippingInfo;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,39 +27,37 @@ export type OrderResponse = Order;
 
 export interface OrderInput {
   userId: number;
-  items: OrderItem[];
+  productId: number;
+  quantity: number;
   total: number;
-  paymentMethod?: string;
-  shippingAddress?: string;
+  couponId?: number;
+  shipping?: ShippingInfo;
+}
+
+export interface OrderProductRow extends ProductDbRow {
+  description: string;
+  productType: string;
+  tags: string[] | string;
+  images: string[];
+  quantity: number;
+  minPrice: number;
+  maxPrice: number;
+  currency: string;
+  vendor?: { brandName: string | null } | null;
+  category?: { name: string | null } | null;
 }
 
 export interface OrderRow {
   id: number;
-  uuid?: string;
+  uuid: string;
   userId: number;
-  user: {
-    id: number;
-    email: string;
-  };
-  product: {
-    id: number;
-    slug: string;
-    title: string;
-    vendorId: number;
-    vendor?: { brandName?: string | null };
-    description: string;
-    productType: string;
-    tags: string[];
-    category?: { name: string };
-    images: string[];
-    quantity: number;
-    minPrice: number;
-    maxPrice: number;
-    currency: string;
-  };
+  productId: number;
   quantity: number;
   total: number;
   status: string;
   createdAt: Date;
   updatedAt: Date;
+  user: User;
+  product: OrderProductRow;
+  coupon?: Coupon | null;
 }
