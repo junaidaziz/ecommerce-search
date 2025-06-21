@@ -10,6 +10,7 @@ import Head from 'next/head';
 import { getPageTitle } from '../lib/pageTitle';
 import HeroSlider from '../components/HeroSlider';
 import ProductCard from '../components/ProductCard';
+import Pagination from '../components/Pagination';
 import DEFAULT_CATEGORIES from '../lib/defaultCategories';
 import { Product } from '../types/product';
 
@@ -298,20 +299,27 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
       ) : products.length === 0 ? (
         <p className="text-gray-500">No products found</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full">
-          {products.map((p) => (
-            <ProductCard
-              key={p.id}
-              product={p}
-              highlightTitle={
-                p.highlights?.find((h) => h.field === 'title')?.snippet
-              }
-              highlightDescription={
-                p.highlights?.find((h) => h.field === 'description')?.snippet
-              }
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full">
+            {products.map((p) => (
+              <ProductCard
+                key={p.id}
+                product={p}
+                highlightTitle={
+                  p.highlights?.find((h) => h.field === 'title')?.snippet
+                }
+                highlightDescription={
+                  p.highlights?.find((h) => h.field === 'description')?.snippet
+                }
+              />
+            ))}
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
       )}
     </div>
   );

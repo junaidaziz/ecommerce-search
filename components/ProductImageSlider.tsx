@@ -16,14 +16,14 @@ export default function ProductImageSlider({
   placeholderSeed = 1,
 }: ProductImageSliderProps) {
   const [idx, setIdx] = useState(0);
-  const urls = images.map((img) =>
-    typeof img === 'string' ? img : img.url
-  );
+  const urls = images.map((img) => (typeof img === 'string' ? img : img.url));
+  const placeholderUrl = `https://picsum.photos/seed/${placeholderSeed}/400/400`;
+  const [errorMap, setErrorMap] = useState<Record<number, boolean>>({});
   if (!urls || urls.length === 0) {
     return (
       <div className={`relative aspect-[4/5] ${className}`}>
         <Image
-          src={`https://source.unsplash.com/400x400/?product&sig=${placeholderSeed}`}
+          src={placeholderUrl}
           alt="Placeholder product"
           fill
           className={`object-cover ${imgClass}`}
@@ -36,10 +36,11 @@ export default function ProductImageSlider({
   return (
     <div className={`relative aspect-[4/5] ${className}`}>
       <Image
-        src={images[idx].url}
+        src={errorMap[idx] ? placeholderUrl : images[idx].url}
         alt={images[idx].alt || `Image ${idx + 1}`}
         fill
         className={`object-cover ${imgClass}`}
+        onError={() => setErrorMap((m) => ({ ...m, [idx]: true }))}
       />
       {urls.length > 1 && (
         <>
