@@ -95,7 +95,7 @@ async function handler(
       }
       const slug = slugify(title || (existing?.title as string) || String(id));
       const qty = quantity ? parseInt(String(quantity), 10) : 0;
-      const data = {
+      const data: Record<string, unknown> = {
         id: Number(id),
         slug,
         title,
@@ -108,7 +108,7 @@ async function handler(
         currency: (currency as string) || 'USD',
         status: 'approved',
         images: JSON.stringify(imagePaths),
-      } as any;
+      };
 
       if (vendor) {
         const vid = parseInt(String(vendor), 10);

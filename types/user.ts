@@ -5,6 +5,16 @@ export interface User {
   brandName?: string;
   gender?: string;
   role?: string;
+  disabled?: boolean;
+  phoneNumber?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  businessAddress?: string;
+  website?: string;
+  businessDescription?: string;
+  logo?: string;
+  taxId?: string;
 }
 
 export type UserResponse = User;

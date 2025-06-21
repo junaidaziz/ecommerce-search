@@ -6,6 +6,7 @@ import {
   addUser,
   setUserDisabled,
 } from '../../../lib/users';
+import type { Role } from '@prisma/client';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 import {
@@ -29,7 +30,7 @@ async function handler(
       const { email, role } = req.body as UserRoleUpdateRequest;
       if (!email || !role)
         return res.status(400).json({ message: 'email and role required' });
-      await updateUserRole(email, role as any);
+      await updateUserRole(email, role as Role);
       return res.status(200).json({ message: 'role updated' });
     }
     if (req.method === 'PATCH') {
@@ -65,7 +66,7 @@ async function handler(
         last_name: lastName,
         brand_name: brandName,
         gender,
-        role: (role || 'USER') as any,
+        role: (role || 'USER') as Role,
       });
       return res.status(201).json({ message: 'user created' });
     }

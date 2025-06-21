@@ -2,13 +2,17 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { findUser } from '../../lib/users';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import type { User } from '../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<{ message: string; user?: User }>
+) {
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
-    const { email, password } = req.body;
+  const { email, password } = req.body as { email?: string; password?: string };
     if (!email || !password) {
       return res.status(400).json({ message: 'email and password required' });
     }
