@@ -36,8 +36,8 @@ const ForgotPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
-      <div className="max-w-sm mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
+    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8 overflow-hidden">
+      <div className="max-w-sm mx-auto border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
         <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
           <EmailInput
