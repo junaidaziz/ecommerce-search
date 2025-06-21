@@ -35,6 +35,19 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const [hoveredCat, setHoveredCat] = useState<Category | null>(null);
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLFormElement>(null);
+  const closeTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMenuEnter = () => {
+    if (closeTimeout.current) {
+      clearTimeout(closeTimeout.current);
+      closeTimeout.current = null;
+    }
+    setMenuOpen(true);
+  };
+
+  const handleMenuLeave = () => {
+    closeTimeout.current = setTimeout(() => setMenuOpen(false), 150);
+  };
 
   useEffect(() => {
     fetch('/api/categories')
@@ -71,11 +84,12 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
         <div className="flex-1 flex items-center gap-x-4">
           <ul className="menu menu-horizontal hidden md:flex">
             <li className="relative">
-              <div onMouseEnter={() => setMenuOpen(true)} onMouseLeave={() => setMenuOpen(false)}>
+              <div onMouseEnter={handleMenuEnter} onMouseLeave={handleMenuLeave}>
                 <button
                   type="button"
                   className="flex items-center gap-1"
                   onClick={() => setMenuOpen((prev) => !prev)}
+                  onMouseEnter={handleMenuEnter}
                 >
                   Categories{' '}
                   <ChevronDownIcon
@@ -85,17 +99,19 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 {menuOpen && (
                   <div
                     id="mega-menu"
+                    onMouseEnter={handleMenuEnter}
+                    onMouseLeave={handleMenuLeave}
                     className="absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 bg-opacity-100 border border-base-200 shadow-lg rounded w-screen max-w-3xl"
                   >
                     <div className="flex gap-6">
-                      <div className="w-56 pr-4 space-y-1 border-r border-base-200">
+                      <div className="w-56 pr-4 space-y-2 border-r border-base-200">
                         {categories.map((cat) => (
                           <button
                             key={cat.name}
                             type="button"
                             onFocus={() => setHoveredCat(cat)}
                             onMouseEnter={() => setHoveredCat(cat)}
-                            className="w-full flex items-center gap-1 text-left hover:text-primary focus:outline-none"
+                            className="w-full flex items-center gap-1 text-left hover:text-primary focus:outline-none capitalize font-bold whitespace-nowrap truncate"
                           >
                             {iconMap[cat.name] || null}
                             {cat.name}
@@ -106,10 +122,10 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                       {hoveredCat?.subcategories && hoveredCat.subcategories.length > 0 && (
                         <ul className="min-w-[200px] pl-4 space-y-1">
                           {hoveredCat.subcategories.map((sub) => (
-                            <li key={sub}>
+                            <li key={sub} className="capitalize">
                               <Link
                                 href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub)}`}
-                                className="block hover:text-primary"
+                                className="block hover:text-primary whitespace-nowrap truncate"
                               >
                                 {sub}
                               </Link>
