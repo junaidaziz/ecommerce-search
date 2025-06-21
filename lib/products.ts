@@ -148,7 +148,7 @@ export function mapDbRowToProduct(row: ProductRow): Product {
     slug: row.slug,
     sku: row.sku,
     title: row.title,
-    vendor: row.vendor,
+    vendor: row.vendor ?? null,
     description: row.description,
     productType: row.productType,
     tags: row.tags,

@@ -14,7 +14,10 @@ export async function getProductByUuid(uuid: string) {
 }
 
 export async function getProductBySlug(slug: string) {
-  return prisma.product.findUnique({ where: { slug } });
+  return prisma.product.findUnique({
+    where: { slug },
+    include: { category: true, vendor: true },
+  });
 }
 
 export async function decreaseProductQuantity(
