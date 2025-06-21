@@ -1,10 +1,15 @@
 import React from 'react';
-import { UseFormRegister, RegisterOptions } from 'react-hook-form';
+import {
+  UseFormRegister,
+  RegisterOptions,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 
-export interface CheckboxProps
+export interface CheckboxProps<T extends FieldValues>
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  name: string;
+  name: Path<T>;
   checked?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
@@ -12,24 +17,27 @@ export interface CheckboxProps
   required?: boolean;
   disabled?: boolean;
   className?: string;
-  register?: UseFormRegister<any>;
-  rules?: RegisterOptions;
+  register?: UseFormRegister<T>;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({
-  label,
-  name,
-  checked,
-  onChange,
-  onBlur,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  register,
-  rules,
-  ...rest
-}) => {
+const Checkbox = <T extends FieldValues>(
+  props: CheckboxProps<T>
+) => {
+  const {
+    label,
+    name,
+    checked,
+    onChange,
+    onBlur,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    register,
+    rules,
+    ...rest
+  } = props;
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
   return (

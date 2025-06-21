@@ -36,8 +36,6 @@ coverage/
 *.bak
 *.tmp
 
-# Search index
-public/index.json
 tsconfig.tsbuildinfo
 
 # Prisma
@@ -46,3 +44,4 @@ prisma/dev.db-journal
 prisma/*.sqlite
 prisma/*.sqlite-journal
 prisma/.schema_hash
+docs/ERD.png

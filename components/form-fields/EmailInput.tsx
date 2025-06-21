@@ -1,10 +1,15 @@
 import React from 'react';
-import { UseFormRegister, RegisterOptions } from 'react-hook-form';
+import {
+  UseFormRegister,
+  RegisterOptions,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 
-export interface EmailInputProps
+export interface EmailInputProps<T extends FieldValues>
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  name: string;
+  name: Path<T>;
   placeholder?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -15,27 +20,30 @@ export interface EmailInputProps
   className?: string;
   leftAddon?: React.ReactNode;
   rightAddon?: React.ReactNode;
-  register?: UseFormRegister<any>;
-  rules?: RegisterOptions;
+  register?: UseFormRegister<T>;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const EmailInput: React.FC<EmailInputProps> = ({
-  label,
-  name,
-  placeholder,
-  value,
-  onChange,
-  onBlur,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  leftAddon,
-  rightAddon,
-  register,
-  rules,
-  ...rest
-}) => {
+const EmailInput = <T extends FieldValues>(
+  props: EmailInputProps<T>
+) => {
+  const {
+    label,
+    name,
+    placeholder,
+    value,
+    onChange,
+    onBlur,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    leftAddon,
+    rightAddon,
+    register,
+    rules,
+    ...rest
+  } = props;
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
 

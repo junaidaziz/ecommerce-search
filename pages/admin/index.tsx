@@ -1,83 +1,127 @@
-import { useState, useEffect, useContext, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  ChangeEvent,
+} from 'react';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
+import { Product, ProductInput, ApiMessage } from '../../types';
+import { fetchJson } from '../../lib/utils/fetchJson';
+import { TextInput } from '../../components/form-fields';
 
 export default function Admin() {
   const { user } = useContext(AppContext)!;
-  const emptyForm = {
+  type FormState = Partial<ProductInput> & { id?: string };
+  const emptyForm: FormState = {
     id: '',
+    sku: '',
     title: '',
-    vendor: '',
+    vendor: { email: '', brandName: '' },
     description: '',
-    product_type: '',
+    productType: '',
     tags: '',
     quantity: 0,
-    min_price: 0,
-    max_price: 0,
+    minPrice: 0,
+    maxPrice: 0,
     currency: 'USD',
+    category: { name: '', slug: '' },
   };
-  const [form, setForm] = useState(emptyForm);
-  const [products, setProducts] = useState([]);
-  const [message, setMessage] = useState('');
-  const [editingId, setEditingId] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [photos, setPhotos] = useState([]);
+  const [form, setForm] = useState<FormState>(emptyForm);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [message, setMessage] = useState<string>('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const fetchProducts = useCallback(async () => {
     if (!user) return;
-    const res = await fetch(
+    const data = await fetchJson<Product[]>(
       `/api/admin/products?vendor=${encodeURIComponent(user.brandName || '')}`
     );
-    if (res.ok) {
-      setProducts(await res.json());
-    }
+    setProducts(data);
   }, [user]);
 
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => {
+      if (name === 'vendor') {
+        return {
+          ...prev,
+          vendor: { ...(prev.vendor || { email: '' }), brandName: value },
+        };
+      }
+      if (name === 'category') {
+        return {
+          ...prev,
+          category: { ...(prev.category || { slug: '' }), name: value },
+        };
+      }
+      return { ...prev, [name]: value };
+    });
   };
 
-  const submit = async (e) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData();
     const payload = editingId ? { ...form, id: editingId } : form;
-    Object.entries(payload).forEach(([k, v]) => fd.append(k, v));
+    fd.append('id', payload.id || '');
+    fd.append('sku', payload.sku || '');
+    fd.append('title', payload.title || '');
+    fd.append('vendor', payload.vendor?.brandName || '');
+    fd.append('description', payload.description || '');
+    fd.append('product_type', payload.productType || '');
+    fd.append('tags', payload.tags || '');
+    fd.append('category', payload.category?.name || '');
+    fd.append('quantity', String(payload.quantity ?? 0));
+    fd.append('min_price', String(payload.minPrice ?? 0));
+    fd.append('max_price', String(payload.maxPrice ?? 0));
+    fd.append('currency', payload.currency || '');
     photos.forEach((file) => fd.append('photos', file));
-    const res = await fetch('/api/admin/products', {
-      method: editingId ? 'PUT' : 'POST',
-      body: fd,
-    });
-    if (res.ok) {
+    try {
+      await fetchJson<ApiMessage>('/api/admin/products', {
+        method: editingId ? 'PUT' : 'POST',
+        body: fd,
+      });
       setMessage(editingId ? 'Product updated' : 'Product added');
       setForm(emptyForm);
       setEditingId(null);
       setPhotos([]);
       fetchProducts();
-    } else {
-      const data = await res.json();
-      setMessage(data.message || 'Error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error';
+      setMessage(msg);
     }
   };
 
-  const handleEdit = (p) => {
+  const handleEdit = (p: Product) => {
     setForm({
-      id: p.ID,
-      title: p.TITLE || '',
-      vendor: p.VENDOR || '',
-      description: p.DESCRIPTION || '',
-      product_type: p.PRODUCT_TYPE || '',
-      tags: p.TAGS || '',
-      quantity: p.TOTAL_INVENTORY || 0,
-      min_price: p.MIN_PRICE || 0,
-      max_price: p.MAX_PRICE || 0,
-      currency: p.CURRENCY || 'USD',
+      id: p.id,
+      sku: p.sku || '',
+      title: p.title || '',
+      vendor:
+        typeof p.vendor === 'string'
+          ? { email: '', brandName: p.vendor }
+          : p.vendor || { email: '', brandName: '' },
+      description: p.description || '',
+      productType: p.productType || '',
+      tags: p.tags || '',
+      category:
+        typeof p.category === 'string'
+          ? { name: p.category, slug: '' }
+          : p.category || { name: '', slug: '' },
+      quantity: p.totalInventory || 0,
+      minPrice: p.minPrice || 0,
+      maxPrice: p.maxPrice || 0,
+      currency: p.currency || 'USD',
     });
     setPhotos([]);
-    setEditingId(p.ID);
+    setEditingId(p.id);
     setShowModal(true);
   };
 
@@ -129,30 +173,31 @@ export default function Admin() {
             <form onSubmit={submit} className="space-y-2">
               {[
                 'id',
+                'sku',
                 'title',
                 'vendor',
                 'description',
-                'product_type',
+                'productType',
                 'tags',
+                'category',
                 'quantity',
-                'min_price',
-                'max_price',
+                'minPrice',
+                'maxPrice',
                 'currency',
               ].map((field) => (
-                <div key={field}>
-                  <label className="label capitalize">
-                    <span className="label-text">
-                      {field.replace('_', ' ')}
-                    </span>
-                  </label>
-                  <input
-                    name={field}
-                    value={form[field]}
-                    onChange={handleChange}
-                    placeholder={field}
-                    className="input input-bordered w-full"
-                  />
-                </div>
+                <TextInput
+                  key={field}
+                  name={field as keyof FormState}
+                  value={
+                    field === 'vendor'
+                      ? form.vendor?.brandName || ''
+                      : field === 'category'
+                        ? form.category?.name || ''
+                        : (form as any)[field]
+                  }
+                  onChange={handleChange}
+                  placeholder={field}
+                />
               ))}
               <div>
                 <label className="label">
@@ -161,7 +206,9 @@ export default function Admin() {
                 <input
                   type="file"
                   multiple
-                  onChange={(e) => setPhotos(Array.from(e.target.files))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setPhotos(e.target.files ? Array.from(e.target.files) : [])
+                  }
                   className="file-input file-input-bordered w-full"
                 />
               </div>
@@ -192,9 +239,9 @@ export default function Admin() {
       <h2 className="text-xl font-semibold mb-2">Existing Products</h2>
       <ul className="space-y-1">
         {products.map((p) => (
-          <li key={p.ID} className="flex justify-between items-center">
+          <li key={p.id} className="flex justify-between items-center">
             <span>
-              {p.TITLE} - {p.PRODUCT_TYPE}
+              {p.title} ({p.sku}) - {p.productType}
             </span>
             <button
               type="button"

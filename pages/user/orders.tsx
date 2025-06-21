@@ -1,18 +1,18 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
-
-export default function UserOrders() {
+import type { Order } from '../../types';
+const UserOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
     setLoading(true);
     fetch('/api/user/orders')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data) => {
+      .then((data: Order[]) => {
         setOrders(data);
         setError(null);
       })
@@ -39,18 +39,10 @@ export default function UserOrders() {
             <p>
               Order #{o.id} - {o.status}
             </p>
-            {o.shipping_name && (
-              <p className="text-sm">Ship To: {o.shipping_name}</p>
-            )}
-            {o.shipping_address && (
-              <p className="text-sm">Address: {o.shipping_address}</p>
-            )}
             <ul className="list-disc pl-4 text-sm mb-1">
-              {o.items.map((item) => (
-                <li key={item.ID}>
-                  {item.TITLE} x {item.qty}
-                </li>
-              ))}
+              <li>
+                {o.product.title} x {o.quantity}
+              </li>
             </ul>
             <p>Total: £{o.total}</p>
           </li>
@@ -60,3 +52,5 @@ export default function UserOrders() {
     </div>
   );
 }
+
+export default UserOrders;

@@ -1,7 +1,7 @@
-import useTheme from '../hooks/useTheme';
+import React, { FC, ReactNode, Dispatch, SetStateAction } from 'react';
+import useTheme, { Theme } from '../hooks/useTheme';
 import Header from './Header';
 import Footer from './Footer';
-import type { FC, ReactNode } from 'react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -9,7 +9,8 @@ interface LayoutProps {
 }
 
 const Layout: FC<LayoutProps> = ({ children, heroSecond }) => {
-  const [theme, setTheme] = useTheme();
+  // If useTheme returns [Theme, Dispatch<SetStateAction<Theme>>]
+  const [theme, setTheme] = useTheme() as [string | Theme, Dispatch<SetStateAction<string | Theme>>];
 
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden">

@@ -1,18 +1,23 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getOrdersForVendor } from '../../../lib/orders';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getQueryParam } from '../../../lib/utils/getQueryParam';
+import type { AnalyticsData, ApiMessage } from '../../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<AnalyticsData | ApiMessage>
+): Promise<void> {
   try {
     if (req.method !== 'GET') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
-    const { vendor } = req.query;
+    const vendor = getQueryParam(req.query.vendor);
     if (!vendor) {
       return res.status(400).json({ message: 'vendor required' });
     }
-    const orders = await getOrdersForVendor(vendor as string);
-    const summary = {
+    const orders = await getOrdersForVendor(vendor);
+    const summary: AnalyticsData = {
       totalOrders: orders.length,
       totalRevenue: 0,
       topProducts: [],
@@ -20,11 +25,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const counts: Record<string, number> = {};
     orders.forEach((o) => {
       summary.totalRevenue += o.total || 0;
-      o.items
-        .filter((i) => i.VENDOR === vendor)
-        .forEach((i) => {
-          counts[i.ID] = (counts[i.ID] || 0) + i.qty;
-        });
+      if (o.product.vendor.brandName === vendor) {
+        counts[o.product.id] = (counts[o.product.id] || 0) + o.quantity;
+      }
     });
     summary.topProducts = Object.entries(counts)
       .sort((a, b) => (b[1] as number) - (a[1] as number))

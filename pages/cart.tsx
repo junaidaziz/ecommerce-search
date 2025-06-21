@@ -1,13 +1,36 @@
 import { useContext } from 'react';
 import { useRouter } from 'next/router';
-import { AppContext } from '../contexts/AppContext';
+import { AppContext, AppContextValue } from '../contexts/AppContext';
 
-export default function Cart() {
+// Define the type for a cart item
+type CartItem = {
+  id: string | number;
+  title: string;
+  minPrice?: string;
+  qty: number;
+};
+
+
+const Cart: React.FC = () => {
   const router = useRouter();
-  const { cart, changeQty, removeFromCart } = useContext(AppContext)!;
+  const context = useContext(AppContext);
+
+  if (!context) {
+    throw new Error('AppContext is undefined. Make sure your component is wrapped in an AppContext.Provider.');
+  }
+
+  const { cart, changeQty, removeFromCart } = context;
+
   const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
   const totalPrice = cart.reduce(
-    (sum, item) => sum + item.qty * parseFloat(item.MIN_PRICE || 0),
+    (sum, item) =>
+      sum +
+      item.qty *
+        parseFloat(
+          typeof item.minPrice === 'number'
+            ? item.minPrice.toString()
+            : item.minPrice || '0'
+        ),
     0
   );
 
@@ -17,35 +40,39 @@ export default function Cart() {
       {cart.length === 0 && <p>Your cart is empty.</p>}
       <ul className="space-y-2 mb-4">
         {cart.map((item) => {
-          const price = parseFloat(item.MIN_PRICE || 0);
+          const price = parseFloat(
+            typeof item.minPrice === 'number'
+              ? item.minPrice.toString()
+              : item.minPrice || '0'
+          );
           const subtotal = price * item.qty;
           return (
             <li
-              key={item.ID}
+              key={item.id}
               className="border p-2 flex justify-between items-center"
             >
               <div>
-                <p className="font-medium">{item.TITLE}</p>
+                <p className="font-medium">{item.title}</p>
                 <p className="text-sm">£{price.toFixed(2)} each</p>
               </div>
               <div className="flex items-center space-x-2">
                 <button
                   className="btn btn-xs"
-                  onClick={() => changeQty(item.ID, -1)}
+                  onClick={() => changeQty(item.id, -1)}
                 >
                   -
                 </button>
                 <span>{item.qty}</span>
                 <button
                   className="btn btn-xs"
-                  onClick={() => changeQty(item.ID, 1)}
+                  onClick={() => changeQty(item.id, 1)}
                 >
                   +
                 </button>
                 <span className="ml-2">£{subtotal.toFixed(2)}</span>
                 <button
                   className="btn btn-xs btn-error"
-                  onClick={() => removeFromCart(item.ID)}
+                  onClick={() => removeFromCart(item.id)}
                 >
                   Remove
                 </button>
@@ -72,4 +99,6 @@ export default function Cart() {
       )}
     </div>
   );
-}
+};
+
+export default Cart;

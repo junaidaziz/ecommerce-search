@@ -7,24 +7,30 @@ import {
 } from '../../lib/orders';
 import { findUser } from '../../lib/users';
 import {
-  getProductById,
+  getProductByUuid,
   decreaseProductQuantity,
   clearCart,
 } from '../../lib/db';
 import { withRole } from '../../lib/withRole';
 import { sendOrderConfirmation } from '../../lib/email';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from './auth/[...nextauth]';
+import type { Order, OrderPlacedResponse, ApiMessage } from '../../types';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Order[] | OrderPlacedResponse | ApiMessage>
+): Promise<void> {
   try {
     if (req.method === 'POST') {
-      const { email, items, total, shippingName, shippingAddress } = req.body;
+      const { email, items, total } = req.body;
     if (!email || !items) {
       return res.status(400).json({ message: 'email and items required' });
     }
 
     for (const item of items) {
-      const product = await getProductById(String(item.ID));
+      const product = await getProductByUuid(String(item.uuid || item.id));
       if (!product) {
         return res.status(404).json({ message: 'Product not found' });
       }
@@ -36,24 +42,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     for (const item of items) {
-      await decreaseProductQuantity(String(item.ID), item.qty);
+      await decreaseProductQuantity(String(item.uuid || item.id), item.qty);
     }
 
-    const orderId = await addOrder({
-      user_email: email,
-      items,
-      total: total || 0,
-      shipping_name: shippingName,
-      shipping_address: shippingAddress,
-    });
+      const orderId = await addOrder({
+        userEmail: email,
+        items,
+        total: total || 0,
+      });
     await clearCart(email);
     await sendOrderConfirmation(email, { id: orderId });
     return res.status(201).json({ message: 'order placed', id: orderId });
   }
 
   if (req.method === 'GET') {
-    const { email } = req.query;
-    if (!email) return res.status(400).json({ message: 'email required' });
+    const session = await getServerSession(req, res, authOptions);
+    const email = session?.user?.email;
+    if (!email) return res.status(401).json({ message: 'Unauthorized' });
     const user = await findUser(email);
     if (!user) return res.status(404).json({ message: 'user not found' });
     if (user.role === 'SUPER_ADMIN') {

@@ -1,22 +1,21 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
-import Image from 'next/image';
 import { AppContext } from '../../contexts/AppContext';
+import { Category, CategoryInput, ApiMessage } from '../../types';
+import { fetchJson } from '../../lib/utils/fetchJson';
+import { TextInput } from '../../components/form-fields';
 
 export default function Categories() {
   const { user } = useContext(AppContext)!;
-  const [categories, setCategories] = useState([]);
-  const [newCat, setNewCat] = useState('');
-  const [newParent, setNewParent] = useState('');
-  const [newImage, setNewImage] = useState('');
-  const [message, setMessage] = useState('');
-  const [editing, setEditing] = useState(null);
-  const [editName, setEditName] = useState('');
-  const [editImage, setEditImage] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [newCat, setNewCat] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editName, setEditName] = useState<string>('');
 
   const load = useCallback(async () => {
     if (!user) return;
-    const res = await fetch('/api/admin/categories');
-    if (res.ok) setCategories(await res.json());
+    const data = await fetchJson<Category[]>('/api/admin/categories');
+    setCategories(data);
   }, [user]);
 
   useEffect(() => {
@@ -25,42 +24,41 @@ export default function Categories() {
 
   const add = async () => {
     if (!newCat.trim()) return;
-    const res = await fetch('/api/admin/categories', {
+    const payload: CategoryInput = {
+      name: newCat,
+    };
+    await fetchJson<ApiMessage>('/api/admin/categories', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newCat, parentId: newParent || null, image: newImage || null }),
+      body: JSON.stringify(payload),
     });
-    if (res.ok) {
-      setNewCat('');
-      setNewImage('');
-      setMessage('Category added');
-      load();
-    }
+    setNewCat('');
+    setMessage('Category added');
+    load();
   };
 
   const update = async () => {
-    const res = await fetch('/api/admin/categories', {
+    const payload: CategoryInput & { uuid: string } = {
+      uuid: editing as string,
+      name: editName,
+    };
+    await fetchJson<ApiMessage>('/api/admin/categories', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: editing, name: editName, image: editImage || null }),
+      body: JSON.stringify(payload),
     });
-    if (res.ok) {
-      setEditing(null);
-      setEditName('');
-      setEditImage('');
-      setMessage('Category updated');
-      load();
-    }
+    setEditing(null);
+    setEditName('');
+    setMessage('Category updated');
+    load();
   };
 
-  const remove = async (id) => {
-    const res = await fetch(`/api/admin/categories?id=${id}`, {
+  const remove = async (id: number) => {
+    await fetchJson<ApiMessage>(`/api/admin/categories?id=${id}`, {
       method: 'DELETE',
     });
-    if (res.ok) {
-      setMessage('Category deleted');
-      load();
-    }
+    setMessage('Category deleted');
+    load();
   };
 
   if (!user)
@@ -73,77 +71,51 @@ export default function Categories() {
       <h1 className="text-2xl font-bold mb-4">Categories</h1>
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <div className="flex gap-2 mb-4">
-        <input
+        <TextInput
+          label=""
+          name="new-category"
           value={newCat}
-          onChange={(e) => setNewCat(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewCat(e.target.value)}
+          onBlur={() => {}}
+          error={undefined}
           placeholder="New category"
-          className="input input-bordered flex-1"
+          className="flex-1"
+          leftAddon={undefined}
+          rightAddon={undefined}
+          register={undefined}
+          rules={undefined}
         />
-        <input
-          value={newImage}
-          onChange={(e) => setNewImage(e.target.value)}
-          placeholder="Image URL (optional)"
-          className="input input-bordered flex-1"
-        />
-        <select
-          className="select select-bordered"
-          value={newParent}
-          onChange={(e) => setNewParent(e.target.value)}
-        >
-          <option value="">No parent</option>
-          {categories
-            .filter((c) => !c.parentId)
-            .map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-        </select>
         <button onClick={add} className="btn btn-primary">
           Add
         </button>
       </div>
       <ul className="space-y-2">
-        {buildTree(categories).map((c) => (
+        {categories.map((c) => (
           <CategoryItem key={c.id} cat={c} />
         ))}
       </ul>
     </div>
   );
 
-  function buildTree(list) {
-    const map = {};
-    list.forEach((c) => {
-      map[c.id] = { ...c, children: [] };
-    });
-    const tree = [];
-    list.forEach((c) => {
-      if (c.parentId) {
-        map[c.parentId]?.children.push(map[c.id]);
-      } else {
-        tree.push(map[c.id]);
-      }
-    });
-    return tree;
-  }
-
-  function CategoryItem({ cat }) {
-    const hasChildren = cat.children && cat.children.length > 0;
+  function CategoryItem({ cat }: { cat: Category }) {
     return (
-      <li className={cat.parentId ? 'ml-4' : ''}>
+      <li>
         <div className="flex items-center gap-2">
           {editing === cat.id ? (
             <>
-              <input
-                className="input input-bordered flex-1"
+              <TextInput
+                className="flex-1"
+                label=""
+                name="edit-category"
+                placeholder="Edit category"
                 value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-              />
-              <input
-                className="input input-bordered flex-1"
-                value={editImage}
-                onChange={(e) => setEditImage(e.target.value)}
-                placeholder="Image URL (optional)"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditName(e.target.value)}
+                onBlur={() => {}}
+                error={undefined}
+                leftAddon={undefined}
+                rightAddon={undefined}
+                register={undefined}
+                rules={undefined}
               />
               <button onClick={update} className="btn btn-sm">
                 Save
@@ -154,23 +126,11 @@ export default function Categories() {
             </>
           ) : (
             <>
-              <span className="flex-1 flex items-center gap-2">
-                {cat.image && (
-                  <Image
-                    src={cat.image}
-                    alt=""
-                    width={24}
-                    height={24}
-                    className="w-6 h-6 object-cover"
-                  />
-                )}
-                {cat.name}
-              </span>
+              <span className="flex-1">{cat.name}</span>
               <button
                 onClick={() => {
-                  setEditing(cat.id);
+                  setEditing(cat.uuid ?? null);
                   setEditName(cat.name);
-                  setEditImage(cat.image || '');
                 }}
                 className="btn btn-sm"
               >
@@ -182,13 +142,6 @@ export default function Categories() {
             </>
           )}
         </div>
-        {hasChildren && (
-          <ul className="ml-4 space-y-2">
-            {cat.children.map((child) => (
-              <CategoryItem key={child.id} cat={child} />
-            ))}
-          </ul>
-        )}
       </li>
     );
   }

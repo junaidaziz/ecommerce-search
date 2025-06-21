@@ -1,33 +1,41 @@
 import React from 'react';
-import { UseFormRegister, RegisterOptions } from 'react-hook-form';
+import {
+  UseFormRegister,
+  RegisterOptions,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 
-export interface FileUploadProps
+export interface FileUploadProps<T extends FieldValues>
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  name: string;
+  name: Path<T>;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   error?: string;
   required?: boolean;
   disabled?: boolean;
   className?: string;
-  register?: UseFormRegister<any>;
-  rules?: RegisterOptions;
+  register?: UseFormRegister<T>;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({
-  label,
-  name,
-  onChange,
-  onBlur,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  register,
-  rules,
-  ...rest
-}) => {
+const FileUpload = <T extends FieldValues>(
+  props: FileUploadProps<T>
+) => {
+  const {
+    label,
+    name,
+    onChange,
+    onBlur,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    register,
+    rules,
+    ...rest
+  } = props;
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
 

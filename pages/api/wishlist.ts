@@ -3,8 +3,12 @@ import { getWishlist, setWishlist } from '../../lib/db';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import type { Product, ApiMessage } from '../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Product[] | ApiMessage>
+): Promise<void> {
   try {
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user) {
@@ -16,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json(items);
     }
     if (req.method === 'POST') {
-      const { items } = req.body || {};
+      const { items } = req.body as { items?: Product[] } || {};
       if (!Array.isArray(items)) {
         return res.status(400).json({ message: 'items required' });
       }

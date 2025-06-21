@@ -1,5 +1,11 @@
 import React from 'react';
-import { Control, Controller, RegisterOptions } from 'react-hook-form';
+import {
+  Control,
+  Controller,
+  RegisterOptions,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 import Select from 'react-select';
 
 export interface SelectOption {
@@ -7,9 +13,9 @@ export interface SelectOption {
   value: string;
 }
 
-export interface SelectDropdownProps {
+export interface SelectDropdownProps<T extends FieldValues> {
   label?: string;
-  name: string;
+  name: Path<T>;
   value?: SelectOption | SelectOption[] | null;
   onChange?: (option: SelectOption | SelectOption[] | null) => void;
   options: SelectOption[];
@@ -21,30 +27,33 @@ export interface SelectDropdownProps {
   className?: string;
   icon?: React.ReactNode;
   components?: any;
-  control?: Control<any>;
-  rules?: RegisterOptions;
+  control?: Control<T>;
+  rules?: RegisterOptions<T, Path<T>>;
   [key: string]: unknown;
 }
 
-const SelectDropdown: React.FC<SelectDropdownProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  options,
-  placeholder,
-  isSearchable = true,
-  isDisabled = false,
-  isMulti = false,
-  error,
-  className = '',
-  icon,
-  components: selectComponents,
-  control,
-  rules,
-  ...rest
-}) => {
-  const inputId = rest.id || name;
+const SelectDropdown = <T extends FieldValues>(
+  props: SelectDropdownProps<T>
+) => {
+  const {
+    label,
+    name,
+    value,
+    onChange,
+    options,
+    placeholder,
+    isSearchable = true,
+    isDisabled = false,
+    isMulti = false,
+    error,
+    className = '',
+    icon,
+    components: selectComponents,
+    control,
+    rules,
+    ...rest
+  } = props;
+  const inputId: string = typeof rest.id === 'string' ? rest.id : String(name);
 
   return (
     <div className="mb-4 w-full">
@@ -96,7 +105,16 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
             inputId={inputId}
             name={name}
             value={value as any}
-            onChange={(val) => onChange?.(val)}
+            onChange={(val) => {
+              if (Array.isArray(val)) {
+                // Cast readonly array to mutable array
+                onChange?.([...val]);
+              } else if (val === null) {
+                onChange?.(null);
+              } else {
+                onChange?.(val as SelectOption);
+              }
+            }}
             options={options}
             placeholder={placeholder}
             isSearchable={isSearchable}

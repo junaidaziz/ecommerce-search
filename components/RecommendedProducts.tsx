@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
 import { Product } from '../types/product';
+import type { SearchResults } from '../types/api';
 
 interface RecommendedProductsProps {
   category?: string;
@@ -8,16 +9,20 @@ interface RecommendedProductsProps {
   title?: string;
 }
 
-export default function RecommendedProducts({ category, excludeId, title = 'You may also like' }: RecommendedProductsProps) {
+const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
+  category,
+  excludeId,
+  title = 'You may also like',
+}) => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     if (!category) return;
     fetch(`/api/search?category=${encodeURIComponent(category)}&perPage=4`)
-      .then((res) => (res.ok ? res.json() : null))
+      .then((res) => (res.ok ? (res.json() as Promise<SearchResults>) : null))
       .then((data) => {
         if (data && Array.isArray(data.results)) {
-          const filtered = data.results.filter((p: Product) => p.ID !== excludeId);
+          const filtered = data.results.filter((p) => p.id !== excludeId);
           setProducts(filtered);
         }
       })
@@ -31,9 +36,11 @@ export default function RecommendedProducts({ category, excludeId, title = 'You 
       <h3 className="font-semibold mb-4">{title}</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
         {products.map((p) => (
-          <ProductCard key={p.ID} product={p} />
+          <ProductCard key={p.id} product={p} />
         ))}
       </div>
     </div>
   );
-}
+};
+
+export default RecommendedProducts;

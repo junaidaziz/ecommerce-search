@@ -3,8 +3,12 @@ import { addUser, findUser } from '../../lib/users';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import type { SignupResponse, ApiMessage } from '../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<SignupResponse | ApiMessage>
+): Promise<void> {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
@@ -22,12 +26,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await addUser({
       email,
       password: hashed,
-      first_name: firstName,
-      last_name: lastName,
-      brand_name: brandName,
+      firstName,
+      lastName,
+      brandName,
       gender,
       role: role || 'USER',
-      verification_token: token,
+      verificationToken: token,
     });
     return res.status(201).json({
       message: 'User created',

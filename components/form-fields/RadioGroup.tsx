@@ -1,14 +1,19 @@
 import React from 'react';
-import { UseFormRegister, RegisterOptions } from 'react-hook-form';
+import {
+  UseFormRegister,
+  RegisterOptions,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 
 export interface RadioOption {
   label: string;
   value: string;
 }
 
-export interface RadioGroupProps {
+export interface RadioGroupProps<T extends FieldValues> {
   label?: string;
-  name: string;
+  name: Path<T>;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
@@ -17,24 +22,27 @@ export interface RadioGroupProps {
   required?: boolean;
   disabled?: boolean;
   className?: string;
-  register?: UseFormRegister<any>;
-  rules?: RegisterOptions;
+  register?: UseFormRegister<T>;
+  rules?: RegisterOptions<T, Path<T>>;
 }
 
-const RadioGroup: React.FC<RadioGroupProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  onBlur,
-  options,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-  register,
-  rules,
-}) => {
+const RadioGroup = <T extends FieldValues>(
+  props: RadioGroupProps<T>
+) => {
+  const {
+    label,
+    name,
+    value,
+    onChange,
+    onBlur,
+    options,
+    error,
+    required = false,
+    disabled = false,
+    className = '',
+    register,
+    rules,
+  } = props;
   const groupName = name;
   const registration = register ? register(name, rules) : {};
 
