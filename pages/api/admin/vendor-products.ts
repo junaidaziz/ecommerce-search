@@ -18,15 +18,15 @@ async function handler(
       return res.status(200).json(list as PendingProduct[]);
     }
     if (req.method === 'PUT') {
-      const { id, action } = req.body as { id?: string; action?: string };
-      if (!id || !action)
-        return res.status(400).json({ message: 'id and action required' });
+      const { uuid, action } = req.body as { uuid?: string; action?: string };
+      if (!uuid || !action)
+        return res.status(400).json({ message: 'uuid and action required' });
       if (action === 'approve') {
-        await approveProduct(id);
+        await approveProduct(uuid);
         return res.status(200).json({ message: 'approved' });
       }
       if (action === 'reject') {
-        await rejectProduct(id);
+        await rejectProduct(uuid);
         return res.status(200).json({ message: 'rejected' });
       }
       return res.status(400).json({ message: 'invalid action' });
