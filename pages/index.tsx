@@ -80,14 +80,14 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
   }, [router.query.type]);
 
   useEffect(() => {
-    const catParam = router.query.category;
+    const catParam = router.query.filterByCategory;
     if (catParam) {
       const c = Array.isArray(catParam) ? catParam[0] : (catParam as string);
       setFilterByCategory(c);
     } else {
       setFilterByCategory('All');
     }
-  }, [router.query.category]);
+  }, [router.query.filterByCategory]);
 
   useEffect(() => {
     async function loadCats() {
@@ -147,7 +147,7 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
       if (filterByVendor && filterByVendor !== 'All')
         params.append('brand', filterByVendor);
       if (filterByCategory && filterByCategory !== 'All')
-        params.append('category', filterByCategory);
+        params.append('filterByCategory', filterByCategory);
       if (filterByType && filterByType !== 'All')
         params.append('filterByType', filterByType);
       if (inStock) params.append('inStock', 'true');

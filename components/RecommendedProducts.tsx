@@ -18,7 +18,9 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
 
   useEffect(() => {
     if (!category) return;
-    fetch(`/api/search?category=${encodeURIComponent(category)}&perPage=4`)
+    fetch(
+      `/api/search?filterByCategory=${encodeURIComponent(category)}&perPage=4`
+    )
       .then((res) => (res.ok ? (res.json() as Promise<SearchResults>) : null))
       .then((data) => {
         if (data && Array.isArray(data.results)) {
