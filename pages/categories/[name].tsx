@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import ProductCard from '../../components/ProductCard';
 import Head from 'next/head';
 import React from 'react';
@@ -12,7 +11,6 @@ const CategoryPage: React.FC = () => {
   const { name, type } = router.query;
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [catImage, setCatImage] = useState<string>('');
 
   useEffect(() => {
     if (!name || Array.isArray(name)) return;
@@ -28,20 +26,7 @@ const CategoryPage: React.FC = () => {
       }
       setLoading(false);
     }
-    async function loadCat() {
-      const res = await fetch('/api/categories');
-      if (res.ok) {
-        const cats: Category[] = await res.json();
-        const found = typeof name === 'string'
-          ? cats.find(
-              (c) => c.name.toLowerCase() === name.toLowerCase()
-            )
-          : undefined;
-        if (found && found.image) setCatImage(found.image);
-      }
-    }
     load();
-    loadCat();
   }, [name, type]);
 
   if (!name || Array.isArray(name)) return <div className="p-4">Loading...</div>;
@@ -62,18 +47,9 @@ const CategoryPage: React.FC = () => {
           }}
         />
       </Head>
-      <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
-        <Image
-          src={catImage || '/placeholder.png'}
-          alt=""
-          width={32}
-          height={32}
-          className="w-8 h-8 object-cover"
-        />
-        <span>
-          Category: {name}
-          {type && typeof type === 'string' && ` - ${type}`}
-        </span>
+      <h1 className="text-2xl font-bold mb-4">
+        Category: {name}
+        {type && typeof type === 'string' && ` - ${type}`}
       </h1>
       {loading && <div>Loading...</div>}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
