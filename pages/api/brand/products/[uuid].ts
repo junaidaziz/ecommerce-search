@@ -14,6 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!existing) return res.status(404).json({ message: 'Not found' });
       const {
         title,
+        sku,
         vendor,
         description,
         product_type,
@@ -26,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } = req.body || {};
     await updateProduct({
       id: String(uuid),
+      sku: sku ?? existing.sku,
       title: title ?? existing.title,
       vendor: vendor ?? existing.vendor,
       description: description ?? existing.description,

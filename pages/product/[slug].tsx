@@ -91,6 +91,7 @@ export default function ProductDetail({
         <div className="md:w-1/2">
           <h1 className="text-2xl font-bold mb-4">{product.title}</h1>
           <p className="mb-2">Vendor: {product.vendor}</p>
+          <p className="mb-2">SKU: {product.sku}</p>
           <p className="mb-2">Type: {product.productType}</p>
           <p className="mb-4">
             {product.descriptionText || product.bodyHtmlText || 'No description available.'}
