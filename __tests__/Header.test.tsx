@@ -3,8 +3,9 @@ import { render, screen } from '@testing-library/react';
 import Header from '../components/Header';
 import { AppContext } from '../contexts/AppContext';
 
+let mockPathname = '/';
 jest.mock('next/router', () => ({
-  useRouter: () => ({ push: jest.fn() }),
+  useRouter: () => ({ push: jest.fn(), pathname: mockPathname }),
 }));
 
 const mockUseSession = jest.fn();
@@ -22,6 +23,7 @@ jest.mock('next/link', () => ({
 beforeEach(() => {
   mockUseSession.mockReset();
   mockUseSession.mockReturnValue({ data: null });
+  mockPathname = '/';
   global.fetch = jest.fn(() =>
     Promise.resolve({ ok: true, json: () => Promise.resolve([]) })
   );
@@ -87,4 +89,10 @@ test('shows fallback when no categories are available', async () => {
   button.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
   expect(await screen.findByText('No categories found')).toBeInTheDocument();
   global.fetch.mockRestore();
+});
+
+test('hides search on auth pages', () => {
+  mockPathname = '/login';
+  renderWithContext(<Header theme="light" setTheme={() => {}} />);
+  expect(screen.queryByPlaceholderText(/search for products/i)).toBeNull();
 });
