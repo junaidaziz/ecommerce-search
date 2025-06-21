@@ -1,7 +1,10 @@
 export interface User {
+  id?: string | number;
   email: string;
   firstName?: string;
   lastName?: string;
+  name?: string | null;
+  image?: string | null;
   brandName?: string;
   gender?: string;
   role?: string;

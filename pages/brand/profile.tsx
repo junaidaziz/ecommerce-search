@@ -1,17 +1,6 @@
 import React, { useContext, useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { AppContext } from '../../contexts/AppContext';
-
-interface User {
-  brandName?: string;
-  phoneNumber?: string;
-  businessAddress?: string;
-  city?: string;
-  country?: string;
-  website?: string;
-  businessDescription?: string;
-  taxId?: string;
-  role?: string;
-}
+import type { User } from '../../types/user';
 
 export const BrandProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };

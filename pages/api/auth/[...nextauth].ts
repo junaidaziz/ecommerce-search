@@ -1,31 +1,22 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import NextAuth, { AuthOptions, User as NextAuthUser } from 'next-auth';
+import NextAuth, { AuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { findUser, addUser } from '../../../lib/users';
+import type { User as AppUser } from '../../../types/user';
 
 // Extend the User type to include 'role'
 declare module 'next-auth' {
-  interface User {
-    role?: string;
-    disabled?: boolean;
-  }
+  interface User extends AppUser {}
   interface Session {
-    user?: {
-      role?: string;
-      disabled?: boolean;
-      [key: string]: any;
-    };
+    user?: AppUser & { [key: string]: any };
   }
 }
 
 declare module 'next-auth/jwt' {
-  interface JWT {
-    role?: string;
-    [key: string]: any;
-  }
+  interface JWT extends AppUser {}
 }
 
 if (!process.env.NEXTAUTH_SECRET) {
