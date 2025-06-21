@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { useRouter } from 'next/router';
 import { AppContext } from '../../contexts/AppContext';
 import type { User } from '../../types/user';
 import Head from 'next/head';
@@ -7,7 +8,11 @@ import { getPageTitle } from '../../lib/pageTitle';
 
 export const UserProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
+  const router = useRouter();
+  const showComplete = router.query.complete === '1';
   type ProfileForm = {
+    lastName: string;
+    gender: string;
     phoneNumber: string;
     address: string;
     city: string;
@@ -20,6 +25,8 @@ export const UserProfile: React.FC = () => {
     formState: { errors },
   } = useForm<ProfileForm>({
     defaultValues: {
+      lastName: '',
+      gender: 'other',
       phoneNumber: '',
       address: '',
       city: '',
@@ -31,6 +38,8 @@ export const UserProfile: React.FC = () => {
   useEffect(() => {
     if (user) {
       reset({
+        lastName: user.lastName || '',
+        gender: user.gender || 'other',
         phoneNumber: user.phoneNumber || '',
         address: user.address || '',
         city: user.city || '',
@@ -60,8 +69,24 @@ export const UserProfile: React.FC = () => {
         <title>{getPageTitle('My Profile')}</title>
       </Head>
       <h1 className="text-2xl font-bold mb-4">My Profile</h1>
+      {showComplete && (
+        <div className="alert alert-info mb-2">Please complete your profile.</div>
+      )}
       {message && <div className="mb-2 text-green-600">{message}</div>}
       <form onSubmit={handleSubmit(submit)} className="space-y-2">
+        <input
+          className="input input-bordered w-full"
+          placeholder="Last Name"
+          {...register('lastName')}
+        />
+        <select
+          className="select select-bordered w-full"
+          {...register('gender')}
+        >
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
         <input
           className="input input-bordered w-full"
           placeholder="Phone Number"
