@@ -3,8 +3,12 @@ import { getOrderByUuid, updateOrderStatus } from '../../../lib/orders';
 import { sendOrderStatusUpdate } from '../../../lib/email';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import type { Order, ApiMessage } from '../../../types';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Order | ApiMessage>
+): Promise<void> {
   try {
     const { uuid } = req.query;
     if (!uuid) {

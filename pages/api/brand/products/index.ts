@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { addProduct, loadAndIndexProducts } from '../../../../lib/products';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
+import type { Product, ApiMessage } from '../../../../types';
 
 function slugify(text) {
   return text
@@ -11,7 +12,10 @@ function slugify(text) {
     .replace(/-+/g, '-');
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Product[] | ApiMessage>
+): Promise<void> {
   try {
     if (req.method === 'GET') {
       const { vendor } = req.query;

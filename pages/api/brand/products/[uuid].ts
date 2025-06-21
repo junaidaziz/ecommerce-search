@@ -3,8 +3,12 @@ import { updateProduct, deleteProduct, loadAndIndexProducts } from '../../../../
 import { getProductByUuid } from '../../../../lib/db';
 import { hasOrdersForProduct } from '../../../../lib/orders';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
+import type { ApiMessage } from '../../../../types';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ApiMessage>
+): Promise<void> {
   try {
     const { uuid } = req.query;
     if (!uuid) return res.status(400).json({ message: 'uuid required' });

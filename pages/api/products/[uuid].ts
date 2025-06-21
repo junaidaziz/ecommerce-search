@@ -3,6 +3,7 @@ import { getProductByUuid, getAverageRating } from '../../../lib/db.js';
 import { mapDbRowToProduct } from '../../../lib/products.js';
 import { Product } from '../../../types/product';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import type { ApiMessage } from '../../../types';
 
 export type ProductResponse = Product & {
   AVERAGE_RATING: number;
@@ -11,8 +12,8 @@ export type ProductResponse = Product & {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ProductResponse | { message: string }>
-) {
+  res: NextApiResponse<ProductResponse | ApiMessage>
+): Promise<void> {
   const { uuid } = req.query;
   if (!uuid) {
     return res.status(400).json({ message: 'uuid required' });

@@ -3,12 +3,12 @@ import { getWishlist, setWishlist } from '../../lib/db';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import { handleApiError } from '../../lib/utils/handleApiError';
-import type { Product } from '../../types';
+import type { Product, ApiMessage } from '../../types';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Product[] | { message: string }>
-) {
+  res: NextApiResponse<Product[] | ApiMessage>
+): Promise<void> {
   try {
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user) {
