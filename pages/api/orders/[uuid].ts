@@ -3,6 +3,7 @@ import { getOrderByUuid, updateOrderStatus } from '../../../lib/orders';
 import { sendOrderStatusUpdate } from '../../../lib/email';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import type { Order, ApiMessage } from '../../../types';
 
 async function handler(
@@ -10,7 +11,7 @@ async function handler(
   res: NextApiResponse<Order | ApiMessage>
 ): Promise<void> {
   try {
-    const { uuid } = req.query;
+    const uuid = getQueryParam(req.query.uuid);
     if (!uuid) {
       return res.status(400).json({ message: 'uuid required' });
     }

@@ -14,6 +14,7 @@ import {
 import { withRole } from '../../lib/withRole';
 import { sendOrderConfirmation } from '../../lib/email';
 import { handleApiError } from '../../lib/utils/handleApiError';
+import { getQueryParam } from '../../lib/utils/getQueryParam';
 import type { Order, OrderPlacedResponse, ApiMessage } from '../../types';
 
 async function handler(
@@ -55,7 +56,7 @@ async function handler(
   }
 
   if (req.method === 'GET') {
-    const { email } = req.query;
+    const email = getQueryParam(req.query.email);
     if (!email) return res.status(400).json({ message: 'email required' });
     const user = await findUser(email);
     if (!user) return res.status(404).json({ message: 'user not found' });
