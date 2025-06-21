@@ -10,8 +10,18 @@ erDiagram
       STRING lastName
       STRING brandName
       STRING gender
+      STRING phoneNumber
+      STRING address
+      STRING city
+      STRING country
+      STRING businessAddress
+      STRING website
+      STRING businessDescription
+      STRING logo
+      STRING taxId
       STRING role
       BOOLEAN verified
+      BOOLEAN disabled
       STRING verificationToken
       STRING resetToken
       DATETIME resetExpires
@@ -27,6 +37,7 @@ erDiagram
     }
     Product {
       INT id PK
+      STRING slug
       STRING title
       STRING description
       STRING productType
@@ -61,11 +72,23 @@ erDiagram
       DATETIME createdAt
       DATETIME updatedAt
     }
+    SearchLog {
+      INT id PK
+      INT userId FK
+      STRING query
+      DATETIME createdAt
+    }
 
     User ||--o{ Product : "has"
     User ||--o{ Order : "places"
+    User ||--o{ DeletionRequest : "requests"
+    User ||--o{ SearchLog : "logs"
     Category ||--o{ Product : "contains"
     Category ||--o{ DeletionRequest : "records"
     Product }o--o{ Order : "ordered in"
-    User ||--o{ DeletionRequest : "requests"
+    Product }o--|| User : "belongs to"
+    Order }o--|| User : "ordered by"
+    DeletionRequest }o--|| User : "belongs to"
+    DeletionRequest }o--|| Category : "about"
+    SearchLog }o--|| User : "by"
 ```
