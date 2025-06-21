@@ -8,6 +8,8 @@ import React, {
 import { AppContext } from '../../contexts/AppContext';
 import type { User, Vendor } from '../../types';
 import { TextInput, Textarea } from '../../components/form-fields';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 export const BrandProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
@@ -84,6 +86,9 @@ export const BrandProfile: React.FC = () => {
 
   return (
     <div className="max-w-sm mx-auto">
+      <Head>
+        <title>{getPageTitle('Brand Profile')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">Brand Profile</h1>
       {message && <div className="mb-2 text-green-600">{message}</div>}
       <form onSubmit={submit} className="space-y-2">

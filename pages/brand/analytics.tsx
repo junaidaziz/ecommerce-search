@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 type TopProduct = {
   id: string;
@@ -31,6 +33,9 @@ const BrandAnalytics: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
+      <Head>
+        <title>{getPageTitle('Brand Analytics')}</title>
+      </Head>
       <h1 className="text-2xl font-bold mb-4">Sales Summary</h1>
       <p>Total Orders: {data.totalOrders}</p>
       <p>Total Revenue: £{data.totalRevenue.toFixed(2)}</p>

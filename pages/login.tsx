@@ -5,6 +5,8 @@ import type { AppContextValue } from '../contexts/AppContext';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import Head from 'next/head';
+import { getPageTitle } from '../lib/pageTitle';
 import {
   EmailInput,
   PasswordInput,
@@ -60,9 +62,12 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8 overflow-hidden">
-      <div className="max-w-sm mx-auto border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full space-y-4">
-        <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+      <Head>
+        <title>{getPageTitle('Login')}</title>
+      </Head>
+      <div className="max-w-md mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full space-y-4">
+        <h1 className="text-2xl font-bold mb-4">Login</h1>
         <button
           type="button"
           className="btn w-full mb-2 hover:bg-red-600 hover:text-white flex items-center justify-center gap-2"

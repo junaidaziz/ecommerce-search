@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import Head from 'next/head';
+import { getPageTitle } from '../../lib/pageTitle';
 
 export default function Confirm() {
   const router = useRouter();
@@ -17,5 +19,12 @@ export default function Confirm() {
     }
     verify();
   }, [token]);
-  return <div className="p-4">{message || 'Verifying...'}</div>;
+  return (
+    <div className="p-4">
+      <Head>
+        <title>{getPageTitle('Email Confirmation')}</title>
+      </Head>
+      {message || 'Verifying...'}
+    </div>
+  );
 }
