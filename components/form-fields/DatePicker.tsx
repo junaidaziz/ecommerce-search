@@ -1,10 +1,15 @@
 import React from 'react';
-import { UseFormRegister, RegisterOptions } from 'react-hook-form';
+import {
+  UseFormRegister,
+  RegisterOptions,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 
-export interface DatePickerProps
+export interface DatePickerProps<T extends FieldValues>
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  name: string;
+  name: Path<T>;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
@@ -12,11 +17,11 @@ export interface DatePickerProps
   required?: boolean;
   disabled?: boolean;
   className?: string;
-  register?: UseFormRegister<any>;
+  register?: UseFormRegister<T>;
   rules?: RegisterOptions;
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({
+const DatePicker = <T extends FieldValues>({
   label,
   name,
   value,

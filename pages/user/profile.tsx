@@ -1,31 +1,48 @@
-import React, { useContext, useState, useEffect, FormEvent } from 'react';
+import React, { useContext, useEffect } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { AppContext } from '../../contexts/AppContext';
 import type { User } from '../../types/user';
 
 export const UserProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
-  const [phoneNumber, setPhoneNumber] = useState<string>(user?.phoneNumber || '');
-  const [address, setAddress] = useState<string>(user?.address || '');
-  const [city, setCity] = useState<string>(user?.city || '');
-  const [country, setCountry] = useState<string>(user?.country || '');
-  const [message, setMessage] = useState<string>('');
+  type ProfileForm = {
+    phoneNumber: string;
+    address: string;
+    city: string;
+    country: string;
+  };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ProfileForm>({
+    defaultValues: {
+      phoneNumber: '',
+      address: '',
+      city: '',
+      country: '',
+    },
+  });
+  const [message, setMessage] = React.useState<string>('');
 
   useEffect(() => {
     if (user) {
-      setPhoneNumber(user.phoneNumber || '');
-      setAddress(user.address || '');
-      setCity(user.city || '');
-      setCountry(user.country || '');
+      reset({
+        phoneNumber: user.phoneNumber || '',
+        address: user.address || '',
+        city: user.city || '',
+        country: user.country || '',
+      });
     }
-  }, [user]);
+  }, [user, reset]);
 
-  const submit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const submit: SubmitHandler<ProfileForm> = async (data) => {
     setMessage('');
     const res = await fetch('/api/user/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phoneNumber, address, city, country }),
+      body: JSON.stringify(data),
     });
     if (res.ok) setMessage('Profile updated');
     else setMessage('Update failed');
@@ -39,30 +56,26 @@ export const UserProfile: React.FC = () => {
     <div className="max-w-sm mx-auto">
       <h1 className="text-2xl font-bold mb-4">My Profile</h1>
       {message && <div className="mb-2 text-green-600">{message}</div>}
-      <form onSubmit={submit} className="space-y-2">
+      <form onSubmit={handleSubmit(submit)} className="space-y-2">
         <input
           className="input input-bordered w-full"
-          value={phoneNumber}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhoneNumber(e.target.value)}
           placeholder="Phone Number"
+          {...register('phoneNumber')}
         />
         <input
           className="input input-bordered w-full"
-          value={address}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)}
           placeholder="Address"
+          {...register('address')}
         />
         <input
           className="input input-bordered w-full"
-          value={city}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCity(e.target.value)}
           placeholder="City"
+          {...register('city')}
         />
         <input
           className="input input-bordered w-full"
-          value={country}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCountry(e.target.value)}
           placeholder="Country"
+          {...register('country')}
         />
         <button className="btn btn-primary w-full" type="submit">
           Update

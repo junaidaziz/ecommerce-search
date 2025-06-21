@@ -1,14 +1,15 @@
 import { useRouter } from 'next/router';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 
 const ResetToken: React.FC = () => {
   const router = useRouter();
   const { token } = router.query as { token?: string };
-  const [password, setPassword] = useState<string>('');
+  type ResetForm = { password: string };
+  const { register, handleSubmit } = useForm<ResetForm>();
   const [message, setMessage] = useState<string>('');
 
-  const submit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const submit: SubmitHandler<ResetForm> = async ({ password }) => {
     const res = await fetch('/api/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -24,13 +25,12 @@ const ResetToken: React.FC = () => {
   return (
     <div className="max-w-sm mx-auto">
       <h1 className="text-2xl font-bold mb-4">Set New Password</h1>
-      <form onSubmit={submit} className="space-y-2">
+      <form onSubmit={handleSubmit(submit)} className="space-y-2">
         <input
           className="input input-bordered w-full"
           type="password"
-          value={password}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
           placeholder="New Password"
+          {...register('password', { required: true })}
         />
         <button className="btn btn-primary w-full" type="submit">
           Reset Password

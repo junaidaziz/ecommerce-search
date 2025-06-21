@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-import { UseFormRegister, RegisterOptions } from 'react-hook-form';
+import {
+  UseFormRegister,
+  RegisterOptions,
+  FieldValues,
+  Path,
+} from 'react-hook-form';
 
-export interface PasswordInputProps
+export interface PasswordInputProps<T extends FieldValues>
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  name: string;
+  name: Path<T>;
   placeholder?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -14,11 +19,11 @@ export interface PasswordInputProps
   disabled?: boolean;
   className?: string;
   leftAddon?: React.ReactNode;
-  register?: UseFormRegister<any>;
+  register?: UseFormRegister<T>;
   rules?: RegisterOptions;
 }
 
-const PasswordInput: React.FC<PasswordInputProps> = ({
+const PasswordInput = <T extends FieldValues>({
   label,
   name,
   placeholder,
