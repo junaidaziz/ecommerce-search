@@ -78,6 +78,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(products.length < total);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver>();
   const priceTimer = useRef<NodeJS.Timeout>();
   const firstPriceRef = useRef(true);
 
@@ -116,7 +117,10 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       );
     }
     setLoadingMore(false);
-  }, [fetchPage, hasMore, loadingMore, page, router, items.length]);
+  }, [fetchPage, hasMore, loadingMore, page, router]);
+
+  const loadMoreFn = useRef(loadMore);
+  loadMoreFn.current = loadMore;
 
   useEffect(() => {
     if (currentPage > 1 && page === 1) {
@@ -142,17 +146,21 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
 
   useEffect(() => {
     if (!loadMoreRef.current) return;
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        loadMore();
-      }
-    });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMoreFn.current();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observerRef.current = observer;
     const el = loadMoreRef.current;
     observer.observe(el);
     return () => {
-      observer.unobserve(el);
+      observer.disconnect();
     };
-  }, [loadMoreRef, loadMore]);
+  }, []);
 
   const applyFilters = useCallback(
     async (e?: React.FormEvent) => {
@@ -427,11 +435,9 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                 ))}
               </div>
             )}
-            {loadingMore && (
-              <div className="flex justify-center my-4">
-                <span className="loading loading-spinner" />
-              </div>
-            )}
+            <div className="flex justify-center my-4 h-8" aria-hidden={!loadingMore}>
+              {loadingMore && <span className="loading loading-spinner" />}
+            </div>
             {!hasMore && items.length > 0 && (
               <p className="text-center text-sm text-gray-500 my-4">No more products.</p>
             )}
