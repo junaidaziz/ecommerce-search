@@ -6,8 +6,8 @@ export interface Category {
   parentId?: number | null;
   description?: string | null;
   image?: string | null;
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
+  createdAt?: Date;
+  updatedAt?: Date;
   children?: Category[];
   subcategories?: string[];
 }

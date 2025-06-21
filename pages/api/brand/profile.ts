@@ -32,8 +32,8 @@ export default async function handler(
         description: userData.businessDescription ?? undefined,
         taxId: userData.taxId ?? undefined,
         status: userData.disabled ? 'disabled' : 'active',
-        createdAt: userData.createdAt?.toISOString(),
-        updatedAt: userData.updatedAt?.toISOString(),
+        createdAt: userData.createdAt ?? undefined,
+        updatedAt: userData.updatedAt ?? undefined,
       };
       return res.status(200).json(vendor);
     }
