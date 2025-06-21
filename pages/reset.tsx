@@ -1,4 +1,5 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
+import Link from 'next/link';
 import { TextInput } from '../components/form-fields';
 
 const RequestReset: React.FC = () => {
@@ -34,6 +35,12 @@ const RequestReset: React.FC = () => {
           Request Reset
         </button>
       </form>
+      <p className="text-center mt-4">
+        Already have an account?{' '}
+        <Link href="/login" className="link">
+          Login
+        </Link>
+      </p>
       {message && <p className="mt-2">{message}</p>}
     </div>
   );

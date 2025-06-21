@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { PasswordInput } from '../../components/form-fields';
 
@@ -38,6 +39,12 @@ const ResetToken: React.FC = () => {
           Reset Password
         </button>
       </form>
+      <p className="text-center mt-4">
+        Already have an account?{' '}
+        <Link href="/login" className="link">
+          Login
+        </Link>
+      </p>
       {message && <p className="mt-2">{message}</p>}
     </div>
   );
