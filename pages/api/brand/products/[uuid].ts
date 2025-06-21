@@ -4,7 +4,7 @@ import { getProductByUuid } from '../../../../lib/db';
 import { hasOrdersForProduct } from '../../../../lib/orders';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../../lib/utils/getQueryParam';
-import type { ApiMessage } from '../../../../types';
+import type { ApiMessage, ProductInput } from '../../../../types';
 
 export default async function handler(
   req: NextApiRequest,
@@ -30,23 +30,24 @@ export default async function handler(
       max_price,
       currency,
     } = req.body || {};
-    await updateProduct({
-      id: String(uuid),
+    const payload: ProductInput & { id?: string } = {
+      uuid: String(uuid),
       sku: sku ?? existing.sku,
       title: title ?? existing.title,
-      vendor: vendor ?? existing.vendor,
+      vendor: { email: '', brandName: vendor ?? existing.vendor },
       description: description ?? existing.description,
-      product_type: product_type ?? existing.product_type,
+      productType: product_type ?? existing.product_type,
       tags: tags ?? existing.tags,
-      category: category ?? existing.category,
+      category: { name: category ?? existing.category, slug: '' },
       quantity:
         typeof quantity !== 'undefined' ? parseInt(quantity, 10) : existing.quantity,
-      min_price: typeof min_price !== 'undefined' ? parseFloat(min_price) : existing.min_price,
-      max_price: typeof max_price !== 'undefined' ? parseFloat(max_price) : existing.max_price,
+      minPrice: typeof min_price !== 'undefined' ? parseFloat(min_price) : existing.min_price,
+      maxPrice: typeof max_price !== 'undefined' ? parseFloat(max_price) : existing.max_price,
       currency: currency ?? existing.currency,
       status: existing.status,
-      images: existing.images,
-    });
+      images: [],
+    };
+    await updateProduct(payload);
       await loadAndIndexProducts();
       return res.status(200).json({ message: 'product updated' });
     }

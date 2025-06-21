@@ -1,8 +1,16 @@
-import React, { useState, useEffect, useContext, useCallback, ChangeEvent, FormEvent } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  ChangeEvent,
+  FormEvent,
+} from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import type { User } from '../../types/user';
+import type { Product, ProductInput } from '../../types/product';
 
-type ProductForm = Partial<Product>;
+type ProductForm = Partial<ProductInput> & { id?: string };
 
 type ProductApi = Product;
 
@@ -11,11 +19,11 @@ const emptyForm: ProductForm = {
   id: '',
   sku: '',
   title: '',
-  vendor: '',
+  vendor: { email: '', brandName: '' },
   description: '',
   productType: '',
   tags: '',
-  category: '',
+  category: { name: '', slug: '' },
   quantity: 0,
   minPrice: 0,
   maxPrice: 0,
@@ -52,13 +60,27 @@ const BrandDashboard: React.FC = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]:
-        name === 'quantity' || name === 'minPrice' || name === 'maxPrice'
-          ? Number(value)
-          : value,
-    }));
+    setForm((prev) => {
+      if (name === 'vendor') {
+        return {
+          ...prev,
+          vendor: { ...(prev.vendor || { email: '' }), brandName: value },
+        };
+      }
+      if (name === 'category') {
+        return {
+          ...prev,
+          category: { ...(prev.category || { slug: '' }), name: value },
+        };
+      }
+      return {
+        ...prev,
+        [name]:
+          name === 'quantity' || name === 'minPrice' || name === 'maxPrice'
+            ? Number(value)
+            : value,
+      };
+    });
   };
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
@@ -75,11 +97,11 @@ const BrandDashboard: React.FC = () => {
         id: payload.id,
         sku: payload.sku,
         title: payload.title,
-        vendor: payload.vendor,
+        vendor: payload.vendor?.brandName,
         description: payload.description,
         product_type: payload.productType,
         tags: payload.tags,
-        category: payload.category,
+        category: payload.category?.name,
         quantity: payload.quantity,
         min_price: payload.minPrice,
         max_price: payload.maxPrice,
@@ -102,11 +124,17 @@ const BrandDashboard: React.FC = () => {
       id: p.id,
       sku: p.sku || '',
       title: p.title || '',
-      vendor: p.vendor || '',
+      vendor:
+        typeof p.vendor === 'string'
+          ? { email: '', brandName: p.vendor }
+          : p.vendor || { email: '', brandName: '' },
       description: p.description || '',
       productType: p.productType || '',
       tags: p.tags || '',
-      category: p.category || '',
+      category:
+        typeof p.category === 'string'
+          ? { name: p.category, slug: '' }
+          : p.category || { name: '', slug: '' },
       quantity: p.totalInventory || 0,
       minPrice: p.minPrice || 0,
       maxPrice: p.maxPrice || 0,
@@ -170,7 +198,13 @@ const BrandDashboard: React.FC = () => {
             </label>
             <input
               name={field}
-              value={form[field]}
+              value={
+                field === 'vendor'
+                  ? form.vendor?.brandName || ''
+                  : field === 'category'
+                  ? form.category?.name || ''
+                  : (form as any)[field]
+              }
               onChange={handleChange}
               placeholder={field}
               className="input input-bordered w-full"
