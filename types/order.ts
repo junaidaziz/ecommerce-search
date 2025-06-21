@@ -7,7 +7,7 @@ export interface Order extends PrismaOrder {
   product: Product;
 }
 
-export type OrderResponse = Order;
+type OrderResponse = Order;
 
 export type OrderInput = Pick<
   PrismaOrder,

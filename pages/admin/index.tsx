@@ -1,17 +1,17 @@
 import { useState, useEffect, useContext, useCallback, ChangeEvent } from 'react';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
-import { Product, ApiMessage } from '../../types';
+import { Product, ProductInput, ApiMessage } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
 
 export default function Admin() {
   const { user } = useContext(AppContext)!;
-  type FormState = Partial<Product>;
+  type FormState = Partial<ProductInput> & { id?: string };
   const emptyForm: FormState = {
     id: '',
     sku: '',
     title: '',
-    vendor: '',
+    vendor: { email: '', brandName: '' },
     description: '',
     productType: '',
     tags: '',
@@ -19,6 +19,7 @@ export default function Admin() {
     minPrice: 0,
     maxPrice: 0,
     currency: 'USD',
+    category: { name: '', slug: '' },
   };
   const [form, setForm] = useState<FormState>(emptyForm);
   const [products, setProducts] = useState<Product[]>([]);
@@ -40,14 +41,40 @@ export default function Admin() {
   }, [fetchProducts]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => {
+      if (name === 'vendor') {
+        return {
+          ...prev,
+          vendor: { ...(prev.vendor || { email: '' }), brandName: value },
+        };
+      }
+      if (name === 'category') {
+        return {
+          ...prev,
+          category: { ...(prev.category || { slug: '' }), name: value },
+        };
+      }
+      return { ...prev, [name]: value };
+    });
   };
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData();
     const payload = editingId ? { ...form, id: editingId } : form;
-    Object.entries(payload).forEach(([k, v]) => fd.append(k, v));
+    fd.append('id', payload.id || '');
+    fd.append('sku', payload.sku || '');
+    fd.append('title', payload.title || '');
+    fd.append('vendor', payload.vendor?.brandName || '');
+    fd.append('description', payload.description || '');
+    fd.append('product_type', payload.productType || '');
+    fd.append('tags', payload.tags || '');
+    fd.append('category', payload.category?.name || '');
+    fd.append('quantity', String(payload.quantity ?? 0));
+    fd.append('min_price', String(payload.minPrice ?? 0));
+    fd.append('max_price', String(payload.maxPrice ?? 0));
+    fd.append('currency', payload.currency || '');
     photos.forEach((file) => fd.append('photos', file));
     try {
       await fetchJson<ApiMessage>('/api/admin/products', {
@@ -66,14 +93,21 @@ export default function Admin() {
   };
 
   const handleEdit = (p: Product) => {
-      setForm({
+    setForm({
       id: p.id,
       sku: p.sku || '',
       title: p.title || '',
-      vendor: p.vendor || '',
+      vendor:
+        typeof p.vendor === 'string'
+          ? { email: '', brandName: p.vendor }
+          : p.vendor || { email: '', brandName: '' },
       description: p.description || '',
       productType: p.productType || '',
       tags: p.tags || '',
+      category:
+        typeof p.category === 'string'
+          ? { name: p.category, slug: '' }
+          : p.category || { name: '', slug: '' },
       quantity: p.totalInventory || 0,
       minPrice: p.minPrice || 0,
       maxPrice: p.maxPrice || 0,
@@ -138,6 +172,7 @@ export default function Admin() {
                 'description',
                 'productType',
                 'tags',
+                'category',
                 'quantity',
                 'minPrice',
                 'maxPrice',
@@ -151,7 +186,13 @@ export default function Admin() {
                   </label>
                   <input
                     name={field}
-                    value={form[field]}
+                    value={
+                      field === 'vendor'
+                        ? form.vendor?.brandName || ''
+                        : field === 'category'
+                        ? form.category?.name || ''
+                        : (form as any)[field]
+                    }
                     onChange={handleChange}
                     placeholder={field}
                     className="input input-bordered w-full"

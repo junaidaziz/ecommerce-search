@@ -1,13 +1,32 @@
 import { JSDOM } from 'jsdom';
 import { getDb } from './db';
-import type { Product } from '../types/product';
+import type { Product, ProductInput } from '../types/product';
 import { parseImages } from './utils/parseImages';
 import type { Category } from '../types/category';
+import type { Vendor } from '../types/vendor';
 import type { Prisma } from '@prisma/client';
 
 type ProductWithRelations = Prisma.ProductGetPayload<{
   include: { category: true; vendor: true };
 }>;
+
+interface ProductRow {
+  id: number | string;
+  uuid?: string | null;
+  slug?: string | null;
+  sku: string;
+  title: string;
+  vendor?: Vendor | null;
+  description?: string | null;
+  productType?: string | null;
+  tags?: string | null;
+  category?: Category | null;
+  images: string | null;
+  quantity: number;
+  minPrice: number;
+  maxPrice: number;
+  currency: string;
+}
 
 /**
  * Simplified representation of a product row returned from the database.
@@ -112,7 +131,7 @@ async function loadProductsData(): Promise<Product[]> {
   }
 }
 
-export function mapDbRowToProduct(row: { images: string | null } & Record<string, any>): Product {
+export function mapDbRowToProduct(row: ProductRow): Product {
   return processProductRow({
     id: row.id,
     uuid: row.uuid,
@@ -144,7 +163,7 @@ export async function loadAndIndexProducts(): Promise<{ products: Product[] }> {
   return { products };
 }
 
-export async function addProduct(product: Product): Promise<void> {
+export async function addProduct(product: ProductInput): Promise<void> {
   const db = getDb();
   const vendor = product.vendor?.brandName
     ? await db.user.findFirst({ where: { brandName: product.vendor.brandName } })
@@ -177,7 +196,9 @@ export async function addProduct(product: Product): Promise<void> {
   await db.product.create({ data });
 }
 
-export async function updateProduct(product: Product): Promise<void> {
+export async function updateProduct(
+  product: ProductInput & { id?: string | number }
+): Promise<void> {
   const db = getDb();
   const vendor = product.vendor?.brandName
     ? await db.user.findFirst({ where: { brandName: product.vendor.brandName } })
