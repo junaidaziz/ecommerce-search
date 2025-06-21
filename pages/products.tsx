@@ -4,6 +4,7 @@ import type { Product } from '../types/product';
 import ProductCard from '../components/ProductCard';
 import Head from 'next/head';
 import { getPageTitle } from '../lib/pageTitle';
+import Pagination from '../components/Pagination';
 
 const Products: React.FC = () => {
   const { addToCart } = useContext(AppContext)!;
@@ -15,6 +16,9 @@ const Products: React.FC = () => {
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const pageSize = 20;
 
   useEffect(() => {
     async function loadCats() {
@@ -39,10 +43,13 @@ const Products: React.FC = () => {
       if (category && category !== 'All') params.append('category', category);
       if (minPrice) params.append('minPrice', minPrice);
       if (maxPrice) params.append('maxPrice', maxPrice);
+      params.append('page', String(currentPage));
+      params.append('perPage', String(pageSize));
       const res = await fetch(`/api/search?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         setProducts(data.results as Product[]);
+        setTotalPages(data.totalPages || 1);
       } else {
         setProducts([]);
       }
@@ -56,10 +63,17 @@ const Products: React.FC = () => {
   useEffect(() => {
     fetchProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setCurrentPage(1);
     fetchProducts();
   };
 
@@ -143,11 +157,18 @@ const Products: React.FC = () => {
         ) : products.length === 0 ? (
           <p>No products found.</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+              {products.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </>
         )}
       </div>
     </div>
