@@ -1,18 +1,12 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { AppContext } from '../../contexts/AppContext';
-<<<<<<< HEAD
 import { Category, CategoryInput, ApiMessage } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
-=======
-import type { Category } from '../../types/category';
-import type { CategoriesResponse } from '../../types/api';
->>>>>>> origin/codex/apply-proper-types-to-data-components
 
 export default function Categories() {
   const { user } = useContext(AppContext)!;
   const [categories, setCategories] = useState<Category[]>([]);
-<<<<<<< HEAD
   const [newCat, setNewCat] = useState<string>('');
   const [newParent, setNewParent] = useState<string>('');
   const [newImage, setNewImage] = useState<string>('');
@@ -25,23 +19,6 @@ export default function Categories() {
     if (!user) return;
     const data = await fetchJson<Category[]>('/api/admin/categories');
     setCategories(data);
-=======
-  const [newCat, setNewCat] = useState('');
-  const [newParent, setNewParent] = useState('');
-  const [newImage, setNewImage] = useState('');
-  const [message, setMessage] = useState('');
-  const [editing, setEditing] = useState<number | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editImage, setEditImage] = useState('');
-
-  const load = useCallback(async () => {
-    if (!user) return;
-    const res = await fetch('/api/admin/categories');
-    if (res.ok) {
-      const data: CategoriesResponse | Category[] = await res.json();
-      setCategories(Array.isArray(data) ? data : data.categories);
-    }
->>>>>>> origin/codex/apply-proper-types-to-data-components
   }, [user]);
 
   useEffect(() => {
@@ -85,11 +62,7 @@ export default function Categories() {
   };
 
   const remove = async (id: number) => {
-<<<<<<< HEAD
     await fetchJson<ApiMessage>(`/api/admin/categories?id=${id}`, {
-=======
-    const res = await fetch(`/api/admin/categories?id=${id}`, {
->>>>>>> origin/codex/apply-proper-types-to-data-components
       method: 'DELETE',
     });
     setMessage('Category deleted');
@@ -144,21 +117,13 @@ export default function Categories() {
     </div>
   );
 
-<<<<<<< HEAD
   function buildTree(list: Category[]): (Category & { children: Category[] })[] {
-    const map: Record<number, Category & { children: Category[] }> = {} as Record<number, Category & { children: Category[] }>;
+    const map: Record<number, Category & { children: Category[] }> =
+      {} as Record<number, Category & { children: Category[] }>;
     list.forEach((c) => {
       map[c.id!] = { ...c, children: [] };
     });
     const tree: (Category & { children: Category[] })[] = [];
-=======
-  function buildTree(list: Category[]): Category[] {
-    const map: Record<number, Category & { children: Category[] }> = {};
-    list.forEach((c) => {
-      map[c.id!] = { ...c, children: [] };
-    });
-    const tree: Category[] = [];
->>>>>>> origin/codex/apply-proper-types-to-data-components
     list.forEach((c) => {
       if (c.parentId) {
         map[c.parentId]?.children.push(map[c.id!]);
@@ -169,11 +134,7 @@ export default function Categories() {
     return tree;
   }
 
-<<<<<<< HEAD
   function CategoryItem({ cat }: { cat: Category & { children: Category[] } }) {
-=======
-  function CategoryItem({ cat }: { cat: Category }) {
->>>>>>> origin/codex/apply-proper-types-to-data-components
     const hasChildren = cat.children && cat.children.length > 0;
     return (
       <li className={cat.parentId ? 'ml-4' : ''}>

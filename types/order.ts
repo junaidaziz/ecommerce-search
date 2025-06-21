@@ -5,24 +5,25 @@ export interface OrderItem extends Product {
 }
 
 export interface Order {
-  id?: number;
-  email: string;
+  id: number;
+  userId: number;
   items: OrderItem[];
   total: number;
-  shippingName: string;
   status: string;
-  shippingAddress: string;
-  createdAt?: string;
+  paymentMethod?: string;
+  shippingAddress?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type OrderResponse = Order;
 
 export interface OrderInput {
-  email: string;
+  userId: number;
   items: OrderItem[];
   total: number;
-  shippingName: string;
-  shippingAddress: string;
+  paymentMethod?: string;
+  shippingAddress?: string;
 }
 
 export interface OrderRow {
@@ -31,7 +32,6 @@ export interface OrderRow {
   user: {
     id: number;
     email: string;
-    // add other user properties if needed
   };
   product: {
     id: number;
@@ -53,4 +53,5 @@ export interface OrderRow {
   total: number;
   status: string;
   createdAt: Date;
+  updatedAt: Date;
 }
