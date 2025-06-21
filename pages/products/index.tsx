@@ -7,6 +7,7 @@ import ProductCard from '../../components/ProductCard';
 import { getPageTitle } from '../../lib/pageTitle';
 import { getProductsPaginated, PaginatedResult } from '../../lib/products';
 import type { Product } from '../../types/product';
+import { serializeDates } from '../../lib/utils/serializeDates';
 
 interface ProductsProps {
   products: Product[];
@@ -31,7 +32,8 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
     inStock,
   });
 
-  return { props: { products: result.products, total: result.total } };
+  const products = serializeDates(result.products);
+  return { props: { products, total: result.total } };
 };
 
 export default function ProductsPage({ products, total }: ProductsProps) {

@@ -15,6 +15,7 @@ import {
 import { mapDbRowToProduct } from '../../lib/products';
 import { Product, Review } from '../../types';
 import { SelectDropdown, Textarea } from '../../components/form-fields';
+import { serializeDates } from '../../lib/utils/serializeDates';
 
 type ProductDetailProps = {
   product: Product;
@@ -40,7 +41,7 @@ export const getServerSideProps: GetServerSideProps<
   const stats = await getAverageRating(String(row.id));
   return {
     props: {
-      product,
+      product: serializeDates(product),
       initialReviews: reviews,
       initialAverage: stats.average,
       initialCount: stats.count,

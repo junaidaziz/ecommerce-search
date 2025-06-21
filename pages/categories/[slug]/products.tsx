@@ -9,6 +9,7 @@ import {
   getCategoryBySlug,
   getProductsByCategorySlug,
 } from '../../../lib/products';
+import { serializeDates } from '../../../lib/utils/serializeDates';
 
 interface CategoryProductsProps {
   products: Product[];
@@ -30,7 +31,12 @@ export const getServerSideProps: GetServerSideProps<
   if (!category) {
     return { notFound: true };
   }
-  return { props: { products, category } };
+  return {
+    props: {
+      products: serializeDates(products),
+      category: serializeDates(category),
+    },
+  };
 };
 
 export default function CategoryProductsPage({
