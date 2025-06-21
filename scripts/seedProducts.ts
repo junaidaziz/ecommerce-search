@@ -90,10 +90,10 @@ async function processRow(row: CsvRow) {
         productType: row.PRODUCT_TYPE || '',
         tags: row.TAGS || '',
         images: row.IMAGES || null,
-        quantity:
-          typeof row.TOTAL_INVENTORY !== 'undefined'
-            ? parseInt(row.TOTAL_INVENTORY as any, 10) || 0
-            : Math.floor(Math.random() * 20),
+        quantity: (() => {
+          const rand = Math.floor(Math.random() * 20);
+          return rand < 6 ? 0 : rand;
+        })(),
         minPrice: price.min,
         maxPrice: price.max,
         currency: price.currency,

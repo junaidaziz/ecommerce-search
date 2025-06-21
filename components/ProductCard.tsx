@@ -19,7 +19,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const context = useContext(AppContext) as AppContextValue;
   const addToCart = context?.addToCart;
 
-  const isOut = product.totalInventory !== undefined && product.totalInventory <= 0;
+  const inventory =
+    product.totalInventory !== undefined
+      ? product.totalInventory
+      : (product as any).quantity;
+  const isOut = typeof inventory === 'number' && inventory <= 0;
   const onSale = product.maxPrice > product.minPrice;
   const isNew = product.tags?.toLowerCase().includes('new');
   const rating = Math.round(product.averageRating || 0);
@@ -32,8 +36,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
             product.images && product.images.length > 0
               ? product.images
               : product.featuredImage
-              ? [product.featuredImage]
-              : []
+                ? [product.featuredImage]
+                : []
           }
           placeholderSeed={Number(product.id)}
           className="w-full bg-gray-200 flex items-center justify-center aspect-[4/5]"
@@ -48,7 +52,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       )}
       <div className="p-3 flex flex-col gap-1">
-        <Link href={`/product/${product.slug}`} className="font-semibold text-base line-clamp-2 hover:underline">
+        <Link
+          href={`/product/${product.slug}`}
+          className="font-semibold text-base line-clamp-2 hover:underline"
+        >
           <span
             dangerouslySetInnerHTML={{
               __html: highlightTitle || product.title || 'Untitled Product',
@@ -67,12 +74,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
           />
         </p>
         <div className="flex justify-between items-center mt-auto text-sm">
-          <span className="font-bold">
+          <span className="font-bold text-base">
             {formatCurrency(product.minPrice ?? 0, product.currency)}
           </span>
           {product.reviewCount > 0 && (
             <span className="text-xs">
-              {'★'.repeat(rating)}{'☆'.repeat(5 - rating)}
+              {'★'.repeat(rating)}
+              {'☆'.repeat(5 - rating)}
             </span>
           )}
         </div>
