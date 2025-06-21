@@ -1,33 +1,9 @@
 import React, { useState, useEffect, useContext, useCallback, ChangeEvent, FormEvent } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
-type ProductForm = {
-  id: string;
-  title: string;
-  vendor: string;
-  description: string;
-  product_type: string;
-  tags: string;
-  category: string;
-  quantity: number;
-  min_price: number;
-  max_price: number;
-  currency: string;
-};
+type ProductForm = Partial<Product>;
 
-type ProductApi = {
-  ID: string;
-  TITLE: string;
-  VENDOR: string;
-  DESCRIPTION: string;
-  PRODUCT_TYPE: string;
-  TAGS: string;
-  CATEGORY: string;
-  TOTAL_INVENTORY: number;
-  MIN_PRICE: number;
-  MAX_PRICE: number;
-  CURRENCY: string;
-};
+type ProductApi = Product;
 
 type User = {
   brandName?: string;
@@ -43,12 +19,12 @@ const emptyForm: ProductForm = {
   title: '',
   vendor: '',
   description: '',
-  product_type: '',
+  productType: '',
   tags: '',
   category: '',
   quantity: 0,
-  min_price: 0,
-  max_price: 0,
+  minPrice: 0,
+  maxPrice: 0,
   currency: 'USD',
 };
 
@@ -85,7 +61,7 @@ const BrandDashboard: React.FC = () => {
     setForm((prev) => ({
       ...prev,
       [name]:
-        name === 'quantity' || name === 'min_price' || name === 'max_price'
+        name === 'quantity' || name === 'minPrice' || name === 'maxPrice'
           ? Number(value)
           : value,
     }));
@@ -101,7 +77,19 @@ const BrandDashboard: React.FC = () => {
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        id: payload.id,
+        title: payload.title,
+        vendor: payload.vendor,
+        description: payload.description,
+        product_type: payload.productType,
+        tags: payload.tags,
+        category: payload.category,
+        quantity: payload.quantity,
+        min_price: payload.minPrice,
+        max_price: payload.maxPrice,
+        currency: payload.currency,
+      }),
     });
     if (res.ok) {
       setMessage(editingId ? 'Product updated' : 'Product added');
@@ -116,19 +104,19 @@ const BrandDashboard: React.FC = () => {
 
   const handleEdit = (p: ProductApi) => {
     setForm({
-      id: p.ID,
-      title: p.TITLE || '',
-      vendor: p.VENDOR || '',
-      description: p.DESCRIPTION || '',
-      product_type: p.PRODUCT_TYPE || '',
-      tags: p.TAGS || '',
-      category: p.CATEGORY || '',
-      quantity: p.TOTAL_INVENTORY || 0,
-      min_price: p.MIN_PRICE || 0,
-      max_price: p.MAX_PRICE || 0,
-      currency: p.CURRENCY || 'USD',
+      id: p.id,
+      title: p.title || '',
+      vendor: p.vendor || '',
+      description: p.description || '',
+      productType: p.productType || '',
+      tags: p.tags || '',
+      category: p.category || '',
+      quantity: p.totalInventory || 0,
+      minPrice: p.minPrice || 0,
+      maxPrice: p.maxPrice || 0,
+      currency: p.currency || 'USD',
     });
-    setEditingId(p.ID);
+    setEditingId(p.id);
   };
 
   const cancelEdit = () => {
@@ -170,12 +158,12 @@ const BrandDashboard: React.FC = () => {
             'title',
             'vendor',
             'description',
-            'product_type',
+            'productType',
             'tags',
             'category',
             'quantity',
-            'min_price',
-            'max_price',
+            'minPrice',
+            'maxPrice',
             'currency',
           ] as (keyof ProductForm)[]
         ).map((field) => (
@@ -191,8 +179,8 @@ const BrandDashboard: React.FC = () => {
               className="input input-bordered w-full"
               type={
                 field === 'quantity' ||
-                field === 'min_price' ||
-                field === 'max_price'
+                field === 'minPrice' ||
+                field === 'maxPrice'
                   ? 'number'
                   : 'text'
               }
@@ -213,9 +201,9 @@ const BrandDashboard: React.FC = () => {
       <h2 className="text-xl font-semibold mb-2">Existing Products</h2>
       <ul className="space-y-1">
         {products.map((p) => (
-          <li key={p.ID} className="flex justify-between items-center gap-2">
+          <li key={p.id} className="flex justify-between items-center gap-2">
             <span>
-              {p.TITLE} - {p.CATEGORY || p.PRODUCT_TYPE}
+              {p.title} - {p.category || p.productType}
             </span>
             <div className="flex gap-2">
               <button
@@ -228,7 +216,7 @@ const BrandDashboard: React.FC = () => {
               <button
                 type="button"
                 className="btn btn-sm btn-error"
-                onClick={() => handleDelete(p.ID)}
+                onClick={() => handleDelete(p.id)}
               >
                 Delete
               </button>
