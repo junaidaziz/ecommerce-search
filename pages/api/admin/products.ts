@@ -7,6 +7,7 @@ import path from 'path';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 import { Product, ApiMessage } from '../../../types';
+import { parseImages } from '../../../lib/utils/parseImages';
 
 function slugify(text) {
   return text
@@ -177,7 +178,7 @@ async function handler(
         productType: p.productType,
         tags: p.tags,
         category: p.category?.name,
-        images: p.images ? JSON.parse(p.images) : [],
+        images: parseImages(p.images),
         totalInventory: p.quantity,
         priceRange: {
           minVariantPrice: { amount: p.minPrice, currencyCode: p.currency },
