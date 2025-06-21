@@ -1,7 +1,7 @@
 # Contributing to Product Search App
 
 Thanks for your interest in contributing to the Product Search App! 🎉  
-This project is a FlexSearch-powered product listing application built with Next.js, and your support is welcome—whether it’s reporting bugs, suggesting improvements, or submitting pull requests.
+This project is a Typesense-powered product listing application built with Next.js, and your support is welcome—whether it’s reporting bugs, suggesting improvements, or submitting pull requests.
 
 ---
 
@@ -42,18 +42,6 @@ Start the dev server:
 
 ```bash
 npm run dev
-```
-
-To rebuild the search index locally:
-
-```bash
-npm run build:index
-```
-
-To generate and deploy index before full build:
-
-```bash
-npm run build
 ```
 
 ---
