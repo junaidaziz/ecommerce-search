@@ -111,7 +111,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                             type="button"
                             onFocus={() => setHoveredCat(cat)}
                             onMouseEnter={() => setHoveredCat(cat)}
-                            className="w-full flex items-center gap-1 text-left hover:text-primary focus:outline-none capitalize font-bold whitespace-nowrap truncate"
+                            className="w-full flex items-center gap-1 text-left font-medium text-gray-800 tracking-wide hover:text-primary transition-colors focus:outline-none capitalize whitespace-nowrap truncate"
                           >
                             {iconMap[cat.name] || null}
                             {cat.name}
@@ -125,7 +125,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                             <li key={sub} className="capitalize">
                               <Link
                                 href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub)}`}
-                                className="block hover:text-primary whitespace-nowrap truncate"
+                                className="block font-medium text-gray-800 tracking-wide hover:text-primary transition-colors whitespace-nowrap truncate"
                               >
                                 {sub}
                               </Link>
