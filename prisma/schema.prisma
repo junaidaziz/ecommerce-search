@@ -118,6 +118,7 @@ model SearchLog {
   uuid      String    @unique @default(uuid())
   userId    Int?
   query     String
+  noResults Boolean   @default(false)
   createdAt DateTime  @default(now())
 
   user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
