@@ -1,5 +1,4 @@
 import { Order, Product } from '../types';
-import type { ProductDbRow } from '../types/product';
 import { getDb } from './db';
 import { mapDbRowToProduct } from './products';
 import type { Prisma } from '@prisma/client';
@@ -138,23 +137,5 @@ export async function getBestSellingProducts(limit = 8): Promise<Product[]> {
     include: { category: true, vendor: true },
   });
 
-  return products.map((p) =>
-    mapDbRowToProduct({
-      id: p.id,
-      uuid: p.uuid,
-      slug: p.slug,
-      sku: p.sku,
-      title: p.title,
-      vendor: p.vendor ?? null,
-      description: p.description,
-      productType: p.productType,
-      tags: p.tags,
-      category: p.category ?? null,
-      images: p.images,
-      quantity: p.quantity,
-      minPrice: p.minPrice,
-      maxPrice: p.maxPrice,
-      currency: p.currency,
-    } as ProductDbRow)
-  );
+  return products.map((p) => mapDbRowToProduct(p));
 }
