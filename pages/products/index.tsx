@@ -23,7 +23,6 @@ interface ProductsProps {
 export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
   context
 ) => {
-  const page = parseInt((context.query.page as string) || '1', 10);
   const inStock = context.query.inStock === 'true';
   const category = context.query.category as string | undefined;
   const q = context.query.q as string | undefined;
@@ -35,7 +34,7 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
     : undefined;
 
   const limit = 20;
-  const offset = (page - 1) * limit;
+  const offset = 0;
   const result: PaginatedResult = await getProductsPaginated({
     limit,
     offset,
@@ -55,10 +54,6 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
 export default function ProductsPage({ products, total, categories }: ProductsProps) {
   const router = useRouter();
   const { addNotification } = useContext(NotificationContext);
-  const pageParam = Array.isArray(router.query.page)
-    ? router.query.page[0]
-    : router.query.page;
-  const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
   const [keyword, setKeyword] = useState(
     typeof router.query.q === 'string' ? router.query.q : ''
   );
@@ -72,9 +67,8 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     typeof router.query.maxPrice === 'string' ? router.query.maxPrice : ''
   );
   const inStock = router.query.inStock === 'true';
-  const totalPages = Math.ceil(total / 20);
   const [items, setItems] = useState<Product[]>(products);
-  const [page, setPage] = useState(currentPage);
+  const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(products.length < total);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -112,40 +106,14 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
         return updated;
       });
       setPage(next);
-      router.replace(
-        { pathname: router.pathname, query: { ...router.query, page: String(next) } },
-        undefined,
-        { shallow: true }
-      );
     }
     setLoadingMore(false);
     isFetchingRef.current = false;
-  }, [fetchPage, hasMore, loadingMore, page, router]);
+  }, [fetchPage, hasMore, loadingMore, page]);
 
   const loadMoreFn = useRef(loadMore);
   loadMoreFn.current = loadMore;
 
-  useEffect(() => {
-    if (currentPage > 1 && page === 1) {
-      (async () => {
-        let extra: Product[] = [];
-        for (let p = 2; p <= currentPage; p++) {
-          const data = await fetchPage(p);
-          if (data) {
-            extra = [...extra, ...data.products];
-          }
-        }
-        if (extra.length > 0) {
-          setItems((prev) => {
-            const updated = [...prev, ...extra];
-            setHasMore(updated.length < total);
-            return updated;
-          });
-        }
-        setPage(currentPage);
-      })();
-    }
-  }, [currentPage, fetchPage, page, total]);
 
   useEffect(() => {
     if (!loadMoreRef.current) return;
@@ -182,7 +150,6 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       }
       const query = {
         ...router.query,
-        page: '1',
       } as Record<string, string>;
       if (keyword) query.q = keyword;
       else delete query.q;
@@ -195,15 +162,13 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       if (inStock) query.inStock = 'true';
       else delete query.inStock;
       const params = new URLSearchParams(query);
+      params.set('page', '1');
       const res = await fetch(`/api/products?${params.toString()}`);
       if (res.ok) {
         const data = (await res.json()) as { products: Product[]; total: number };
         setItems(data.products);
         setPage(1);
         setHasMore(data.products.length < data.total);
-        router.replace({ pathname: router.pathname, query }, undefined, {
-          shallow: true,
-        });
       }
     },
     [
@@ -235,8 +200,8 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     const query = { ...router.query } as Record<string, string>;
     if (inStock) delete query.inStock;
     else query.inStock = 'true';
-    query.page = '1';
     const params = new URLSearchParams(query);
+    params.set('page', '1');
     fetch(`/api/products?${params.toString()}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -244,9 +209,6 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
           setItems(data.products);
           setPage(1);
           setHasMore(data.products.length < data.total);
-          router.replace({ pathname: router.pathname, query }, undefined, {
-            shallow: true,
-          });
         }
       });
   }, [router, inStock]);
@@ -263,8 +225,8 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       clear: () => {
         const query = { ...router.query } as Record<string, string>;
         delete query.inStock;
-        query.page = '1';
         const params = new URLSearchParams(query);
+        params.set('page', '1');
         fetch(`/api/products?${params.toString()}`)
           .then((res) => (res.ok ? res.json() : null))
           .then((data) => {
@@ -272,9 +234,6 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
               setItems(data.products);
               setPage(1);
               setHasMore(data.products.length < data.total);
-              router.replace({ pathname: router.pathname, query }, undefined, {
-                shallow: true,
-              });
             }
           });
       },
@@ -302,7 +261,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     setSelectedCategory('');
     setMinPrice('');
     setMaxPrice('');
-    const query = { page: '1' } as Record<string, string>;
+    const query = {} as Record<string, string>;
     const res = await fetch('/api/products?page=1');
     if (res.ok) {
       const data = (await res.json()) as { products: Product[]; total: number };
