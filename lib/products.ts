@@ -401,7 +401,7 @@ export async function getApprovedProductsPaginated(
 export interface PaginatedOptions {
   limit: number;
   offset: number;
-  categorySlug?: string;
+  categorySlugs?: string[];
   search?: string;
   inStock?: boolean;
   minPrice?: number;
@@ -418,8 +418,8 @@ export async function getProductsPaginated(
 ): Promise<PaginatedResult> {
   const db = getDb();
   const where: Prisma.ProductWhereInput = { status: 'approved' };
-  if (options.categorySlug) {
-    where.category = { slug: options.categorySlug };
+  if (options.categorySlugs && options.categorySlugs.length > 0) {
+    where.category = { slug: { in: options.categorySlugs } };
   }
   if (options.inStock) {
     where.quantity = { gt: 0 };

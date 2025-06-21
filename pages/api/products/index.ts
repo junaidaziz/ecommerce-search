@@ -29,8 +29,9 @@ export default async function handler(
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
-  const slug =
+  const catParam =
     getQueryParam(req.query.category) || getQueryParam(req.query.categorySlug);
+  const categorySlugs = catParam ? catParam.split(',').filter(Boolean) : [];
   const limit = parseInt(getQueryParam(req.query.limit) ?? '20', 10);
   const page = parseInt(getQueryParam(req.query.page) ?? '1', 10);
   const offset = parseInt(getQueryParam(req.query.offset) ?? String((page - 1) * limit), 10);
@@ -44,7 +45,7 @@ export default async function handler(
     const result = await getProductsPaginated({
       limit,
       offset,
-      categorySlug: slug || undefined,
+      categorySlugs,
       search: q || undefined,
       inStock,
       minPrice,
