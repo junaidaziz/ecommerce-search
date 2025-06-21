@@ -54,12 +54,12 @@ export interface ResetTokenResponse {
   token: string;
 }
 
-export type CouponResponse = import('./coupon').Coupon;
+type CouponResponse = import('./coupon').Coupon;
 
 export interface CategoriesResponse {
   categories: import('./category').Category[];
 }
 
-export interface UsersResponse {
+interface UsersResponse {
   users: (import('./user').User & { disabled?: boolean })[];
 }
