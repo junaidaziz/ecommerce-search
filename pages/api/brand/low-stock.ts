@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { loadAndIndexProducts } from '../../../lib/products';
 import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import type { Product, ApiMessage } from '../../../types';
 
 export default async function handler(
@@ -8,7 +9,7 @@ export default async function handler(
   res: NextApiResponse<Product[] | ApiMessage>
 ): Promise<void> {
   try {
-    const { vendor } = req.query;
+    const vendor = getQueryParam(req.query.vendor);
     if (!vendor) return res.status(400).json({ message: 'vendor required' });
     const { products } = await loadAndIndexProducts();
     const low = products.filter(
