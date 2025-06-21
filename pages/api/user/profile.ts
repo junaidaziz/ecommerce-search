@@ -19,8 +19,10 @@ export default async function handler(
       return res.status(200).json(userData);
     }
     if (req.method === 'PUT') {
-      const { phoneNumber, address, city, country } = req.body;
+      const { lastName, gender, phoneNumber, address, city, country } = req.body;
       await updateUserProfile(session.user.email, {
+        lastName,
+        gender,
         phoneNumber,
         address,
         city,
