@@ -53,10 +53,18 @@ export interface ProductInput {
 
 export interface ProductDbRow {
   id: number;
-  uuid?: string;
-  slug: string | null;
-  sku: PrismaProduct['sku'] | null;
+  uuid: string;
+  slug: string;
+  sku: PrismaProduct['sku'];
   title: string;
-  vendor?: Vendor | null;
-  category?: Category | null;
+  description: string;
+  productType: string;
+  tags: string | null;
+  images: string | null;
+  quantity: number;
+  minPrice: number;
+  maxPrice: number;
+  currency: string;
+  vendor: Vendor | null;
+  category: Category | null;
 }

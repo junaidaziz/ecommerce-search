@@ -3,7 +3,10 @@ import { getDb } from './db';
 import type { Product, ProductDbRow } from '../types/product';
 import type { Category } from '../types/category';
 import type { Prisma } from '@prisma/client';
-import { OrderProductRow } from '../types';
+
+type ProductWithRelations = Prisma.ProductGetPayload<{
+  include: { category: true; vendor: true };
+}>;
 
 /**
  * Simplified representation of a product row returned from the database.
@@ -72,12 +75,12 @@ function processProductRow(row: Record<string, unknown>): Product {
 async function loadProductsData(): Promise<Product[]> {
   const db = getDb();
   try {
-    const rows = (await db.product.findMany({
+    const rows: ProductWithRelations[] = await db.product.findMany({
       where: { status: 'approved' },
       include: { category: true, vendor: true },
-    })) as ProductDbRow[];
+    });
 
-    return rows.map((row: ProductDbRow) =>
+    return rows.map((row) =>
       processProductRow({
         id: row.id,
         uuid: row.uuid,
@@ -110,7 +113,7 @@ async function loadProductsData(): Promise<Product[]> {
   }
 }
 
-export function mapDbRowToProduct(row: OrderProductRow): Product {
+export function mapDbRowToProduct(row: ProductDbRow): Product {
   return processProductRow({
     id: row.id,
     uuid: row.uuid,
@@ -208,11 +211,11 @@ export async function updateProduct(product: Product): Promise<void> {
 
 export async function getPendingProducts(): Promise<Product[]> {
   const db = getDb();
-  const rows = (await db.product.findMany({
+  const rows: ProductWithRelations[] = await db.product.findMany({
     where: { status: 'pending' },
     include: { category: true, vendor: true },
-  })) as ProductDbRow[];
-  return rows.map((row: ProductDbRow) =>
+  });
+  return rows.map((row) =>
     processProductRow({
       id: row.id,
       slug: row.slug,
