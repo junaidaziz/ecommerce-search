@@ -1,10 +1,23 @@
-import { useState, useEffect, useContext, useCallback } from 'react';
+import { useState, useEffect, useContext, useCallback, ChangeEvent } from 'react';
 import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
+import type { Product } from '../../types/product';
 
 export default function Admin() {
   const { user } = useContext(AppContext)!;
-  const emptyForm = {
+  interface FormState {
+    id: string;
+    title: string;
+    vendor: string;
+    description: string;
+    product_type: string;
+    tags: string;
+    quantity: number;
+    min_price: number;
+    max_price: number;
+    currency: string;
+  }
+  const emptyForm: FormState = {
     id: '',
     title: '',
     vendor: '',
@@ -16,12 +29,12 @@ export default function Admin() {
     max_price: 0,
     currency: 'USD',
   };
-  const [form, setForm] = useState(emptyForm);
-  const [products, setProducts] = useState([]);
+  const [form, setForm] = useState<FormState>(emptyForm);
+  const [products, setProducts] = useState<Product[]>([]);
   const [message, setMessage] = useState('');
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [photos, setPhotos] = useState([]);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const fetchProducts = useCallback(async () => {
     if (!user) return;
@@ -29,7 +42,8 @@ export default function Admin() {
       `/api/admin/products?vendor=${encodeURIComponent(user.brandName || '')}`
     );
     if (res.ok) {
-      setProducts(await res.json());
+      const data: Product[] = await res.json();
+      setProducts(data);
     }
   }, [user]);
 
@@ -37,11 +51,11 @@ export default function Admin() {
     fetchProducts();
   }, [fetchProducts]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name as keyof FormState]: e.target.value });
   };
 
-  const submit = async (e) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData();
     const payload = editingId ? { ...form, id: editingId } : form;
@@ -63,7 +77,7 @@ export default function Admin() {
     }
   };
 
-  const handleEdit = (p) => {
+  const handleEdit = (p: Product) => {
     setForm({
       id: p.ID,
       title: p.TITLE || '',
@@ -161,7 +175,9 @@ export default function Admin() {
                 <input
                   type="file"
                   multiple
-                  onChange={(e) => setPhotos(Array.from(e.target.files))}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setPhotos(Array.from(e.target.files ?? []))
+                  }
                   className="file-input file-input-bordered w-full"
                 />
               </div>
