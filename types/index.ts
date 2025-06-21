@@ -10,3 +10,4 @@ export * from './vendor';
 export * from './coupon';
 export * from './image';
 export * from './price';
+export * from './user';
