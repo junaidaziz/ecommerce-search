@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
+import type { Image as ProductImage } from '../types/image';
 
 export interface ProductImageSliderProps {
-  images?: string[];
+  images?: ProductImage[];
   className?: string;
   imgClass?: string;
   placeholderSeed?: number;
@@ -32,8 +33,8 @@ export default function ProductImageSlider({
   return (
     <div className={`relative aspect-[4/5] ${className}`}>
       <Image
-        src={images[idx]}
-        alt={`Image ${idx + 1}`}
+        src={images[idx].url}
+        alt={images[idx].alt || `Image ${idx + 1}`}
         fill
         className={`object-cover ${imgClass}`}
       />
