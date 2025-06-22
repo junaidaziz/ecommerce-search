@@ -48,11 +48,16 @@ test('shows login and signup when unauthenticated', () => {
 });
 
 test('shows name and cart count when authenticated', () => {
-  const user = { role: 'super-admin', firstName: 'Alice', email: 'a@a.com' };
+  const user = {
+    role: 'super-admin',
+    firstName: 'Alice',
+    lastName: 'Smith',
+    email: 'a@a.com',
+  };
   const cart = [{ ID: 1, qty: 2 }];
   mockUseSession.mockReturnValue({ data: { user } });
   renderWithContext(<Header theme="light" setTheme={() => {}} />, { cart });
-  expect(screen.getAllByText('Alice').length).toBeGreaterThan(0);
+  expect(screen.getAllByText('Alice Smith').length).toBeGreaterThan(0);
   expect(screen.getAllByText('2').length).toBeGreaterThan(0);
 });
 
