@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import type { Image as ProductImage } from '../types/image';
 import ChevronLeftIcon from './icons/ChevronLeftIcon';
@@ -21,6 +21,16 @@ export default function ProductImageSlider({
 }: ProductImageSliderProps) {
   const [idx, setIdx] = useState(0);
   const [zoom, setZoom] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setZoom(false);
+    };
+    if (zoom) {
+      document.addEventListener('keydown', handler);
+    }
+    return () => document.removeEventListener('keydown', handler);
+  }, [zoom]);
   const urls = images.map((img) => (typeof img === 'string' ? img : img.url));
   const placeholderUrl = `https://picsum.photos/seed/${placeholderSeed}/400/400`;
   const [errorMap, setErrorMap] = useState<Record<number, boolean>>({});
@@ -61,8 +71,22 @@ export default function ProductImageSlider({
         </div>
       )}
       {zoom && (
-        <dialog open className="modal">
-          <div className="modal-box p-0 max-w-none">
+        <dialog
+          ref={dialogRef}
+          open
+          className="modal"
+          onClick={(e) => {
+            if (e.target === dialogRef.current) setZoom(false);
+          }}
+        >
+          <div className="modal-box p-0 max-w-none relative">
+            <button
+              type="button"
+              className="btn btn-sm btn-circle absolute right-2 top-2"
+              onClick={() => setZoom(false)}
+            >
+              ✖
+            </button>
             <Image
               src={errorMap[idx] ? placeholderUrl : images[idx].url}
               alt={images[idx].alt || `Image ${idx + 1}`}
@@ -70,8 +94,12 @@ export default function ProductImageSlider({
               height={800}
               className="w-full h-auto object-contain"
             />
-            <form method="dialog" className="modal-backdrop">
-              <button onClick={() => setZoom(false)}>close</button>
+            <form
+              method="dialog"
+              className="modal-backdrop"
+              onClick={() => setZoom(false)}
+            >
+              <button>close</button>
             </form>
           </div>
         </dialog>
