@@ -32,7 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <div
-      className={`group relative flex flex-col h-full bg-base-100 border border-base-300 rounded-xl overflow-hidden shadow hover:shadow-lg transition-shadow duration-200 ${className}`}
+      className={`group relative flex flex-col h-full bg-base-100 border border-base-300 rounded-xl overflow-hidden shadow hover:shadow-lg transition-shadow duration-200 w-4/5 mx-auto ${className}`}
     >
       <Link href={`/product/${product.slug}`} className="block overflow-hidden">
         <ProductImageSlider
@@ -44,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 : []
           }
           placeholderSeed={Number(product.id)}
-          className="w-4/5 mx-auto bg-gray-200 flex items-center justify-center"
+          className="w-full bg-gray-200 flex items-center justify-center"
           imgClass="transition-transform duration-200 group-hover:scale-105"
           aspectRatioClass="aspect-square"
         />
@@ -56,7 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {isOut && <span className="badge">Out of stock</span>}
         </div>
       )}
-      <div className="p-3 flex flex-col gap-1">
+      <div className="p-2 flex flex-col gap-1">
         <Link
           href={`/product/${product.slug}`}
           className="font-semibold text-base line-clamp-2 hover:underline"
