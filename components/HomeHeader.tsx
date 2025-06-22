@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useContext, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import SearchIcon from './icons/SearchIcon';
 import UserIcon from './icons/UserIcon';
 import CartIcon from './icons/CartIcon';
@@ -9,6 +10,8 @@ import { AppContext } from '../contexts/AppContext';
 
 const HomeHeader: React.FC = () => {
   const router = useRouter();
+  const { data: session } = useSession();
+  const user = session?.user as any;
   const app = useContext(AppContext);
   const cart = app?.cart ?? [];
   const [term, setTerm] = useState('');
@@ -54,9 +57,25 @@ const HomeHeader: React.FC = () => {
           >
             <SearchIcon className="w-5 h-5" />
           </button>
-          <Link href="/profile" className="btn btn-ghost">
-            <UserIcon className="w-5 h-5" />
-          </Link>
+          {user ? (
+            <Link href="/profile" className="btn btn-ghost flex items-center gap-1">
+              <UserIcon className="w-5 h-5" />
+              <span className="hidden sm:block">
+                {user.firstName || user.lastName
+                  ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
+                  : user.email}
+              </span>
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="btn btn-ghost">
+                Login
+              </Link>
+              <Link href="/signup" className="btn btn-primary">
+                Signup
+              </Link>
+            </>
+          )}
           <Link href="/cart" className="btn btn-ghost relative">
             <CartIcon className="w-5 h-5" />
             {itemCount > 0 && (
