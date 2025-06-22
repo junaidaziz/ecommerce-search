@@ -51,7 +51,7 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const pageSize = 12;
+  const pageSize = 40;
 
   const [allVendors, setAllVendors] = useState<string[]>([]);
   const [allProductTypes, setAllProductTypes] = useState<string[]>([]);
@@ -322,7 +322,7 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
         <p className="text-gray-500">No products found</p>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full">
             {products.map((p) => (
               <ProductCard
                 key={p.id}
