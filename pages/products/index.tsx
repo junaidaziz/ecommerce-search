@@ -119,28 +119,6 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   const loadMoreFn = useRef(loadMore);
   loadMoreFn.current = loadMore;
 
-  const applyFiltersRef = useRef(applyFilters);
-  applyFiltersRef.current = applyFilters;
-
-
-  useEffect(() => {
-    if (!loadMoreRef.current) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMoreFn.current();
-        }
-      },
-      { rootMargin: '200px' }
-    );
-    observerRef.current = observer;
-    const el = loadMoreRef.current;
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
   const applyFilters = useCallback(
     async (e?: React.FormEvent) => {
       e?.preventDefault();
@@ -178,6 +156,28 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     },
     [router, keyword, selectedCategories, minPrice, maxPrice, inStock, addNotification]
   );
+
+  const applyFiltersRef = useRef(applyFilters);
+  applyFiltersRef.current = applyFilters;
+
+
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMoreFn.current();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observerRef.current = observer;
+    const el = loadMoreRef.current;
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     if (firstPriceRef.current) {
