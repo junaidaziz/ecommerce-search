@@ -97,7 +97,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
       <h1 className="text-2xl font-bold mb-4">{product.title || 'Product'}</h1>
       <div className="mb-4 w-full flex flex-col items-center">
         <ProductImageSlider
-          className="w-full max-w-sm md:max-w-md"
+          className="w-full"
           images={
             product.images && product.images.length > 0
               ? product.images
@@ -106,7 +106,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
                 : []
           }
           imgClass="hover:scale-110 transition"
-          aspectRatioClass="aspect-square md:aspect-[4/5]"
+          aspectRatioClass="aspect-square md:aspect-[4/3]"
         />
       </div>
       <p className="mb-2">Vendor: {product.vendor?.brandName ?? 'Unknown'}</p>

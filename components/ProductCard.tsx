@@ -44,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 : []
           }
           placeholderSeed={Number(product.id)}
-          className="w-full bg-gray-200 flex items-center justify-center"
+          className="w-4/5 mx-auto bg-gray-200 flex items-center justify-center"
           imgClass="transition-transform duration-200 group-hover:scale-105"
           aspectRatioClass="aspect-square"
         />
