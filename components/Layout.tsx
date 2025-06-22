@@ -10,13 +10,16 @@ interface LayoutProps {
 
 const Layout: FC<LayoutProps> = ({ children, heroSecond }) => {
   // If useTheme returns [Theme, Dispatch<SetStateAction<Theme>>]
-  const [theme, setTheme] = useTheme() as [string | Theme, Dispatch<SetStateAction<string | Theme>>];
+  const [theme, setTheme] = useTheme() as [
+    string | Theme,
+    Dispatch<SetStateAction<string | Theme>>,
+  ];
 
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden">
       <Header theme={theme} setTheme={setTheme} />
       {heroSecond && <div className="w-full">{heroSecond}</div>}
-      <main className="w-full mx-auto flex-1 px-4 sm:px-6 lg:px-8 py-6">
+      <main className="w-full max-w-[90%] mx-auto flex-1 px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
       <Footer />

@@ -229,7 +229,7 @@ export default function ProductDetail({
         />
       )}
       <div className="mt-4">
-        <Link href="/">&larr; Back to products</Link>
+        <Link href="/products">&larr; Back to products</Link>
       </div>
     </div>
   );

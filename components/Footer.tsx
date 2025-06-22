@@ -65,10 +65,10 @@ const Footer: FC = () => {
           </form>
         </div>
       </div>
-      <div className="mt-8 flex justify-center md:justify-start gap-4">
-        <VisaIcon size={32} />
-        <MastercardIcon size={32} />
-        <PaypalIcon size={32} />
+      <div className="mt-8 flex justify-end gap-4 pr-2">
+        <VisaIcon size={32} color="#1A1F71" />
+        <MastercardIcon size={32} color="#EB001B" />
+        <PaypalIcon size={32} color="#003087" />
       </div>
     </footer>
   );
