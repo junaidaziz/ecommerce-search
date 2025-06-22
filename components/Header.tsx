@@ -238,11 +238,29 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
 
           {user ? (
             <div className="dropdown dropdown-end">
-              <label tabIndex={0} className="flex items-center gap-1 cursor-pointer">
-                <UserIcon className="w-5 h-5" />
-                <span>{user.firstName || user.email}</span>
+              <label
+                tabIndex={0}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                {user.logo ? (
+                  <img
+                    src={user.logo}
+                    alt="avatar"
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <UserIcon className="w-5 h-5" />
+                )}
+                <span>
+                  {user.firstName || user.lastName
+                    ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
+                    : user.email}
+                </span>
               </label>
-              <ul tabIndex={0} className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded w-40">
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded w-40"
+              >
                 <li>
                   <Link href="/orders">My Orders</Link>
                 </li>

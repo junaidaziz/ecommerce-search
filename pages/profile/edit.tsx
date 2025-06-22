@@ -1,18 +1,30 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Head from 'next/head';
+import { useEffect, useState } from 'react';
 import useRequireAuth from '../../hooks/useRequireAuth';
 import { getPageTitle } from '../../lib/pageTitle';
-import { EmailInput, PasswordInput, TextInput } from '../../components/form-fields';
+import {
+  EmailInput,
+  PasswordInput,
+  TextInput,
+} from '../../components/form-fields';
+import type { User } from '../../types/user';
 
 interface FormValues {
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber: string;
+  address: string;
+  city: string;
+  country: string;
   password: string;
 }
 
 const EditProfile: React.FC = () => {
   const user = useRequireAuth();
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [loading, setLoading] = useState(true);
   const {
     register,
     handleSubmit,
@@ -23,9 +35,35 @@ const EditProfile: React.FC = () => {
       firstName: user?.firstName || '',
       lastName: user?.lastName || '',
       email: user?.email || '',
+      phoneNumber: '',
+      address: '',
+      city: '',
+      country: '',
       password: '',
     },
   });
+
+  useEffect(() => {
+    if (!user) return;
+    fetch('/api/user/profile')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: User | null) => {
+        if (data) {
+          reset({
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+            email: data.email,
+            phoneNumber: data.phoneNumber || '',
+            address: data.address || '',
+            city: data.city || '',
+            country: data.country || '',
+            password: '',
+          });
+        }
+      })
+      .finally(() => setLoading(false))
+      .catch(() => setLoading(false));
+  }, [user, reset]);
 
   const submit: SubmitHandler<FormValues> = async (data) => {
     await fetch('/api/user/profile', {
@@ -37,9 +75,10 @@ const EditProfile: React.FC = () => {
   };
 
   if (!user) return null;
+  if (loading) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="max-w-sm mx-auto">
+    <div className="max-w-md mx-auto">
       <Head>
         <title>{getPageTitle('Update Profile')}</title>
       </Head>
@@ -59,13 +98,56 @@ const EditProfile: React.FC = () => {
           rules={{ required: 'Required' }}
           error={errors.lastName?.message}
         />
-        <EmailInput<FormValues>
-          label="Email"
-          name="email"
+        <div className="flex items-end gap-2">
+          <div className="flex-1">
+            <EmailInput<FormValues>
+              label="Email"
+              name="email"
+              readOnly={!editingEmail}
+              register={register}
+              rules={{ required: 'Required' }}
+              error={errors.email?.message}
+            />
+          </div>
+          {!editingEmail && (
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => {
+                const pwd = window.prompt('Enter password to edit email');
+                if (pwd) setEditingEmail(true);
+              }}
+            >
+              Change Email
+            </button>
+          )}
+        </div>
+        <TextInput<FormValues>
+          label="Phone"
+          name="phoneNumber"
           register={register}
-          rules={{ required: 'Required' }}
-          error={errors.email?.message}
+          error={errors.phoneNumber?.message}
         />
+        <TextInput<FormValues>
+          label="Address"
+          name="address"
+          register={register}
+          error={errors.address?.message}
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <TextInput<FormValues>
+            label="City"
+            name="city"
+            register={register}
+            error={errors.city?.message}
+          />
+          <TextInput<FormValues>
+            label="Country"
+            name="country"
+            register={register}
+            error={errors.country?.message}
+          />
+        </div>
         <PasswordInput<FormValues>
           label="Password"
           name="password"
@@ -82,4 +164,3 @@ const EditProfile: React.FC = () => {
 };
 
 export default EditProfile;
-
