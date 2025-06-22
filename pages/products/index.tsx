@@ -75,7 +75,9 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const [maxPrice, setMaxPrice] = useState(
     typeof router.query.maxPrice === 'string' ? router.query.maxPrice : ''
   );
-  const inStock = router.query.inStock === 'true';
+  const [inStock, setInStock] = useState(
+    router.query.inStock === 'true'
+  );
   const [items, setItems] = useState<Product[]>(products);
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -83,6 +85,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver>();
   const isFetchingRef = useRef(false);
+  const filterAbortRef = useRef<AbortController | null>(null);
   const lastFetchRef = useRef(0);
   const priceTimer = useRef<NodeJS.Timeout>();
   const filterTimer = useRef<NodeJS.Timeout>();
@@ -136,6 +139,12 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const applyFilters = useCallback(
     async (e?: React.FormEvent) => {
       e?.preventDefault();
+      if (filterAbortRef.current) {
+        filterAbortRef.current.abort();
+      }
+      filterAbortRef.current = new AbortController();
+      const signal = filterAbortRef.current.signal;
+      isFetchingRef.current = true;
       const min = minPrice ? parseFloat(minPrice) : undefined;
       const max = maxPrice ? parseFloat(maxPrice) : undefined;
       if (
@@ -157,19 +166,30 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       if (inStock) query.inStock = 'true';
       const params = new URLSearchParams(query);
       params.set('page', '1');
-      const res = await fetch(`/api/products?${params.toString()}`);
-      if (res.ok) {
-        const data = (await res.json()) as {
-          products: Product[];
-          total: number;
-        };
-        setItems(data.products);
-        setPage(1);
-        setHasMore(data.products.length < data.total);
+      try {
+        const res = await fetch(`/api/products?${params.toString()}`, { signal });
+        if (res.ok) {
+          const data = (await res.json()) as {
+            products: Product[];
+            total: number;
+          };
+          setItems(data.products);
+          setPage(1);
+          setHasMore(data.products.length < data.total);
+        }
+        router.replace({ pathname: router.pathname, query }, undefined, {
+          shallow: true,
+        });
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          console.error('Failed to fetch products:', err);
+        }
+      } finally {
+        if (!signal.aborted) {
+          filterAbortRef.current = null;
+          isFetchingRef.current = false;
+        }
       }
-      router.replace({ pathname: router.pathname, query }, undefined, {
-        shallow: true,
-      });
     },
     [
       router,
@@ -184,6 +204,10 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
 
   const applyFiltersRef = useRef(applyFilters);
   applyFiltersRef.current = applyFilters;
+
+  useEffect(() => {
+    setInStock(router.query.inStock === 'true');
+  }, [router.query.inStock]);
 
 
   useEffect(() => {
@@ -230,30 +254,11 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     return () => {
       if (filterTimer.current) clearTimeout(filterTimer.current);
     };
-  }, [selectedCategories, keyword]);
+  }, [selectedCategories, keyword, inStock]);
 
-  const toggleInStock = useCallback(async () => {
-    const next = !inStock;
-    const query: Record<string, string> = {};
-    if (keyword) query.q = keyword;
-    if (selectedCategories.length > 0)
-      query.category = selectedCategories.join(',');
-    if (minPrice) query.minPrice = minPrice;
-    if (maxPrice) query.maxPrice = maxPrice;
-    if (next) query.inStock = 'true';
-    const params = new URLSearchParams(query);
-    params.set('page', '1');
-    const res = await fetch(`/api/products?${params.toString()}`);
-    if (res.ok) {
-      const data = (await res.json()) as { products: Product[]; total: number };
-      setItems(data.products);
-      setPage(1);
-      setHasMore(data.products.length < data.total);
-    }
-    router.replace({ pathname: router.pathname, query }, undefined, {
-      shallow: true,
-    });
-  }, [router, inStock, keyword, selectedCategories, minPrice, maxPrice]);
+  const toggleInStock = useCallback(() => {
+    setInStock((prev) => !prev);
+  }, []);
 
   const activeFilters: { label: string; clear: () => void }[] = [];
   if (selectedCategories.length > 0)
@@ -287,6 +292,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     setSelectedCategories([]);
     setMinPrice('');
     setMaxPrice('');
+    setInStock(false);
     router.replace({ pathname: router.pathname, query: {} }, undefined, {
       shallow: true,
     });
