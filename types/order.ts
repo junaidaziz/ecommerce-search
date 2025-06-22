@@ -5,6 +5,9 @@ import type { Product } from './product';
 export interface Order extends PrismaOrder {
   user: User;
   product: Product;
+  paymentMethod?: string | null;
+  paymentReference?: string | null;
+  paymentProof?: string | null;
 }
 
 type OrderResponse = Order;

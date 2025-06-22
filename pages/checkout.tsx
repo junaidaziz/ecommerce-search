@@ -7,6 +7,7 @@ import { AppContext, AppContextValue } from '../contexts/AppContext';
 import type { User } from '../types/user';
 import type { Coupon } from '../types';
 import { TextInput, Textarea } from '../components/form-fields';
+import FileUpload from '../components/form-fields/FileUpload';
 
 // Types for cart item and user
 type CartItem = {
@@ -33,6 +34,9 @@ const Checkout: React.FC = () => {
   const [error, setError] = useState('');
   const [coupon, setCoupon] = useState('');
   const [discount, setDiscount] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [paymentReference, setPaymentReference] = useState('');
+  const [paymentProof, setPaymentProof] = useState<File | null>(null);
 
   const itemCount = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce(
@@ -63,19 +67,33 @@ const Checkout: React.FC = () => {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('/api/checkout/create-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart,
-          email: user.email,
-          shipping: { name, address },
-          discount,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Checkout failed');
-      window.location.href = data.url;
+      if (paymentMethod === 'card') {
+        const res = await fetch('/api/checkout/create-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: cart,
+            email: user.email,
+            shipping: { name, address },
+            discount,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Checkout failed');
+        window.location.href = data.url;
+      } else {
+        const fd = new FormData();
+        fd.append('email', user.email);
+        fd.append('items', JSON.stringify(cart));
+        fd.append('total', discountedTotal.toString());
+        fd.append('paymentMethod', paymentMethod);
+        if (paymentReference) fd.append('paymentReference', paymentReference);
+        if (paymentProof) fd.append('paymentProof', paymentProof);
+        const res = await fetch('/api/orders', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Checkout failed');
+        router.push('/orders');
+      }
     } catch (e: any) {
       setError(e.message || 'Order failed');
     }
@@ -182,14 +200,67 @@ const Checkout: React.FC = () => {
             <Textarea
               name="address"
               id="address"
-            className="w-full"
-            value={address}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              setAddress(e.target.value)
-            }
-            required
-          />
+              className="w-full"
+              value={address}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                setAddress(e.target.value)
+              }
+              required
+            />
         </div>
+        <div>
+          <label className="label" htmlFor="paymentMethod">
+            Payment Method
+          </label>
+          <select
+            id="paymentMethod"
+            className="select select-bordered w-full"
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+          >
+            <option value="card">Credit/Debit Card</option>
+            <option value="easypaisa">EasyPaisa</option>
+            <option value="jazzcash">JazzCash</option>
+            <option value="bank">Bank Transfer</option>
+          </select>
+        </div>
+        {paymentMethod !== 'card' && (
+          <div className="border p-3 rounded space-y-2">
+            {paymentMethod === 'easypaisa' && (
+              <p>
+                Send payment to EasyPaisa account <b>0300-1234567</b> and enter
+                the transaction ID below.
+              </p>
+            )}
+            {paymentMethod === 'jazzcash' && (
+              <p>
+                Send payment to JazzCash account <b>0300-7654321</b> and enter
+                the transaction ID below.
+              </p>
+            )}
+            {paymentMethod === 'bank' && (
+              <p>
+                Transfer to Bank Account <b>PK00 TEST 1234 5678 9012 3456</b> and
+                provide reference.
+              </p>
+            )}
+            <TextInput
+              name="reference"
+              id="reference"
+              placeholder="Transaction / Reference ID"
+              className="w-full"
+              value={paymentReference}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setPaymentReference(e.target.value)
+              }
+            />
+            <FileUpload
+              name="proof"
+              label="Upload Payment Proof (optional)"
+              onChange={(e) => setPaymentProof(e.target.files?.[0] || null)}
+            />
+          </div>
+        )}
         {error && <p className="text-red-500">{error}</p>}
         <button className="btn btn-primary" type="submit">
           Place Order
