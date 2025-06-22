@@ -7,6 +7,7 @@ import { AppContext } from '../contexts/AppContext';
 import CartIcon from './icons/CartIcon';
 import MoonIcon from './icons/MoonIcon';
 import SunIcon from './icons/SunIcon';
+import UserIcon from './icons/UserIcon';
 import MenuIcon from './icons/MenuIcon';
 import ChevronDownIcon from './icons/ChevronDownIcon';
 import ElectronicsIcon from './icons/ElectronicsIcon';
@@ -235,12 +236,26 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           </label>
 
           {user ? (
-            <>
-              <span>Hello, {user.firstName || user.email}</span>
-              <button onClick={logout} className="btn btn-outline">
-                Logout
-              </button>
-            </>
+            <div className="dropdown dropdown-end">
+              <label tabIndex={0} className="flex items-center gap-1 cursor-pointer">
+                <UserIcon className="w-5 h-5" />
+                <span>{user.firstName || user.email}</span>
+              </label>
+              <ul tabIndex={0} className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded w-40">
+                <li>
+                  <Link href="/orders">My Orders</Link>
+                </li>
+                <li>
+                  <Link href="/profile">Profile</Link>
+                </li>
+                <li>
+                  <Link href="/profile/edit">Update Profile</Link>
+                </li>
+                <li>
+                  <button onClick={logout}>Logout</button>
+                </li>
+              </ul>
+            </div>
           ) : (
             !isAuthRoute && (
               <>

@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../contexts/AppContext';
+import { useEffect, useState } from 'react';
+import useRequireAuth from '../hooks/useRequireAuth';
 import type { Order } from '../types';
 import Head from 'next/head';
 import { getPageTitle } from '../lib/pageTitle';
@@ -7,7 +7,7 @@ import { getPageTitle } from '../lib/pageTitle';
 type OrdersProps = {};
 
 const Orders: React.FC<OrdersProps> = (_props) => {
-  const { user } = useContext(AppContext)!;
+  const user = useRequireAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,7 @@ const Orders: React.FC<OrdersProps> = (_props) => {
   }, [user]);
 
   if (!user) {
-    return <div className="p-4">Please log in to view orders.</div>;
+    return null;
   }
 
   return (
