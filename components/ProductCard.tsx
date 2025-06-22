@@ -9,6 +9,8 @@ interface ProductCardProps {
   product: Product;
   highlightTitle?: string;
   highlightDescription?: string;
+  /** Render a smaller card variant */
+  compact?: boolean;
   className?: string;
 }
 
@@ -16,6 +18,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   product,
   highlightTitle,
   highlightDescription,
+  compact = false,
   className = '',
 }) => {
   const context = useContext(AppContext) as AppContextValue;
@@ -56,10 +59,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {isOut && <span className="badge">Out of stock</span>}
         </div>
       )}
-      <div className="p-2 flex flex-col gap-1">
+      <div className={`${compact ? 'p-1 gap-0.5' : 'p-2 gap-1'} flex flex-col`}>
         <Link
           href={`/product/${product.slug}`}
-          className="font-semibold text-base line-clamp-2 hover:underline"
+          className={`font-semibold line-clamp-2 hover:underline ${compact ? 'text-sm' : 'text-base'}`}
         >
           <span
             dangerouslySetInnerHTML={{
@@ -67,7 +70,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
             }}
           />
         </Link>
-        <p className="text-sm text-base-content line-clamp-2">
+        <p
+          className={`text-base-content line-clamp-2 ${compact ? 'text-xs' : 'text-sm'}`}
+        >
           <span
             dangerouslySetInnerHTML={{
               __html:
@@ -78,8 +83,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
             }}
           />
         </p>
-        <div className="flex justify-between items-center mt-auto text-sm">
-          <span className="font-bold text-base">
+        <div
+          className={`flex justify-between items-center mt-auto ${compact ? 'text-xs' : 'text-sm'}`}
+        >
+          <span className={`font-bold ${compact ? 'text-sm' : 'text-base'}`}>
             {formatCurrency(product.minPrice ?? 0, product.currency)}
           </span>
           {product.reviewCount > 0 && (
@@ -90,7 +97,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </div>
         <button
-          className="btn btn-sm btn-primary absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
+          className={`btn btn-primary absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity ${compact ? 'btn-xs' : 'btn-sm'}`}
           onClick={() => addToCart && addToCart(product)}
           disabled={!addToCart}
         >
