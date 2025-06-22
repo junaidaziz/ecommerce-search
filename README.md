@@ -76,12 +76,23 @@ TYPESENSE_API_KEY=xyz
 
 Visit [http://localhost:8108/health](http://localhost:8108/health) to verify the server is running.
 
-6. **Place your product data**
+6. **Initialize the Typesense collection**
+
+```bash
+npm run init:typesense
+```
+
+7. **Place your product data**
 
 Either put your `products.csv` inside the `/data/` directory **or** specify a
-remote file via the `PRODUCTS_URL` environment variable.
+remote file via the `PRODUCTS_URL` environment variable. Then seed the database
+and index the products:
 
-7. **Run the project**
+```bash
+npm run seed:products
+```
+
+8. **Run the project**
 
 ```bash
 npm run dev
