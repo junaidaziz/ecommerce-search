@@ -33,7 +33,10 @@ interface HistoryInfo {
   id?: string;
 }
 
-const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
+const Home: React.FC & {
+  heroSecond?: typeof HeroSlider;
+  maxWidthClass?: string;
+} = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [products, setProducts] = useState<SearchResult[]>([]);
@@ -378,5 +381,6 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
 };
 
 Home.heroSecond = HeroSlider;
+Home.maxWidthClass = 'max-w-[95%] 2xl:max-w-[1440px]';
 
 export default Home;
