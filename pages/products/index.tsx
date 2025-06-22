@@ -83,7 +83,9 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver>();
   const isFetchingRef = useRef(false);
+  const lastFetchRef = useRef(0);
   const priceTimer = useRef<NodeJS.Timeout>();
+  const filterTimer = useRef<NodeJS.Timeout>();
   const firstPriceRef = useRef(true);
   const firstFilterRef = useRef(true);
 
@@ -109,6 +111,9 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
 
   const loadMore = useCallback(async () => {
     if (isFetchingRef.current || loadingMore || !hasMore) return;
+    const now = Date.now();
+    if (now - lastFetchRef.current < 500) return;
+    lastFetchRef.current = now;
     isFetchingRef.current = true;
     setLoadingMore(true);
     const next = page + 1;
@@ -218,7 +223,13 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       firstFilterRef.current = false;
       return;
     }
-    applyFiltersRef.current();
+    if (filterTimer.current) clearTimeout(filterTimer.current);
+    filterTimer.current = setTimeout(() => {
+      applyFiltersRef.current();
+    }, 300);
+    return () => {
+      if (filterTimer.current) clearTimeout(filterTimer.current);
+    };
   }, [selectedCategories, keyword]);
 
   const toggleInStock = useCallback(async () => {
