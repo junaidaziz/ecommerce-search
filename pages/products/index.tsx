@@ -128,27 +128,6 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const loadMoreFn = useRef(loadMore);
   loadMoreFn.current = loadMore;
 
-  const applyFiltersRef = useRef(applyFilters);
-  applyFiltersRef.current = applyFilters;
-
-  useEffect(() => {
-    if (!loadMoreRef.current) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMoreFn.current();
-        }
-      },
-      { rootMargin: '200px' }
-    );
-    observerRef.current = observer;
-    const el = loadMoreRef.current;
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
   const applyFilters = useCallback(
     async (e?: React.FormEvent) => {
       e?.preventDefault();
@@ -197,6 +176,28 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       addNotification,
     ]
   );
+
+  const applyFiltersRef = useRef(applyFilters);
+  applyFiltersRef.current = applyFilters;
+
+
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMoreFn.current();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observerRef.current = observer;
+    const el = loadMoreRef.current;
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     if (firstPriceRef.current) {
