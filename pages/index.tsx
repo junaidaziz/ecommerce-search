@@ -63,7 +63,9 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
   useEffect(() => {
     const pageParam = router.query.page;
     if (pageParam) {
-      const p = Array.isArray(pageParam) ? parseInt(pageParam[0], 10) : parseInt(pageParam as string, 10);
+      const p = Array.isArray(pageParam)
+        ? parseInt(pageParam[0], 10)
+        : parseInt(pageParam as string, 10);
       setCurrentPage(isNaN(p) ? 1 : p);
     } else {
       setCurrentPage(1);
@@ -227,8 +229,13 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
-      const query = { ...router.query, page: String(newPage) } as Record<string, string>;
-      router.push({ pathname: router.pathname, query }, undefined, { shallow: true });
+      const query = { ...router.query, page: String(newPage) } as Record<
+        string,
+        string
+      >;
+      router.push({ pathname: router.pathname, query }, undefined, {
+        shallow: true,
+      });
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -251,7 +258,9 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
     e.preventDefault();
     setCurrentPage(1);
     const query = { ...router.query, page: '1' } as Record<string, string>;
-    router.push({ pathname: router.pathname, query }, undefined, { shallow: true });
+    router.push({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
+    });
     fetchProducts();
   };
 
@@ -262,7 +271,11 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
       clear: () => {
         setFilterByVendor('All');
         setCurrentPage(1);
-        router.push({ pathname: router.pathname, query: { ...router.query, page: '1' } }, undefined, { shallow: true });
+        router.push(
+          { pathname: router.pathname, query: { ...router.query, page: '1' } },
+          undefined,
+          { shallow: true }
+        );
       },
     });
   if (filterByType !== 'All')
@@ -276,7 +289,11 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
       clear: () => {
         setFilterByCategory('All');
         setCurrentPage(1);
-        router.push({ pathname: router.pathname, query: { ...router.query, page: '1' } }, undefined, { shallow: true });
+        router.push(
+          { pathname: router.pathname, query: { ...router.query, page: '1' } },
+          undefined,
+          { shallow: true }
+        );
       },
     });
   if (inStock)
@@ -285,7 +302,11 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
       clear: () => {
         setInStock(false);
         setCurrentPage(1);
-        router.push({ pathname: router.pathname, query: { ...router.query, page: '1' } }, undefined, { shallow: true });
+        router.push(
+          { pathname: router.pathname, query: { ...router.query, page: '1' } },
+          undefined,
+          { shallow: true }
+        );
       },
     });
   if (minPrice)
@@ -294,7 +315,11 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
       clear: () => {
         setMinPrice('');
         setCurrentPage(1);
-        router.push({ pathname: router.pathname, query: { ...router.query, page: '1' } }, undefined, { shallow: true });
+        router.push(
+          { pathname: router.pathname, query: { ...router.query, page: '1' } },
+          undefined,
+          { shallow: true }
+        );
       },
     });
   if (maxPrice)
@@ -303,7 +328,11 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
       clear: () => {
         setMaxPrice('');
         setCurrentPage(1);
-        router.push({ pathname: router.pathname, query: { ...router.query, page: '1' } }, undefined, { shallow: true });
+        router.push(
+          { pathname: router.pathname, query: { ...router.query, page: '1' } },
+          undefined,
+          { shallow: true }
+        );
       },
     });
 
@@ -322,7 +351,7 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
         <p className="text-gray-500">No products found</p>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4 w-full">
             {products.map((p) => (
               <ProductCard
                 key={p.id}
@@ -333,6 +362,7 @@ const Home: React.FC & { heroSecond?: typeof HeroSlider } = () => {
                 highlightDescription={
                   p.highlights?.find((h) => h.field === 'description')?.snippet
                 }
+                compact
               />
             ))}
           </div>
