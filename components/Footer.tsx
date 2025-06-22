@@ -18,9 +18,9 @@ const Footer: FC = () => {
     <footer className="bg-base-300 mt-12 py-8 text-base-content">
       <div className="w-full px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          <h3 className="font-bold mb-2">Organic Store</h3>
+          <h3 className="font-bold mb-2">ShopVerse</h3>
           <p className="text-sm text-gray-600">
-            Quality products for healthy living.
+            Everything you need, all in one place.
           </p>
         </div>
         <div>
