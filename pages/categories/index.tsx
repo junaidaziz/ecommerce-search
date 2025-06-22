@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Head from 'next/head';
+import CategoryCard from '../../components/CategoryCard';
 import { getPageTitle } from '../../lib/pageTitle';
 import { Category } from '../../types';
 
@@ -10,25 +10,28 @@ const Categories: React.FC = () => {
   useEffect(() => {
     fetch('/api/categories')
       .then((res) => (res.ok ? res.json() : { categories: [] }))
-      .then((data: { categories: Category[] }) => setCategories(data.categories));
+      .then((data: { categories: Category[] }) =>
+        setCategories(data.categories)
+      );
   }, []);
 
   const renderCat = (cat: Category): React.ReactNode => (
-    <li key={cat.id}>
-      <Link href={`/categories/${encodeURIComponent(cat.name)}`}>{cat.name}</Link>
-    </li>
+    <CategoryCard key={cat.id ?? cat.name} category={cat} />
   );
 
   return (
-    <div className="max-w-2xl mx-auto min-h-screen p-4">
+    <div className="max-w-screen-lg mx-auto min-h-screen p-4">
       <Head>
         <title>{getPageTitle('Categories')}</title>
       </Head>
       <h1 className="text-2xl font-bold mb-4">Categories</h1>
-      <ul className="list-disc pl-4 space-y-2">
-        {categories.map((c) => renderCat(c))}
-        {categories.length === 0 && <li>No categories found.</li>}
-      </ul>
+      {categories.length === 0 ? (
+        <p>No categories found.</p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {categories.map((c) => renderCat(c))}
+        </div>
+      )}
     </div>
   );
 };
