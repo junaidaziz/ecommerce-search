@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { FC } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import VisaIcon from './icons/VisaIcon';
@@ -21,7 +22,13 @@ const Footer: FC = () => {
     <footer className="bg-base-300 mt-12 py-8 text-base-content px-4 sm:px-6 lg:px-8">
       <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <h3 className="font-bold mb-2">ShopVerse</h3>
+          <Image
+            src="/images/logo.png"
+            alt="Logo"
+            width={120}
+            height={40}
+            className="mb-2"
+          />
           <p className="text-sm text-gray-600">
             Everything you need, all in one place.
           </p>
@@ -75,7 +82,7 @@ const Footer: FC = () => {
         </div>
         <div className="flex items-end justify-end gap-4">
           <VisaIcon size={36} className="text-blue-600" />
-          <MastercardIcon size={36} className="text-red-500" />
+          <MastercardIcon size={36} className="text-[#EB001B]" />
           <PaypalIcon size={36} className="text-blue-500" />
         </div>
       </div>
