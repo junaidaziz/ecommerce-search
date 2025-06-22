@@ -25,6 +25,7 @@ const SearchBar: FC<SearchBarProps> = ({
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedIdx, setSelectedIdx] = useState(-1);
   const [recent, setRecent] = useState<string[]>([]);
   const [trending, setTrending] = useState<string[]>([]);
   const suggestTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -57,6 +58,7 @@ const SearchBar: FC<SearchBarProps> = ({
   useEffect(() => {
     if (!query.trim()) {
       setSuggestions([]);
+      setSelectedIdx(-1);
       return;
     }
     if (suggestTimeout.current) clearTimeout(suggestTimeout.current);
@@ -69,6 +71,7 @@ const SearchBar: FC<SearchBarProps> = ({
           if (data && Array.isArray(data.suggestions))
             setSuggestions(data.suggestions);
           else setSuggestions([]);
+          setSelectedIdx(-1);
         })
         .catch(() => setSuggestions([]));
     }, 250);
@@ -89,6 +92,30 @@ const SearchBar: FC<SearchBarProps> = ({
     );
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      if (!showSuggestions) {
+        setShowSuggestions(true);
+        return;
+      }
+      if (suggestions.length === 0) return;
+      e.preventDefault();
+      setSelectedIdx((idx) => (idx + 1) % suggestions.length);
+    } else if (e.key === 'ArrowUp') {
+      if (!showSuggestions) return;
+      if (suggestions.length === 0) return;
+      e.preventDefault();
+      setSelectedIdx((idx) => (idx - 1 + suggestions.length) % suggestions.length);
+    } else if (e.key === 'Enter') {
+      if (selectedIdx >= 0) {
+        e.preventDefault();
+        handleSearch(suggestions[selectedIdx]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+    }
+  };
+
   const handleSearch = (term: string) => {
     const trimmed = term.trim();
     if (!trimmed) return;
@@ -104,6 +131,7 @@ const SearchBar: FC<SearchBarProps> = ({
     }
     setQuery(trimmed);
     setShowSuggestions(false);
+    setSelectedIdx(-1);
     if (onSearch) onSearch(trimmed);
     else router.push(`/products?q=${encodeURIComponent(trimmed)}`);
   };
@@ -126,9 +154,13 @@ const SearchBar: FC<SearchBarProps> = ({
       <input
         className="input input-bordered w-full pr-16"
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setShowSuggestions(true);
+        }}
         onFocus={() => setShowSuggestions(true)}
         onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder}
       />
       {query && (
@@ -139,6 +171,7 @@ const SearchBar: FC<SearchBarProps> = ({
           onClick={() => {
             setQuery('');
             setSuggestions([]);
+            setSelectedIdx(-1);
           }}
         >
           ×
@@ -149,12 +182,15 @@ const SearchBar: FC<SearchBarProps> = ({
         <div className="absolute left-0 right-0 mt-1 bg-base-100 border border-base-200 shadow rounded z-50">
           {query && suggestions.length > 0 && (
             <ul>
-              {suggestions.map((s) => (
+              {suggestions.map((s, idx) => (
                 <li key={s}>
                   <button
                     type="button"
-                    className="block w-full text-left px-3 py-1 hover:bg-base-200"
+                    className={`block w-full text-left px-3 py-1 hover:bg-base-200 ${
+                      idx === selectedIdx ? 'bg-base-200' : ''
+                    }`}
                     onMouseDown={(e) => e.preventDefault()}
+                    onMouseEnter={() => setSelectedIdx(idx)}
                     onClick={() => selectSuggestion(s)}
                   >
                     {highlightMatch(s, query)}
