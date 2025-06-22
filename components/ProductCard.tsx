@@ -33,10 +33,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <Link href={`/product/${product.slug}`} className="block overflow-hidden">
         <ProductImageSlider
           images={
-            product.images && product.images.length > 0
-              ? product.images
-              : product.featuredImage
-                ? [product.featuredImage]
+            product.featuredImage
+              ? [product.featuredImage]
+              : product.images && product.images.length > 0
+                ? [product.images[0]]
                 : []
           }
           placeholderSeed={Number(product.id)}
