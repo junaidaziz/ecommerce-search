@@ -136,12 +136,15 @@ export function AppProvider({ children }: AppProviderProps) {
       throw new Error('Signup failed');
     }
     const data: T = await res.json();
-    addNotification('Signup successful', 'success');
+    addNotification(
+      'Signup successful! Please check your email to verify your account before logging in.',
+      'success'
+    );
     return data;
   };
 
   const logout = (): void => {
-    nextSignOut({ redirect: false });
+    nextSignOut({ callbackUrl: '/' });
     addNotification('Logged out', 'info');
   };
 
