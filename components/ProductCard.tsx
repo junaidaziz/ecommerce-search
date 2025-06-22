@@ -9,12 +9,14 @@ interface ProductCardProps {
   product: Product;
   highlightTitle?: string;
   highlightDescription?: string;
+  className?: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
   highlightTitle,
   highlightDescription,
+  className = '',
 }) => {
   const context = useContext(AppContext) as AppContextValue;
   const addToCart = context?.addToCart;
@@ -29,7 +31,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const rating = Math.round(product.averageRating || 0);
 
   return (
-    <div className="group relative flex flex-col h-full bg-base-100 border border-base-300 rounded-xl overflow-hidden shadow hover:shadow-lg transition-shadow duration-200">
+    <div
+      className={`group relative flex flex-col h-full bg-base-100 border border-base-300 rounded-xl overflow-hidden shadow hover:shadow-lg transition-shadow duration-200 ${className}`}
+    >
       <Link href={`/product/${product.slug}`} className="block overflow-hidden">
         <ProductImageSlider
           images={
@@ -40,8 +44,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 : []
           }
           placeholderSeed={Number(product.id)}
-          className="w-full bg-gray-200 flex items-center justify-center aspect-[4/5]"
+          className="w-full bg-gray-200 flex items-center justify-center"
           imgClass="transition-transform duration-200 group-hover:scale-105"
+          aspectRatioClass="aspect-square"
         />
       </Link>
       {(isNew || onSale || isOut) && (
