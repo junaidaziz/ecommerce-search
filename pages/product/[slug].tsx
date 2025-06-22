@@ -100,7 +100,7 @@ export default function ProductDetail({
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/2 flex justify-center">
           <ProductImageSlider
-            className="w-full"
+            className="w-11/12 md:w-10/12 mx-auto"
             images={
               product.images && product.images.length > 0
                 ? product.images
