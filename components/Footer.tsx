@@ -19,24 +19,33 @@ const Footer: FC = () => {
   };
   return (
     <footer className="bg-base-300 mt-12 py-8 text-base-content px-4 sm:px-6 lg:px-8">
-      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
           <h3 className="font-bold mb-2">ShopVerse</h3>
           <p className="text-sm text-gray-600">
             Everything you need, all in one place.
           </p>
+          <div className="mt-4 text-sm space-y-1">
+            <p>123 Market Street, London</p>
+            <p>
+              <a href="mailto:info@shopverse.com" className="link">
+                info@shopverse.com
+              </a>
+            </p>
+            <p>+44 1234 567890</p>
+          </div>
         </div>
         <div>
-          <h4 className="font-semibold mb-2">Quick Links</h4>
+          <h4 className="font-semibold mb-2">Useful Links</h4>
           <ul className="space-y-1">
             <li>
-              <Link href="/">Home</Link>
+              <Link href="/shipping">Shipping</Link>
             </li>
             <li>
-              <Link href="/products">Products</Link>
+              <Link href="/privacy">Privacy Policy</Link>
             </li>
             <li>
-              <Link href="/categories">Categories</Link>
+              <Link href="/terms">Terms &amp; Conditions</Link>
             </li>
           </ul>
         </div>
@@ -64,11 +73,11 @@ const Footer: FC = () => {
             )}
           </form>
         </div>
-      </div>
-      <div className="mt-8 flex justify-end gap-4 pr-2">
-        <VisaIcon size={32} color="#1A1F71" />
-        <MastercardIcon size={32} color="#EB001B" />
-        <PaypalIcon size={32} color="#003087" />
+        <div className="flex items-end justify-end gap-4">
+          <VisaIcon size={32} color="#1A1F71" />
+          <MastercardIcon size={32} color="#EB001B" />
+          <PaypalIcon size={32} color="#003087" />
+        </div>
       </div>
     </footer>
   );
