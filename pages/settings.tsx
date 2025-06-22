@@ -1,0 +1,234 @@
+import { useState, useEffect, useMemo, useContext } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import Head from 'next/head';
+import countryList from 'react-select-country-list';
+import { getPageTitle } from '../lib/pageTitle';
+import useRequireAuth from '../hooks/useRequireAuth';
+import { NotificationContext } from '../contexts/NotificationContext';
+import {
+  TextInput,
+  EmailInput,
+  PasswordInput,
+  SelectDropdown,
+} from '../components/form-fields';
+
+interface ProfileFormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+}
+
+interface PasswordFormValues {
+  password: string;
+  confirm: string;
+}
+
+interface AddressFormValues {
+  address: string;
+  city: string;
+  country: { label: string; value: string } | null;
+}
+
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+const SettingsPage: React.FC = () => {
+  const user = useRequireAuth();
+  const { addNotification } = useContext(NotificationContext);
+  const [active, setActive] = useState<'profile' | 'password' | 'address'>('profile');
+  const countryOptions = useMemo(() => countryList().getData(), []);
+
+  const profileForm = useForm<ProfileFormValues>();
+  const passwordForm = useForm<PasswordFormValues>();
+  const addressForm = useForm<AddressFormValues>();
+
+  useEffect(() => {
+    if (!user) return;
+    fetch('/api/user/profile')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        profileForm.reset({
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          email: data.email || '',
+          phoneNumber: data.phoneNumber || '',
+        });
+        addressForm.reset({
+          address: data.address || '',
+          city: data.city || '',
+          country: data.country ? { label: data.country, value: data.country } : null,
+        });
+      })
+      .catch(() => {});
+  }, [user, profileForm, addressForm]);
+
+  const submitProfile: SubmitHandler<ProfileFormValues> = async (values) => {
+    const res = await fetch('/api/user/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+    if (res.ok) addNotification('Profile updated', 'success');
+    else addNotification('Update failed', 'error');
+  };
+
+  const submitPassword: SubmitHandler<PasswordFormValues> = async ({ password }) => {
+    const res = await fetch('/api/user/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    });
+    if (res.ok) addNotification('Password changed', 'success');
+    else addNotification('Change failed', 'error');
+    passwordForm.reset();
+  };
+
+  const submitAddress: SubmitHandler<AddressFormValues> = async (values) => {
+    const payload = {
+      address: values.address,
+      city: values.city,
+      country: values.country?.value || '',
+    };
+    const res = await fetch('/api/user/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) addNotification('Address updated', 'success');
+    else addNotification('Update failed', 'error');
+  };
+
+  if (!user) return null;
+
+  return (
+    <div className="flex flex-col md:flex-row gap-6">
+      <Head>
+        <title>{getPageTitle('Settings')}</title>
+      </Head>
+      <aside className="md:w-48 w-full">
+        <ul className="menu menu-vertical bg-base-100 rounded-box">
+          <li>
+            <button
+              className={active === 'profile' ? 'active' : ''}
+              onClick={() => setActive('profile')}
+            >
+              Update Profile
+            </button>
+          </li>
+          <li>
+            <button
+              className={active === 'password' ? 'active' : ''}
+              onClick={() => setActive('password')}
+            >
+              Change Password
+            </button>
+          </li>
+          <li>
+            <button
+              className={active === 'address' ? 'active' : ''}
+              onClick={() => setActive('address')}
+            >
+              Manage Address
+            </button>
+          </li>
+        </ul>
+      </aside>
+      <div className="flex-1">
+        {active === 'profile' && (
+          <form onSubmit={profileForm.handleSubmit(submitProfile)} className="space-y-2 max-w-md">
+            <h2 className="text-xl font-bold mb-2">Update Profile</h2>
+            <TextInput
+              label="First Name"
+              register={profileForm.register}
+              name="firstName"
+              rules={{ required: 'Required' }}
+              error={profileForm.formState.errors.firstName?.message}
+            />
+            <TextInput
+              label="Last Name"
+              register={profileForm.register}
+              name="lastName"
+              rules={{ required: 'Required' }}
+              error={profileForm.formState.errors.lastName?.message}
+            />
+            <EmailInput
+              label="Email"
+              register={profileForm.register}
+              name="email"
+              rules={{ required: 'Required' }}
+              error={profileForm.formState.errors.email?.message}
+            />
+            <TextInput
+              label="Phone Number"
+              register={profileForm.register}
+              name="phoneNumber"
+              error={profileForm.formState.errors.phoneNumber?.message}
+            />
+            <button type="submit" className="btn btn-primary w-full">
+              Save
+            </button>
+          </form>
+        )}
+        {active === 'password' && (
+          <form onSubmit={passwordForm.handleSubmit(submitPassword)} className="space-y-2 max-w-md">
+            <h2 className="text-xl font-bold mb-2">Change Password</h2>
+            <PasswordInput
+              label="New Password"
+              register={passwordForm.register}
+              name="password"
+              rules={{ required: 'Required', pattern: { value: passwordRegex, message: 'Weak password' } }}
+              error={passwordForm.formState.errors.password?.message}
+            />
+            <PasswordInput
+              label="Confirm Password"
+              register={passwordForm.register}
+              name="confirm"
+              rules={{
+                required: 'Required',
+                validate: (v) => v === passwordForm.getValues('password') || 'Passwords do not match',
+              }}
+              error={passwordForm.formState.errors.confirm?.message}
+            />
+            <button type="submit" className="btn btn-primary w-full">
+              Change Password
+            </button>
+          </form>
+        )}
+        {active === 'address' && (
+          <form onSubmit={addressForm.handleSubmit(submitAddress)} className="space-y-2 max-w-md">
+            <h2 className="text-xl font-bold mb-2">Manage Address</h2>
+            <TextInput
+              label="Address"
+              register={addressForm.register}
+              name="address"
+              rules={{ required: 'Required' }}
+              error={addressForm.formState.errors.address?.message}
+            />
+            <TextInput
+              label="City"
+              register={addressForm.register}
+              name="city"
+              rules={{ required: 'Required' }}
+              error={addressForm.formState.errors.city?.message}
+            />
+            <SelectDropdown
+              label="Country"
+              name="country"
+              control={addressForm.control}
+              options={countryOptions}
+              placeholder="Select country"
+              rules={{ required: 'Required' }}
+              error={addressForm.formState.errors.country?.message as string}
+            />
+            <button type="submit" className="btn btn-primary w-full">
+              Save Address
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default SettingsPage;
