@@ -213,6 +213,10 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           {!isAuthRoute && (
             <SearchBar placeholder="Search for products, brands..." />
           )}
+          <nav className="hidden lg:flex gap-4 ml-4">
+            <Link href="/about">About</Link>
+            <Link href="/contact">Contact</Link>
+          </nav>
         </div>
 
         <nav className="flex items-center gap-2">
