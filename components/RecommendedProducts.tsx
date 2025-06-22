@@ -7,24 +7,28 @@ interface RecommendedProductsProps {
   category?: string;
   excludeId?: string;
   title?: string;
+  limit?: number;
 }
 
 const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
   category,
   excludeId,
-  title = 'You may also like',
+  title = 'Suggested Products',
+  limit = 5,
 }) => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     if (!category) return;
     fetch(
-      `/api/search?filterByCategory=${encodeURIComponent(category)}&perPage=10`
+      `/api/search?filterByCategory=${encodeURIComponent(category)}&perPage=${limit}`
     )
       .then((res) => (res.ok ? (res.json() as Promise<SearchResults>) : null))
       .then((data) => {
         if (data && Array.isArray(data.results)) {
-          const filtered = data.results.filter((p) => p.id !== excludeId);
+          const filtered = data.results
+            .filter((p) => p.id !== excludeId)
+            .slice(0, limit);
           setProducts(filtered);
         }
       })

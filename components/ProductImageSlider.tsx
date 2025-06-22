@@ -46,6 +46,9 @@ export default function ProductImageSlider({
       </div>
     );
   }
+  const next = () => setIdx((idx + 1) % urls.length);
+  const prev = () => setIdx((idx - 1 + urls.length) % urls.length);
+
   return (
     <div className={`relative ${aspectRatioClass} ${className}`}>
       <Image
@@ -57,18 +60,34 @@ export default function ProductImageSlider({
         onError={() => setErrorMap((m) => ({ ...m, [idx]: true }))}
       />
       {urls.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-          {urls.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setIdx(i)}
-              className={`w-2 h-2 rounded-full ${
-                i === idx ? 'bg-primary' : 'bg-base-300'
-              }`}
-            />
-          ))}
-        </div>
+        <>
+          <button
+            type="button"
+            onClick={prev}
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-base-100/70 rounded-full p-1"
+          >
+            <ChevronLeftIcon />
+          </button>
+          <button
+            type="button"
+            onClick={next}
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-base-100/70 rounded-full p-1"
+          >
+            <ChevronRightIcon />
+          </button>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+            {urls.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setIdx(i)}
+                className={`w-2 h-2 rounded-full ${
+                  i === idx ? 'bg-primary' : 'bg-base-300'
+                }`}
+              />
+            ))}
+          </div>
+        </>
       )}
       {zoom && (
         <dialog
@@ -87,13 +106,45 @@ export default function ProductImageSlider({
             >
               ✖
             </button>
-            <Image
-              src={errorMap[idx] ? placeholderUrl : images[idx].url}
-              alt={images[idx].alt || `Image ${idx + 1}`}
-              width={800}
-              height={800}
-              className="w-full h-auto object-contain"
-            />
+            <div className="relative w-full flex items-center justify-center">
+              <Image
+                src={errorMap[idx] ? placeholderUrl : images[idx].url}
+                alt={images[idx].alt || `Image ${idx + 1}`}
+                width={800}
+                height={800}
+                className="w-full h-auto object-contain max-h-[80vh]"
+              />
+              {urls.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={prev}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-base-100/70 rounded-full p-1"
+                  >
+                    <ChevronLeftIcon />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={next}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-base-100/70 rounded-full p-1"
+                  >
+                    <ChevronRightIcon />
+                  </button>
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                    {urls.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setIdx(i)}
+                        className={`w-2 h-2 rounded-full ${
+                          i === idx ? 'bg-primary' : 'bg-base-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
             <form
               method="dialog"
               className="modal-backdrop"
