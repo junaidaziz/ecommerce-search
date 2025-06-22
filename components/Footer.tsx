@@ -23,11 +23,12 @@ const Footer: FC = () => {
       <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
           <Image
-            src="/images/logo.png"
+            src="/images/logo-medium.png"
             alt="Logo"
             width={120}
             height={40}
-            className="mb-2"
+            className="mb-2 max-h-10 w-auto"
+            priority
           />
           <p className="text-sm text-gray-600">
             Everything you need, all in one place.
