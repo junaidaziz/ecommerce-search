@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -33,7 +33,7 @@ export default function BrandSignup() {
     email: string;
     password: string;
     confirm: string;
-  }>();
+  }>({ mode: 'onChange' });
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -45,25 +45,55 @@ export default function BrandSignup() {
     }
   }, [user, router]);
 
-  const handleEmailBlur = async () => {
-    const value = getValues('email');
-    if (value && !emailRegex.test(value)) {
-      setError('email', { type: 'pattern', message: 'Invalid email format' });
-      return;
-    }
-    if (value) {
+  const [checkingEmail, setCheckingEmail] = useState(false);
+  const emailValue = watch('email');
+
+  const checkEmail = useCallback(
+    async (value: string) => {
+      if (!value) {
+        clearErrors('email');
+        return;
+      }
+      if (!emailRegex.test(value)) {
+        setError('email', { type: 'pattern', message: 'Invalid email format' });
+        return;
+      }
+      setCheckingEmail(true);
       try {
-        const res = await fetch(`/api/check-email?email=${encodeURIComponent(value)}`);
+        const res = await fetch(
+          `/api/check-email?email=${encodeURIComponent(value)}`
+        );
         if (res.ok) {
           const data = await res.json();
           if (data.exists) {
-            setError('email', { type: 'manual', message: 'Email already registered' });
+            setError('email', {
+              type: 'manual',
+              message: 'Email already registered',
+            });
           } else {
             clearErrors('email');
           }
         }
-      } catch (_) {}
-    }
+      } catch (_) {
+        // ignore network errors
+      } finally {
+        setCheckingEmail(false);
+      }
+    },
+    [clearErrors, setError]
+  );
+
+  useEffect(() => {
+    if (!emailValue) return;
+    const handler = setTimeout(() => {
+      void checkEmail(emailValue);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [emailValue, checkEmail]);
+
+  const handleEmailBlur = async () => {
+    const value = getValues('email');
+    await checkEmail(value);
   };
 
   const handlePasswordFocus = () => {
@@ -78,7 +108,10 @@ export default function BrandSignup() {
     const password = getValues('password');
     const confirm = getValues('confirm');
     if (password && confirm && password !== confirm) {
-      setError('confirm', { type: 'manual', message: 'Passwords do not match' });
+      setError('confirm', {
+        type: 'manual',
+        message: 'Passwords do not match',
+      });
       return 'Passwords do not match';
     }
     clearErrors('confirm');
@@ -99,7 +132,9 @@ export default function BrandSignup() {
   };
 
   const passwordValue = watch('password');
-  const showPasswordHint = passwordFocused || (passwordValue !== '' && !passwordRegex.test(passwordValue));
+  const showPasswordHint =
+    passwordFocused ||
+    (passwordValue !== '' && !passwordRegex.test(passwordValue));
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
@@ -139,13 +174,10 @@ export default function BrandSignup() {
             name="email"
             placeholder="Email"
             register={register}
+            onBlur={handleEmailBlur}
             rules={{
               required: 'Email is required',
               pattern: { value: emailRegex, message: 'Invalid email format' },
-              validate: async () => {
-                await handleEmailBlur();
-                return true;
-              },
             }}
             error={errors.email?.message as string}
           />
@@ -180,7 +212,14 @@ export default function BrandSignup() {
               lowercase, number and special character
             </p>
           )}
-          <button className="btn btn-primary w-full" type="submit">
+          <button
+            className="btn btn-primary w-full"
+            type="submit"
+            disabled={checkingEmail || !!errors.email}
+          >
+            {checkingEmail && (
+              <span className="loading loading-spinner mr-2"></span>
+            )}
             Sign Up
           </button>
         </form>
