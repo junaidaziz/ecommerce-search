@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import type { FC } from 'react';
 import { AppContext } from '../contexts/AppContext';
-import SearchIcon from './icons/SearchIcon';
 import CartIcon from './icons/CartIcon';
 import MoonIcon from './icons/MoonIcon';
 import SunIcon from './icons/SunIcon';
@@ -16,8 +15,8 @@ import HomeIcon from './icons/HomeIcon';
 import ToysIcon from './icons/ToysIcon';
 import SportsIcon from './icons/SportsIcon';
 import DEFAULT_CATEGORIES from '../lib/defaultCategories';
+import SearchBar from './SearchBar';
 import type { Category } from '../types/category';
-import type { Product } from '../types/product';
 import type { User } from '../types/user';
 
 interface HeaderProps {
@@ -42,11 +41,6 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [hoveredCat, setHoveredCat] = useState<Category | null>(null);
-  const [search, setSearch] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const searchRef = useRef<HTMLFormElement>(null);
-  const suggestTimeout = useRef<NodeJS.Timeout | null>(null);
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleMenuEnter = () => {
@@ -86,47 +80,6 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
     Toys: <ToysIcon className="h-5 w-5 mr-1" />,
     Sports: <SportsIcon className="h-5 w-5 mr-1" />,
   };
-
-  const highlightMatch = (text: string, query: string) => {
-    const idx = text.toLowerCase().indexOf(query.toLowerCase());
-    if (idx === -1) return text;
-    return (
-      <>
-        {text.slice(0, idx)}
-        <span className="font-semibold">
-          {text.slice(idx, idx + query.length)}
-        </span>
-        {text.slice(idx + query.length)}
-      </>
-    );
-  };
-
-  const submitSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!search.trim()) return;
-    setShowSuggestions(false);
-    router.push(`/products?q=${encodeURIComponent(search.trim())}`);
-  };
-
-  useEffect(() => {
-    if (!search.trim()) {
-      setSuggestions([]);
-      return;
-    }
-    if (suggestTimeout.current) clearTimeout(suggestTimeout.current);
-    suggestTimeout.current = setTimeout(() => {
-      fetch(`/api/suggest?q=${encodeURIComponent(search)}`)
-        .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
-        .then((data) => {
-          if (Array.isArray(data.suggestions)) setSuggestions(data.suggestions);
-          else setSuggestions([]);
-        })
-        .catch(() => setSuggestions([]));
-    }, 250);
-    return () => {
-      if (suggestTimeout.current) clearTimeout(suggestTimeout.current);
-    };
-  }, [search]);
 
   return (
     <header className="relative bg-base-300 mb-6">
@@ -256,56 +209,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           </div>
 
           {!isAuthRoute && (
-            <form
-              onSubmit={submitSearch}
-              ref={searchRef}
-              className="relative flex-1 max-w-lg"
-            >
-              <input
-                className="input input-bordered w-full pr-16"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onFocus={() => setShowSuggestions(true)}
-                onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
-                placeholder="Search for products, brands..."
-              />
-              {search && (
-                <button
-                  type="button"
-                  className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-500"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => {
-                    setSearch('');
-                    setSuggestions([]);
-                  }}
-                >
-                  ×
-                </button>
-              )}
-              <SearchIcon className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
-              {showSuggestions && suggestions.length > 0 && (
-                <ul className="absolute left-0 right-0 mt-1 bg-base-100 border border-base-200 shadow rounded z-50">
-                  {suggestions.map((s) => (
-                    <li key={s}>
-                      <button
-                        type="button"
-                        className="block w-full text-left px-3 py-1 hover:bg-base-200"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => {
-                          setSearch(s);
-                          setShowSuggestions(false);
-                          router.push(
-                            `/products?q=${encodeURIComponent(s.trim())}`
-                          );
-                        }}
-                      >
-                        {highlightMatch(s, search)}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </form>
+            <SearchBar placeholder="Search for products, brands..." />
           )}
         </div>
 
