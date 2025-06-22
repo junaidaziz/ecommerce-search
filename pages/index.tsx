@@ -344,7 +344,7 @@ const Home: React.FC & {
       <Head>
         <title>{getPageTitle('Home')}</title>
         <meta name="description" content="Search products from CSV data" />
-        <link rel="icon" href="/favicon.webp" type="image/webp" />
+        <link rel="icon" href="/favicon.webp" type="image/webp" sizes="32x32" />
       </Head>
       {loading ? (
         <div className="flex justify-center my-4 w-full">

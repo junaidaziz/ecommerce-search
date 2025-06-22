@@ -85,8 +85,8 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
 
   return (
     <header className="relative bg-base-300 mb-6">
-      <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <Link href="/" className="btn btn-ghost">
+      <div className="w-full px-4 sm:px-6 lg:px-8 flex items-center gap-x-4 gap-y-2 h-16">
+        <Link href="/" className="flex items-center">
           <Image src="/images/logo.png" alt="Logo" width={120} height={40} />
         </Link>
 
@@ -238,11 +238,17 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
 
           {user ? (
             <div className="dropdown dropdown-end">
-              <label tabIndex={0} className="flex items-center gap-1 cursor-pointer">
+              <label
+                tabIndex={0}
+                className="flex items-center gap-1 cursor-pointer"
+              >
                 <UserIcon className="w-5 h-5" />
                 <span>{user.firstName || user.email}</span>
               </label>
-              <ul tabIndex={0} className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded w-40">
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded w-40"
+              >
                 <li>
                   <Link href="/orders">My Orders</Link>
                 </li>
