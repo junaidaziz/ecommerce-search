@@ -28,7 +28,12 @@ export default async function handler(
       throw new Error(`HTTP ${resp.status}`);
     }
     const data = await resp.json();
-    return res.status(200).json(data);
+    const suggestions = Array.isArray(data.suggestions)
+      ? data.suggestions.map((s: any) =>
+          typeof s === 'string' ? s : s.text
+        )
+      : [];
+    return res.status(200).json({ suggestions });
   } catch (err) {
     console.error('Typesense suggest error', err);
     return handleApiError(res, err, 'Suggest failed');
