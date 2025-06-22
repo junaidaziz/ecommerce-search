@@ -285,15 +285,15 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       <Head>
         <title>{getPageTitle('Products')}</title>
       </Head>
-      <div className="max-w-screen-xl mx-auto px-4">
+      <div className="w-full px-4">
         <h1 className="text-3xl font-bold mb-4">Products</h1>
         <div className="flex flex-col md:flex-row gap-6">
-          <aside className="md:w-60 w-full">
+          <aside className="md:w-80 w-full flex-shrink-0">
             <form onSubmit={applyFilters} className="space-y-4 sticky top-4">
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  className="checkbox"
+                  className="checkbox checkbox-primary"
                   checked={inStock}
                   onChange={toggleInStock}
                 />
@@ -373,7 +373,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
           </aside>
           <div className="flex-1">
             {activeFilters.length > 0 && (
-              <div className="mb-4 flex flex-wrap gap-2">
+              <div className="mb-4 flex flex-wrap gap-2 items-center">
                 {activeFilters.map((f, i) => (
                   <span key={i} className="badge badge-outline gap-1">
                     {f.label}
