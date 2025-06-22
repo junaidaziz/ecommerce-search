@@ -17,6 +17,32 @@ import { handleApiError } from '../../lib/utils/handleApiError';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import type { Order, OrderPlacedResponse, ApiMessage } from '../../types';
+import formidable, { type Fields, type Files, type File } from 'formidable';
+import fs from 'fs';
+import path from 'path';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+async function parseBody(req: NextApiRequest): Promise<{ fields: Fields; files: Files }> {
+  const type = req.headers['content-type'] || '';
+  if (type.includes('application/json')) {
+    const buffers: Uint8Array[] = [];
+    for await (const chunk of req) buffers.push(chunk);
+    const body = Buffer.concat(buffers).toString();
+    return { fields: JSON.parse(body || '{}') as Fields, files: {} as Files };
+  }
+  return new Promise<{ fields: Fields; files: Files }>((resolve, reject) => {
+    const form = formidable({ multiples: true });
+    form.parse(req, (err, fields, files) => {
+      if (err) reject(err);
+      else resolve({ fields, files });
+    });
+  });
+}
 
 async function handler(
   req: NextApiRequest,
@@ -24,10 +50,26 @@ async function handler(
 ): Promise<void> {
   try {
     if (req.method === 'POST') {
-      const { email, items, total } = req.body;
-    if (!email || !items) {
-      return res.status(400).json({ message: 'email and items required' });
-    }
+      const { fields, files } = await parseBody(req);
+      const email = fields.email as string;
+      const items = fields.items ? JSON.parse(String(fields.items)) : [];
+      const total = fields.total ? parseFloat(String(fields.total)) : 0;
+      const paymentMethod = fields.paymentMethod as string | undefined;
+      const paymentReference = fields.paymentReference as string | undefined;
+      let paymentProofPath: string | undefined = undefined;
+      const proof = files.paymentProof as File | File[] | undefined;
+      if (proof) {
+        const file = Array.isArray(proof) ? proof[0] : proof;
+        const dir = path.join(process.cwd(), 'public', 'payment-proofs');
+        fs.mkdirSync(dir, { recursive: true });
+        const name = Date.now() + '-' + file.originalFilename;
+        const dest = path.join(dir, name);
+        fs.renameSync(file.filepath, dest);
+        paymentProofPath = `/payment-proofs/${name}`;
+      }
+      if (!email || !items) {
+        return res.status(400).json({ message: 'email and items required' });
+      }
 
     for (const item of items) {
       const product = await getProductByUuid(String(item.uuid || item.id));
@@ -49,6 +91,9 @@ async function handler(
         userEmail: email,
         items,
         total: total || 0,
+        paymentMethod,
+        paymentReference,
+        paymentProof: paymentProofPath,
       });
       const orderId = Array.isArray(orders) && orders.length > 0 ? orders[0].id : '';
       await clearCart(email);

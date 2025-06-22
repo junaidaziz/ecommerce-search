@@ -21,6 +21,9 @@ interface AddOrderParams {
   items: OrderItemInput[];
   total: number;
   status?: Order['status'];
+  paymentMethod?: string;
+  paymentReference?: string;
+  paymentProof?: string;
 }
 
 function mapOrderRow(row: OrderWithRelations): Order {
@@ -32,6 +35,9 @@ function mapOrderRow(row: OrderWithRelations): Order {
     quantity: row.quantity,
     total: row.total,
     status: row.status as Order['status'],
+    paymentMethod: row.paymentMethod || undefined,
+    paymentReference: row.paymentReference || undefined,
+    paymentProof: row.paymentProof || undefined,
     user: row.user,
     product: mapDbRowToProduct(row.product),
     createdAt: row.createdAt,
@@ -44,6 +50,9 @@ export async function addOrder({
   items,
   total,
   status = 'pending',
+  paymentMethod,
+  paymentReference,
+  paymentProof,
 }: AddOrderParams): Promise<Order[]> {
   const db = getDb();
   const user = await db.user.findUnique({ where: { email: userEmail } });
@@ -58,6 +67,9 @@ export async function addOrder({
           quantity: item.qty ?? 1,
           total,
           status,
+          paymentMethod,
+          paymentReference,
+          paymentProof,
         },
         include: {
           user: true,
