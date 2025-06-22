@@ -102,6 +102,27 @@ export function resetPassword(token: string, password: string) {
   });
 }
 
+export async function changeEmail(
+  currentEmail: string,
+  token: string,
+  newEmail: string
+) {
+  const user = await prisma.user.findFirst({
+    where: {
+      email: currentEmail,
+      resetToken: token,
+      resetExpires: { gt: new Date() },
+    },
+  });
+  if (!user) throw new Error('Invalid token');
+  const exists = await prisma.user.findUnique({ where: { email: newEmail } });
+  if (exists) throw new Error('Email exists');
+  await prisma.user.update({
+    where: { email: currentEmail },
+    data: { email: newEmail, resetToken: null, resetExpires: null },
+  });
+}
+
 export function updateUserProfile(email: string, data: Prisma.UserUpdateInput) {
   return prisma.user.update({ where: { email }, data });
 }
