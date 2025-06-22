@@ -25,7 +25,9 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
 ) => {
   const inStock = context.query.inStock === 'true';
   const categoryParam = context.query.category as string | undefined;
-  const categorySlugs = categoryParam ? categoryParam.split(',').filter(Boolean) : [];
+  const categorySlugs = categoryParam
+    ? categoryParam.split(',').filter(Boolean)
+    : [];
   const q = context.query.q as string | undefined;
   const minPrice = context.query.minPrice
     ? parseFloat(context.query.minPrice as string)
@@ -52,7 +54,11 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
   return { props: { products, total: result.total, categories } };
 };
 
-export default function ProductsPage({ products, total, categories }: ProductsProps) {
+const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
+  products,
+  total,
+  categories,
+}: ProductsProps) => {
   const router = useRouter();
   const { addNotification } = useContext(NotificationContext);
   const [keyword, setKeyword] = useState(
@@ -88,9 +94,12 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       if (router.query.category)
         params.set('category', String(router.query.category));
       if (router.query.q) params.set('q', String(router.query.q));
-      if (router.query.inStock) params.set('inStock', String(router.query.inStock));
-      if (router.query.minPrice) params.set('minPrice', String(router.query.minPrice));
-      if (router.query.maxPrice) params.set('maxPrice', String(router.query.maxPrice));
+      if (router.query.inStock)
+        params.set('inStock', String(router.query.inStock));
+      if (router.query.minPrice)
+        params.set('minPrice', String(router.query.minPrice));
+      if (router.query.maxPrice)
+        params.set('maxPrice', String(router.query.maxPrice));
       const res = await fetch(`/api/products?${params.toString()}`);
       if (!res.ok) return null;
       return (await res.json()) as { products: Product[]; total: number };
@@ -121,7 +130,6 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
 
   const applyFiltersRef = useRef(applyFilters);
   applyFiltersRef.current = applyFilters;
-
 
   useEffect(() => {
     if (!loadMoreRef.current) return;
@@ -167,7 +175,10 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       params.set('page', '1');
       const res = await fetch(`/api/products?${params.toString()}`);
       if (res.ok) {
-        const data = (await res.json()) as { products: Product[]; total: number };
+        const data = (await res.json()) as {
+          products: Product[];
+          total: number;
+        };
         setItems(data.products);
         setPage(1);
         setHasMore(data.products.length < data.total);
@@ -176,7 +187,15 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
         shallow: true,
       });
     },
-    [router, keyword, selectedCategories, minPrice, maxPrice, inStock, addNotification]
+    [
+      router,
+      keyword,
+      selectedCategories,
+      minPrice,
+      maxPrice,
+      inStock,
+      addNotification,
+    ]
   );
 
   useEffect(() => {
@@ -233,8 +252,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
           setSelectedCategories((prev) => prev.filter((s) => s !== sc)),
       })
     );
-  if (inStock)
-    activeFilters.push({ label: 'In Stock', clear: toggleInStock });
+  if (inStock) activeFilters.push({ label: 'In Stock', clear: toggleInStock });
   if (minPrice)
     activeFilters.push({
       label: `Min £${minPrice}`,
@@ -251,7 +269,6 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     });
   if (keyword)
     activeFilters.push({ label: keyword, clear: () => setKeyword('') });
-
 
   const clearAll = useCallback(() => {
     setKeyword('');
@@ -283,7 +300,9 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                 <span>In Stock Only</span>
               </label>
               <details open className="collapse bg-base-100 rounded-box">
-                <summary className="collapse-title font-medium">Category</summary>
+                <summary className="collapse-title font-medium">
+                  Category
+                </summary>
                 <div className="collapse-content max-h-48 overflow-y-auto">
                   {categories.map((c) => (
                     <label key={c.slug} className="block mb-1">
@@ -307,7 +326,9 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                 </div>
               </details>
               <details className="collapse bg-base-100 rounded-box">
-                <summary className="collapse-title font-medium">Price Range</summary>
+                <summary className="collapse-title font-medium">
+                  Price Range
+                </summary>
                 <div className="collapse-content space-y-2">
                   <div className="flex items-center gap-2">
                     <input
@@ -329,7 +350,9 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                 </div>
               </details>
               <details className="collapse bg-base-100 rounded-box">
-                <summary className="collapse-title font-medium">Keyword</summary>
+                <summary className="collapse-title font-medium">
+                  Keyword
+                </summary>
                 <div className="collapse-content">
                   <input
                     type="text"
@@ -379,11 +402,16 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                 ))}
               </div>
             )}
-            <div className="flex justify-center my-4 h-8" aria-hidden={!loadingMore}>
+            <div
+              className="flex justify-center my-4 h-8"
+              aria-hidden={!loadingMore}
+            >
               {loadingMore && <span className="loading loading-spinner" />}
             </div>
             {!hasMore && items.length > 0 && (
-              <p className="text-center text-sm text-gray-500 my-4">No more products.</p>
+              <p className="text-center text-sm text-gray-500 my-4">
+                No more products.
+              </p>
             )}
             <div ref={loadMoreRef} className="h-4" />
           </div>
@@ -391,4 +419,8 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       </div>
     </div>
   );
-}
+};
+
+ProductsPage.maxWidthClass = 'max-w-[95%] 2xl:max-w-[1440px]';
+
+export default ProductsPage;

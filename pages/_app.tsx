@@ -11,11 +11,15 @@ export default function App({
   pageProps: { session, ...pageProps },
 }: AppProps & { pageProps: { session: any } }) {
   const HeroSecond = (Component as any).heroSecond;
+  const maxWidthClass = (Component as any).maxWidthClass;
   return (
     <SessionProvider session={session}>
       <NotificationProvider>
         <AppProvider>
-          <Layout heroSecond={HeroSecond ? <HeroSecond /> : null}>
+          <Layout
+            heroSecond={HeroSecond ? <HeroSecond /> : null}
+            maxWidthClass={maxWidthClass}
+          >
             <Component {...pageProps} />
           </Layout>
         </AppProvider>
