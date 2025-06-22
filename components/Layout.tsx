@@ -9,7 +9,7 @@ interface LayoutProps {
   maxWidthClass?: string;
 }
 
-const Layout: FC<LayoutProps> = ({ children, heroSecond, maxWidthClass }) => {
+const Layout: FC<LayoutProps> = ({ children, heroSecond }) => {
   // If useTheme returns [Theme, Dispatch<SetStateAction<Theme>>]
   const [theme, setTheme] = useTheme() as [
     string | Theme,
@@ -21,9 +21,7 @@ const Layout: FC<LayoutProps> = ({ children, heroSecond, maxWidthClass }) => {
       <Header theme={theme} setTheme={setTheme} />
       {heroSecond && <div className="w-full">{heroSecond}</div>}
       <main
-        className={`w-full mx-auto flex-1 px-4 sm:px-6 lg:px-8 py-6 ${
-          maxWidthClass || 'max-w-[90%]'
-        }`}
+        className={`w-full mx-auto flex-1 px-4 sm:px-6 lg:px-8 py-6 `}
       >
         {children}
       </main>

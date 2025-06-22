@@ -214,8 +214,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
             <SearchBar placeholder="Search for products, brands..." />
           )}
           <nav className="hidden lg:flex gap-4 ml-4">
-            <Link href="/about">About</Link>
-            <Link href="/contact">Contact</Link>
+          <Link href="/products">Shop</Link>
+          <Link href="/about">About</Link>
+          <Link href="/contact">Contact</Link>
           </nav>
         </div>
 
