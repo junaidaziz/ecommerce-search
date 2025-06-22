@@ -271,6 +271,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                   <Link href="/profile/edit">Update Profile</Link>
                 </li>
                 <li>
+                  <Link href="/settings">Settings</Link>
+                </li>
+                <li>
                   <button onClick={logout}>Logout</button>
                 </li>
               </ul>
