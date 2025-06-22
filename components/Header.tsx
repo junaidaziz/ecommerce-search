@@ -32,13 +32,21 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const cart = appContext?.cart ?? [];
   const user = session?.user as User | undefined;
   const pathname = router.pathname;
-  const isAuthRoute = ['/login', '/signup', '/user/signup', '/brand/signup'].includes(pathname);
+  const isAuthRoute = [
+    '/login',
+    '/signup',
+    '/user/signup',
+    '/brand/signup',
+  ].includes(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [hoveredCat, setHoveredCat] = useState<Category | null>(null);
   const [search, setSearch] = useState('');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef<HTMLFormElement>(null);
+  const suggestTimeout = useRef<NodeJS.Timeout | null>(null);
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleMenuEnter = () => {
@@ -56,7 +64,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   useEffect(() => {
     fetch('/api/categories')
       .then((res) => res.json())
-      .then((data) => setCategories(data.categories || data || DEFAULT_CATEGORIES))
+      .then((data) =>
+        setCategories(data.categories || data || DEFAULT_CATEGORIES)
+      )
       .catch(() => setCategories(DEFAULT_CATEGORIES));
   }, []);
 
@@ -70,23 +80,60 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const logout = () => signOut({ callbackUrl: '/', redirect: true });
 
   const iconMap: Record<string, JSX.Element> = {
-    Electronics: <ElectronicsIcon className="h-5 w-5 mr-1" />, 
-    Fashion: <FashionIcon className="h-5 w-5 mr-1" />, 
+    Electronics: <ElectronicsIcon className="h-5 w-5 mr-1" />,
+    Fashion: <FashionIcon className="h-5 w-5 mr-1" />,
     Home: <HomeIcon className="h-5 w-5 mr-1" />,
     Toys: <ToysIcon className="h-5 w-5 mr-1" />,
     Sports: <SportsIcon className="h-5 w-5 mr-1" />,
   };
 
+  const highlightMatch = (text: string, query: string) => {
+    const idx = text.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) return text;
+    return (
+      <>
+        {text.slice(0, idx)}
+        <span className="font-semibold">
+          {text.slice(idx, idx + query.length)}
+        </span>
+        {text.slice(idx + query.length)}
+      </>
+    );
+  };
+
   const submitSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!search.trim()) return;
-    router.push(`/?q=${encodeURIComponent(search.trim())}`);
+    setShowSuggestions(false);
+    router.push(`/products?q=${encodeURIComponent(search.trim())}`);
   };
+
+  useEffect(() => {
+    if (!search.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    if (suggestTimeout.current) clearTimeout(suggestTimeout.current);
+    suggestTimeout.current = setTimeout(() => {
+      fetch(`/api/suggest?q=${encodeURIComponent(search)}`)
+        .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+        .then((data) => {
+          if (Array.isArray(data.suggestions)) setSuggestions(data.suggestions);
+          else setSuggestions([]);
+        })
+        .catch(() => setSuggestions([]));
+    }, 250);
+    return () => {
+      if (suggestTimeout.current) clearTimeout(suggestTimeout.current);
+    };
+  }, [search]);
 
   return (
     <header className="relative bg-base-300 mb-6">
       <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <Link href="/" className="btn btn-ghost text-xl">Home</Link>
+        <Link href="/" className="btn btn-ghost text-xl">
+          Home
+        </Link>
 
         <div className="flex-1 flex items-center gap-x-4 relative">
           <button
@@ -101,7 +148,10 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           </button>
           <ul className="menu menu-horizontal hidden md:flex" role="menubar">
             <li className="relative">
-              <div onMouseEnter={handleMenuEnter} onMouseLeave={handleMenuLeave}>
+              <div
+                onMouseEnter={handleMenuEnter}
+                onMouseLeave={handleMenuLeave}
+              >
                 <button
                   type="button"
                   className="flex items-center gap-1"
@@ -121,32 +171,38 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                   className={`absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 bg-opacity-100 border border-base-200 shadow-lg rounded w-screen max-w-3xl transition-all transform ${menuOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 -translate-y-2'}`}
                   aria-hidden={!menuOpen}
                 >
-                    <div className="flex gap-6">
-                      <div className="w-56 pr-4 space-y-2 border-r border-base-200">
-                        {categories.map((cat) => (
-                          <button
-                            key={cat.name}
-                            type="button"
-                            role="menuitem"
-                            aria-haspopup={!!cat.subcategories?.length}
-                            aria-expanded={hoveredCat?.name === cat.name}
-                            onFocus={() => setHoveredCat(cat)}
-                            onMouseEnter={() => setHoveredCat(cat)}
-                            className="w-full flex items-center gap-1 text-left font-medium text-gray-800 tracking-wide hover:text-primary transition-colors focus:outline-none capitalize whitespace-nowrap truncate"
-                          >
-                            {iconMap[cat.name] || null}
-                            {cat.name}
-                            {cat.subcategories?.length ? (
-                              <ChevronDownIcon
-                                className={`w-3 h-3 ml-auto transition-transform ${hoveredCat?.name === cat.name ? 'rotate-180' : ''}`}
-                              />
-                            ) : null}
-                          </button>
-                        ))}
-                        {categories.length === 0 && <span>No categories found</span>}
-                      </div>
-                      {hoveredCat?.subcategories && hoveredCat.subcategories.length > 0 && (
-                        <ul className="min-w-[200px] pl-4 space-y-1" role="menu">
+                  <div className="flex gap-6">
+                    <div className="w-56 pr-4 space-y-2 border-r border-base-200">
+                      {categories.map((cat) => (
+                        <button
+                          key={cat.name}
+                          type="button"
+                          role="menuitem"
+                          aria-haspopup={!!cat.subcategories?.length}
+                          aria-expanded={hoveredCat?.name === cat.name}
+                          onFocus={() => setHoveredCat(cat)}
+                          onMouseEnter={() => setHoveredCat(cat)}
+                          className="w-full flex items-center gap-1 text-left font-medium text-gray-800 tracking-wide hover:text-primary transition-colors focus:outline-none capitalize whitespace-nowrap truncate"
+                        >
+                          {iconMap[cat.name] || null}
+                          {cat.name}
+                          {cat.subcategories?.length ? (
+                            <ChevronDownIcon
+                              className={`w-3 h-3 ml-auto transition-transform ${hoveredCat?.name === cat.name ? 'rotate-180' : ''}`}
+                            />
+                          ) : null}
+                        </button>
+                      ))}
+                      {categories.length === 0 && (
+                        <span>No categories found</span>
+                      )}
+                    </div>
+                    {hoveredCat?.subcategories &&
+                      hoveredCat.subcategories.length > 0 && (
+                        <ul
+                          className="min-w-[200px] pl-4 space-y-1"
+                          role="menu"
+                        >
                           {hoveredCat.subcategories.map((sub) => (
                             <li key={sub} className="capitalize" role="none">
                               <Link
@@ -160,9 +216,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                           ))}
                         </ul>
                       )}
-                    </div>
                   </div>
                 </div>
+              </div>
             </li>
           </ul>
           <div
@@ -171,7 +227,10 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           >
             <ul className="space-y-2">
               {categories.map((cat) => (
-                <details key={cat.name} className="border-b border-base-200 last:border-none">
+                <details
+                  key={cat.name}
+                  className="border-b border-base-200 last:border-none"
+                >
                   <summary className="flex items-center gap-2 py-2 cursor-pointer list-none">
                     {iconMap[cat.name] || null}
                     <span className="capitalize">{cat.name}</span>
@@ -203,12 +262,49 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
               className="relative flex-1 max-w-lg"
             >
               <input
-                className="input input-bordered w-full pr-10"
+                className="input input-bordered w-full pr-16"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
                 placeholder="Search for products, brands..."
               />
+              {search && (
+                <button
+                  type="button"
+                  className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-500"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    setSearch('');
+                    setSuggestions([]);
+                  }}
+                >
+                  ×
+                </button>
+              )}
               <SearchIcon className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
+              {showSuggestions && suggestions.length > 0 && (
+                <ul className="absolute left-0 right-0 mt-1 bg-base-100 border border-base-200 shadow rounded z-50">
+                  {suggestions.map((s) => (
+                    <li key={s}>
+                      <button
+                        type="button"
+                        className="block w-full text-left px-3 py-1 hover:bg-base-200"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => {
+                          setSearch(s);
+                          setShowSuggestions(false);
+                          router.push(
+                            `/products?q=${encodeURIComponent(s.trim())}`
+                          );
+                        }}
+                      >
+                        {highlightMatch(s, search)}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </form>
           )}
         </div>
@@ -237,13 +333,19 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           {user ? (
             <>
               <span>Hello, {user.firstName || user.email}</span>
-              <button onClick={logout} className="btn btn-outline">Logout</button>
+              <button onClick={logout} className="btn btn-outline">
+                Logout
+              </button>
             </>
           ) : (
             !isAuthRoute && (
               <>
-                <Link href="/login" className="btn btn-ghost">Login</Link>
-                <Link href="/signup" className="btn btn-primary">Signup</Link>
+                <Link href="/login" className="btn btn-ghost">
+                  Login
+                </Link>
+                <Link href="/signup" className="btn btn-primary">
+                  Signup
+                </Link>
               </>
             )
           )}
