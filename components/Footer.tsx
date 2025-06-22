@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import type { FC } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import VisaIcon from './icons/VisaIcon';
+import MastercardIcon from './icons/MastercardIcon';
+import PaypalIcon from './icons/PaypalIcon';
 
 const Footer: FC = () => {
   type NewsletterForm = { email: string };
@@ -15,8 +18,8 @@ const Footer: FC = () => {
     console.log(data);
   };
   return (
-    <footer className="bg-base-300 mt-12 py-8 text-base-content">
-      <div className="w-full px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="bg-base-300 mt-12 py-8 text-base-content px-4 sm:px-6 lg:px-8">
+      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
           <h3 className="font-bold mb-2">ShopVerse</h3>
           <p className="text-sm text-gray-600">
@@ -61,6 +64,11 @@ const Footer: FC = () => {
             )}
           </form>
         </div>
+      </div>
+      <div className="mt-8 flex justify-center md:justify-start gap-4">
+        <VisaIcon size={32} />
+        <MastercardIcon size={32} />
+        <PaypalIcon size={32} />
       </div>
     </footer>
   );
