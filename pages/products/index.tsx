@@ -399,7 +399,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
                 {items.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                  <ProductCard key={p.id} product={p} className="w-full" />
                 ))}
               </div>
             )}
