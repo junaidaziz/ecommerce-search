@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -23,7 +23,6 @@ export default function UserSignup() {
   const {
     register,
     handleSubmit,
-    control,
     watch,
     getValues,
     setError,
@@ -34,7 +33,7 @@ export default function UserSignup() {
     email: string;
     password: string;
     confirm: string;
-  }>();
+  }>({ mode: 'onChange' });
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -46,25 +45,55 @@ export default function UserSignup() {
     }
   }, [user, router]);
 
-  const handleEmailBlur = async () => {
-    const value = getValues('email');
-    if (value && !emailRegex.test(value)) {
-      setError('email', { type: 'pattern', message: 'Invalid email format' });
-      return;
-    }
-    if (value) {
+  const [checkingEmail, setCheckingEmail] = useState(false);
+  const emailValue = watch('email');
+
+  const checkEmail = useCallback(
+    async (value: string) => {
+      if (!value) {
+        clearErrors('email');
+        return;
+      }
+      if (!emailRegex.test(value)) {
+        setError('email', { type: 'pattern', message: 'Invalid email format' });
+        return;
+      }
+      setCheckingEmail(true);
       try {
-        const res = await fetch(`/api/check-email?email=${encodeURIComponent(value)}`);
+        const res = await fetch(
+          `/api/check-email?email=${encodeURIComponent(value)}`
+        );
         if (res.ok) {
           const data = await res.json();
           if (data.exists) {
-            setError('email', { type: 'manual', message: 'Email already registered' });
+            setError('email', {
+              type: 'manual',
+              message: 'Email already registered',
+            });
           } else {
             clearErrors('email');
           }
         }
-      } catch (_) {}
-    }
+      } catch (_) {
+        // ignore network errors
+      } finally {
+        setCheckingEmail(false);
+      }
+    },
+    [clearErrors, setError]
+  );
+
+  useEffect(() => {
+    if (!emailValue) return;
+    const handler = setTimeout(() => {
+      void checkEmail(emailValue);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [emailValue, checkEmail]);
+
+  const handleEmailBlur = async () => {
+    const value = getValues('email');
+    await checkEmail(value);
   };
 
   const handlePasswordFocus = () => {
@@ -79,7 +108,10 @@ export default function UserSignup() {
     const password = getValues('password');
     const confirm = getValues('confirm');
     if (password && confirm && password !== confirm) {
-      setError('confirm', { type: 'manual', message: 'Passwords do not match' });
+      setError('confirm', {
+        type: 'manual',
+        message: 'Passwords do not match',
+      });
       return 'Passwords do not match';
     }
     clearErrors('confirm');
@@ -101,7 +133,8 @@ export default function UserSignup() {
 
   const passwordValue = watch('password');
   const showPasswordHint =
-    passwordFocused || (passwordValue !== '' && !passwordRegex.test(passwordValue));
+    passwordFocused ||
+    (passwordValue !== '' && !passwordRegex.test(passwordValue));
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
@@ -110,52 +143,49 @@ export default function UserSignup() {
       </Head>
       <div className="max-w-lg mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
         <h1 className="text-2xl font-bold mb-4 text-center">User Sign Up</h1>
-      <div className="flex flex-col gap-6 mb-4">
-        <button
-          type="button"
-          className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white"
-          onClick={() => signIn('google')}
-        >
-          <GoogleIcon className="h-5 w-5" />
-          Continue with Google
-        </button>
-        <button
-          type="button"
-          className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-gray-800 hover:text-white"
-          onClick={() => signIn('github')}
-        >
-          <GithubIcon className="h-5 w-5" />
-          Continue with GitHub
-        </button>
-      </div>
-      {formError && <div className="text-red-500 mb-2">{formError}</div>}
-      <form onSubmit={handleSubmit(submit)} className="space-y-2">
-        <TextInput
-          name="firstName"
-          placeholder="First Name"
-          register={register}
-          rules={{ required: 'First name is required' }}
-          error={errors.firstName?.message as string}
-        />
-        <EmailInput
-          name="email"
-          placeholder="Email"
-          register={register}
-          rules={{
-            required: 'Email is required',
-            pattern: { value: emailRegex, message: 'Invalid email format' },
-            validate: async () => {
-              await handleEmailBlur();
-              return true;
-            },
-          }}
-          error={errors.email?.message as string}
-        />
-        <div className="space-y-2">
-          <PasswordInput
-            name="password"
-            placeholder="Password"
+        <div className="flex flex-col gap-6 mb-4">
+          <button
+            type="button"
+            className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white"
+            onClick={() => signIn('google')}
+          >
+            <GoogleIcon className="h-5 w-5" />
+            Continue with Google
+          </button>
+          <button
+            type="button"
+            className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-gray-800 hover:text-white"
+            onClick={() => signIn('github')}
+          >
+            <GithubIcon className="h-5 w-5" />
+            Continue with GitHub
+          </button>
+        </div>
+        {formError && <div className="text-red-500 mb-2">{formError}</div>}
+        <form onSubmit={handleSubmit(submit)} className="space-y-2">
+          <TextInput
+            name="firstName"
+            placeholder="First Name"
             register={register}
+            rules={{ required: 'First name is required' }}
+            error={errors.firstName?.message as string}
+          />
+          <EmailInput
+            name="email"
+            placeholder="Email"
+            register={register}
+            onBlur={handleEmailBlur}
+            rules={{
+              required: 'Email is required',
+              pattern: { value: emailRegex, message: 'Invalid email format' },
+            }}
+            error={errors.email?.message as string}
+          />
+          <div className="space-y-2">
+            <PasswordInput
+              name="password"
+              placeholder="Password"
+              register={register}
               rules={{
                 required: 'Password is required',
                 pattern: {
@@ -168,36 +198,43 @@ export default function UserSignup() {
               onFocus={handlePasswordFocus}
               error={errors.password?.message as string}
             />
-          <PasswordInput
-            name="confirm"
-            placeholder="Confirm Password"
-            register={register}
-            rules={{ validate: handleConfirmBlur }}
-            error={errors.confirm?.message as string}
-          />
-        </div>
-        {showPasswordHint && (
-          <p id="password-help" className="text-sm text-gray-500">
-            Password must be at least 8 characters and include uppercase,
-            lowercase, number and special character
-          </p>
-        )}
-        <button className="btn btn-primary w-full" type="submit">
-          Sign Up
-        </button>
-      </form>
-      <p className="text-center mt-4">
-        Already have an account?{' '}
-        <Link href="/login" className="link">
-          Login
-        </Link>
-      </p>
-      <p className="text-sm text-center mt-4 text-gray-600">
-        Want to sign up as a brand instead?{' '}
-        <Link href="/signup/brand" className="text-blue-600 hover:underline">
-          Sign up as a brand instead
-        </Link>
-      </p>
+            <PasswordInput
+              name="confirm"
+              placeholder="Confirm Password"
+              register={register}
+              rules={{ validate: handleConfirmBlur }}
+              error={errors.confirm?.message as string}
+            />
+          </div>
+          {showPasswordHint && (
+            <p id="password-help" className="text-sm text-gray-500">
+              Password must be at least 8 characters and include uppercase,
+              lowercase, number and special character
+            </p>
+          )}
+          <button
+            className="btn btn-primary w-full"
+            type="submit"
+            disabled={checkingEmail || !!errors.email}
+          >
+            {checkingEmail && (
+              <span className="loading loading-spinner mr-2"></span>
+            )}
+            Sign Up
+          </button>
+        </form>
+        <p className="text-center mt-4">
+          Already have an account?{' '}
+          <Link href="/login" className="link">
+            Login
+          </Link>
+        </p>
+        <p className="text-sm text-center mt-4 text-gray-600">
+          Want to sign up as a brand instead?{' '}
+          <Link href="/signup/brand" className="text-blue-600 hover:underline">
+            Sign up as a brand instead
+          </Link>
+        </p>
       </div>
     </div>
   );
