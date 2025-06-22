@@ -100,7 +100,7 @@ export default function ProductDetail({
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/2 flex justify-center">
           <ProductImageSlider
-            className="w-11/12 md:w-10/12 mx-auto"
+            className="w-11/12 md:w-10/12 mx-auto max-h-80 md:max-h-96"
             images={
               product.images && product.images.length > 0
                 ? product.images
@@ -226,6 +226,7 @@ export default function ProductDetail({
         <RecommendedProducts
           category={product.category.name}
           excludeId={product.id}
+          limit={5}
         />
       )}
       <div className="mt-4">
