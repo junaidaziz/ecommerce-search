@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Head from 'next/head';
-import countryList from 'react-select-country-list';
 import { getPageTitle } from '../lib/pageTitle';
 import useRequireAuth from '../hooks/useRequireAuth';
 import { NotificationContext } from '../contexts/NotificationContext';
@@ -9,8 +8,9 @@ import {
   TextInput,
   EmailInput,
   PasswordInput,
-  SelectDropdown,
+  CountrySelect,
 } from '../components/form-fields';
+import countries from '../data/countries';
 
 interface ProfileFormValues {
   firstName: string;
@@ -27,7 +27,16 @@ interface PasswordFormValues {
 interface AddressFormValues {
   address: string;
   city: string;
-  country: { label: string; value: string } | null;
+  country: {
+    label: string;
+    value: string;
+    callingCode: string;
+  } | null;
+}
+
+interface EmailFormValues {
+  email: string;
+  token: string;
 }
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -35,12 +44,15 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 const SettingsPage: React.FC = () => {
   const user = useRequireAuth();
   const { addNotification } = useContext(NotificationContext);
-  const [active, setActive] = useState<'profile' | 'password' | 'address'>('profile');
-  const countryOptions = useMemo(() => countryList().getData(), []);
+  const [active, setActive] = useState<
+    'profile' | 'password' | 'address' | 'email'
+  >('profile');
+  const [codeSent, setCodeSent] = useState(false);
 
   const profileForm = useForm<ProfileFormValues>();
   const passwordForm = useForm<PasswordFormValues>();
   const addressForm = useForm<AddressFormValues>();
+  const emailForm = useForm<EmailFormValues>();
 
   useEffect(() => {
     if (!user) return;
@@ -57,7 +69,7 @@ const SettingsPage: React.FC = () => {
         addressForm.reset({
           address: data.address || '',
           city: data.city || '',
-          country: data.country ? { label: data.country, value: data.country } : null,
+          country: countries.find((c) => c.value === data.country) || null,
         });
       })
       .catch(() => {});
@@ -73,7 +85,9 @@ const SettingsPage: React.FC = () => {
     else addNotification('Update failed', 'error');
   };
 
-  const submitPassword: SubmitHandler<PasswordFormValues> = async ({ password }) => {
+  const submitPassword: SubmitHandler<PasswordFormValues> = async ({
+    password,
+  }) => {
     const res = await fetch('/api/user/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -97,6 +111,37 @@ const SettingsPage: React.FC = () => {
     });
     if (res.ok) addNotification('Address updated', 'success');
     else addNotification('Update failed', 'error');
+  };
+
+  const sendCode = async () => {
+    const email = emailForm.getValues('email');
+    if (!email) return;
+    const res = await fetch('/api/request-email-change', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    if (res.ok) {
+      setCodeSent(true);
+      addNotification('Verification code sent', 'success');
+    } else {
+      addNotification('Send failed', 'error');
+    }
+  };
+
+  const submitEmailChange: SubmitHandler<EmailFormValues> = async (values) => {
+    const res = await fetch('/api/change-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+    if (res.ok) {
+      addNotification('Email updated', 'success');
+      setCodeSent(false);
+      emailForm.reset();
+    } else {
+      addNotification('Update failed', 'error');
+    }
   };
 
   if (!user) return null;
@@ -132,11 +177,22 @@ const SettingsPage: React.FC = () => {
               Manage Address
             </button>
           </li>
+          <li>
+            <button
+              className={active === 'email' ? 'active' : ''}
+              onClick={() => setActive('email')}
+            >
+              Change Email
+            </button>
+          </li>
         </ul>
       </aside>
       <div className="flex-1">
         {active === 'profile' && (
-          <form onSubmit={profileForm.handleSubmit(submitProfile)} className="space-y-2 max-w-md">
+          <form
+            onSubmit={profileForm.handleSubmit(submitProfile)}
+            className="space-y-2 max-w-md mx-auto"
+          >
             <h2 className="text-xl font-bold mb-2">Update Profile</h2>
             <TextInput
               label="First Name"
@@ -171,13 +227,19 @@ const SettingsPage: React.FC = () => {
           </form>
         )}
         {active === 'password' && (
-          <form onSubmit={passwordForm.handleSubmit(submitPassword)} className="space-y-2 max-w-md">
+          <form
+            onSubmit={passwordForm.handleSubmit(submitPassword)}
+            className="space-y-2 max-w-md mx-auto"
+          >
             <h2 className="text-xl font-bold mb-2">Change Password</h2>
             <PasswordInput
               label="New Password"
               register={passwordForm.register}
               name="password"
-              rules={{ required: 'Required', pattern: { value: passwordRegex, message: 'Weak password' } }}
+              rules={{
+                required: 'Required',
+                pattern: { value: passwordRegex, message: 'Weak password' },
+              }}
               error={passwordForm.formState.errors.password?.message}
             />
             <PasswordInput
@@ -186,7 +248,9 @@ const SettingsPage: React.FC = () => {
               name="confirm"
               rules={{
                 required: 'Required',
-                validate: (v) => v === passwordForm.getValues('password') || 'Passwords do not match',
+                validate: (v) =>
+                  v === passwordForm.getValues('password') ||
+                  'Passwords do not match',
               }}
               error={passwordForm.formState.errors.confirm?.message}
             />
@@ -196,7 +260,10 @@ const SettingsPage: React.FC = () => {
           </form>
         )}
         {active === 'address' && (
-          <form onSubmit={addressForm.handleSubmit(submitAddress)} className="space-y-2 max-w-md">
+          <form
+            onSubmit={addressForm.handleSubmit(submitAddress)}
+            className="space-y-2 max-w-md mx-auto"
+          >
             <h2 className="text-xl font-bold mb-2">Manage Address</h2>
             <TextInput
               label="Address"
@@ -212,17 +279,48 @@ const SettingsPage: React.FC = () => {
               rules={{ required: 'Required' }}
               error={addressForm.formState.errors.city?.message}
             />
-            <SelectDropdown
+            <CountrySelect
               label="Country"
               name="country"
               control={addressForm.control}
-              options={countryOptions}
-              placeholder="Select country"
               rules={{ required: 'Required' }}
               error={addressForm.formState.errors.country?.message as string}
             />
             <button type="submit" className="btn btn-primary w-full">
               Save Address
+            </button>
+          </form>
+        )}
+        {active === 'email' && (
+          <form
+            onSubmit={emailForm.handleSubmit(submitEmailChange)}
+            className="space-y-2 max-w-md mx-auto"
+          >
+            <h2 className="text-xl font-bold mb-2">Change Email</h2>
+            <EmailInput
+              label="New Email"
+              register={emailForm.register}
+              name="email"
+              rules={{ required: 'Required' }}
+              error={emailForm.formState.errors.email?.message}
+            />
+            <div className="flex items-end gap-2">
+              <TextInput
+                label="Verification Code"
+                register={emailForm.register}
+                name="token"
+                error={emailForm.formState.errors.token?.message}
+              />
+              <button type="button" className="btn" onClick={sendCode}>
+                Send Code
+              </button>
+            </div>
+            <button
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={!codeSent}
+            >
+              Confirm
             </button>
           </form>
         )}
