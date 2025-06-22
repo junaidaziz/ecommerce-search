@@ -206,7 +206,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
   const removeFromWishlist = (id: string) => {
     setWishlist((prev) => prev.filter((item) => item.id !== id));
-    addNotification('Removed from wishlist', 'info');
+    addNotification('Removed from wishlist', 'warning');
   };
 
   return (
