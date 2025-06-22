@@ -42,7 +42,7 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
             <ProductCard
               key={p.id}
               product={p}
-              className="w-40 sm:w-48 flex-shrink-0"
+              className="w-36 sm:w-44 flex-shrink-0"
             />
           ))}
         </div>
