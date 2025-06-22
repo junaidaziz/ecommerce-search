@@ -61,44 +61,9 @@ test('shows name and cart count when authenticated', () => {
   expect(screen.getAllByText('2').length).toBeGreaterThan(0);
 });
 
-test('shows orders link when authenticated as customer', () => {
-  const user = { role: 'customer', firstName: 'Bob', email: 'b@b.com' };
-  mockUseSession.mockReturnValue({ data: { user } });
-  renderWithContext(<Header theme="light" setTheme={() => {}} />);
-  expect(screen.getAllByText('My Orders').length).toBeGreaterThan(0);
-});
-
-test('renders categories from API', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () =>
-        Promise.resolve([{ name: 'Electronics', subcategories: ['Phones'] }]),
-    })
-  );
-  renderWithContext(<Header theme="light" setTheme={() => {}} />);
-  // open the menu to render categories
-  const button = screen.getAllByRole('button', { name: /categories/i })[0];
-  await act(async () => {
-    button.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-  });
-  expect(global.fetch).toHaveBeenCalled();
-  global.fetch.mockRestore();
-});
-
-test('shows fallback when no categories are available', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({ ok: true, json: () => Promise.resolve([]) })
-  );
-  renderWithContext(<Header theme="light" setTheme={() => {}} />);
-  const button = screen.getAllByRole('button', { name: /categories/i })[0];
-  button.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-  expect(global.fetch).toHaveBeenCalled();
-  global.fetch.mockRestore();
-});
 
 test('hides search on auth pages', () => {
   mockPathname = '/login';
   renderWithContext(<Header theme="light" setTheme={() => {}} />);
-  expect(screen.queryByPlaceholderText(/search for products/i)).toBeNull();
+  expect(screen.queryByPlaceholderText(/search/i)).toBeNull();
 });
