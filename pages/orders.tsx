@@ -15,7 +15,7 @@ const Orders: React.FC<OrdersProps> = (_props) => {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    fetch(`/api/orders?email=${encodeURIComponent(user.email)}`)
+    fetch('/api/user/orders')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: Order[]) => {
         setOrders(data);
@@ -30,7 +30,7 @@ const Orders: React.FC<OrdersProps> = (_props) => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <Head>
         <title>{getPageTitle('Orders')}</title>
       </Head>
@@ -41,22 +41,58 @@ const Orders: React.FC<OrdersProps> = (_props) => {
           <span className="loading loading-spinner"></span>
         </div>
       )}
-      <ul className="space-y-2">
-        {orders.map((o) => (
-          <li key={o.id} className="border p-2">
-            <p>
-              Order #{o.id} - {o.status}
-            </p>
-            <ul className="list-disc pl-4 text-sm mb-1">
-              <li>
-                {o.product.title} x {o.quantity}
-              </li>
-            </ul>
-            <p>Total: £{o.total}</p>
-          </li>
-        ))}
-        {!loading && orders.length === 0 && <li>No orders found.</li>}
-      </ul>
+      {orders.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((o) => (
+                <tr key={o.id} className="hover">
+                  <td>{o.id}</td>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={
+                          o.product.featuredImage?.url ||
+                          `https://picsum.photos/seed/${o.product.id}/40/40`
+                        }
+                        alt={o.product.title}
+                        className="w-10 h-10 object-cover rounded"
+                      />
+                      <span>{o.product.title}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      className={`badge ${
+                        o.status === 'pending'
+                          ? 'badge-warning'
+                          : o.status === 'shipped'
+                            ? 'badge-info'
+                            : 'badge-success'
+                      }`}
+                    >
+                      {o.status}
+                    </span>
+                  </td>
+                  <td>£{o.total}</td>
+                  <td>{new Date(o.createdAt).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        !loading && <p>No orders found.</p>
+      )}
     </div>
   );
 };
