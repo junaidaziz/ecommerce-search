@@ -24,7 +24,8 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
   context
 ) => {
   const inStock = context.query.inStock === 'true';
-  const category = context.query.category as string | undefined;
+  const categoryParam = context.query.category as string | undefined;
+  const categorySlugs = categoryParam ? categoryParam.split(',').filter(Boolean) : [];
   const q = context.query.q as string | undefined;
   const minPrice = context.query.minPrice
     ? parseFloat(context.query.minPrice as string)
@@ -38,7 +39,7 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
   const result: PaginatedResult = await getProductsPaginated({
     limit,
     offset,
-    categorySlug: category,
+    categorySlugs,
     search: q,
     inStock,
     minPrice,
@@ -57,8 +58,10 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   const [keyword, setKeyword] = useState(
     typeof router.query.q === 'string' ? router.query.q : ''
   );
-  const [selectedCategory, setSelectedCategory] = useState(
-    typeof router.query.category === 'string' ? router.query.category : ''
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    typeof router.query.category === 'string' && router.query.category
+      ? router.query.category.split(',')
+      : []
   );
   const [minPrice, setMinPrice] = useState(
     typeof router.query.minPrice === 'string' ? router.query.minPrice : ''
@@ -81,7 +84,8 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     async (p: number) => {
       const params = new URLSearchParams();
       params.set('page', String(p));
-      if (router.query.category) params.set('category', String(router.query.category));
+      if (router.query.category)
+        params.set('category', String(router.query.category));
       if (router.query.q) params.set('q', String(router.query.q));
       if (router.query.inStock) params.set('inStock', String(router.query.inStock));
       if (router.query.minPrice) params.set('minPrice', String(router.query.minPrice));
@@ -153,7 +157,8 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       } as Record<string, string>;
       if (keyword) query.q = keyword;
       else delete query.q;
-      if (selectedCategory) query.category = selectedCategory;
+      if (selectedCategories.length > 0)
+        query.category = selectedCategories.join(',');
       else delete query.category;
       if (minPrice) query.minPrice = minPrice;
       else delete query.minPrice;
@@ -174,7 +179,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     [
       router,
       keyword,
-      selectedCategory,
+      selectedCategories,
       minPrice,
       maxPrice,
       inStock,
@@ -214,11 +219,14 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   }, [router, inStock]);
 
   const activeFilters: { label: string; clear: () => void }[] = [];
-  if (selectedCategory)
-    activeFilters.push({
-      label: categories.find((c) => c.slug === selectedCategory)?.name || '',
-      clear: () => setSelectedCategory(''),
-    });
+  if (selectedCategories.length > 0)
+    selectedCategories.forEach((sc) =>
+      activeFilters.push({
+        label: categories.find((c) => c.slug === sc)?.name || sc,
+        clear: () =>
+          setSelectedCategories((prev) => prev.filter((s) => s !== sc)),
+      })
+    );
   if (inStock)
     activeFilters.push({
       label: 'In Stock',
@@ -258,7 +266,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
 
   const clearAll = useCallback(async () => {
     setKeyword('');
-    setSelectedCategory('');
+    setSelectedCategories([]);
     setMinPrice('');
     setMaxPrice('');
     const query = {} as Record<string, string>;
@@ -282,29 +290,33 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
         <div className="flex flex-col md:flex-row gap-6">
           <aside className="md:w-60 w-full">
             <form onSubmit={applyFilters} className="space-y-4 sticky top-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  checked={inStock}
+                  onChange={toggleInStock}
+                />
+                <span>In Stock Only</span>
+              </label>
               <details open className="collapse bg-base-100 rounded-box">
                 <summary className="collapse-title font-medium">Category</summary>
                 <div className="collapse-content max-h-48 overflow-y-auto">
-                  <label className="block mb-1">
-                    <input
-                      type="radio"
-                      name="category"
-                      className="radio mr-2"
-                      value=""
-                      checked={selectedCategory === ''}
-                      onChange={() => setSelectedCategory('')}
-                    />
-                    All
-                  </label>
                   {categories.map((c) => (
                     <label key={c.slug} className="block mb-1">
                       <input
-                        type="radio"
-                        name="category"
-                        className="radio mr-2"
+                        type="checkbox"
+                        className="checkbox mr-2"
                         value={c.slug}
-                        checked={selectedCategory === c.slug}
-                        onChange={() => setSelectedCategory(c.slug || '')}
+                        checked={selectedCategories.includes(c.slug || '')}
+                        onChange={(e) => {
+                          const slug = c.slug || '';
+                          setSelectedCategories((prev) =>
+                            e.target.checked
+                              ? [...prev, slug]
+                              : prev.filter((s) => s !== slug)
+                          );
+                        }}
                       />
                       {c.name}
                     </label>
@@ -345,15 +357,6 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                   />
                 </div>
               </details>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  className="checkbox"
-                  checked={inStock}
-                  onChange={toggleInStock}
-                />
-                <span>In Stock Only</span>
-              </label>
               <div className="flex gap-2">
                 <button type="submit" className="btn btn-primary btn-sm flex-1">
                   Apply
@@ -391,7 +394,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
             {items.length === 0 ? (
               <p className="text-gray-500">No products found.</p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {items.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
