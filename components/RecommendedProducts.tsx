@@ -19,7 +19,7 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
   useEffect(() => {
     if (!category) return;
     fetch(
-      `/api/search?filterByCategory=${encodeURIComponent(category)}&perPage=4`
+      `/api/search?filterByCategory=${encodeURIComponent(category)}&perPage=10`
     )
       .then((res) => (res.ok ? (res.json() as Promise<SearchResults>) : null))
       .then((data) => {
@@ -36,10 +36,12 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
   return (
     <div className="mt-8">
       <h3 className="font-semibold mb-4">{title}</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
-        {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
+      <div className="overflow-x-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 min-w-max">
+          {products.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+        </div>
       </div>
     </div>
   );
