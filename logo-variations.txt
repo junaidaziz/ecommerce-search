@@ -1,0 +1,6 @@
+# Logo Variations
+
+logo-small.png 60x20
+logo-medium.png 120x40
+logo-large.png 240x80
+logo-xlarge.png 480x160
