@@ -79,6 +79,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   const isFetchingRef = useRef(false);
   const priceTimer = useRef<NodeJS.Timeout>();
   const firstPriceRef = useRef(true);
+  const firstFilterRef = useRef(true);
 
   const fetchPage = useCallback(
     async (p: number) => {
@@ -118,6 +119,9 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
   const loadMoreFn = useRef(loadMore);
   loadMoreFn.current = loadMore;
 
+  const applyFiltersRef = useRef(applyFilters);
+  applyFiltersRef.current = applyFilters;
+
 
   useEffect(() => {
     if (!loadMoreRef.current) return;
@@ -152,20 +156,13 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
         addNotification('Min price cannot exceed Max price', 'error');
         return;
       }
-      const query = {
-        ...router.query,
-      } as Record<string, string>;
+      const query: Record<string, string> = {};
       if (keyword) query.q = keyword;
-      else delete query.q;
       if (selectedCategories.length > 0)
         query.category = selectedCategories.join(',');
-      else delete query.category;
       if (minPrice) query.minPrice = minPrice;
-      else delete query.minPrice;
       if (maxPrice) query.maxPrice = maxPrice;
-      else delete query.maxPrice;
       if (inStock) query.inStock = 'true';
-      else delete query.inStock;
       const params = new URLSearchParams(query);
       params.set('page', '1');
       const res = await fetch(`/api/products?${params.toString()}`);
@@ -175,16 +172,11 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
         setPage(1);
         setHasMore(data.products.length < data.total);
       }
+      router.replace({ pathname: router.pathname, query }, undefined, {
+        shallow: true,
+      });
     },
-    [
-      router,
-      keyword,
-      selectedCategories,
-      minPrice,
-      maxPrice,
-      inStock,
-      addNotification,
-    ]
+    [router, keyword, selectedCategories, minPrice, maxPrice, inStock, addNotification]
   );
 
   useEffect(() => {
@@ -201,22 +193,36 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     };
   }, [minPrice, maxPrice, applyFilters]);
 
-  const toggleInStock = useCallback(() => {
-    const query = { ...router.query } as Record<string, string>;
-    if (inStock) delete query.inStock;
-    else query.inStock = 'true';
+  useEffect(() => {
+    if (firstFilterRef.current) {
+      firstFilterRef.current = false;
+      return;
+    }
+    applyFiltersRef.current();
+  }, [selectedCategories, keyword]);
+
+  const toggleInStock = useCallback(async () => {
+    const next = !inStock;
+    const query: Record<string, string> = {};
+    if (keyword) query.q = keyword;
+    if (selectedCategories.length > 0)
+      query.category = selectedCategories.join(',');
+    if (minPrice) query.minPrice = minPrice;
+    if (maxPrice) query.maxPrice = maxPrice;
+    if (next) query.inStock = 'true';
     const params = new URLSearchParams(query);
     params.set('page', '1');
-    fetch(`/api/products?${params.toString()}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data) {
-          setItems(data.products);
-          setPage(1);
-          setHasMore(data.products.length < data.total);
-        }
-      });
-  }, [router, inStock]);
+    const res = await fetch(`/api/products?${params.toString()}`);
+    if (res.ok) {
+      const data = (await res.json()) as { products: Product[]; total: number };
+      setItems(data.products);
+      setPage(1);
+      setHasMore(data.products.length < data.total);
+    }
+    router.replace({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
+    });
+  }, [router, inStock, keyword, selectedCategories, minPrice, maxPrice]);
 
   const activeFilters: { label: string; clear: () => void }[] = [];
   if (selectedCategories.length > 0)
@@ -228,24 +234,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       })
     );
   if (inStock)
-    activeFilters.push({
-      label: 'In Stock',
-      clear: () => {
-        const query = { ...router.query } as Record<string, string>;
-        delete query.inStock;
-        const params = new URLSearchParams(query);
-        params.set('page', '1');
-        fetch(`/api/products?${params.toString()}`)
-          .then((res) => (res.ok ? res.json() : null))
-          .then((data) => {
-            if (data) {
-              setItems(data.products);
-              setPage(1);
-              setHasMore(data.products.length < data.total);
-            }
-          });
-      },
-    });
+    activeFilters.push({ label: 'In Stock', clear: toggleInStock });
   if (minPrice)
     activeFilters.push({
       label: `Min £${minPrice}`,
@@ -264,20 +253,14 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
     activeFilters.push({ label: keyword, clear: () => setKeyword('') });
 
 
-  const clearAll = useCallback(async () => {
+  const clearAll = useCallback(() => {
     setKeyword('');
     setSelectedCategories([]);
     setMinPrice('');
     setMaxPrice('');
-    const query = {} as Record<string, string>;
-    const res = await fetch('/api/products?page=1');
-    if (res.ok) {
-      const data = (await res.json()) as { products: Product[]; total: number };
-      setItems(data.products);
-      setPage(1);
-      setHasMore(data.products.length < data.total);
-    }
-    router.replace({ pathname: router.pathname, query }, undefined, { shallow: true });
+    router.replace({ pathname: router.pathname, query: {} }, undefined, {
+      shallow: true,
+    });
   }, [router]);
 
   return (
@@ -285,7 +268,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
       <Head>
         <title>{getPageTitle('Products')}</title>
       </Head>
-      <div className="w-full px-4">
+      <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold mb-4">Products</h1>
         <div className="flex flex-col md:flex-row gap-6">
           <aside className="md:w-80 w-full flex-shrink-0">
@@ -357,10 +340,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                   />
                 </div>
               </details>
-              <div className="flex gap-2">
-                <button type="submit" className="btn btn-primary btn-sm flex-1">
-                  Apply
-                </button>
+              <div className="flex justify-end">
                 <button
                   type="button"
                   className="btn btn-sm btn-ghost"
@@ -382,7 +362,6 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
                       className="ml-1"
                       onClick={() => {
                         f.clear();
-                        applyFilters();
                       }}
                     >
                       ✕
@@ -394,7 +373,7 @@ export default function ProductsPage({ products, total, categories }: ProductsPr
             {items.length === 0 ? (
               <p className="text-gray-500">No products found.</p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
                 {items.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
