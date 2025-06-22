@@ -74,9 +74,9 @@ const Footer: FC = () => {
           </form>
         </div>
         <div className="flex items-end justify-end gap-4">
-          <VisaIcon size={32} color="#1A1F71" />
-          <MastercardIcon size={32} color="#EB001B" />
-          <PaypalIcon size={32} color="#003087" />
+          <VisaIcon size={36} className="text-blue-600" />
+          <MastercardIcon size={36} className="text-red-500" />
+          <PaypalIcon size={36} className="text-blue-500" />
         </div>
       </div>
     </footer>
