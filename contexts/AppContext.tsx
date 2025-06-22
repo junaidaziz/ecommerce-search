@@ -81,7 +81,7 @@ export function AppProvider({ children }: AppProviderProps) {
         lastName,
         brandName,
         gender,
-        role,
+        role: (role || '').toLowerCase(),
         phoneNumber: '',
         address: '',
         city: '',
@@ -144,7 +144,7 @@ export function AppProvider({ children }: AppProviderProps) {
   };
 
   const logout = (): void => {
-    nextSignOut({ callbackUrl: '/' });
+    nextSignOut({ callbackUrl: '/', redirect: true });
     addNotification('Logged out', 'info');
   };
 
