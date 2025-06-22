@@ -16,7 +16,7 @@ const Layout: FC<LayoutProps> = ({ children, heroSecond }) => {
     <div className="flex flex-col min-h-screen overflow-x-hidden">
       <Header theme={theme} setTheme={setTheme} />
       {heroSecond && <div className="w-full">{heroSecond}</div>}
-      <main className="container mx-auto flex-1 px-4 sm:px-6 lg:px-8 py-6">
+      <main className="w-full mx-auto flex-1 px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
       <Footer />
