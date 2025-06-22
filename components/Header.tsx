@@ -67,7 +67,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   }, [menuOpen, categories]);
 
   const itemCount = cart.reduce((sum, item) => sum + (item.qty || 0), 0);
-  const logout = () => signOut({ callbackUrl: '/' });
+  const logout = () => signOut({ callbackUrl: '/', redirect: true });
 
   const iconMap: Record<string, JSX.Element> = {
     Electronics: <ElectronicsIcon className="h-5 w-5 mr-1" />, 
