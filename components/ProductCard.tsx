@@ -35,7 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <div
-      className={`group relative flex flex-col h-full bg-base-100 border border-base-300 rounded-xl overflow-hidden shadow hover:shadow-lg transition-shadow duration-200 w-4/5 mx-auto ${className}`}
+      className={`group relative flex flex-col h-full border border-base-300 rounded-xl overflow-hidden shadow hover:shadow-lg transition-shadow duration-200 w-4/5 mx-auto ${className}`}
     >
       <Link href={`/product/${product.slug}`} className="block overflow-hidden">
         <ProductImageSlider
@@ -92,7 +92,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {product.reviewCount > 0 && (
             <span className="text-xs">
               {'★'.repeat(rating)}
-              {'☆'.repeat(5 - rating)}
+              {'☆'.repeat(5 - rating)} ({product.averageRating.toFixed(1)})
             </span>
           )}
         </div>
