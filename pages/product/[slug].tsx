@@ -100,7 +100,7 @@ export default function ProductDetail({
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/2 flex justify-center">
           <ProductImageSlider
-            className="w-full max-w-sm"
+            className="w-full"
             images={
               product.images && product.images.length > 0
                 ? product.images
@@ -109,7 +109,7 @@ export default function ProductDetail({
                   : []
             }
             imgClass="hover:scale-110 transition"
-            aspectRatioClass="aspect-square md:aspect-[4/5]"
+            aspectRatioClass="aspect-square md:aspect-[4/3]"
           />
         </div>
         <div className="md:w-1/2">
