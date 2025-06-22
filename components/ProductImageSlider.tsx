@@ -9,6 +9,7 @@ export interface ProductImageSliderProps {
   className?: string;
   imgClass?: string;
   placeholderSeed?: number;
+  aspectRatioClass?: string;
 }
 
 export default function ProductImageSlider({
@@ -16,6 +17,7 @@ export default function ProductImageSlider({
   className = '',
   imgClass = '',
   placeholderSeed = 1,
+  aspectRatioClass = 'aspect-[4/5]',
 }: ProductImageSliderProps) {
   const [idx, setIdx] = useState(0);
   const [zoom, setZoom] = useState(false);
@@ -24,7 +26,7 @@ export default function ProductImageSlider({
   const [errorMap, setErrorMap] = useState<Record<number, boolean>>({});
   if (!urls || urls.length === 0) {
     return (
-      <div className={`relative aspect-[4/5] ${className}`}>
+      <div className={`relative ${aspectRatioClass} ${className}`}>
         <Image
           src={placeholderUrl}
           alt="Placeholder product"
@@ -35,7 +37,7 @@ export default function ProductImageSlider({
     );
   }
   return (
-    <div className={`relative aspect-[4/5] ${className}`}>
+    <div className={`relative ${aspectRatioClass} ${className}`}>
       <Image
         src={errorMap[idx] ? placeholderUrl : images[idx].url}
         alt={images[idx].alt || `Image ${idx + 1}`}

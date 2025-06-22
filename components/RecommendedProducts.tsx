@@ -37,9 +37,13 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
     <div className="mt-8">
       <h3 className="font-semibold mb-4">{title}</h3>
       <div className="overflow-x-auto">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 min-w-max">
+        <div className="flex gap-4 sm:gap-6 flex-nowrap pb-2">
           {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <ProductCard
+              key={p.id}
+              product={p}
+              className="w-40 sm:w-48 flex-shrink-0"
+            />
           ))}
         </div>
       </div>
