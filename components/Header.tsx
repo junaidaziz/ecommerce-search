@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
@@ -85,8 +86,8 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   return (
     <header className="relative bg-base-300 mb-6">
       <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <Link href="/" className="btn btn-ghost text-xl">
-          Home
+        <Link href="/" className="btn btn-ghost">
+          <Image src="/images/logo.png" alt="Logo" width={120} height={40} />
         </Link>
 
         <div className="flex-1 flex items-center gap-x-4 relative">
