@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useCallback } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -13,6 +13,7 @@ import {
   PasswordInput,
   TextInput,
 } from '../../components/form-fields';
+import useEmailAvailability from '../../hooks/useEmailAvailability';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -45,56 +46,12 @@ export default function BrandSignup() {
     }
   }, [user, router]);
 
-  const [checkingEmail, setCheckingEmail] = useState(false);
-  const emailValue = watch('email');
-
-  const checkEmail = useCallback(
-    async (value: string) => {
-      if (!value) {
-        clearErrors('email');
-        return;
-      }
-      if (!emailRegex.test(value)) {
-        setError('email', { type: 'pattern', message: 'Invalid email format' });
-        return;
-      }
-      setCheckingEmail(true);
-      try {
-        const res = await fetch(
-          `/api/check-email?email=${encodeURIComponent(value)}`
-        );
-        if (res.ok) {
-          const data = await res.json();
-          if (data.exists) {
-            setError('email', {
-              type: 'manual',
-              message: 'Email already registered',
-            });
-          } else {
-            clearErrors('email');
-          }
-        }
-      } catch (_) {
-        // ignore network errors
-      } finally {
-        setCheckingEmail(false);
-      }
-    },
-    [clearErrors, setError]
+  const { checkingEmail, handleEmailBlur } = useEmailAvailability(
+    watch,
+    getValues,
+    setError,
+    clearErrors
   );
-
-  useEffect(() => {
-    if (!emailValue) return;
-    const handler = setTimeout(() => {
-      void checkEmail(emailValue);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [emailValue, checkEmail]);
-
-  const handleEmailBlur = async () => {
-    const value = getValues('email');
-    await checkEmail(value);
-  };
 
   const handlePasswordFocus = () => {
     setPasswordFocused(true);
