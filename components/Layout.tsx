@@ -6,9 +6,10 @@ import Footer from './Footer';
 interface LayoutProps {
   children: ReactNode;
   heroSecond?: ReactNode;
+  maxWidthClass?: string;
 }
 
-const Layout: FC<LayoutProps> = ({ children, heroSecond }) => {
+const Layout: FC<LayoutProps> = ({ children, heroSecond, maxWidthClass }) => {
   // If useTheme returns [Theme, Dispatch<SetStateAction<Theme>>]
   const [theme, setTheme] = useTheme() as [
     string | Theme,
@@ -19,7 +20,11 @@ const Layout: FC<LayoutProps> = ({ children, heroSecond }) => {
     <div className="flex flex-col min-h-screen overflow-x-hidden">
       <Header theme={theme} setTheme={setTheme} />
       {heroSecond && <div className="w-full">{heroSecond}</div>}
-      <main className="w-full max-w-[90%] mx-auto flex-1 px-4 sm:px-6 lg:px-8 py-6">
+      <main
+        className={`w-full mx-auto flex-1 px-4 sm:px-6 lg:px-8 py-6 ${
+          maxWidthClass || 'max-w-[90%]'
+        }`}
+      >
         {children}
       </main>
       <Footer />
