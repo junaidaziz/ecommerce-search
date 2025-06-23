@@ -1,11 +1,14 @@
+.grid {
+  @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4;
+}
 .card {
-  @apply relative h-40 sm:h-48 rounded-lg overflow-hidden;
+  @apply relative h-40 sm:h-48 rounded-lg overflow-hidden group;
 }
 .image {
   @apply object-cover transition-transform duration-300;
 }
 .card:hover .image {
-  transform: scale(1.05);
+  @apply scale-105;
 }
 .overlay {
   @apply absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 text-white font-semibold;
