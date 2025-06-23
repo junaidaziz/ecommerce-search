@@ -2,8 +2,9 @@ import { FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { A11y } from 'swiper/modules';
+import { A11y, Navigation } from 'swiper/modules';
 import 'swiper/css';
+import 'swiper/css/navigation';
 
 import styles from './CategorySlider.module.css';
 
@@ -24,8 +25,9 @@ const CategorySlider: FC<CategorySliderProps> = ({ categories }) => {
 
   return (
     <Swiper
-      modules={[A11y]}
-      spaceBetween={10}
+      modules={[Navigation, A11y]}
+      navigation
+      spaceBetween={16}
       slidesPerView={2.5}
       breakpoints={{
         640: { slidesPerView: 3.5 },
