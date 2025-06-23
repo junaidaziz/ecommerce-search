@@ -22,7 +22,10 @@ const Footer: FC = () => {
     <footer className="bg-base-300 mt-12 py-8 text-base-content px-4 sm:px-6 lg:px-8">
       <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <Link href="/" className="inline-block transition duration-200 hover:opacity-80">
+          <Link
+            href="/"
+            className="inline-block transition duration-200 hover:opacity-80"
+          >
             <Image
               src="/images/logo-medium.png"
               alt="Logo"
@@ -84,9 +87,9 @@ const Footer: FC = () => {
           </form>
         </div>
         <div className="flex items-end justify-end gap-4">
-          <VisaIcon size={36} className="text-blue-600" />
-          <MastercardIcon size={36} className="text-[#EB001B]" />
-          <PaypalIcon size={36} className="text-blue-500" />
+          <VisaIcon size={36} className="text-blue-600 cursor-pointer" />
+          <MastercardIcon size={36} className="cursor-pointer" />
+          <PaypalIcon size={36} className="text-blue-500 cursor-pointer" />
         </div>
       </div>
     </footer>
