@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import ProductFilters from '../../components/ProductFilters';
 import ActiveFilters from '../../components/ActiveFilters';
 import ProductGrid from '../../components/ProductGrid';
+import Loader from '../../components/Loader';
 import InfiniteLoader from '../../components/InfiniteLoader';
 import { getPageTitle } from '../../lib/pageTitle';
 import {
@@ -167,7 +168,6 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     filterChangedRef.current = Date.now();
     debounceTimerRef.current = setTimeout(() => {
       requestedRef.current.clear();
-      setItems([]);
       setHasMore(true);
       initializingRef.current = true;
       loadProductsRef.current?.(1, 'reset');
@@ -247,7 +247,12 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
           </aside>
           <div className="flex-1">
             <ActiveFilters filters={activeFilters} clearAll={clearAll} />
-            <ProductGrid products={items} loading={loading} />
+            <div className="relative">
+              <ProductGrid products={items} />
+              {loading && (
+                <Loader className="absolute inset-0 bg-base-200/70" />
+              )}
+            </div>
             <InfiniteLoader
               onLoadMore={handleLoadMore}
               hasMore={hasMore}
