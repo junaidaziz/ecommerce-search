@@ -4,7 +4,7 @@ import Layout from '../components/Layout';
 import { AppContext } from '../contexts/AppContext';
 
 jest.mock('next/router', () => ({
-  useRouter: () => ({ push: jest.fn() }),
+  useRouter: () => ({ push: jest.fn(), pathname: '/' }),
 }));
 
 jest.mock('next-auth/react', () => ({
@@ -50,7 +50,9 @@ test('toggle adds and removes dark class on html', () => {
       <div>Content</div>
     </Layout>
   );
-  const [checkbox] = screen.getAllByRole('checkbox', { name: /toggle dark mode/i });
+  const [checkbox] = screen.getAllByRole('checkbox', {
+    name: /toggle dark mode/i,
+  });
   expect(document.documentElement.classList.contains('dark')).toBe(false);
   fireEvent.click(checkbox);
   expect(document.documentElement.classList.contains('dark')).toBe(true);
