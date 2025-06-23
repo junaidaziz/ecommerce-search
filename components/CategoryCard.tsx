@@ -1,32 +1,34 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Category } from '../types';
-import ElectronicsIcon from './icons/ElectronicsIcon';
-import FashionIcon from './icons/FashionIcon';
-import HomeIcon from './icons/HomeIcon';
-import ToysIcon from './icons/ToysIcon';
-import SportsIcon from './icons/SportsIcon';
+import CATEGORY_IMAGES from '../lib/categoryImages';
 
 interface CategoryCardProps {
   category: Category;
 }
 
-const iconMap: Record<string, JSX.Element> = {
-  Electronics: <ElectronicsIcon className="w-8 h-8 mb-2" />,
-  Fashion: <FashionIcon className="w-8 h-8 mb-2" />,
-  Home: <HomeIcon className="w-8 h-8 mb-2" />,
-  Toys: <ToysIcon className="w-8 h-8 mb-2" />,
-  Sports: <SportsIcon className="w-8 h-8 mb-2" />,
-};
+const placeholder = '/placeholder.png';
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   return (
     <Link
       href={`/categories/${encodeURIComponent(category.name)}`}
-      className="group border border-base-300 rounded-xl p-5 flex flex-col items-center text-center gap-2 transition-transform duration-200 hover:shadow-lg hover:-translate-y-1 hover:border-primary"
+      className="group block border border-base-300 rounded-xl overflow-hidden shadow-sm transition-transform duration-200 hover:shadow-lg hover:-translate-y-1"
     >
-      {iconMap[category.name] ?? <div className="w-8 h-8 mb-2" />}
-      <span className="capitalize font-medium">{category.name}</span>
+      <div className="relative w-full aspect-square bg-base-200">
+        <Image
+          src={CATEGORY_IMAGES[category.name] || placeholder}
+          alt={category.name}
+          fill
+          className="object-cover"
+        />
+      </div>
+      <div className="p-3 h-14 flex items-center justify-center">
+        <span className="font-medium text-center line-clamp-2">
+          {category.name}
+        </span>
+      </div>
     </Link>
   );
 };
