@@ -13,3 +13,4 @@ export * from './price';
 export * from './user';
 export * from './shipping';
 export * from './shared';
+export * from './forms';
