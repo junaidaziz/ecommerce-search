@@ -58,7 +58,7 @@ const HomePage: React.FC = () => {
           <CategorySlider categories={categories} />
         </section>
         <FeaturedProducts />
-        <CategoryPromotion />
+        <CategoryPromotion categories={categories} />
       </main>
     </div>
   );
