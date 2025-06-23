@@ -22,14 +22,16 @@ const Footer: FC = () => {
     <footer className="bg-base-300 mt-12 py-8 text-base-content px-4 sm:px-6 lg:px-8">
       <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <Image
-            src="/images/logo-medium.png"
-            alt="Logo"
-            width={120}
-            height={40}
-            className="mb-2 max-h-10 w-auto"
-            priority
-          />
+          <Link href="/">
+            <Image
+              src="/images/logo-medium.png"
+              alt="Logo"
+              width={120}
+              height={40}
+              className="mb-2 max-h-10 w-auto"
+              priority
+            />
+          </Link>
           <p className="text-sm text-gray-600">
             Everything you need, all in one place.
           </p>
@@ -50,10 +52,10 @@ const Footer: FC = () => {
               <Link href="/shipping">Shipping</Link>
             </li>
             <li>
-              <Link href="/privacy">Privacy Policy</Link>
+              <Link href="/privacy-policy">Privacy Policy</Link>
             </li>
             <li>
-              <Link href="/terms">Terms &amp; Conditions</Link>
+              <Link href="/terms-and-conditions">Terms &amp; Conditions</Link>
             </li>
           </ul>
         </div>
