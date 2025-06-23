@@ -119,27 +119,29 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   }, [keyword, selectedCategories, minPrice, maxPrice, inStock]);
 
   const loadProducts = useCallback(
-    (p: number, mode: 'reset' | 'append') => {
-      return new Promise<void>(async (resolve) => {
-        const snapshot = getFilterSnapshot();
-        const key = `${snapshot}_${p}`;
-        if (requestedRef.current.has(key)) return resolve();
-        if (loadingRef.current) return resolve();
-        if (mode === 'append' && !hasMore) return resolve();
+    async (p: number, mode: 'reset' | 'append'): Promise<void> => {
+      const snapshot = getFilterSnapshot();
+      const key = `${snapshot}_${p}`;
+      if (requestedRef.current.has(key)) return;
+      if (loadingRef.current) return;
+      if (mode === 'append' && !hasMore) return;
 
-        loadingRef.current = true;
-        requestedRef.current.add(key);
-        lastFilterSnapshot.current = snapshot;
-        lastPageRequested.current = p;
-        if (mode === 'append') setLoadingMore(true);
-        else {
-          setLoading(true);
-        }
+      loadingRef.current = true;
+      requestedRef.current.add(key);
+      lastFilterSnapshot.current = snapshot;
+      lastPageRequested.current = p;
+      if (mode === 'append') setLoadingMore(true);
+      else {
+        setLoading(true);
+      }
 
       try {
         const res = await fetch(`/api/products?${buildParams(p).toString()}`);
         if (!res.ok) throw new Error('Failed to fetch');
-        const data = (await res.json()) as { products: Product[]; total: number };
+        const data = (await res.json()) as {
+          products: Product[];
+          total: number;
+        };
         if (mode === 'reset') {
           setItems(data.products);
           setHasMore(data.products.length < data.total);
@@ -150,7 +152,6 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
             setHasMore(updated.length < data.total);
             return updated;
           });
-          setPage(p);
         }
         if (mode === 'reset') {
           const query: Record<string, string> = {};
@@ -170,11 +171,19 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         if (mode === 'append') setLoadingMore(false);
         else setLoading(false);
         loadingRef.current = false;
-        resolve();
       }
-      });
     },
-    [buildParams, getFilterSnapshot, hasMore, keyword, selectedCategories, minPrice, maxPrice, inStock, router]
+    [
+      buildParams,
+      getFilterSnapshot,
+      hasMore,
+      keyword,
+      selectedCategories,
+      minPrice,
+      maxPrice,
+      inStock,
+      router,
+    ]
   );
 
   useEffect(() => {
@@ -192,7 +201,10 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
           !initializingRef.current &&
           Date.now() - filterChangedRef.current > 300
         ) {
-          loadProducts(page + 1, 'append');
+          const nextPage = lastPageRequested.current + 1;
+          loadProducts(nextPage, 'append').then(() => {
+            setPage(lastPageRequested.current);
+          });
         }
       },
       { rootMargin: '200px' }
@@ -203,7 +215,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     return () => {
       observer.disconnect();
     };
-  }, [loadProducts, hasMore, page]);
+  }, [loadProducts, hasMore]);
 
   useEffect(() => {
     if (firstFilterRef.current) {
@@ -212,12 +224,12 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     }
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     filterChangedRef.current = Date.now();
-    initializingRef.current = true;
     debounceTimerRef.current = setTimeout(() => {
       requestedRef.current.clear();
       setItems([]);
       setPage(1);
       setHasMore(true);
+      initializingRef.current = true;
       loadProducts(1, 'reset').then(() => {
         initializingRef.current = false;
       });
@@ -278,7 +290,10 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         <h1 className="text-3xl font-bold mb-4">Products</h1>
         <div className="flex flex-col md:flex-row gap-6">
           <aside className="md:w-80 w-full flex-shrink-0">
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-4 sticky top-4">
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="space-y-4 sticky top-4"
+            >
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
