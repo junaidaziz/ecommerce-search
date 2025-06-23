@@ -1,5 +1,7 @@
 import React from 'react';
 import type { Category } from '../types/category';
+import InputField from './ui/InputField';
+import { Checkbox } from './form-fields';
 
 interface ProductFiltersProps {
   keyword: string;
@@ -32,34 +34,29 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
 }) => {
   return (
     <form onSubmit={(e) => e.preventDefault()} className="space-y-4 sticky top-4">
-      <label className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          className="checkbox checkbox-primary"
-          checked={inStock}
-          onChange={(e) => setInStock(e.target.checked)}
-        />
-        <span>In Stock Only</span>
-      </label>
+      <Checkbox
+        label="In Stock Only"
+        name="inStock"
+        checked={inStock}
+        onChange={(e) => setInStock(e.target.checked)}
+      />
       <details open className="collapse bg-base-100 rounded-box">
         <summary className="collapse-title font-medium">Category</summary>
         <div className="collapse-content max-h-48 overflow-y-auto">
           {categories.map((c) => (
-            <label key={c.slug} className="block mb-1">
-              <input
-                type="checkbox"
-                className="checkbox mr-2"
-                value={c.slug}
-                checked={selectedCategories.includes(c.slug || '')}
-                onChange={(e) => {
-                  const slug = c.slug || '';
-                  setSelectedCategories((prev) =>
-                    e.target.checked ? [...prev, slug] : prev.filter((s) => s !== slug)
-                  );
-                }}
-              />
-              {c.name}
-            </label>
+            <Checkbox
+              key={c.slug}
+              className="mb-1"
+              label={c.name}
+              name={`cat-${c.slug}`}
+              checked={selectedCategories.includes(c.slug || '')}
+              onChange={(e) => {
+                const slug = c.slug || '';
+                setSelectedCategories((prev) =>
+                  e.target.checked ? [...prev, slug] : prev.filter((s) => s !== slug)
+                );
+              }}
+            />
           ))}
         </div>
       </details>
@@ -67,18 +64,18 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
         <summary className="collapse-title font-medium">Price Range</summary>
         <div className="collapse-content space-y-2">
           <div className="flex items-center gap-2">
-            <input
+            <InputField
               type="number"
               placeholder="Min"
-              className="input input-sm input-bordered w-full"
+              name="minPrice"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
             />
             <span>-</span>
-            <input
+            <InputField
               type="number"
               placeholder="Max"
-              className="input input-sm input-bordered w-full"
+              name="maxPrice"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
             />
@@ -88,10 +85,10 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       <details className="collapse bg-base-100 rounded-box">
         <summary className="collapse-title font-medium">Keyword</summary>
         <div className="collapse-content">
-          <input
+          <InputField
             type="text"
             placeholder="Search name"
-            className="input input-sm input-bordered w-full"
+            name="keyword"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
           />
