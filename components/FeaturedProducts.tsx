@@ -15,12 +15,12 @@ const FeaturedProducts: React.FC = () => {
   if (products.length === 0) return null;
 
   return (
-    <section className="py-12">
-      <div className="max-w-screen-xl mx-auto px-4">
-        <h2 className="text-2xl font-bold mb-6 text-center">
+    <section className="py-12 bg-gray-50">
+      <div className="max-w-screen-2xl mx-auto px-4">
+        <h2 className="text-5xl font-bold mb-6 text-center">
           Featured Products
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {products.map((p) => (
             <ProductCard key={p.id} product={p} className="w-full" />
           ))}
