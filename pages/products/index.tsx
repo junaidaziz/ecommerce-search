@@ -21,21 +21,13 @@ interface ProductsProps {
   categories: Category[];
 }
 
-export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
-  context
-) => {
+export const getServerSideProps: GetServerSideProps<ProductsProps> = async (context) => {
   const inStock = context.query.inStock === 'true';
   const categoryParam = context.query.category as string | undefined;
-  const categorySlugs = categoryParam
-    ? categoryParam.split(',').filter(Boolean)
-    : [];
+  const categorySlugs = categoryParam ? categoryParam.split(',').filter(Boolean) : [];
   const q = context.query.q as string | undefined;
-  const minPrice = context.query.minPrice
-    ? parseFloat(context.query.minPrice as string)
-    : undefined;
-  const maxPrice = context.query.maxPrice
-    ? parseFloat(context.query.maxPrice as string)
-    : undefined;
+  const minPrice = context.query.minPrice ? parseFloat(context.query.minPrice as string) : undefined;
+  const maxPrice = context.query.maxPrice ? parseFloat(context.query.maxPrice as string) : undefined;
 
   const limit = 20;
   const offset = 0;
@@ -50,7 +42,6 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
   });
 
   const categories = serializeDates(await getCategoriesFlat());
-
   const products = serializeDates(result.products);
   return { props: { products, total: result.total, categories } };
 };
@@ -59,23 +50,15 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   products,
   total,
   categories,
-}: ProductsProps) => {
+}) => {
   const router = useRouter();
   const { addNotification } = useContext(NotificationContext);
-  const [keyword, setKeyword] = useState(
-    typeof router.query.q === 'string' ? router.query.q : ''
-  );
+  const [keyword, setKeyword] = useState(typeof router.query.q === 'string' ? router.query.q : '');
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    typeof router.query.category === 'string' && router.query.category
-      ? router.query.category.split(',')
-      : []
+    typeof router.query.category === 'string' && router.query.category ? router.query.category.split(',') : []
   );
-  const [minPrice, setMinPrice] = useState(
-    typeof router.query.minPrice === 'string' ? router.query.minPrice : ''
-  );
-  const [maxPrice, setMaxPrice] = useState(
-    typeof router.query.maxPrice === 'string' ? router.query.maxPrice : ''
-  );
+  const [minPrice, setMinPrice] = useState(typeof router.query.minPrice === 'string' ? router.query.minPrice : '');
+  const [maxPrice, setMaxPrice] = useState(typeof router.query.maxPrice === 'string' ? router.query.maxPrice : '');
   const [inStock, setInStock] = useState(router.query.inStock === 'true');
   const [items, setItems] = useState<Product[]>(products);
   const [page, setPage] = useState(1);
@@ -92,35 +75,26 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const lastFilterSnapshot = useRef('');
   const lastPageRequested = useRef(0);
   const firstFilterRef = useRef(true);
+  const loadProductsRef = useRef<null | ((p: number, mode: 'reset' | 'append') => void)>(null);
 
-  const buildParams = useCallback(
-    (p: number) => {
-      const query: Record<string, string> = {};
-      if (keyword) query.q = keyword;
-      if (selectedCategories.length > 0)
-        query.category = selectedCategories.join(',');
-      if (minPrice) query.minPrice = minPrice;
-      if (maxPrice) query.maxPrice = maxPrice;
-      if (inStock) query.inStock = 'true';
-      const params = new URLSearchParams(query);
-      params.set('page', String(p));
-      return params;
-    },
-    [keyword, selectedCategories, minPrice, maxPrice, inStock]
-  );
-
-  const getFilterSnapshot = useCallback(() => {
-    return JSON.stringify({
-      keyword,
-      categories: selectedCategories,
-      minPrice,
-      maxPrice,
-      inStock,
-    });
+  const buildParams = useCallback((p: number) => {
+    const query: Record<string, string> = {};
+    if (keyword) query.q = keyword;
+    if (selectedCategories.length > 0) query.category = selectedCategories.join(',');
+    if (minPrice) query.minPrice = minPrice;
+    if (maxPrice) query.maxPrice = maxPrice;
+    if (inStock) query.inStock = 'true';
+    const params = new URLSearchParams(query);
+    params.set('page', String(p));
+    return params;
   }, [keyword, selectedCategories, minPrice, maxPrice, inStock]);
 
-  const loadProducts = useCallback(
-    async (p: number, mode: 'reset' | 'append'): Promise<void> => {
+  const getFilterSnapshot = useCallback(() => {
+    return JSON.stringify({ keyword, categories: selectedCategories, minPrice, maxPrice, inStock });
+  }, [keyword, selectedCategories, minPrice, maxPrice, inStock]);
+
+  const loadProductsFn = useCallback(
+    async (p: number, mode: 'reset' | 'append') => {
       const snapshot = getFilterSnapshot();
       const key = `${snapshot}_${p}`;
       if (requestedRef.current.has(key)) return;
@@ -132,17 +106,12 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       lastFilterSnapshot.current = snapshot;
       lastPageRequested.current = p;
       if (mode === 'append') setLoadingMore(true);
-      else {
-        setLoading(true);
-      }
+      else setLoading(true);
 
       try {
         const res = await fetch(`/api/products?${buildParams(p).toString()}`);
         if (!res.ok) throw new Error('Failed to fetch');
-        const data = (await res.json()) as {
-          products: Product[];
-          total: number;
-        };
+        const data = (await res.json()) as { products: Product[]; total: number };
         if (mode === 'reset') {
           setItems(data.products);
           setHasMore(data.products.length < data.total);
@@ -157,14 +126,11 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         if (mode === 'reset') {
           const query: Record<string, string> = {};
           if (keyword) query.q = keyword;
-          if (selectedCategories.length > 0)
-            query.category = selectedCategories.join(',');
+          if (selectedCategories.length > 0) query.category = selectedCategories.join(',');
           if (minPrice) query.minPrice = minPrice;
           if (maxPrice) query.maxPrice = maxPrice;
           if (inStock) query.inStock = 'true';
-          router.replace({ pathname: router.pathname, query }, undefined, {
-            shallow: true,
-          });
+          router.replace({ pathname: router.pathname, query }, undefined, { shallow: true });
         }
       } catch (err) {
         console.error('Failed to load products:', err);
@@ -174,22 +140,12 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         loadingRef.current = false;
       }
     },
-    [
-      buildParams,
-      getFilterSnapshot,
-      hasMore,
-      keyword,
-      selectedCategories,
-      minPrice,
-      maxPrice,
-      inStock,
-      router,
-    ]
+    [buildParams, getFilterSnapshot, hasMore, keyword, selectedCategories, minPrice, maxPrice, inStock, router]
   );
 
   useEffect(() => {
-    setInStock(router.query.inStock === 'true');
-  }, [router.query.inStock]);
+    loadProductsRef.current = loadProductsFn;
+  }, [loadProductsFn]);
 
   useEffect(() => {
     if (!loadMoreRef.current) return;
@@ -203,9 +159,8 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
           Date.now() - filterChangedRef.current > 300
         ) {
           const nextPage = lastPageRequested.current + 1;
-          loadProducts(nextPage, 'append').then(() => {
-            setPage(lastPageRequested.current);
-          });
+          loadProductsRef.current?.(nextPage, 'append');
+          setPage(lastPageRequested.current);
         }
       },
       { rootMargin: '200px' }
@@ -216,7 +171,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     return () => {
       observer.disconnect();
     };
-  }, [loadProducts, hasMore]);
+  }, [hasMore]);
 
   useEffect(() => {
     if (firstFilterRef.current) {
@@ -231,14 +186,14 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       setPage(1);
       setHasMore(true);
       initializingRef.current = true;
-      loadProducts(1, 'reset').then(() => {
-        initializingRef.current = false;
-      });
+      loadProductsRef.current?.(1, 'reset');
+      initializingRef.current = false;
     }, 300);
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
-  }, [keyword, selectedCategories, minPrice, maxPrice, inStock, loadProducts]);
+  }, [keyword, selectedCategories, minPrice, maxPrice, inStock]);
+
 
   const toggleInStock = useCallback(() => {
     setInStock((prev) => !prev);
@@ -287,7 +242,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       <Head>
         <title>{getPageTitle('Products')}</title>
       </Head>
-      <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold mb-4">Products</h1>
         <div className="flex flex-col md:flex-row gap-6">
           <aside className="md:w-80 w-full flex-shrink-0">
