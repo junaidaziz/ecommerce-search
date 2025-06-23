@@ -147,7 +147,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                           aria-expanded={hoveredCat?.name === cat.name}
                           onFocus={() => setHoveredCat(cat)}
                           onMouseEnter={() => setHoveredCat(cat)}
-                          className="w-full flex items-center gap-1 text-left font-medium text-gray-800 tracking-wide hover:text-primary transition-colors duration-200 focus:outline-none capitalize whitespace-nowrap truncate"
+                          className="w-full flex items-center gap-1 text-left font-medium text-gray-800 tracking-wide hover:text-primary hover:underline transition-colors duration-200 focus:outline-none capitalize whitespace-nowrap truncate"
                         >
                           {iconMap[cat.name] || null}
                           {cat.name}
@@ -173,7 +173,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                               <Link
                                 href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub)}`}
                                 role="menuitem"
-                                className="block font-medium text-gray-800 tracking-wide hover:text-primary transition-colors duration-200 whitespace-nowrap truncate"
+                                className="block font-medium text-gray-800 tracking-wide hover:text-primary hover:underline transition-colors duration-200 whitespace-nowrap truncate"
                               >
                                 {sub}
                               </Link>
@@ -196,7 +196,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                   key={cat.name}
                   className="border-b border-base-200 last:border-none"
                 >
-                  <summary className="flex items-center gap-2 py-2 cursor-pointer list-none transition-colors duration-200 hover:text-primary">
+                  <summary className="flex items-center gap-2 py-2 cursor-pointer list-none transition-colors duration-200 hover:text-primary hover:underline">
                     {iconMap[cat.name] || null}
                     <span className="capitalize">{cat.name}</span>
                   </summary>
@@ -297,7 +297,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 <li>
                   <Link
                     href="/orders"
-                    className="transition-colors duration-200 hover:text-primary"
+                    className="transition-colors duration-200 hover:text-primary hover:underline"
                   >
                     My Orders
                   </Link>
@@ -305,7 +305,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 <li>
                   <Link
                     href="/profile"
-                    className="transition-colors duration-200 hover:text-primary"
+                    className="transition-colors duration-200 hover:text-primary hover:underline"
                   >
                     Profile
                   </Link>
@@ -313,7 +313,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 <li>
                   <Link
                     href="/profile/edit"
-                    className="transition-colors duration-200 hover:text-primary"
+                    className="transition-colors duration-200 hover:text-primary hover:underline"
                   >
                     Update Profile
                   </Link>
@@ -321,7 +321,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 <li>
                   <Link
                     href="/settings"
-                    className="transition-colors duration-200 hover:text-primary"
+                    className="transition-colors duration-200 hover:text-primary hover:underline"
                   >
                     Settings
                   </Link>
@@ -329,7 +329,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 <li>
                   <button
                     onClick={logout}
-                    className="transition-colors duration-200 hover:text-primary"
+                    className="transition-colors duration-200 hover:text-primary hover:underline"
                   >
                     Logout
                   </button>
