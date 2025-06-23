@@ -14,19 +14,23 @@ interface CategoryPromotionProps {
 
 const placeholder = '/placeholder.png';
 
-const CategoryPromotion: React.FC<CategoryPromotionProps> = ({ categories }) => {
+const CategoryPromotion: React.FC<CategoryPromotionProps> = ({
+  categories,
+}) => {
   if (!categories || categories.length === 0) return null;
 
   return (
     <section className="py-12">
       <div className="max-w-screen-xl mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-6 text-center">Browse Categories</h2>
-        <div className={styles.grid}>
+        <h2 className="text-3xl font-bold mb-6 text-center">
+          Browse Categories
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {categories.map((cat) => (
             <Link
               key={cat.slug ?? cat.name}
               href={`/products?category=${encodeURIComponent(cat.slug ?? cat.name)}`}
-              className={styles.card}
+              className={`${styles.card} group`}
             >
               <Image
                 src={cat.image || placeholder}
