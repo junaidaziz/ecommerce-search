@@ -53,10 +53,6 @@ const HomePage: React.FC = () => {
       </Head>
       <main className="flex-1">
         <HomeHero />
-        <section className="max-w-screen-xl mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-4">Shop by Category</h2>
-          <CategorySlider categories={categories} />
-        </section>
         <FeaturedProducts />
         <CategoryPromotion categories={categories} />
       </main>
