@@ -12,3 +12,4 @@ export * from './image';
 export * from './price';
 export * from './user';
 export * from './shipping';
+export * from './shared';
