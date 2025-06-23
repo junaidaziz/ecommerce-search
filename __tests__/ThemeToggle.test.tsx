@@ -4,7 +4,7 @@ import Layout from '../components/Layout';
 import { AppContext } from '../contexts/AppContext';
 
 jest.mock('next/router', () => ({
-  useRouter: () => ({ push: jest.fn() }),
+  useRouter: () => ({ push: jest.fn(), pathname: '/' }),
 }));
 
 jest.mock('next-auth/react', () => ({

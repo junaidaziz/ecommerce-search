@@ -23,7 +23,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   return (
     <Link
       href={`/categories/${encodeURIComponent(category.name)}`}
-      className="group border border-base-300 rounded-xl p-4 flex flex-col items-center text-center transition-transform duration-200 hover:shadow-lg hover:-translate-y-1 hover:border-primary"
+      className="group border border-base-300 rounded-xl p-5 flex flex-col items-center text-center gap-2 transition-transform duration-200 hover:shadow-lg hover:-translate-y-1 hover:border-primary"
     >
       {iconMap[category.name] ?? <div className="w-8 h-8 mb-2" />}
       <span className="capitalize font-medium">{category.name}</span>
