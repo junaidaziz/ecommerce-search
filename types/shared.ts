@@ -13,7 +13,7 @@ export interface ActiveFilter {
 
 export interface ProductGridProps {
   products: import('./product').Product[];
-  loading: boolean;
+  className?: string;
 }
 
 export interface InfiniteLoaderProps {
