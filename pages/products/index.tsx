@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState, useContext } from 'react';
 import ProductCard from '../../components/ProductCard';
+import ProductFilters from '../../components/ProductFilters';
 import { getPageTitle } from '../../lib/pageTitle';
 import {
   getProductsPaginated,
@@ -290,93 +291,20 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         <h1 className="text-3xl font-bold mb-4">Products</h1>
         <div className="flex flex-col md:flex-row gap-6">
           <aside className="md:w-80 w-full flex-shrink-0">
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="space-y-4 sticky top-4"
-            >
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-primary"
-                  checked={inStock}
-                  onChange={toggleInStock}
-                />
-                <span>In Stock Only</span>
-              </label>
-              <details open className="collapse bg-base-100 rounded-box">
-                <summary className="collapse-title font-medium">
-                  Category
-                </summary>
-                <div className="collapse-content max-h-48 overflow-y-auto">
-                  {categories.map((c) => (
-                    <label key={c.slug} className="block mb-1">
-                      <input
-                        type="checkbox"
-                        className="checkbox mr-2"
-                        value={c.slug}
-                        checked={selectedCategories.includes(c.slug || '')}
-                        onChange={(e) => {
-                          const slug = c.slug || '';
-                          setSelectedCategories((prev) =>
-                            e.target.checked
-                              ? [...prev, slug]
-                              : prev.filter((s) => s !== slug)
-                          );
-                        }}
-                      />
-                      {c.name}
-                    </label>
-                  ))}
-                </div>
-              </details>
-              <details className="collapse bg-base-100 rounded-box">
-                <summary className="collapse-title font-medium">
-                  Price Range
-                </summary>
-                <div className="collapse-content space-y-2">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      placeholder="Min"
-                      className="input input-sm input-bordered w-full"
-                      value={minPrice}
-                      onChange={(e) => setMinPrice(e.target.value)}
-                    />
-                    <span>-</span>
-                    <input
-                      type="number"
-                      placeholder="Max"
-                      className="input input-sm input-bordered w-full"
-                      value={maxPrice}
-                      onChange={(e) => setMaxPrice(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </details>
-              <details className="collapse bg-base-100 rounded-box">
-                <summary className="collapse-title font-medium">
-                  Keyword
-                </summary>
-                <div className="collapse-content">
-                  <input
-                    type="text"
-                    placeholder="Search name"
-                    className="input input-sm input-bordered w-full"
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                  />
-                </div>
-              </details>
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  className="btn btn-sm btn-ghost"
-                  onClick={clearAll}
-                >
-                  Clear All
-                </button>
-              </div>
-            </form>
+            <ProductFilters
+              keyword={keyword}
+              setKeyword={setKeyword}
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
+              minPrice={minPrice}
+              setMinPrice={setMinPrice}
+              maxPrice={maxPrice}
+              setMaxPrice={setMaxPrice}
+              inStock={inStock}
+              setInStock={setInStock}
+              categories={categories}
+              clearAll={clearAll}
+            />
           </aside>
           <div className="flex-1">
             {activeFilters.length > 0 && (
