@@ -22,7 +22,7 @@ const Footer: FC = () => {
     <footer className="bg-base-300 mt-12 py-8 text-base-content px-4 sm:px-6 lg:px-8">
       <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <Link href="/">
+          <Link href="/" className="inline-block transition duration-200 hover:opacity-80">
             <Image
               src="/images/logo-medium.png"
               alt="Logo"
