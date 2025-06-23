@@ -75,22 +75,24 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const [maxPrice, setMaxPrice] = useState(
     typeof router.query.maxPrice === 'string' ? router.query.maxPrice : ''
   );
-  const [inStock, setInStock] = useState(
-    router.query.inStock === 'true'
-  );
+  const [inStock, setInStock] = useState(router.query.inStock === 'true');
   const [items, setItems] = useState<Product[]>(products);
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(products.length < total);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver>();
   const isFetchingRef = useRef(false);
   const filterAbortRef = useRef<AbortController | null>(null);
+  const scrollAbortRef = useRef<AbortController | null>(null);
   const lastFetchRef = useRef(0);
   const priceTimer = useRef<NodeJS.Timeout>();
   const filterTimer = useRef<NodeJS.Timeout>();
   const firstPriceRef = useRef(true);
   const firstFilterRef = useRef(true);
+  const debounceTimerRef = useRef<NodeJS.Timeout>();
+  const requestedRef = useRef<Set<string>>(new Set());
 
   const buildParams = useCallback(
     (p: number) => {
@@ -111,33 +113,51 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const fetchProducts = useCallback(
     async (p: number, signal?: AbortSignal) => {
       const params = buildParams(p);
-      const res = await fetch(`/api/products?${params.toString()}`, { signal });
-      if (!res.ok) return null;
-      return (await res.json()) as { products: Product[]; total: number };
+      const key = params.toString();
+      if (requestedRef.current.has(key)) return null;
+      requestedRef.current.add(key);
+      try {
+        const res = await fetch(`/api/products?${key}`, { signal });
+        if (!res.ok) {
+          requestedRef.current.delete(key);
+          return null;
+        }
+        return (await res.json()) as { products: Product[]; total: number };
+      } catch (err) {
+        requestedRef.current.delete(key);
+        throw err;
+      }
     },
     [buildParams]
   );
 
   const loadMore = useCallback(async () => {
-    if (isFetchingRef.current || loadingMore || !hasMore) return;
+    if (isFetchingRef.current || loadingMore || loading || !hasMore) return;
     const now = Date.now();
     if (now - lastFetchRef.current < 500) return;
     lastFetchRef.current = now;
+    if (scrollAbortRef.current) scrollAbortRef.current.abort();
+    const controller = new AbortController();
+    scrollAbortRef.current = controller;
     isFetchingRef.current = true;
     setLoadingMore(true);
     const next = page + 1;
-    const data = await fetchProducts(next);
-    if (data) {
-      setItems((prev) => {
-        const updated = [...prev, ...data.products];
-        setHasMore(updated.length < data.total);
-        return updated;
-      });
-      setPage(next);
+    try {
+      const data = await fetchProducts(next, controller.signal);
+      if (data) {
+        setItems((prev) => {
+          const updated = [...prev, ...data.products];
+          setHasMore(updated.length < data.total);
+          return updated;
+        });
+        setPage(next);
+      }
+    } finally {
+      setLoadingMore(false);
+      isFetchingRef.current = false;
+      scrollAbortRef.current = null;
     }
-    setLoadingMore(false);
-    isFetchingRef.current = false;
-  }, [fetchProducts, hasMore, loadingMore, page]);
+  }, [fetchProducts, hasMore, loadingMore, loading, page]);
 
   const loadMoreFn = useRef(loadMore);
   loadMoreFn.current = loadMore;
@@ -155,9 +175,14 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       if (filterAbortRef.current) {
         filterAbortRef.current.abort();
       }
+      if (scrollAbortRef.current) {
+        scrollAbortRef.current.abort();
+      }
+      requestedRef.current.clear();
       filterAbortRef.current = new AbortController();
       const signal = filterAbortRef.current.signal;
       isFetchingRef.current = true;
+      setLoading(true);
       const min = minPrice ? parseFloat(minPrice) : undefined;
       const max = maxPrice ? parseFloat(maxPrice) : undefined;
       if (
@@ -196,6 +221,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       } finally {
         filterAbortRef.current = null;
         isFetchingRef.current = false;
+        setLoading(false);
       }
     },
     [
@@ -218,13 +244,17 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     setInStock(router.query.inStock === 'true');
   }, [router.query.inStock]);
 
-
   useEffect(() => {
     if (!loadMoreRef.current) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          loadMoreFn.current();
+          if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+          }
+          debounceTimerRef.current = setTimeout(() => {
+            loadMoreFn.current();
+          }, 250);
         }
       },
       { rootMargin: '200px' }
@@ -234,6 +264,9 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     observer.observe(el);
     return () => {
       observer.disconnect();
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
   }, []);
 
@@ -420,15 +453,20 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
                 ))}
               </div>
             )}
-            {items.length === 0 ? (
+            {loading && (
+              <div className="flex justify-center my-4">
+                <span className="loading loading-spinner" />
+              </div>
+            )}
+            {items.length === 0 && !loading ? (
               <p className="text-gray-500">No products found.</p>
-            ) : (
+            ) : !loading ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
                 {items.map((p) => (
                   <ProductCard key={p.id} product={p} className="w-full" />
                 ))}
               </div>
-            )}
+            ) : null}
             <div
               className="flex justify-center my-4 h-8"
               aria-hidden={!loadingMore}
