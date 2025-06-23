@@ -86,7 +86,10 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   return (
     <header className="relative bg-base-300 mb-6 py-4">
       <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <Link href="/" className="p-0 flex items-center transition duration-200 hover:opacity-80">
+        <Link
+          href="/"
+          className="p-0 flex items-center transition duration-200 hover:opacity-80"
+        >
           <Image
             src="/images/logo-medium.png"
             alt="Logo"
@@ -144,7 +147,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                           aria-expanded={hoveredCat?.name === cat.name}
                           onFocus={() => setHoveredCat(cat)}
                           onMouseEnter={() => setHoveredCat(cat)}
-                          className="w-full flex items-center gap-1 text-left font-medium text-gray-800 tracking-wide hover:text-primary transition-colors focus:outline-none capitalize whitespace-nowrap truncate"
+                          className="w-full flex items-center gap-1 text-left font-medium text-gray-800 tracking-wide hover:text-primary transition-colors duration-200 focus:outline-none capitalize whitespace-nowrap truncate"
                         >
                           {iconMap[cat.name] || null}
                           {cat.name}
@@ -170,7 +173,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                               <Link
                                 href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub)}`}
                                 role="menuitem"
-                                className="block font-medium text-gray-800 tracking-wide hover:text-primary transition-colors whitespace-nowrap truncate"
+                                className="block font-medium text-gray-800 tracking-wide hover:text-primary transition-colors duration-200 whitespace-nowrap truncate"
                               >
                                 {sub}
                               </Link>
@@ -193,7 +196,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                   key={cat.name}
                   className="border-b border-base-200 last:border-none"
                 >
-                  <summary className="flex items-center gap-2 py-2 cursor-pointer list-none">
+                  <summary className="flex items-center gap-2 py-2 cursor-pointer list-none transition-colors duration-200 hover:text-primary">
                     {iconMap[cat.name] || null}
                     <span className="capitalize">{cat.name}</span>
                   </summary>
@@ -203,7 +206,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                         <li key={sub} className="capitalize">
                           <Link
                             href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub)}`}
-                            className="block py-1"
+                            className="block py-1 transition-colors duration-200 hover:text-primary hover:underline"
                           >
                             {sub}
                           </Link>
@@ -221,14 +224,32 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
             <SearchBar placeholder="Search for products, brands..." />
           )}
           <nav className="hidden lg:flex gap-4 ml-4">
-            <Link href="/products">Shop</Link>
-            <Link href="/about">About</Link>
-            <Link href="/contact">Contact</Link>
+            <Link
+              href="/products"
+              className={`transition-colors duration-200 hover:text-primary hover:underline ${pathname.startsWith('/products') ? 'text-primary underline' : ''}`}
+            >
+              Shop
+            </Link>
+            <Link
+              href="/about"
+              className={`transition-colors duration-200 hover:text-primary hover:underline ${pathname === '/about' ? 'text-primary underline' : ''}`}
+            >
+              About
+            </Link>
+            <Link
+              href="/contact"
+              className={`transition-colors duration-200 hover:text-primary hover:underline ${pathname === '/contact' ? 'text-primary underline' : ''}`}
+            >
+              Contact
+            </Link>
           </nav>
         </div>
 
         <nav className="flex items-center gap-2">
-          <Link href="/cart" className="relative p-2">
+          <Link
+            href="/cart"
+            className="relative p-2 transition-colors duration-200 hover:text-primary"
+          >
             <CartIcon className="w-5 h-5" />
             {itemCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
@@ -274,19 +295,44 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded w-40"
               >
                 <li>
-                  <Link href="/orders">My Orders</Link>
+                  <Link
+                    href="/orders"
+                    className="transition-colors duration-200 hover:text-primary"
+                  >
+                    My Orders
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/profile">Profile</Link>
+                  <Link
+                    href="/profile"
+                    className="transition-colors duration-200 hover:text-primary"
+                  >
+                    Profile
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/profile/edit">Update Profile</Link>
+                  <Link
+                    href="/profile/edit"
+                    className="transition-colors duration-200 hover:text-primary"
+                  >
+                    Update Profile
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/settings">Settings</Link>
+                  <Link
+                    href="/settings"
+                    className="transition-colors duration-200 hover:text-primary"
+                  >
+                    Settings
+                  </Link>
                 </li>
                 <li>
-                  <button onClick={logout}>Logout</button>
+                  <button
+                    onClick={logout}
+                    className="transition-colors duration-200 hover:text-primary"
+                  >
+                    Logout
+                  </button>
                 </li>
               </ul>
             </div>
