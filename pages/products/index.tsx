@@ -83,16 +83,14 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const [hasMore, setHasMore] = useState(products.length < total);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver>();
-  const isFetchingRef = useRef(false);
-  const filterAbortRef = useRef<AbortController | null>(null);
-  const scrollAbortRef = useRef<AbortController | null>(null);
-  const lastFetchRef = useRef(0);
-  const priceTimer = useRef<NodeJS.Timeout>();
-  const filterTimer = useRef<NodeJS.Timeout>();
-  const firstPriceRef = useRef(true);
-  const firstFilterRef = useRef(true);
   const debounceTimerRef = useRef<NodeJS.Timeout>();
   const requestedRef = useRef<Set<string>>(new Set());
+  const loadingRef = useRef(false);
+  const initializingRef = useRef(false);
+  const filterChangedRef = useRef(0);
+  const lastFilterSnapshot = useRef('');
+  const lastPageRequested = useRef(0);
+  const firstFilterRef = useRef(true);
 
   const buildParams = useCallback(
     (p: number) => {
@@ -110,135 +108,74 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     [keyword, selectedCategories, minPrice, maxPrice, inStock]
   );
 
-  const fetchProducts = useCallback(
-    async (p: number, signal?: AbortSignal) => {
-      const params = buildParams(p);
-      const key = params.toString();
-      if (requestedRef.current.has(key)) return null;
-      requestedRef.current.add(key);
-      try {
-        const res = await fetch(`/api/products?${key}`, { signal });
-        if (!res.ok) {
-          requestedRef.current.delete(key);
-          return null;
-        }
-        return (await res.json()) as { products: Product[]; total: number };
-      } catch (err) {
-        requestedRef.current.delete(key);
-        throw err;
-      }
-    },
-    [buildParams]
-  );
-
-  const loadMore = useCallback(async () => {
-    if (isFetchingRef.current || loadingMore || loading || !hasMore) return;
-    const now = Date.now();
-    if (now - lastFetchRef.current < 500) return;
-    lastFetchRef.current = now;
-    if (scrollAbortRef.current) scrollAbortRef.current.abort();
-    const controller = new AbortController();
-    scrollAbortRef.current = controller;
-    isFetchingRef.current = true;
-    setLoadingMore(true);
-    const next = page + 1;
-    try {
-      const data = await fetchProducts(next, controller.signal);
-      if (data) {
-        setItems((prev) => {
-          const updated = [...prev, ...data.products];
-          setHasMore(updated.length < data.total);
-          return updated;
-        });
-        setPage(next);
-      }
-    } finally {
-      setLoadingMore(false);
-      isFetchingRef.current = false;
-      scrollAbortRef.current = null;
-    }
-  }, [fetchProducts, hasMore, loadingMore, loading, page]);
-
-  const loadMoreFn = useRef(loadMore);
-  loadMoreFn.current = loadMore;
-
-  const resetObserver = useCallback(() => {
-    if (observerRef.current && loadMoreRef.current) {
-      observerRef.current.disconnect();
-      observerRef.current.observe(loadMoreRef.current);
-    }
-  }, []);
-
-  const applyFilters = useCallback(
-    async (e?: React.FormEvent) => {
-      e?.preventDefault();
-      if (filterAbortRef.current) {
-        filterAbortRef.current.abort();
-      }
-      if (scrollAbortRef.current) {
-        scrollAbortRef.current.abort();
-      }
-      requestedRef.current.clear();
-      filterAbortRef.current = new AbortController();
-      const signal = filterAbortRef.current.signal;
-      isFetchingRef.current = true;
-      setLoading(true);
-      const min = minPrice ? parseFloat(minPrice) : undefined;
-      const max = maxPrice ? parseFloat(maxPrice) : undefined;
-      if (
-        typeof min === 'number' &&
-        typeof max === 'number' &&
-        !isNaN(min) &&
-        !isNaN(max) &&
-        min > max
-      ) {
-        addNotification('Min price cannot exceed Max price', 'error');
-        return;
-      }
-      try {
-        const data = await fetchProducts(1, signal);
-        if (data) {
-          setItems(data.products);
-          setPage(1);
-          setHasMore(data.products.length < data.total);
-          resetObserver();
-          window.scrollTo({ top: 0 });
-        }
-        const query: Record<string, string> = {};
-        if (keyword) query.q = keyword;
-        if (selectedCategories.length > 0)
-          query.category = selectedCategories.join(',');
-        if (minPrice) query.minPrice = minPrice;
-        if (maxPrice) query.maxPrice = maxPrice;
-        if (inStock) query.inStock = 'true';
-        router.replace({ pathname: router.pathname, query }, undefined, {
-          shallow: true,
-        });
-      } catch (err) {
-        if ((err as Error).name !== 'AbortError') {
-          console.error('Failed to fetch products:', err);
-        }
-      } finally {
-        filterAbortRef.current = null;
-        isFetchingRef.current = false;
-        setLoading(false);
-      }
-    },
-    [
-      router,
+  const getFilterSnapshot = useCallback(() => {
+    return JSON.stringify({
       keyword,
-      selectedCategories,
+      categories: selectedCategories,
       minPrice,
       maxPrice,
       inStock,
-      fetchProducts,
-      resetObserver,
-      addNotification,
-    ]
-  );
+    });
+  }, [keyword, selectedCategories, minPrice, maxPrice, inStock]);
 
-  const applyFiltersRef = useRef(applyFilters);
-  applyFiltersRef.current = applyFilters;
+  const loadProducts = useCallback(
+    async (p: number, mode: 'reset' | 'append') => {
+      const snapshot = getFilterSnapshot();
+      const key = `${snapshot}_${p}`;
+      if (requestedRef.current.has(key)) return;
+      if (loadingRef.current) return;
+      if (mode === 'append' && !hasMore) return;
+
+      loadingRef.current = true;
+      requestedRef.current.add(key);
+      lastFilterSnapshot.current = snapshot;
+      lastPageRequested.current = p;
+      if (mode === 'append') setLoadingMore(true);
+      else {
+        setLoading(true);
+        initializingRef.current = true;
+      }
+
+      try {
+        const res = await fetch(`/api/products?${buildParams(p).toString()}`);
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = (await res.json()) as { products: Product[]; total: number };
+        if (mode === 'reset') {
+          setItems(data.products);
+          setPage(1);
+          setHasMore(data.products.length < data.total);
+          window.scrollTo({ top: 0 });
+        } else {
+          setItems((prev) => {
+            const updated = [...prev, ...data.products];
+            setHasMore(updated.length < data.total);
+            return updated;
+          });
+          setPage(p);
+        }
+        if (mode === 'reset') {
+          const query: Record<string, string> = {};
+          if (keyword) query.q = keyword;
+          if (selectedCategories.length > 0)
+            query.category = selectedCategories.join(',');
+          if (minPrice) query.minPrice = minPrice;
+          if (maxPrice) query.maxPrice = maxPrice;
+          if (inStock) query.inStock = 'true';
+          router.replace({ pathname: router.pathname, query }, undefined, {
+            shallow: true,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load products:', err);
+      } finally {
+        if (mode === 'append') setLoadingMore(false);
+        else setLoading(false);
+        loadingRef.current = false;
+        initializingRef.current = false;
+      }
+    },
+    [buildParams, getFilterSnapshot, hasMore, keyword, selectedCategories, minPrice, maxPrice, inStock, router]
+  );
 
   useEffect(() => {
     setInStock(router.query.inStock === 'true');
@@ -248,13 +185,14 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     if (!loadMoreRef.current) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-          }
-          debounceTimerRef.current = setTimeout(() => {
-            loadMoreFn.current();
-          }, 250);
+        if (
+          entries[0].isIntersecting &&
+          !loadingRef.current &&
+          hasMore &&
+          !initializingRef.current &&
+          Date.now() - filterChangedRef.current > 300
+        ) {
+          loadProducts(page + 1, 'append');
         }
       },
       { rootMargin: '200px' }
@@ -264,39 +202,27 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     observer.observe(el);
     return () => {
       observer.disconnect();
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
     };
-  }, []);
-
-  useEffect(() => {
-    if (firstPriceRef.current) {
-      firstPriceRef.current = false;
-      return;
-    }
-    if (priceTimer.current) clearTimeout(priceTimer.current);
-    priceTimer.current = setTimeout(() => {
-      applyFilters();
-    }, 500);
-    return () => {
-      if (priceTimer.current) clearTimeout(priceTimer.current);
-    };
-  }, [minPrice, maxPrice, applyFilters]);
+  }, [loadProducts, hasMore, page]);
 
   useEffect(() => {
     if (firstFilterRef.current) {
       firstFilterRef.current = false;
       return;
     }
-    if (filterTimer.current) clearTimeout(filterTimer.current);
-    filterTimer.current = setTimeout(() => {
-      applyFiltersRef.current();
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    filterChangedRef.current = Date.now();
+    debounceTimerRef.current = setTimeout(() => {
+      requestedRef.current.clear();
+      setItems([]);
+      setPage(1);
+      setHasMore(true);
+      loadProducts(1, 'reset');
     }, 300);
     return () => {
-      if (filterTimer.current) clearTimeout(filterTimer.current);
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
-  }, [selectedCategories, keyword, inStock]);
+  }, [keyword, selectedCategories, minPrice, maxPrice, inStock, loadProducts]);
 
   const toggleInStock = useCallback(() => {
     setInStock((prev) => !prev);
@@ -349,7 +275,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         <h1 className="text-3xl font-bold mb-4">Products</h1>
         <div className="flex flex-col md:flex-row gap-6">
           <aside className="md:w-80 w-full flex-shrink-0">
-            <form onSubmit={applyFilters} className="space-y-4 sticky top-4">
+            <form onSubmit={(e) => e.preventDefault()} className="space-y-4 sticky top-4">
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
