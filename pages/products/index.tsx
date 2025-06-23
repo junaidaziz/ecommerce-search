@@ -1,9 +1,11 @@
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useRef, useState, useContext } from 'react';
-import ProductCard from '../../components/ProductCard';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ProductFilters from '../../components/ProductFilters';
+import ActiveFilters from '../../components/ActiveFilters';
+import ProductGrid from '../../components/ProductGrid';
+import InfiniteLoader from '../../components/InfiniteLoader';
 import { getPageTitle } from '../../lib/pageTitle';
 import {
   getProductsPaginated,
@@ -13,7 +15,6 @@ import {
 import type { Product } from '../../types/product';
 import type { Category } from '../../types/category';
 import { serializeDates } from '../../lib/utils/serializeDates';
-import { NotificationContext } from '../../contexts/NotificationContext';
 
 interface ProductsProps {
   products: Product[];
@@ -52,7 +53,6 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   categories,
 }) => {
   const router = useRouter();
-  const { addNotification } = useContext(NotificationContext);
   const [keyword, setKeyword] = useState(typeof router.query.q === 'string' ? router.query.q : '');
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     typeof router.query.category === 'string' && router.query.category ? router.query.category.split(',') : []
@@ -61,12 +61,9 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const [maxPrice, setMaxPrice] = useState(typeof router.query.maxPrice === 'string' ? router.query.maxPrice : '');
   const [inStock, setInStock] = useState(router.query.inStock === 'true');
   const [items, setItems] = useState<Product[]>(products);
-  const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(products.length < total);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const observerRef = useRef<IntersectionObserver>();
   const debounceTimerRef = useRef<NodeJS.Timeout>();
   const requestedRef = useRef<Set<string>>(new Set());
   const loadingRef = useRef(false);
@@ -147,31 +144,19 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     loadProductsRef.current = loadProductsFn;
   }, [loadProductsFn]);
 
-  useEffect(() => {
-    if (!loadMoreRef.current) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          !loadingRef.current &&
-          hasMore &&
-          !initializingRef.current &&
-          Date.now() - filterChangedRef.current > 300
-        ) {
-          const nextPage = lastPageRequested.current + 1;
-          loadProductsRef.current?.(nextPage, 'append');
-          setPage(lastPageRequested.current);
-        }
-      },
-      { rootMargin: '200px' }
-    );
-    observerRef.current = observer;
-    const el = loadMoreRef.current;
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-    };
+  const handleLoadMore = useCallback(() => {
+    if (
+      loadingRef.current ||
+      !hasMore ||
+      initializingRef.current ||
+      Date.now() - filterChangedRef.current <= 300
+    ) {
+      return;
+    }
+    const nextPage = lastPageRequested.current + 1;
+    loadProductsRef.current?.(nextPage, 'append');
   }, [hasMore]);
+
 
   useEffect(() => {
     if (firstFilterRef.current) {
@@ -183,7 +168,6 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     debounceTimerRef.current = setTimeout(() => {
       requestedRef.current.clear();
       setItems([]);
-      setPage(1);
       setHasMore(true);
       initializingRef.current = true;
       loadProductsRef.current?.(1, 'reset');
@@ -262,50 +246,14 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
             />
           </aside>
           <div className="flex-1">
-            {activeFilters.length > 0 && (
-              <div className="mb-4 flex flex-wrap gap-2 items-center">
-                {activeFilters.map((f, i) => (
-                  <span key={i} className="badge badge-outline gap-1">
-                    {f.label}
-                    <button
-                      type="button"
-                      className="ml-1"
-                      onClick={() => {
-                        f.clear();
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-            {loading && (
-              <div className="flex justify-center my-4">
-                <span className="loading loading-spinner" />
-              </div>
-            )}
-            {items.length === 0 && !loading ? (
-              <p className="text-gray-500">No products found.</p>
-            ) : !loading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-                {items.map((p) => (
-                  <ProductCard key={p.id} product={p} className="w-full" />
-                ))}
-              </div>
-            ) : null}
-            <div
-              className="flex justify-center my-4 h-8"
-              aria-hidden={!loadingMore}
-            >
-              {loadingMore && <span className="loading loading-spinner" />}
-            </div>
-            {!hasMore && items.length > 0 && (
-              <p className="text-center text-sm text-gray-500 my-4">
-                No more products.
-              </p>
-            )}
-            <div ref={loadMoreRef} className="h-4" />
+            <ActiveFilters filters={activeFilters} clearAll={clearAll} />
+            <ProductGrid products={items} loading={loading} />
+            <InfiniteLoader
+              onLoadMore={handleLoadMore}
+              hasMore={hasMore}
+              loading={loadingMore}
+              itemsLength={items.length}
+            />
           </div>
         </div>
       </div>
