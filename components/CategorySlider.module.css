@@ -1,29 +1,28 @@
 .slider {
-  width: 100%;
-  padding: 1rem 0;
+  @apply w-full py-4;
 }
+
 .slide {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0.5rem;
+  @apply p-2;
 }
+
+.card {
+  @apply flex flex-col bg-base-100 border border-base-300 rounded-xl overflow-hidden shadow-sm transition-shadow duration-200 hover:shadow-lg;
+}
+
 .imageWrapper {
-  position: relative;
-  width: 100px;
-  height: 100px;
+  @apply relative w-28 h-28 md:w-32 md:h-32 mx-auto;
 }
+
 .image {
-  border-radius: 0.5rem;
-  object-fit: cover;
+  @apply object-cover;
 }
+
 .name {
-  margin-top: 0.5rem;
-  font-weight: 500;
-  text-align: center;
+  @apply mt-2 font-medium text-center line-clamp-2;
 }
 
 .swiper-button-next,
 .swiper-button-prev {
-  color: #fff;
+  @apply text-primary;
 }
