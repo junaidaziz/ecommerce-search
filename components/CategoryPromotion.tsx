@@ -6,7 +6,7 @@ interface CategoryPromotionProps {
 }
 
 const CategoryPromotion: React.FC<CategoryPromotionProps> = ({ categories }) => (
-  <section className="py-12 bg-primary text-white">
+  <section className="py-12 bg-base-200 text-base-content">
     <div className="max-w-screen-xl mx-auto px-4 text-center">
       <h2 className="text-3xl font-bold mb-2">Browse Categories</h2>
       <p className="mb-6">Find exactly what you need…</p>

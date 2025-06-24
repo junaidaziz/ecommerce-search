@@ -2,7 +2,7 @@ import { FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { A11y, Navigation } from 'swiper/modules';
+import { A11y, Navigation, Autoplay, Keyboard } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
@@ -25,8 +25,11 @@ const CategorySlider: FC<CategorySliderProps> = ({ categories }) => {
 
   return (
     <Swiper
-      modules={[Navigation, A11y]}
+      modules={[Navigation, Autoplay, Keyboard, A11y]}
       navigation
+      loop
+      autoplay={{ delay: 3000, disableOnInteraction: false }}
+      keyboard={{ enabled: true }}
       spaceBetween={16}
       slidesPerView={2.5}
       breakpoints={{
@@ -42,7 +45,7 @@ const CategorySlider: FC<CategorySliderProps> = ({ categories }) => {
             href={`/products?category=${encodeURIComponent(
               cat.slug ?? cat.name
             )}`}
-            className="block"
+            className={styles.card}
           >
             <div className={styles.imageWrapper}>
               <Image
@@ -52,7 +55,7 @@ const CategorySlider: FC<CategorySliderProps> = ({ categories }) => {
                 className={styles.image}
               />
             </div>
-            <span className={styles.name}>{cat.name}</span>
+            <div className={styles.name}>{cat.name}</div>
           </Link>
         </SwiperSlide>
       ))}
