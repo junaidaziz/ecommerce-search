@@ -7,6 +7,10 @@ import type { User } from '../types/user';
 import type { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './api/auth/[...nextauth]';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 const Profile: React.FC = () => {
   const user = useRequireAuth();
@@ -25,12 +29,21 @@ const Profile: React.FC = () => {
       ? String(value)
       : 'Not provided';
 
+  const lastUpdated = profile?.updatedAt
+    ? `Updated ${dayjs(profile.updatedAt).fromNow()}`
+    : 'Never updated';
+
+  const fullName = `${profile?.firstName || user.firstName || ''} ${
+    profile?.lastName || user.lastName || ''
+  }`.trim();
+
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       <Head>
         <title>{getPageTitle('My Profile')}</title>
       </Head>
       <h1 className="text-2xl font-bold mb-4">My Profile</h1>
+
       <div className="flex items-center gap-4">
         {profile?.logo ? (
           <img
@@ -42,92 +55,84 @@ const Profile: React.FC = () => {
           <div className="w-16 h-16 rounded-full bg-gray-300" />
         )}
         <div>
-          <p className="text-lg font-semibold">
-            {display(
-              `${profile?.firstName || user.firstName || ''} ${
-                profile?.lastName || user.lastName || ''
-              }`.trim()
-            )}
-          </p>
-          <p className="text-gray-600">
-            {display(profile?.email || user.email)}
-          </p>
+          <p className="text-lg font-semibold">{display(fullName)}</p>
+          <p className="text-gray-600">{display(profile?.email || user.email)}</p>
         </div>
       </div>
 
-      <div className="border-t pt-4 space-y-1">
-        <h2 className="text-lg font-semibold mb-2">Contact Info</h2>
-        <p>
-          <strong>ID:</strong> {display(profile?.id)}
-        </p>
-        <p>
-          <strong>Phone:</strong> {display(profile?.phoneNumber)}
-        </p>
-      </div>
-
-      <div className="border-t pt-4 space-y-1">
-        <h2 className="text-lg font-semibold mb-2">Address</h2>
-        <p>
-          <strong>Street:</strong> {display(profile?.address)}
-        </p>
-        <p>
-          <strong>City:</strong> {display(profile?.city)}
-        </p>
-        <p>
-          <strong>State:</strong> {display((profile as any)?.state)}
-        </p>
-        <p>
-          <strong>Postal Code:</strong> {display((profile as any)?.postalCode)}
-        </p>
-        <p>
-          <strong>Country:</strong> {display(profile?.country)}
-        </p>
-      </div>
-
-      <div className="border-t pt-4 space-y-1">
-        <h2 className="text-lg font-semibold mb-2">Business Info</h2>
-        <p>
-          <strong>Brand Name:</strong> {display(profile?.brandName)}
-        </p>
-        <p>
-          <strong>Business Address:</strong> {display(profile?.businessAddress)}
-        </p>
-        <p>
-          <strong>Website:</strong> {display(profile?.website)}
-        </p>
-        <p>
-          <strong>Description:</strong> {display(profile?.businessDescription)}
-        </p>
-        <p>
-          <strong>Tax ID:</strong> {display(profile?.taxId)}
-        </p>
-      </div>
-
-      <div className="border-t pt-4 space-y-1">
-        <h2 className="text-lg font-semibold mb-2">Meta</h2>
-        <p>
-          <strong>Role:</strong> {display(profile?.role)}
-        </p>
-        <p>
-          <strong>Verified:</strong>{' '}
-          {profile ? (profile.verified ? 'Yes' : 'No') : 'Not provided'}
-        </p>
-        <p>
-          <strong>Disabled:</strong>{' '}
-          {profile ? (profile.disabled ? 'Yes' : 'No') : 'Not provided'}
-        </p>
-        <p>
-          <strong>Created:</strong>{' '}
-          {profile?.createdAt
-            ? new Date(profile.createdAt).toLocaleString()
-            : 'Not provided'}
-        </p>
-        <p>
-          <strong>Updated:</strong>{' '}
-          {profile?.updatedAt
-            ? new Date(profile.updatedAt).toLocaleString()
-            : 'Not provided'}
-        </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
+        <div>
+          <p className="text-sm text-gray-500">Full Name</p>
+          <p className="font-medium">{display(fullName)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Email</p>
+          <p className="font-medium">{display(profile?.email || user.email)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Phone</p>
+          <p className="font-medium">{display(profile?.phoneNumber)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Address</p>
+          <p className="font-medium">{display(profile?.address)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">City</p>
+          <p className="font-medium">{display(profile?.city)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">State</p>
+          <p className="font-medium">{display((profile as any)?.state)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Postal Code</p>
+          <p className="font-medium">{display((profile as any)?.postalCode)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Country</p>
+          <p className="font-medium">{display(profile?.country)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Brand Name</p>
+          <p className="font-medium">{display(profile?.brandName)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Business Address</p>
+          <p className="font-medium">{display(profile?.businessAddress)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Website</p>
+          <p className="font-medium">{display(profile?.website)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Description</p>
+          <p className="font-medium">{display(profile?.businessDescription)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Tax ID</p>
+          <p className="font-medium">{display(profile?.taxId)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Role</p>
+          <p className="font-medium">{display(profile?.role)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Verified</p>
+          <p className="font-medium">
+            {profile ? (profile.verified ? 'Yes' : 'No') : 'Not provided'}
+          </p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Disabled</p>
+          <p className="font-medium">
+            {profile ? (profile.disabled ? 'Yes' : 'No') : 'Not provided'}
+          </p>
+        </div>
+        <div className="md:col-span-2">
+          <p className="text-sm text-gray-500">Last updated</p>
+          <p className="font-medium">{lastUpdated}</p>
+        </div>
       </div>
 
       <Link href="/profile/edit" className="btn btn-primary mt-4">
