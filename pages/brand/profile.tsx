@@ -8,7 +8,7 @@ import React, {
 import { useRouter } from 'next/router';
 import { AppContext } from '../../contexts/AppContext';
 import type { User, Vendor } from '../../types';
-import { TextInput, Textarea } from '../../components/form-fields';
+import { TextInput, Textarea, CountrySelect } from '../../components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 
@@ -130,13 +130,9 @@ export const BrandProfile: React.FC = () => {
           }
           placeholder="City"
         />
-        <TextInput
-          name="country"
+        <CountrySelect
           value={country}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setCountry(e.target.value)
-          }
-          placeholder="Country"
+          onChange={(val) => setCountry(val)}
         />
         <TextInput
           name="website"
