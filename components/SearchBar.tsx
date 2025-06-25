@@ -149,10 +149,10 @@ const SearchBar: FC<SearchBarProps> = ({
     <form
       onSubmit={submitSearch}
       ref={formRef}
-      className={`relative flex-1 max-w-lg ${className}`}
+      className={`relative flex-1 max-w-lg transition-all duration-300 focus-within:max-w-xl ${className}`}
     >
       <input
-        className="input input-bordered w-full pr-16"
+        className="input input-bordered w-full pr-16 rounded-full shadow-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:shadow-lg"
         value={query}
         onChange={(e) => {
           setQuery(e.target.value);
