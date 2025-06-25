@@ -24,9 +24,7 @@ export interface TextInputProps<T extends FieldValues>
   rules?: RegisterOptions<T, Path<T>>;
 }
 
-const TextInput = <T extends FieldValues>(
-  props: TextInputProps<T>
-) => {
+const TextInput = <T extends FieldValues>(props: TextInputProps<T>) => {
   const {
     label,
     name,
@@ -85,7 +83,11 @@ const TextInput = <T extends FieldValues>(
           </span>
         )}
       </div>
-      {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+      {error && (
+        <p role="alert" className="text-sm text-red-600 mt-1">
+          {error}
+        </p>
+      )}
     </div>
   );
 };
