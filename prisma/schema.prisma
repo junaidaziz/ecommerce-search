@@ -45,6 +45,7 @@ model User {
   orders            Order[]
   deletionRequests  DeletionRequest[] @relation("BrandDeletionRequests")
   searchLogs        SearchLog[]
+  couponUsages      CouponUsage[]
 }
 
 model Category {
@@ -138,6 +139,7 @@ model Coupon {
   isActive      Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  usages        CouponUsage[]
 }
 
 model CouponUsage {
