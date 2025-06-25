@@ -32,9 +32,27 @@ const emptyForm: ProductForm = {
   currency: 'USD',
 };
 
+const labels: Record<keyof ProductForm, string> = {
+  id: 'ID',
+  sku: 'SKU',
+  title: 'Title',
+  vendor: 'Vendor',
+  description: 'Description',
+  productType: 'Product Type',
+  tags: 'Tags',
+  category: 'Category',
+  quantity: 'Quantity',
+  minPrice: 'Min Price',
+  maxPrice: 'Max Price',
+  currency: 'Currency',
+};
+
 const BrandDashboard: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
   const [form, setForm] = useState<ProductForm>(emptyForm);
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof ProductForm, string>>
+  >({});
   const [products, setProducts] = useState<ProductApi[]>([]);
   const [lowStock, setLowStock] = useState<ProductApi[]>([]);
   const [message, setMessage] = useState<string>('');
@@ -62,6 +80,7 @@ const BrandDashboard: React.FC = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
     setForm((prev) => {
       if (name === 'vendor') {
         return {
@@ -75,18 +94,34 @@ const BrandDashboard: React.FC = () => {
           category: { ...(prev.category || { slug: '' }), name: value },
         };
       }
-      return {
-        ...prev,
-        [name]:
-          name === 'quantity' || name === 'minPrice' || name === 'maxPrice'
-            ? Number(value)
-            : value,
-      };
+      if (name === 'quantity' || name === 'minPrice' || name === 'maxPrice') {
+        const num = Number(value);
+        return { ...prev, [name]: num < 0 ? 0 : num };
+      }
+      return { ...prev, [name]: value };
     });
+    if (name === 'quantity' || name === 'minPrice' || name === 'maxPrice') {
+      const num = Number(value);
+      if (num < 0) {
+        setErrors((prev) => ({
+          ...prev,
+          [name]: 'Value must be non-negative',
+        }));
+      }
+    }
   };
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const newErrors: Partial<Record<keyof ProductForm, string>> = {};
+    ['quantity', 'minPrice', 'maxPrice'].forEach((f) => {
+      const val = (form as any)[f];
+      if (typeof val === 'number' && val < 0) {
+        newErrors[f as keyof ProductForm] = 'Value must be non-negative';
+      }
+    });
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
     const payload = editingId ? { ...form, id: editingId } : form;
     const url = editingId
       ? `/api/brand/products/${editingId}`
@@ -180,81 +215,92 @@ const BrandDashboard: React.FC = () => {
         </div>
       )}
       {message && <div className="mb-4 text-green-600">{message}</div>}
-      <form onSubmit={submit} className="space-y-2 mb-6">
-        {(
-          [
-            'id',
-            'sku',
-            'title',
-            'vendor',
-            'description',
-            'productType',
-            'tags',
-            'category',
-            'quantity',
-            'minPrice',
-            'maxPrice',
-            'currency',
-          ] as (keyof ProductForm)[]
-        ).map((field) => (
-          <TextInput
-            key={field}
-            name={field as keyof ProductForm}
-            value={
-              field === 'vendor'
-                ? form.vendor?.brandName || ''
-                : field === 'category'
-                  ? form.category?.name || ''
-                  : (form as any)[field]
-            }
-            onChange={handleChange as any}
-            placeholder={field}
-            type={
-              field === 'quantity' ||
-              field === 'minPrice' ||
-              field === 'maxPrice'
-                ? 'number'
-                : 'text'
-            }
-          />
-        ))}
-        <div className="flex gap-2">
-          {editingId && (
-            <button type="button" onClick={cancelEdit} className="btn">
-              Cancel
+      <div className="max-w-2xl mx-auto">
+        <form onSubmit={submit} className="space-y-2 mb-6">
+          {(
+            [
+              'id',
+              'sku',
+              'title',
+              'vendor',
+              'description',
+              'productType',
+              'tags',
+              'category',
+              'quantity',
+              'minPrice',
+              'maxPrice',
+              'currency',
+            ] as (keyof ProductForm)[]
+          ).map((field) => (
+            <TextInput
+              key={field}
+              label={labels[field]}
+              name={field as keyof ProductForm}
+              value={
+                field === 'vendor'
+                  ? form.vendor?.brandName || ''
+                  : field === 'category'
+                    ? form.category?.name || ''
+                    : (form as any)[field]
+              }
+              onChange={handleChange as any}
+              placeholder={labels[field]}
+              type={
+                field === 'quantity' ||
+                field === 'minPrice' ||
+                field === 'maxPrice'
+                  ? 'number'
+                  : 'text'
+              }
+              min={
+                field === 'quantity' ||
+                field === 'minPrice' ||
+                field === 'maxPrice'
+                  ? 0
+                  : undefined
+              }
+              error={errors[field]}
+            />
+          ))}
+          <div className="flex gap-2">
+            {editingId && (
+              <button type="button" onClick={cancelEdit} className="btn">
+                Cancel
+              </button>
+            )}
+            <button type="submit" className="btn btn-primary">
+              {editingId ? 'Update Product' : 'Add Product'}
             </button>
-          )}
-          <button type="submit" className="btn btn-primary">
-            {editingId ? 'Update Product' : 'Add Product'}
-          </button>
-        </div>
-      </form>
-      <h2 className="text-xl font-semibold mb-2">Existing Products</h2>
-      <ul className="space-y-1">
-        {products.map((p) => (
-          <li key={p.id} className="flex justify-between items-center gap-2">
-            <span>
-              {p.title} ({p.sku}) - {p.category || p.productType}
-            </span>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="btn btn-sm"
-                onClick={() => handleEdit(p)}
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                className="btn btn-sm btn-error"
-                onClick={() => handleDelete(p.id)}
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+          </div>
+        </form>
+        <h2 className="text-xl font-semibold mb-2">Existing Products</h2>
+        <ul className="space-y-1">
+          {products.map((p) => (
+            <li key={p.id} className="flex justify-between items-center gap-2">
+              <span>
+                {p.title} ({p.sku}) - {p.category || p.productType}
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="btn btn-sm"
+                  onClick={() => handleEdit(p)}
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-error"
+                  onClick={() => handleDelete(p.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
