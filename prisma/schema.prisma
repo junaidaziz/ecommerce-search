@@ -2,7 +2,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -15,131 +14,131 @@ enum Role {
 }
 
 model User {
-  id                Int       @id @default(autoincrement())
-  uuid              String    @unique @default(uuid())
-  email             String    @unique
-  password          String
-  firstName         String
-  lastName          String
-  brandName         String?
-  gender            String
-  phoneNumber       String?
-  address           String?
-  city              String?
-  country           String?
-  businessAddress   String?
-  website           String?
+  id                  Int       @id @default(autoincrement())
+  uuid                String    @unique @default(uuid())
+  email               String    @unique
+  password            String
+  firstName           String
+  lastName            String
+  brandName           String?
+  gender              String
+  phoneNumber         String?
+  address             String?
+  city                String?
+  country             String?
+  businessAddress     String?
+  website             String?
   businessDescription String?
-  logo              String?
-  taxId             String?
-  role              Role      @default(USER)
-  verified          Boolean   @default(false)
-  disabled          Boolean   @default(false)
-  verificationToken String?
-  resetToken        String?
-  resetExpires      DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  logo                String?
+  taxId               String?
+  role                Role      @default(USER)
+  verified            Boolean   @default(false)
+  disabled            Boolean   @default(false)
+  verificationToken   String?
+  resetToken          String?
+  resetExpires        DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
-  products          Product[]
-  orders            Order[]
-  deletionRequests  DeletionRequest[] @relation("BrandDeletionRequests")
-  searchLogs        SearchLog[]
-  couponUsages      CouponUsage[]
+  products         Product[]
+  orders           Order[]
+  deletionRequests DeletionRequest[] @relation("BrandDeletionRequests")
+  searchLogs       SearchLog[]
+  couponUsages     CouponUsage[]
 }
 
 model Category {
-  id        Int       @id @default(autoincrement())
-  uuid      String    @unique @default(uuid())
+  id        Int      @id @default(autoincrement())
+  uuid      String   @unique @default(uuid())
   name      String
-  slug      String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  products  Product[]
+  products         Product[]
   deletionRequests DeletionRequest[]
 }
 
 model Product {
-  id          Int       @id @default(autoincrement())
-  uuid        String    @unique @default(uuid())
-  slug        String    @unique
-  sku         String    @unique
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  slug        String   @unique
+  sku         String   @unique
   title       String
   description String
   productType String
   tags        String?
-  quantity    Int       @default(0)
-  minPrice    Float     @default(0)
-  maxPrice    Float     @default(0)
-  currency    String    @default("USD")
-  status      String    @default("approved")
+  quantity    Int      @default(0)
+  minPrice    Float    @default(0)
+  maxPrice    Float    @default(0)
+  currency    String   @default("USD")
+  status      String   @default("approved")
   images      String?
   vendorId    Int
   categoryId  Int
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  vendor      User      @relation(fields: [vendorId], references: [id])
-  category    Category  @relation(fields: [categoryId], references: [id])
-  orders      Order[]
+  vendor   User     @relation(fields: [vendorId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+  orders   Order[]
 }
 
 model Order {
-  id        Int       @id @default(autoincrement())
-  uuid      String    @unique @default(uuid())
-  userId    Int
-  productId Int
-  quantity  Int
-  total     Float
-  status    String    @default("pending")
-  paymentMethod   String?
+  id               Int      @id @default(autoincrement())
+  uuid             String   @unique @default(uuid())
+  userId           Int
+  productId        Int
+  quantity         Int
+  total            Float
+  status           String   @default("pending")
+  paymentMethod    String?
   paymentReference String?
   paymentProof     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  user      User      @relation(fields: [userId], references: [id])
-  product   Product   @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 }
 
 model DeletionRequest {
-  id        Int       @id @default(autoincrement())
-  uuid      String    @unique @default(uuid())
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
   categoryId Int
-  brandId   Int
-  reason    String?
-  status    String    @default("pending")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  brandId    Int
+  reason     String?
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  category  Category  @relation(fields: [categoryId], references: [id])
-  brand     User      @relation("BrandDeletionRequests", fields: [brandId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+  brand    User     @relation("BrandDeletionRequests", fields: [brandId], references: [id])
 }
 
 model SearchLog {
-  id        Int       @id @default(autoincrement())
-  uuid      String    @unique @default(uuid())
+  id        Int      @id @default(autoincrement())
+  uuid      String   @unique @default(uuid())
   userId    Int?
   query     String
-  noResults Boolean   @default(false)
-  createdAt DateTime  @default(now())
+  noResults Boolean  @default(false)
+  createdAt DateTime @default(now())
 
-  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model Coupon {
-  id            Int       @id @default(autoincrement())
-  code          String    @unique
-  discountType  String
-  amount        Float
+  id             Int           @id @default(autoincrement())
+  code           String        @unique
+  discountType   String
+  amount         Float
   expirationDate DateTime?
-  usageLimit    Int?
-  usedCount     Int       @default(0)
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  usages        CouponUsage[]
+  usageLimit     Int?
+  usedCount      Int           @default(0)
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  usages         CouponUsage[]
 }
 
 model CouponUsage {
