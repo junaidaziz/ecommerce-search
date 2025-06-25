@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import useRequireAuth from '../hooks/useRequireAuth';
 import { getPageTitle } from '../lib/pageTitle';
 import type { User } from '../types/user';
+import type { GetServerSideProps } from 'next';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from './api/auth/[...nextauth]';
 
 const Profile: React.FC = () => {
   const user = useRequireAuth();
@@ -134,3 +137,17 @@ const Profile: React.FC = () => {
   );
 };
 export default Profile;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
+  if (!session?.user) {
+    return {
+      redirect: { destination: '/login', permanent: false },
+    };
+  }
+  return { props: {} };
+};
