@@ -7,6 +7,7 @@ import {
   EmailInput,
   PasswordInput,
   TextInput,
+  CountrySelect,
 } from '../../components/form-fields';
 import type { User } from '../../types/user';
 
@@ -28,6 +29,7 @@ const EditProfile: React.FC = () => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
     reset,
   } = useForm<FormValues>({
@@ -141,11 +143,11 @@ const EditProfile: React.FC = () => {
             register={register}
             error={errors.city?.message}
           />
-          <TextInput<FormValues>
+          <CountrySelect<FormValues>
             label="Country"
             name="country"
-            register={register}
-            error={errors.country?.message}
+            control={control}
+            error={errors.country?.message as string}
           />
         </div>
         <PasswordInput<FormValues>
