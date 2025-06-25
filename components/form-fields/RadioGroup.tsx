@@ -26,9 +26,7 @@ export interface RadioGroupProps<T extends FieldValues> {
   rules?: RegisterOptions<T, Path<T>>;
 }
 
-const RadioGroup = <T extends FieldValues>(
-  props: RadioGroupProps<T>
-) => {
+const RadioGroup = <T extends FieldValues>(props: RadioGroupProps<T>) => {
   const {
     label,
     name,

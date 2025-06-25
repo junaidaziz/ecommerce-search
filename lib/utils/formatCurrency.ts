@@ -1,4 +1,7 @@
-export function formatCurrency(amount: number, currency: string = 'USD'): string {
+export function formatCurrency(
+  amount: number,
+  currency: string = 'USD'
+): string {
   if (isNaN(amount)) amount = 0;
   try {
     return new Intl.NumberFormat('en-US', {

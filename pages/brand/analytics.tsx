@@ -20,7 +20,9 @@ const BrandAnalytics: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
-    fetch(`/api/brand/analytics?vendor=${encodeURIComponent(user.brandName || '')}`)
+    fetch(
+      `/api/brand/analytics?vendor=${encodeURIComponent(user.brandName || '')}`
+    )
       .then((res) => (res.ok ? res.json() : null))
       .then(setData);
   }, [user]);

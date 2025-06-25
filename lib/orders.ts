@@ -86,7 +86,10 @@ export async function getOrdersForUser(email: string): Promise<Order[]> {
   const db = getDb();
   const rows: OrderWithRelations[] = await db.order.findMany({
     where: { user: { email } },
-    include: { user: true, product: { include: { vendor: true, category: true } } },
+    include: {
+      user: true,
+      product: { include: { vendor: true, category: true } },
+    },
     orderBy: { createdAt: 'desc' },
   });
   return rows.map(mapOrderRow);
@@ -95,7 +98,10 @@ export async function getOrdersForUser(email: string): Promise<Order[]> {
 export async function getAllOrders(): Promise<Order[]> {
   const db = getDb();
   const rows: OrderWithRelations[] = await db.order.findMany({
-    include: { user: true, product: { include: { vendor: true, category: true } } },
+    include: {
+      user: true,
+      product: { include: { vendor: true, category: true } },
+    },
     orderBy: { createdAt: 'desc' },
   });
   return rows.map(mapOrderRow);
@@ -105,30 +111,45 @@ export async function getOrdersForVendor(vendor: string): Promise<Order[]> {
   const db = getDb();
   const rows: OrderWithRelations[] = await db.order.findMany({
     where: { product: { vendor: { brandName: vendor } } },
-    include: { user: true, product: { include: { vendor: true, category: true } } },
+    include: {
+      user: true,
+      product: { include: { vendor: true, category: true } },
+    },
     orderBy: { createdAt: 'desc' },
   });
   return rows.map(mapOrderRow);
 }
 
-export async function hasOrdersForProduct(productUuid: string): Promise<boolean> {
+export async function hasOrdersForProduct(
+  productUuid: string
+): Promise<boolean> {
   const db = getDb();
-  const count = await db.order.count({ where: { product: { uuid: productUuid } } });
+  const count = await db.order.count({
+    where: { product: { uuid: productUuid } },
+  });
   return count > 0;
 }
 
-export async function getOrderByUuid(uuid: string): Promise<(Order & { userEmail: string }) | null> {
+export async function getOrderByUuid(
+  uuid: string
+): Promise<(Order & { userEmail: string }) | null> {
   const db = getDb();
   const row: OrderWithRelations | null = await db.order.findUnique({
     where: { uuid },
-    include: { user: true, product: { include: { vendor: true, category: true } } },
+    include: {
+      user: true,
+      product: { include: { vendor: true, category: true } },
+    },
   });
   if (!row) return null;
   const order = mapOrderRow(row);
   return { ...order, userEmail: row.user.email };
 }
 
-export async function updateOrderStatus(uuid: string, status: string): Promise<void> {
+export async function updateOrderStatus(
+  uuid: string,
+  status: string
+): Promise<void> {
   const db = getDb();
   await db.order.update({ where: { uuid }, data: { status } });
 }
@@ -147,7 +168,9 @@ export async function getBestSellingProducts(limit = 8): Promise<Product[]> {
     include: { category: true, vendor: true },
   });
 
-  return products.map((p: Prisma.ProductGetPayload<{ include: { category: true; vendor: true } }>) =>
-    mapDbRowToProduct(p)
+  return products.map(
+    (
+      p: Prisma.ProductGetPayload<{ include: { category: true; vendor: true } }>
+    ) => mapDbRowToProduct(p)
   );
 }

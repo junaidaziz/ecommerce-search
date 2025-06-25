@@ -156,10 +156,7 @@ export function AppProvider({ children }: AppProviderProps) {
       body: JSON.stringify({
         email: user.email,
         items: cart,
-        total: cart.reduce(
-          (s, i) => s + i.qty * (i.minPrice || 0),
-          0
-        ),
+        total: cart.reduce((s, i) => s + i.qty * (i.minPrice || 0), 0),
         shipping,
       }),
     });
@@ -183,13 +180,19 @@ export function AppProvider({ children }: AppProviderProps) {
       }
       return [...prev, { ...product, qty }];
     });
-    addNotification(`Added ${product.title} (x${qty}) to cart`, 'success', 'center');
+    addNotification(
+      `Added ${product.title} (x${qty}) to cart`,
+      'success',
+      'center'
+    );
   };
 
   const changeQty = (id: string, delta: number) => {
     setCart((prev) => {
       return prev
-        .map((item) => (item.id === id ? { ...item, qty: item.qty + delta } : item))
+        .map((item) =>
+          item.id === id ? { ...item, qty: item.qty + delta } : item
+        )
         .filter((item) => item.qty > 0);
     });
   };

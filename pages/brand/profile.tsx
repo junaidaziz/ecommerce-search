@@ -8,7 +8,11 @@ import React, {
 import { useRouter } from 'next/router';
 import { AppContext } from '../../contexts/AppContext';
 import type { User, Vendor } from '../../types';
-import { TextInput, Textarea, CountrySelect } from '../../components/form-fields';
+import {
+  TextInput,
+  Textarea,
+  CountrySelect,
+} from '../../components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 
@@ -94,7 +98,9 @@ export const BrandProfile: React.FC = () => {
       </Head>
       <h1 className="text-2xl font-bold mb-4">Brand Profile</h1>
       {showComplete && (
-        <div className="alert alert-info mb-2">Please complete your profile.</div>
+        <div className="alert alert-info mb-2">
+          Please complete your profile.
+        </div>
       )}
       {message && <div className="mb-2 text-green-600">{message}</div>}
       <form onSubmit={submit} className="space-y-2">
@@ -130,10 +136,7 @@ export const BrandProfile: React.FC = () => {
           }
           placeholder="City"
         />
-        <CountrySelect
-          value={country}
-          onChange={(val) => setCountry(val)}
-        />
+        <CountrySelect value={country} onChange={(val) => setCountry(val)} />
         <TextInput
           name="website"
           value={website}

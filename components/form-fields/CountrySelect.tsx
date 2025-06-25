@@ -40,14 +40,10 @@ const formatOptionLabel = (option: CountryInfo) => (
   </div>
 );
 
-const CountrySelect = <T extends FieldValues>(
-  props: CountrySelectProps<T>
-) => {
+const CountrySelect = <T extends FieldValues>(props: CountrySelectProps<T>) => {
   const { label, error, className = '' } = props;
   const inputId =
-    'name' in props && props.name
-      ? String(props.name)
-      : 'country-select';
+    'name' in props && props.name ? String(props.name) : 'country-select';
 
   const select = (fieldProps: any) => (
     <Select

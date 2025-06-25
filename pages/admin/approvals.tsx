@@ -12,7 +12,9 @@ export default function Approvals() {
 
   const load = useCallback(async () => {
     if (!user) return;
-    const data = await fetchJson<PendingProduct[]>('/api/admin/vendor-products');
+    const data = await fetchJson<PendingProduct[]>(
+      '/api/admin/vendor-products'
+    );
     setPending(data);
   }, [user]);
 

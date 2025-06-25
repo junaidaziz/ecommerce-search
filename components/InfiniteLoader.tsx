@@ -12,11 +12,14 @@ const InfiniteLoader: React.FC<InfiniteLoaderProps> = ({
   useEffect(() => {
     const el = ref.current;
     if (!el || !hasMore) return;
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        onLoadMore();
-      }
-    }, { rootMargin: '200px' });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onLoadMore();
+        }
+      },
+      { rootMargin: '200px' }
+    );
     observer.observe(el);
     return () => observer.disconnect();
   }, [onLoadMore, hasMore]);
@@ -27,7 +30,9 @@ const InfiniteLoader: React.FC<InfiniteLoaderProps> = ({
         {loading && <span className="loading loading-spinner" />}
       </div>
       {!hasMore && itemsLength > 0 && (
-        <p className="text-center text-sm text-gray-500 my-4">No more products.</p>
+        <p className="text-center text-sm text-gray-500 my-4">
+          No more products.
+        </p>
       )}
       <div ref={ref} className="h-4" />
     </>

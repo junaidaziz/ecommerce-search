@@ -10,8 +10,12 @@ declare module '@prisma/client' {
     export type ProductCreateInput = any;
     export type ProductUpdateInput = any;
     export type UserUpdateInput = any;
-    export interface User { [key: string]: any }
-    export interface Product { [key: string]: any }
+    export interface User {
+      [key: string]: any;
+    }
+    export interface Product {
+      [key: string]: any;
+    }
   }
   export type Role = any;
   export interface Product extends Record<string, any> {}

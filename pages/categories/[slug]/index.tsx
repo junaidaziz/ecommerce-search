@@ -6,7 +6,6 @@ import React from 'react';
 import { getPageTitle } from '../../../lib/pageTitle';
 import { Category, Product } from '../../../types';
 
-
 const CategoryPage: React.FC = () => {
   const router = useRouter();
   const { slug, type } = router.query;
@@ -18,7 +17,9 @@ const CategoryPage: React.FC = () => {
     async function load() {
       setLoading(true);
       const url = `/api/search?filterByCategory=${encodeURIComponent(slug as string)}${
-        type && typeof type === 'string' ? `&filterByType=${encodeURIComponent(type)}` : ''
+        type && typeof type === 'string'
+          ? `&filterByType=${encodeURIComponent(type)}`
+          : ''
       }`;
       const res = await fetch(url);
       if (res.ok) {
@@ -30,12 +31,17 @@ const CategoryPage: React.FC = () => {
     load();
   }, [slug, type]);
 
-  if (!slug || Array.isArray(slug)) return <div className="p-4">Loading...</div>;
+  if (!slug || Array.isArray(slug))
+    return <div className="p-4">Loading...</div>;
 
   return (
     <div className="max-w-screen-2xl mx-auto min-h-screen p-4">
       <Head>
-        <title>{getPageTitle(slug && !Array.isArray(slug) ? `Category: ${slug}` : 'Category')}</title>
+        <title>
+          {getPageTitle(
+            slug && !Array.isArray(slug) ? `Category: ${slug}` : 'Category'
+          )}
+        </title>
         <meta name="description" content={`Products for ${slug}`} />
         <script
           type="application/ld+json"

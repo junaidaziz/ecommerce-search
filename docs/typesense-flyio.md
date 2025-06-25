@@ -18,6 +18,7 @@ This guide shows how to run a self-hosted Typesense instance for development on 
    CMD ["--data-dir", "/data", "--api-key", "xyz123", "--enable-cors"]
    ```
 4. **Update `fly.toml`** with the mount and port configuration:
+
    ```toml
    [[mounts]]
      source = "typesense_data"
@@ -29,6 +30,7 @@ This guide shows how to run a self-hosted Typesense instance for development on 
      [[services.ports]]
        port = 80
    ```
+
 5. **Store the API key** as a Fly secret:
    ```bash
    flyctl secrets set TYPESENSE_API_KEY=xyz123
@@ -41,11 +43,13 @@ This guide shows how to run a self-hosted Typesense instance for development on 
 ## Validation
 
 Check the health endpoint:
+
 ```bash
 curl https://<your-app>.fly.dev/health
 ```
 
 Test the API:
+
 ```bash
 curl https://<your-app>.fly.dev/collections \
   -H "X-TYPESENSE-API-KEY: xyz123"

@@ -1,5 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { updateProduct, deleteProduct, loadAndIndexProducts } from '../../../../lib/products';
+import {
+  updateProduct,
+  deleteProduct,
+  loadAndIndexProducts,
+} from '../../../../lib/products';
 import { getProductByUuid } from '../../../../lib/db';
 import { hasOrdersForProduct } from '../../../../lib/orders';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
@@ -23,31 +27,39 @@ export default async function handler(
         vendor,
         description,
         product_type,
-      tags,
-      category,
-      quantity,
-      min_price,
-      max_price,
-      currency,
-    } = req.body || {};
-    const payload: ProductInput & { id?: string } = {
-      uuid: String(uuid),
-      sku: sku ?? existing.sku,
-      title: title ?? existing.title,
-      vendor: { email: '', brandName: vendor ?? existing.vendor },
-      description: description ?? existing.description,
-      productType: product_type ?? existing.product_type,
-      tags: tags ?? existing.tags,
-      category: { name: category ?? existing.category, slug: '' },
-      quantity:
-        typeof quantity !== 'undefined' ? parseInt(quantity, 10) : existing.quantity,
-      minPrice: typeof min_price !== 'undefined' ? parseFloat(min_price) : existing.min_price,
-      maxPrice: typeof max_price !== 'undefined' ? parseFloat(max_price) : existing.max_price,
-      currency: currency ?? existing.currency,
-      status: existing.status,
-      images: [],
-    };
-    await updateProduct(payload);
+        tags,
+        category,
+        quantity,
+        min_price,
+        max_price,
+        currency,
+      } = req.body || {};
+      const payload: ProductInput & { id?: string } = {
+        uuid: String(uuid),
+        sku: sku ?? existing.sku,
+        title: title ?? existing.title,
+        vendor: { email: '', brandName: vendor ?? existing.vendor },
+        description: description ?? existing.description,
+        productType: product_type ?? existing.product_type,
+        tags: tags ?? existing.tags,
+        category: { name: category ?? existing.category, slug: '' },
+        quantity:
+          typeof quantity !== 'undefined'
+            ? parseInt(quantity, 10)
+            : existing.quantity,
+        minPrice:
+          typeof min_price !== 'undefined'
+            ? parseFloat(min_price)
+            : existing.min_price,
+        maxPrice:
+          typeof max_price !== 'undefined'
+            ? parseFloat(max_price)
+            : existing.max_price,
+        currency: currency ?? existing.currency,
+        status: existing.status,
+        images: [],
+      };
+      await updateProduct(payload);
       await loadAndIndexProducts();
       return res.status(200).json({ message: 'product updated' });
     }
@@ -56,7 +68,9 @@ export default async function handler(
       const existing = await getProductByUuid(String(uuid));
       if (!existing) return res.status(404).json({ message: 'Not found' });
       if (existing.quantity > 0 || (await hasOrdersForProduct(String(uuid)))) {
-        return res.status(400).json({ message: 'cannot delete product with stock or orders' });
+        return res
+          .status(400)
+          .json({ message: 'cannot delete product with stock or orders' });
       }
       await deleteProduct(String(uuid));
       await loadAndIndexProducts();

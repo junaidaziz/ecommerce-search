@@ -20,9 +20,7 @@ export interface FileUploadProps<T extends FieldValues>
   rules?: RegisterOptions<T, Path<T>>;
 }
 
-const FileUpload = <T extends FieldValues>(
-  props: FileUploadProps<T>
-) => {
+const FileUpload = <T extends FieldValues>(props: FileUploadProps<T>) => {
   const {
     label,
     name,

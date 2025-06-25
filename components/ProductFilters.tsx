@@ -33,7 +33,10 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   clearAll,
 }) => {
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="space-y-4 sticky top-4">
+    <form
+      onSubmit={(e) => e.preventDefault()}
+      className="space-y-4 sticky top-4"
+    >
       <Checkbox
         label="In Stock Only"
         name="inStock"
@@ -53,7 +56,9 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
               onChange={(e) => {
                 const slug = c.slug || '';
                 setSelectedCategories((prev) =>
-                  e.target.checked ? [...prev, slug] : prev.filter((s) => s !== slug)
+                  e.target.checked
+                    ? [...prev, slug]
+                    : prev.filter((s) => s !== slug)
                 );
               }}
             />
@@ -95,7 +100,11 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
         </div>
       </details>
       <div className="flex justify-end">
-        <button type="button" className="btn btn-sm btn-ghost" onClick={clearAll}>
+        <button
+          type="button"
+          className="btn btn-sm btn-ghost"
+          onClick={clearAll}
+        >
           Clear All
         </button>
       </div>

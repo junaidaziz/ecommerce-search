@@ -155,14 +155,14 @@ export default function VendorDashboard() {
           'minPrice',
           'maxPrice',
           'currency',
-          ].map((field) => (
-            <TextInput
-              key={field}
-              name={field as keyof FormState}
-              value={String(form[field as keyof FormState] ?? '')}
-              onChange={handleChange}
-              placeholder={field}
-            />
+        ].map((field) => (
+          <TextInput
+            key={field}
+            name={field as keyof FormState}
+            value={String(form[field as keyof FormState] ?? '')}
+            onChange={handleChange}
+            placeholder={field}
+          />
         ))}
         <div className="flex gap-2">
           {editingId && (

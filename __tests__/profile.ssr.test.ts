@@ -13,13 +13,23 @@ describe('profile getServerSideProps', () => {
 
   it('redirects to login when unauthenticated', async () => {
     mockedGetServerSession.mockResolvedValueOnce(null);
-    const result = (await getServerSideProps({ req: {}, res: {} } as any)) as any;
-    expect(result).toEqual({ redirect: { destination: '/login', permanent: false } });
+    const result = (await getServerSideProps({
+      req: {},
+      res: {},
+    } as any)) as any;
+    expect(result).toEqual({
+      redirect: { destination: '/login', permanent: false },
+    });
   });
 
   it('returns props when authenticated', async () => {
-    mockedGetServerSession.mockResolvedValueOnce({ user: { email: 'a@a.com' } });
-    const result = (await getServerSideProps({ req: {}, res: {} } as any)) as any;
+    mockedGetServerSession.mockResolvedValueOnce({
+      user: { email: 'a@a.com' },
+    });
+    const result = (await getServerSideProps({
+      req: {},
+      res: {},
+    } as any)) as any;
     expect(result).toEqual({ props: {} });
   });
 });

@@ -80,7 +80,9 @@ export default function Categories() {
           label=""
           name="new-category"
           value={newCat}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewCat(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setNewCat(e.target.value)
+          }
           onBlur={() => {}}
           error={undefined}
           placeholder="New category"
@@ -114,7 +116,9 @@ export default function Categories() {
                 name="edit-category"
                 placeholder="Edit category"
                 value={editName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditName(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setEditName(e.target.value)
+                }
                 onBlur={() => {}}
                 error={undefined}
                 leftAddon={undefined}
@@ -141,7 +145,10 @@ export default function Categories() {
               >
                 Edit
               </button>
-              <button onClick={() => remove(Number(cat.id))} className="btn btn-sm">
+              <button
+                onClick={() => remove(Number(cat.id))}
+                className="btn btn-sm"
+              >
                 Delete
               </button>
             </>

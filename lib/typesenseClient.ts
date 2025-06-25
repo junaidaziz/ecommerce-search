@@ -14,7 +14,9 @@ const client = new Typesense.Client({
 async function healthCheck() {
   const url = `${protocol}://${host}:${port}/health`;
   try {
-    const resp = await fetch(url, { headers: { 'X-TYPESENSE-API-KEY': apiKey } });
+    const resp = await fetch(url, {
+      headers: { 'X-TYPESENSE-API-KEY': apiKey },
+    });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
     if (!data.ok) {

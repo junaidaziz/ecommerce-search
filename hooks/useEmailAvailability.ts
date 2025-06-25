@@ -29,11 +29,16 @@ export default function useEmailAvailability(
       }
       setCheckingEmail(true);
       try {
-        const res = await fetch(`/api/check-email?email=${encodeURIComponent(value)}`);
+        const res = await fetch(
+          `/api/check-email?email=${encodeURIComponent(value)}`
+        );
         if (res.ok) {
           const data = await res.json();
           if (data.exists) {
-            setError('email', { type: 'manual', message: 'Email already registered' });
+            setError('email', {
+              type: 'manual',
+              message: 'Email already registered',
+            });
           } else {
             clearErrors('email');
           }

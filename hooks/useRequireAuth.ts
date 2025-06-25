@@ -16,4 +16,3 @@ export default function useRequireAuth() {
   }, [status, session, router]);
   return user;
 }
-

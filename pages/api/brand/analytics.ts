@@ -38,4 +38,3 @@ export default async function handler(
     return handleApiError(res, error, 'Failed to load analytics');
   }
 }
-

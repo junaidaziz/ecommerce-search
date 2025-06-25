@@ -22,9 +22,7 @@ export interface TextareaProps<T extends FieldValues>
   rules?: RegisterOptions<T, Path<T>>;
 }
 
-const Textarea = <T extends FieldValues>(
-  props: TextareaProps<T>
-) => {
+const Textarea = <T extends FieldValues>(props: TextareaProps<T>) => {
   const {
     label,
     name,

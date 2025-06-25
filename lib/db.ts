@@ -8,7 +8,6 @@ const reviewsStore = new Map<string, Review[]>();
 
 export const getDb = () => prisma;
 
-
 export async function getProductByUuid(uuid: string) {
   return prisma.product.findUnique({ where: { uuid } });
 }
@@ -20,10 +19,7 @@ export async function getProductBySlug(slug: string) {
   });
 }
 
-export async function decreaseProductQuantity(
-  uuid: string,
-  qty: number
-) {
+export async function decreaseProductQuantity(uuid: string, qty: number) {
   return prisma.product.update({
     where: { uuid },
     data: { quantity: { decrement: qty } },
@@ -34,7 +30,10 @@ export function getCart(email: string): (Product & { qty: number })[] {
   return cartStore.get(email) || [];
 }
 
-export function setCart(email: string, items: (Product & { qty: number })[]): void {
+export function setCart(
+  email: string,
+  items: (Product & { qty: number })[]
+): void {
   cartStore.set(email, items);
 }
 

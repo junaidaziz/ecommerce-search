@@ -12,13 +12,14 @@ type CartItem = {
   qty: number;
 };
 
-
 const Cart: React.FC = () => {
   const router = useRouter();
   const context = useContext(AppContext);
 
   if (!context) {
-    throw new Error('AppContext is undefined. Make sure your component is wrapped in an AppContext.Provider.');
+    throw new Error(
+      'AppContext is undefined. Make sure your component is wrapped in an AppContext.Provider.'
+    );
   }
 
   const { cart, changeQty, removeFromCart } = context;

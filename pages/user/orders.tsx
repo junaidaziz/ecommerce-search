@@ -56,6 +56,6 @@ const UserOrders: React.FC = () => {
       </ul>
     </div>
   );
-}
+};
 
 export default UserOrders;
