@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { CountrySelect } from '../../components/form-fields';
 import { useRouter } from 'next/router';
 import { AppContext } from '../../contexts/AppContext';
 import type { User } from '../../types/user';
@@ -21,6 +22,7 @@ export const UserProfile: React.FC = () => {
   const {
     register,
     handleSubmit,
+    control,
     reset,
     formState: { errors },
   } = useForm<ProfileForm>({
@@ -102,10 +104,9 @@ export const UserProfile: React.FC = () => {
           placeholder="City"
           {...register('city')}
         />
-        <input
-          className="input input-bordered w-full"
-          placeholder="Country"
-          {...register('country')}
+        <CountrySelect<ProfileForm>
+          name="country"
+          control={control}
         />
         <button className="btn btn-primary w-full" type="submit">
           Update
