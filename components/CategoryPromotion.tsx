@@ -14,7 +14,7 @@ const CategoryPromotion: React.FC<CategoryPromotionProps> = ({ categories }) => 
       <div className="text-center mt-8">
         <Link
           href="/categories"
-          className="btn btn-outline bg-white text-primary hover:bg-white"
+          className="btn btn-outline bg-white text-primary hover:bg-white hover:text-primary border-primary"
         >
           Browse Categories
         </Link>

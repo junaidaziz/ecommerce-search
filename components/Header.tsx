@@ -88,7 +88,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
       <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 gap-y-2">
         <Link
           href="/"
-          className="p-0 flex items-center cursor-pointer transition-transform duration-300 ease-out hover:scale-110 hover:shadow-lg hover:rotate-1"
+          className="p-0 flex items-center cursor-pointer transition-transform duration-300 ease-out hover:scale-110 hover:-translate-y-1 hover:shadow-xl"
         >
           <Image
             src="/images/logo-medium.png"
