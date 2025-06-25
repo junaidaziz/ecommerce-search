@@ -193,12 +193,12 @@ const options = [
   isSearchable
 />;
 ```
+
 ## 📊 Database ER Diagram
 
 Run `npm run generate:erd` to generate `docs/ERD.png` using a remote rendering service.
 
 ![ERD](docs/ERD.png)
-
 
 ## 👨‍💻 Author
 

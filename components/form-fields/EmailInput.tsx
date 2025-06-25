@@ -24,9 +24,7 @@ export interface EmailInputProps<T extends FieldValues>
   rules?: RegisterOptions<T, Path<T>>;
 }
 
-const EmailInput = <T extends FieldValues>(
-  props: EmailInputProps<T>
-) => {
+const EmailInput = <T extends FieldValues>(props: EmailInputProps<T>) => {
   const {
     label,
     name,

@@ -20,16 +20,13 @@ export default async function handler(
   }
 
   try {
-    const result = await client
-      .collections('products')
-      .documents()
-      .search({
-        q: query,
-        query_by: 'title,description',
-        prefix: 'true',
-        page: 1,
-        per_page: 5,
-      });
+    const result = await client.collections('products').documents().search({
+      q: query,
+      query_by: 'title,description',
+      prefix: 'true',
+      page: 1,
+      per_page: 5,
+    });
 
     const suggestions = Array.isArray(result.hits)
       ? result.hits.map((h: any) => h.document.title).filter(Boolean)

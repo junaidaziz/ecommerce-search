@@ -1,4 +1,7 @@
-export async function sendOrderConfirmation(to: string, order: { id: string | number }) {
+export async function sendOrderConfirmation(
+  to: string,
+  order: { id: string | number }
+) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM || 'orders@example.com';
   if (!apiKey) {
@@ -27,7 +30,10 @@ export async function sendOrderConfirmation(to: string, order: { id: string | nu
   }
 }
 
-export async function sendOrderStatusUpdate(to: string, order: { id: string | number, status: string }) {
+export async function sendOrderStatusUpdate(
+  to: string,
+  order: { id: string | number; status: string }
+) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM || 'orders@example.com';
   if (!apiKey) {

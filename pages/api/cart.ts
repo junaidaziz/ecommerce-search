@@ -20,7 +20,7 @@ export default async function handler(
       return res.status(200).json(items);
     }
     if (req.method === 'POST') {
-      const { items } = req.body as { items?: CartItem[] } || {};
+      const { items } = (req.body as { items?: CartItem[] }) || {};
       if (!Array.isArray(items)) {
         return res.status(400).json({ message: 'items required' });
       }

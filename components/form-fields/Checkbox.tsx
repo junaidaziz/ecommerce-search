@@ -21,9 +21,7 @@ export interface CheckboxProps<T extends FieldValues>
   rules?: RegisterOptions<T, Path<T>>;
 }
 
-const Checkbox = <T extends FieldValues>(
-  props: CheckboxProps<T>
-) => {
+const Checkbox = <T extends FieldValues>(props: CheckboxProps<T>) => {
   const {
     label,
     name,

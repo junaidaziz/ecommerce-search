@@ -32,7 +32,7 @@ if (!/^postgres/.test(url)) {
 if (fs.existsSync(gitignorePath)) {
   const gitignore = fs.readFileSync(gitignorePath, 'utf8');
   const lines = gitignore.split(/\r?\n/);
-  const filtered = lines.filter(line => line.trim() !== 'prisma/migrations');
+  const filtered = lines.filter((line) => line.trim() !== 'prisma/migrations');
   if (lines.length !== filtered.length) {
     fs.writeFileSync(gitignorePath, filtered.join('\n'));
     console.log('Removed prisma/migrations from .gitignore');
@@ -53,16 +53,21 @@ let previousHash = null;
 if (fs.existsSync(hashPath)) {
   previousHash = fs.readFileSync(hashPath, 'utf8').trim();
 }
-const migrationsMissing = !fs.existsSync(migrationsDir) || fs.readdirSync(migrationsDir).length === 0;
+const migrationsMissing =
+  !fs.existsSync(migrationsDir) || fs.readdirSync(migrationsDir).length === 0;
 const schemaChanged = currentHash !== previousHash;
 
 if (migrationsMissing || schemaChanged) {
   console.log('Generating Prisma migration...');
-  execSync('npx prisma migrate dev --name init --skip-seed', { stdio: 'inherit' });
+  execSync('npx prisma migrate dev --name init --skip-seed', {
+    stdio: 'inherit',
+  });
   fs.writeFileSync(hashPath, currentHash);
   try {
     execSync('git add prisma/migrations');
-    execSync('git commit -m "chore(migrations): auto-generated initial migration"');
+    execSync(
+      'git commit -m "chore(migrations): auto-generated initial migration"'
+    );
     console.log('Committed Prisma migrations');
   } catch (err) {
     console.warn('Failed to commit migrations:', err.message);

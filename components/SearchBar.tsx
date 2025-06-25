@@ -105,7 +105,9 @@ const SearchBar: FC<SearchBarProps> = ({
       if (!showSuggestions) return;
       if (suggestions.length === 0) return;
       e.preventDefault();
-      setSelectedIdx((idx) => (idx - 1 + suggestions.length) % suggestions.length);
+      setSelectedIdx(
+        (idx) => (idx - 1 + suggestions.length) % suggestions.length
+      );
     } else if (e.key === 'Enter') {
       if (selectedIdx >= 0) {
         e.preventDefault();

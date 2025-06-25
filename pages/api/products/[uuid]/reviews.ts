@@ -18,9 +18,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ReviewsResponse | ReviewAddedResponse | ApiMessage>
 ): Promise<void> {
-  const {
-    method,
-  } = req;
+  const { method } = req;
   const uuid = getQueryParam(req.query.uuid);
   try {
     if (!uuid) return res.status(400).json({ message: 'uuid required' });

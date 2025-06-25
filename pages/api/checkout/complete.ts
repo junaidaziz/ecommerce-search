@@ -17,7 +17,8 @@ export default async function handler(
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
   const { sessionId } = req.body || {};
-  if (!sessionId) return res.status(400).json({ message: 'sessionId required' });
+  if (!sessionId)
+    return res.status(400).json({ message: 'sessionId required' });
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     if (session.payment_status !== 'paid') {
@@ -30,7 +31,8 @@ export default async function handler(
       total: (session.amount_total ?? 0) / 100,
       status: 'completed',
     });
-    const orderId = Array.isArray(orders) && orders.length > 0 ? orders[0].id : '';
+    const orderId =
+      Array.isArray(orders) && orders.length > 0 ? orders[0].id : '';
     await sendOrderConfirmation(metadata.email, { id: orderId });
     return res.status(200).json({ id: orderId });
   } catch (e) {

@@ -13,11 +13,7 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({ filters, clearAll }) => {
       {filters.map((f, i) => (
         <span key={i} className="badge badge-outline gap-1">
           {f.label}
-          <button
-            type="button"
-            className="ml-1"
-            onClick={() => f.clear()}
-          >
+          <button type="button" className="ml-1" onClick={() => f.clear()}>
             ✕
           </button>
         </span>

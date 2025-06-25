@@ -182,9 +182,9 @@ const Checkout: React.FC = () => {
           <label className="label" htmlFor="name">
             Name
           </label>
-            <TextInput
-              name="name"
-              id="name"
+          <TextInput
+            name="name"
+            id="name"
             className="w-full"
             value={name}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -197,16 +197,16 @@ const Checkout: React.FC = () => {
           <label className="label" htmlFor="address">
             Address
           </label>
-            <Textarea
-              name="address"
-              id="address"
-              className="w-full"
-              value={address}
-              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-                setAddress(e.target.value)
-              }
-              required
-            />
+          <Textarea
+            name="address"
+            id="address"
+            className="w-full"
+            value={address}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+              setAddress(e.target.value)
+            }
+            required
+          />
         </div>
         <div>
           <label className="label" htmlFor="paymentMethod">
@@ -240,8 +240,8 @@ const Checkout: React.FC = () => {
             )}
             {paymentMethod === 'bank' && (
               <p>
-                Transfer to Bank Account <b>PK00 TEST 1234 5678 9012 3456</b> and
-                provide reference.
+                Transfer to Bank Account <b>PK00 TEST 1234 5678 9012 3456</b>{' '}
+                and provide reference.
               </p>
             )}
             <TextInput

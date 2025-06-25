@@ -6,7 +6,16 @@ jest.mock('../lib/products', () => ({
 }));
 
 test('returns categories list', async () => {
-  const data = [{ id: 1, uuid: 'u1', name: 'Electronics', slug: 'electronics', createdAt: new Date(), updatedAt: new Date() }];
+  const data = [
+    {
+      id: 1,
+      uuid: 'u1',
+      name: 'Electronics',
+      slug: 'electronics',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
   (getCategoryTree as jest.Mock).mockResolvedValue(data);
   const json = jest.fn();
   const status = jest.fn(() => ({ json }));

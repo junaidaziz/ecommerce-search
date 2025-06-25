@@ -9,9 +9,9 @@ const AboutPage: React.FC = () => {
       </Head>
       <h1 className="text-2xl font-bold mb-4">About Us</h1>
       <p>
-        ShopVerse is a modern ecommerce marketplace bringing the best products to
-        your fingertips. This page is a placeholder showcasing where you would
-        normally describe your company history and mission.
+        ShopVerse is a modern ecommerce marketplace bringing the best products
+        to your fingertips. This page is a placeholder showcasing where you
+        would normally describe your company history and mission.
       </p>
       <p>
         Use this space to highlight your values, share your story and let your

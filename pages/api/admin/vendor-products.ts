@@ -45,5 +45,4 @@ async function handler(
   }
 }
 
-
 export default withRole(['SUPER_ADMIN'])(handler);

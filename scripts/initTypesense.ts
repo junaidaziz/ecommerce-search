@@ -43,7 +43,9 @@ async function init() {
       existing.fields?.length === schema.fields.length &&
       existing.fields.every((f: any, i: number) => {
         const s = schema.fields[i] as any;
-        return f.name === s.name && f.type === s.type && (!!f.facet === !!s.facet);
+        return (
+          f.name === s.name && f.type === s.type && !!f.facet === !!s.facet
+        );
       }) &&
       existing.default_sorting_field === schema.default_sorting_field;
 
@@ -58,7 +60,9 @@ async function init() {
     console.log('✅ Recreated Typesense collection "products".');
   } catch (err: unknown) {
     if (err instanceof ObjectNotFound) {
-      console.log('ℹ️  "products" collection not found. Creating new collection...');
+      console.log(
+        'ℹ️  "products" collection not found. Creating new collection...'
+      );
       try {
         await client.collections().create(schema);
         console.log('✅ Created Typesense collection "products".');
@@ -67,7 +71,10 @@ async function init() {
         process.exit(1);
       }
     } else {
-      console.error('❌ Unexpected error checking for existing collection:', err);
+      console.error(
+        '❌ Unexpected error checking for existing collection:',
+        err
+      );
       process.exit(1);
     }
   }

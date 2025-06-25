@@ -14,7 +14,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const { data: session } = useSession();
   const role =
     app?.user?.role?.toLowerCase() ||
-    ((session?.user as { role?: string } | undefined)?.role || '').toLowerCase();
+    (
+      (session?.user as { role?: string } | undefined)?.role || ''
+    ).toLowerCase();
   if (role === 'brand') {
     return <BrandHeader theme={theme} setTheme={setTheme} />;
   }

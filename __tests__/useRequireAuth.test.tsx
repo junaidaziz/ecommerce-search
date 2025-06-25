@@ -17,7 +17,11 @@ const TestComp = () => {
 };
 
 const renderWithContext = (value: any) =>
-  render(<AppContext.Provider value={value}><TestComp /></AppContext.Provider>);
+  render(
+    <AppContext.Provider value={value}>
+      <TestComp />
+    </AppContext.Provider>
+  );
 
 const mockedUseRouter = useRouter as jest.Mock;
 const mockedUseSession = useSession as jest.Mock;
@@ -44,7 +48,10 @@ describe('useRequireAuth', () => {
   });
 
   it('does not redirect when authenticated', () => {
-    mockedUseSession.mockReturnValue({ data: { user: { email: 'a' } }, status: 'authenticated' });
+    mockedUseSession.mockReturnValue({
+      data: { user: { email: 'a' } },
+      status: 'authenticated',
+    });
     const replace = jest.fn();
     mockedUseRouter.mockReturnValue({ replace });
     renderWithContext({ user: { email: 'a' } });

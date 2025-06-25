@@ -21,9 +21,7 @@ export interface DatePickerProps<T extends FieldValues>
   rules?: RegisterOptions<T, Path<T>>;
 }
 
-const DatePicker = <T extends FieldValues>(
-  props: DatePickerProps<T>
-) => {
+const DatePicker = <T extends FieldValues>(props: DatePickerProps<T>) => {
   const {
     label,
     name,

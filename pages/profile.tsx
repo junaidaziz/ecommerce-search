@@ -56,7 +56,9 @@ const Profile: React.FC = () => {
         )}
         <div>
           <p className="text-lg font-semibold">{display(fullName)}</p>
-          <p className="text-gray-600">{display(profile?.email || user.email)}</p>
+          <p className="text-gray-600">
+            {display(profile?.email || user.email)}
+          </p>
         </div>
       </div>
 
@@ -144,11 +146,7 @@ const Profile: React.FC = () => {
 export default Profile;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerSession(
-    context.req,
-    context.res,
-    authOptions
-  );
+  const session = await getServerSession(context.req, context.res, authOptions);
   if (!session?.user) {
     return {
       redirect: { destination: '/login', permanent: false },

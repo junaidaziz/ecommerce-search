@@ -25,9 +25,7 @@ export interface PasswordInputProps<T extends FieldValues>
   rules?: RegisterOptions<T, Path<T>>;
 }
 
-const PasswordInput = <T extends FieldValues>(
-  props: PasswordInputProps<T>
-) => {
+const PasswordInput = <T extends FieldValues>(props: PasswordInputProps<T>) => {
   const {
     label,
     name,

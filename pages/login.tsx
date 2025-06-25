@@ -7,10 +7,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
 import { getPageTitle } from '../lib/pageTitle';
-import {
-  EmailInput,
-  PasswordInput,
-} from '../components/form-fields';
+import { EmailInput, PasswordInput } from '../components/form-fields';
 import GoogleIcon from '../components/icons/GoogleIcon';
 import GithubIcon from '../components/icons/GithubIcon';
 import { User } from '../types';
@@ -55,7 +52,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     }
   }, [user, router, onLoginSuccess]);
 
-  const onSubmit: SubmitHandler<LoginFormInputs> = async ({ email, password }) => {
+  const onSubmit: SubmitHandler<LoginFormInputs> = async ({
+    email,
+    password,
+  }) => {
     if (!login) return;
     try {
       setLoading(true);

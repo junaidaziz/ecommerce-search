@@ -74,6 +74,6 @@ const HeroSlider: FC = () => {
       </Swiper>
     </section>
   );
-}
+};
 
 export default HeroSlider;

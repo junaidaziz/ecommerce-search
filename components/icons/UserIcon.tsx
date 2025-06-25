@@ -1,7 +1,12 @@
 import React from 'react';
 import type { IconProps } from './IconProps';
 
-const UserIcon: React.FC<IconProps> = ({ size = 24, color = 'currentColor', className = '', ...rest }) => (
+const UserIcon: React.FC<IconProps> = ({
+  size = 24,
+  color = 'currentColor',
+  className = '',
+  ...rest
+}) => (
   <svg
     width={size}
     height={size}
@@ -23,4 +28,3 @@ const UserIcon: React.FC<IconProps> = ({ size = 24, color = 'currentColor', clas
 );
 
 export default UserIcon;
-

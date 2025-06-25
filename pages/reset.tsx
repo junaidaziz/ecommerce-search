@@ -22,7 +22,7 @@ const RequestReset: React.FC = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8 overflow-hidden">
-            <Head>
+      <Head>
         <title>{getPageTitle('Reset Password')}</title>
       </Head>
 

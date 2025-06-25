@@ -18,11 +18,15 @@ if (!fs.existsSync(envPath)) {
 dotenv.config({ path: envPath });
 
 if (!process.env.DATABASE_URL) {
-  console.warn('DATABASE_URL is missing in .env. Please set it for local development.');
+  console.warn(
+    'DATABASE_URL is missing in .env. Please set it for local development.'
+  );
 }
 
 if (!process.env.TYPESENSE_API_KEY) {
-  console.warn('TYPESENSE_API_KEY is missing in .env. Searches will fail without a running Typesense server.');
+  console.warn(
+    'TYPESENSE_API_KEY is missing in .env. Searches will fail without a running Typesense server.'
+  );
 }
 
 const host = process.env.TYPESENSE_HOST || 'localhost';
@@ -31,7 +35,7 @@ const protocol = process.env.TYPESENSE_PROTOCOL || 'http';
 const healthUrl = `${protocol}://${host}:${port}/health`;
 
 fetch(healthUrl)
-  .then(res => {
+  .then((res) => {
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}`);
     }

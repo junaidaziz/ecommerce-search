@@ -32,11 +32,17 @@ async function handler(
     const topSearches = Object.entries(counts)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
-      .map(([query, count]): { query: string; count: number } => ({ query, count }));
+      .map(([query, count]): { query: string; count: number } => ({
+        query,
+        count,
+      }));
     const failedSearches = Object.entries(fails)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
-      .map(([query, count]): { query: string; count: number } => ({ query, count }));
+      .map(([query, count]): { query: string; count: number } => ({
+        query,
+        count,
+      }));
 
     res.status(200).json({ topSearches, failedSearches });
     return;

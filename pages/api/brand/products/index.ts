@@ -25,35 +25,37 @@ export default async function handler(
         title,
         vendor,
         description,
-      product_type,
-      tags,
-      category,
-      quantity,
-      min_price,
-      max_price,
-      currency,
-    } = req.body || {};
-    if (!id || !sku || !title || !vendor) {
-      return res.status(400).json({ message: 'id, sku, title, vendor required' });
-    }
-    const payload: ProductInput = {
-      sku,
-      title,
-      slug: slugify(title || String(id)),
-      uuid: String(id),
-      vendor: { email: '', brandName: vendor },
-      description,
-      productType: product_type,
-      tags,
-      category: { name: category, slug: '' },
-      quantity: quantity ? parseInt(quantity, 10) : 0,
-      minPrice: parseFloat(min_price || '0'),
-      maxPrice: parseFloat(max_price || '0'),
-      currency: currency || 'USD',
-      status: 'approved',
-      images: [],
-    };
-    await addProduct(payload);
+        product_type,
+        tags,
+        category,
+        quantity,
+        min_price,
+        max_price,
+        currency,
+      } = req.body || {};
+      if (!id || !sku || !title || !vendor) {
+        return res
+          .status(400)
+          .json({ message: 'id, sku, title, vendor required' });
+      }
+      const payload: ProductInput = {
+        sku,
+        title,
+        slug: slugify(title || String(id)),
+        uuid: String(id),
+        vendor: { email: '', brandName: vendor },
+        description,
+        productType: product_type,
+        tags,
+        category: { name: category, slug: '' },
+        quantity: quantity ? parseInt(quantity, 10) : 0,
+        minPrice: parseFloat(min_price || '0'),
+        maxPrice: parseFloat(max_price || '0'),
+        currency: currency || 'USD',
+        status: 'approved',
+        images: [],
+      };
+      await addProduct(payload);
       await loadAndIndexProducts();
       return res.status(201).json({ message: 'product created' });
     }

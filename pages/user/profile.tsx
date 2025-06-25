@@ -72,7 +72,9 @@ export const UserProfile: React.FC = () => {
       </Head>
       <h1 className="text-2xl font-bold mb-4">My Profile</h1>
       {showComplete && (
-        <div className="alert alert-info mb-2">Please complete your profile.</div>
+        <div className="alert alert-info mb-2">
+          Please complete your profile.
+        </div>
       )}
       {message && <div className="mb-2 text-green-600">{message}</div>}
       <form onSubmit={handleSubmit(submit)} className="space-y-2">
@@ -104,10 +106,7 @@ export const UserProfile: React.FC = () => {
           placeholder="City"
           {...register('city')}
         />
-        <CountrySelect<ProfileForm>
-          name="country"
-          control={control}
-        />
+        <CountrySelect<ProfileForm> name="country" control={control} />
         <button className="btn btn-primary w-full" type="submit">
           Update
         </button>

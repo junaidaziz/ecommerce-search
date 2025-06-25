@@ -26,15 +26,15 @@ export default async function handler(
     }
     const hashed = await bcrypt.hash(password, 10);
     const token = crypto.randomBytes(20).toString('hex');
-      await addUser({
-        email,
-        password: hashed,
-        firstName,
-        lastName: '',
-        gender: 'other',
-        role: 'USER',
-        verificationToken: token,
-      });
+    await addUser({
+      email,
+      password: hashed,
+      firstName,
+      lastName: '',
+      gender: 'other',
+      role: 'USER',
+      verificationToken: token,
+    });
     return res.status(201).json({ token });
   } catch (error) {
     return handleApiError(res, error, 'Failed to sign up user');

@@ -17,7 +17,9 @@ export const config = {
   },
 };
 
-async function parseBody(req: NextApiRequest): Promise<{ fields: Fields; files: Files }> {
+async function parseBody(
+  req: NextApiRequest
+): Promise<{ fields: Fields; files: Files }> {
   const type = req.headers['content-type'] || '';
   if (type.includes('application/json')) {
     const buffers: Uint8Array[] = [];
@@ -25,15 +27,13 @@ async function parseBody(req: NextApiRequest): Promise<{ fields: Fields; files: 
     const body = Buffer.concat(buffers).toString();
     return { fields: JSON.parse(body || '{}') as Fields, files: {} as Files };
   }
-  return new Promise<{ fields: Fields; files: Files }>(
-    (resolve, reject) => {
-      const form = formidable({ multiples: true });
-      form.parse(req, (err, fields, files) => {
-        if (err) reject(err);
-        else resolve({ fields, files });
-      });
-    }
-  );
+  return new Promise<{ fields: Fields; files: Files }>((resolve, reject) => {
+    const form = formidable({ multiples: true });
+    form.parse(req, (err, fields, files) => {
+      if (err) reject(err);
+      else resolve({ fields, files });
+    });
+  });
 }
 
 async function handler(
@@ -84,7 +84,9 @@ async function handler(
           res.status(404).json({ message: 'Not found' });
           return;
         }
-        const existingImages = existing.images ? JSON.parse(existing.images) : [];
+        const existingImages = existing.images
+          ? JSON.parse(existing.images)
+          : [];
         imagePaths.push(...existingImages);
       }
       const slug = slugify(String(title || existing?.title || id));
@@ -109,7 +111,9 @@ async function handler(
         const vid = parseInt(String(vendor), 10);
         if (!isNaN(vid)) data.vendorId = vid;
         else {
-          const v = await db.user.findFirst({ where: { brandName: String(vendor) } });
+          const v = await db.user.findFirst({
+            where: { brandName: String(vendor) },
+          });
           if (v) data.vendorId = v.id;
         }
       }
@@ -118,7 +122,9 @@ async function handler(
         const cid = parseInt(String(category), 10);
         if (!isNaN(cid)) data.categoryId = cid;
         else {
-          const c = await db.category.findFirst({ where: { name: String(category) } });
+          const c = await db.category.findFirst({
+            where: { name: String(category) },
+          });
           if (c) data.categoryId = c.id;
         }
       }
@@ -164,34 +170,36 @@ async function handler(
         where,
         include: { category: true, vendor: true },
       });
-      const data: Product[] = rows.map((p: any): Product => ({
-        id: String(p.id),
-        slug: p.slug,
-        sku: p.sku,
-        title: p.title,
-        vendor: p.vendor?.brandName ?? String(p.vendorId),
-        description: p.description,
-        productType: p.productType,
-        tags: p.tags,
-        category: p.category?.name,
-        images: parseImages(p.images),
-        totalInventory: p.quantity,
-        priceRange: {
-          minVariantPrice: { amount: p.minPrice, currencyCode: p.currency },
-          maxVariantPrice: { amount: p.maxPrice, currencyCode: p.currency },
-        },
-        minPrice: p.minPrice,
-        maxPrice: p.maxPrice,
-        currency: p.currency,
-        soldCount: 0,
-        reviewCount: 0,
-        averageRating: 0,
-        quantity: p.quantity,
-        status: p.status,
-        uuid: p.uuid,
-        createdAt: p.createdAt,
-        updatedAt: p.updatedAt,
-      }));
+      const data: Product[] = rows.map(
+        (p: any): Product => ({
+          id: String(p.id),
+          slug: p.slug,
+          sku: p.sku,
+          title: p.title,
+          vendor: p.vendor?.brandName ?? String(p.vendorId),
+          description: p.description,
+          productType: p.productType,
+          tags: p.tags,
+          category: p.category?.name,
+          images: parseImages(p.images),
+          totalInventory: p.quantity,
+          priceRange: {
+            minVariantPrice: { amount: p.minPrice, currencyCode: p.currency },
+            maxVariantPrice: { amount: p.maxPrice, currencyCode: p.currency },
+          },
+          minPrice: p.minPrice,
+          maxPrice: p.maxPrice,
+          currency: p.currency,
+          soldCount: 0,
+          reviewCount: 0,
+          averageRating: 0,
+          quantity: p.quantity,
+          status: p.status,
+          uuid: p.uuid,
+          createdAt: p.createdAt,
+          updatedAt: p.updatedAt,
+        })
+      );
       res.status(200).json(data);
       return;
     }
@@ -203,5 +211,4 @@ async function handler(
   }
 }
 
-
-export default withRole(['BRAND','SUPER_ADMIN'])(handler);
+export default withRole(['BRAND', 'SUPER_ADMIN'])(handler);

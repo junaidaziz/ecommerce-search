@@ -107,7 +107,9 @@ test('shows brand navigation for brand role', () => {
   const sessionUser = { role: 'brand', firstName: 'Jane', email: 'j@b.com' };
   mockUseSession.mockReturnValue({ data: { user: sessionUser } });
   const contextUser = { role: 'brand', email: 'j@b.com' };
-  renderWithContext(<Header theme="light" setTheme={() => {}} />, { user: contextUser });
+  renderWithContext(<Header theme="light" setTheme={() => {}} />, {
+    user: contextUser,
+  });
   expect(screen.queryByText('My Orders')).toBeNull();
   expect(screen.getAllByText('Dashboard').length).toBeGreaterThan(0);
 });
