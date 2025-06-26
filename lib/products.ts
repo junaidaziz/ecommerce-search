@@ -220,8 +220,15 @@ export async function addProduct(product: ProductInput): Promise<void> {
       ? await db.category.findFirst({ where: { name: product.category.name } })
       : null;
 
-  if (!vendor || !category) {
-    throw new Error('Invalid vendor or category');
+  if (!vendor) {
+    const err = new Error('Vendor not found') as Error & { code?: string };
+    (err as any).code = 'BAD_REQUEST';
+    throw err;
+  }
+  if (!category) {
+    const err = new Error('Category not found') as Error & { code?: string };
+    (err as any).code = 'BAD_REQUEST';
+    throw err;
   }
 
   const data: Prisma.ProductCreateInput = {
@@ -260,8 +267,15 @@ export async function updateProduct(
     : product.category?.name
       ? await db.category.findFirst({ where: { name: product.category.name } })
       : null;
-  if (!vendor || !category) {
-    throw new Error('Invalid vendor or category');
+  if (!vendor) {
+    const err = new Error('Vendor not found') as Error & { code?: string };
+    (err as any).code = 'BAD_REQUEST';
+    throw err;
+  }
+  if (!category) {
+    const err = new Error('Category not found') as Error & { code?: string };
+    (err as any).code = 'BAD_REQUEST';
+    throw err;
   }
   await db.product.update({
     where: { uuid: product.uuid || String(product.id) },
