@@ -3,6 +3,8 @@ import { useForm, Controller } from 'react-hook-form';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import type { SelectOption } from './form-fields/SelectDropdown';
 import { TextInput, Textarea, FileUpload, Checkbox, TagInput } from './form-fields';
+import { GenericInput, GenericModal } from './ui';
+import { slugify } from '../lib/slugify';
 import { AppContext } from '../contexts/AppContext';
 
 export interface ProductFormValues {
@@ -65,12 +67,60 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
   }, [user, setValue]);
   const [images, setImages] = useState<File[]>([]);
-  const loadCategoryOptions = async (inputValue: string): Promise<SelectOption[]> => {
+  const [categoryOption, setCategoryOption] = useState<SelectOption | null>(
+    initial?.categoryId
+      ? { label: '', value: String(initial.categoryId) }
+      : null
+  );
+  const [showCatModal, setShowCatModal] = useState(false);
+  const [newCatName, setNewCatName] = useState('');
+  const [newCatSlug, setNewCatSlug] = useState('');
+  const [catError, setCatError] = useState('');
+  const loadCategoryOptions = async (
+    inputValue: string
+  ): Promise<SelectOption[]> => {
     const params = new URLSearchParams({ search: inputValue, limit: '20' });
     const res = await fetch(`/api/categories?${params.toString()}`);
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.categories || []).map((c: any) => ({ label: c.name, value: String(c.id) }));
+    return (data.categories || []).map((c: any) => ({
+      label: c.name,
+      value: String(c.id),
+    }));
+  };
+
+  const openCreateCategory = (input: string) => {
+    const name = input.trim();
+    setNewCatName(name);
+    setNewCatSlug(slugify(name));
+    setCatError('');
+    setShowCatModal(true);
+  };
+
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCatName.trim()) {
+      setCatError('Name required');
+      return;
+    }
+    const res = await fetch('/api/brand/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: newCatName.trim(),
+        slug: newCatSlug.trim(),
+      }),
+    });
+    if (res.ok) {
+      const cat = await res.json();
+      const opt = { label: cat.name, value: String(cat.id) } as SelectOption;
+      setCategoryOption(opt);
+      setValue('categoryId', opt.value);
+      setShowCatModal(false);
+    } else {
+      const data = await res.json().catch(() => ({ message: 'Error' }));
+      setCatError(data.message || 'Error');
+    }
   };
 
   const onFormSubmit = handleSubmit(async (values) => {
@@ -147,33 +197,70 @@ const ProductForm: React.FC<ProductFormProps> = ({
         control={control}
         rules={{ required: 'Required' }}
         render={({ field }) => (
-          <AsyncCreatableSelect
-            inputId="category-select"
-            ref={field.ref}
-            name={field.name}
-            value={field.value ? { label: '', value: field.value } : null}
-            defaultOptions
-            loadOptions={loadCategoryOptions}
-            onBlur={field.onBlur}
-            onChange={(val) => {
-              if (!val) return field.onChange('');
-              if (Array.isArray(val)) return;
-              field.onChange(val.value);
-            }}
-            onCreateOption={async (input) => {
-              const res = await fetch('/api/brand/categories', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: input }),
-              });
-              if (res.ok) {
-                const cat = await res.json();
-                field.onChange(String(cat.id));
+          <>
+            <AsyncCreatableSelect
+              inputId="category-select"
+              ref={field.ref}
+              value={categoryOption}
+              defaultOptions
+              loadOptions={loadCategoryOptions}
+              onBlur={field.onBlur}
+              onChange={(val) => {
+                if (!val) {
+                  setCategoryOption(null);
+                  field.onChange('');
+                } else if (!Array.isArray(val)) {
+                  setCategoryOption(val as SelectOption);
+                  field.onChange(val.value);
+                }
+              }}
+              onCreateOption={openCreateCategory}
+              formatCreateLabel={() => 'Create New Category'}
+              isValidNewOption={(input, _value, options) =>
+                input.trim().length > 0 && options.length === 0
               }
-            }}
-            placeholder="Category"
-            classNamePrefix="react-select"
-          />
+              placeholder="Category"
+              classNamePrefix="react-select"
+            />
+            <GenericModal
+              isOpen={showCatModal}
+              onClose={() => setShowCatModal(false)}
+              title="Create Category"
+            >
+              <form onSubmit={handleCreateCategory} className="space-y-2">
+                <GenericInput
+                  label="Category Name"
+                  name="category-name"
+                  value={newCatName}
+                  onChange={(e) => {
+                    setNewCatName(e.target.value);
+                    setNewCatSlug(slugify(e.target.value));
+                  }}
+                  required
+                />
+                <GenericInput
+                  label="Slug"
+                  name="category-slug"
+                  value={newCatSlug}
+                  onChange={(e) => setNewCatSlug(e.target.value)}
+                  required
+                />
+                {catError && <p className="text-sm text-red-600">{catError}</p>}
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    className="btn"
+                    onClick={() => setShowCatModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    Save
+                  </button>
+                </div>
+              </form>
+            </GenericModal>
+          </>
         )}
       />
       {errors.categoryId && (
