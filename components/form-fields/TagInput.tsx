@@ -19,7 +19,15 @@ export interface TagInputProps<T extends FieldValues> {
 }
 
 const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
-  const { name, control, label, placeholder = '', disabled, error, rules } = props;
+  const {
+    name,
+    control,
+    label,
+    placeholder = '',
+    disabled,
+    error,
+    rules,
+  } = props;
 
   const loadOptions = async (inputValue: string) => {
     const params = new URLSearchParams({ search: inputValue });
@@ -30,22 +38,31 @@ const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
   };
 
   const customComponents = {
-    MultiValueContainer: (props: any) => (
-      <span className="badge badge-outline gap-1 mr-1">
-        {props.data.label}
-        <button
-          type="button"
-          className="ml-1"
-          onClick={props.removeProps.onClick}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            props.removeProps.onMouseDown(e);
-          }}
-        >
-          ✕
-        </button>
-      </span>
-    ),
+    MultiValueContainer: (props: any) => {
+      if (!props.removeProps) {
+        // eslint-disable-next-line no-console
+        console.error('TagInput: removeProps not provided');
+      }
+      const handleClick = props.removeProps?.onClick;
+      const handleMouseDown = props.removeProps?.onMouseDown;
+      return (
+        <span className="badge badge-outline gap-1 mr-1">
+          {props.data.label}
+          <button
+            type="button"
+            className="ml-1"
+            onClick={handleClick}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              handleMouseDown?.(e);
+            }}
+            aria-label="Remove tag"
+          >
+            ✕
+          </button>
+        </span>
+      );
+    },
     MultiValueLabel: () => null,
     MultiValueRemove: () => null,
   };
