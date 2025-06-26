@@ -48,20 +48,20 @@ const BrandDashboard: React.FC = () => {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           {user.logo && (
-            <img src={user.logo} alt="logo" className="w-12 h-12 rounded-full object-cover" />
+            <img
+              src={user.logo}
+              alt="logo"
+              className="w-12 h-12 rounded-full object-cover"
+            />
           )}
           <div>
-            <h1 className="text-2xl font-bold">Welcome, {user.brandName || user.firstName}!</h1>
+            <h1 className="text-2xl font-bold">
+              Welcome, {user.brandName || user.firstName}!
+            </h1>
             {summary && <p className="text-sm text-gray-600">{summary}</p>}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/brand/products/new" className="btn btn-primary btn-sm">
-            + Add Product
-          </Link>
-          <Link href="/brand/orders" className="btn btn-sm">🧾 View Orders</Link>
-          <Link href="/brand/analytics" className="btn btn-sm">📈 Open Analytics</Link>
-        </div>
+        {/* Action buttons moved to BrandHeader */}
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <TotalProductsCard />
