@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import DashboardCard from './DashboardCard';
+import BoxIcon from '../icons/BoxIcon';
 import CartIcon from '../icons/CartIcon';
 
 interface Props {
@@ -41,6 +42,7 @@ const TotalProductsCard: React.FC<Props> = ({ brandId }) => {
       title="Total Products"
       loading={count === null && !error}
       error={error}
+      icon={<BoxIcon className="w-5 h-5" />}
       onClick={handleClick}
       className="bg-indigo-50"
     >
