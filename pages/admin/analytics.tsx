@@ -5,23 +5,29 @@ import { AnalyticsData } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
+import BarChart from '../../components/BarChart';
 
 export default function AdminAnalytics() {
   const { user } = useContext(AppContext)!;
   const [data, setData] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
+    setLoading(true);
     fetchJson<AnalyticsData>('/api/admin/analytics')
-      .then(setData)
-      .catch(() => setData(null));
+      .then((res) => setData(res))
+      .catch(() =>
+        setData({ totalOrders: 0, totalRevenue: 0, topProducts: [] })
+      )
+      .finally(() => setLoading(false));
   }, [user]);
 
   if (!user) return <div className="p-4">Please log in to view analytics.</div>;
   if (user.role !== 'super-admin')
     return <div className="p-4">Admin access required.</div>;
 
-  if (!data) return <div className="p-4">Loading...</div>;
+  if (loading || data === null) return <div className="p-4">Loading...</div>;
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
@@ -54,6 +60,11 @@ export default function AdminAnalytics() {
         ))}
         {data.topProducts.length === 0 && <li>No sales yet.</li>}
       </ul>
+      <div className="mt-4">
+        <BarChart
+          data={data.topProducts.map((p) => ({ label: p.id, value: p.qty }))}
+        />
+      </div>
     </div>
   );
 }
