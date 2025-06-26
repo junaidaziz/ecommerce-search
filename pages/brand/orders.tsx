@@ -7,21 +7,21 @@ import { getPageTitle } from '../../lib/pageTitle';
 
 const BrandOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
-    const vendorId = session?.user?.id;
+    if (!user || status === 'loading') return;
+    const vendorId = user.brandName || (session?.user as any)?.brandName;
     if (!vendorId) {
       setError('Unable to determine brand ID');
       setLoading(false);
       return;
     }
     setLoading(true);
-    fetch(`/api/brand/orders?vendor=${encodeURIComponent(vendorId as string)}`)
+    fetch(`/api/brand/orders?vendor=${encodeURIComponent(vendorId)}`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: Order[]) => {
         setOrders(data);
@@ -29,7 +29,7 @@ const BrandOrders: React.FC = () => {
       })
       .catch(() => setError('Failed to load orders'))
       .finally(() => setLoading(false));
-  }, [user, session]);
+  }, [user, session, status]);
 
   if (!user) {
     return <div className="p-4">Please log in to view orders.</div>;
