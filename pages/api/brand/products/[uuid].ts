@@ -9,6 +9,34 @@ import { hasOrdersForProduct } from '../../../../lib/orders';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../../lib/utils/getQueryParam';
 import type { ApiMessage, ProductInput } from '../../../../types';
+import formidable, { type Fields, type Files, type File } from 'formidable';
+import fs from 'fs';
+import path from 'path';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+async function parseBody(
+  req: NextApiRequest
+): Promise<{ fields: Fields; files: Files }> {
+  const type = req.headers['content-type'] || '';
+  if (type.includes('application/json')) {
+    const buffers: Uint8Array[] = [];
+    for await (const chunk of req) buffers.push(chunk);
+    const body = Buffer.concat(buffers).toString();
+    return { fields: JSON.parse(body || '{}') as Fields, files: {} as Files };
+  }
+  return new Promise<{ fields: Fields; files: Files }>((resolve, reject) => {
+    const form = formidable({ multiples: true });
+    form.parse(req, (err, fields, files) => {
+      if (err) reject(err);
+      else resolve({ fields, files });
+    });
+  });
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,6 +49,7 @@ export default async function handler(
     if (req.method === 'PUT') {
       const existing = await getProductByUuid(String(uuid));
       if (!existing) return res.status(404).json({ message: 'Not found' });
+      const { fields, files } = await parseBody(req);
       const {
         title,
         sku,
@@ -33,31 +62,47 @@ export default async function handler(
         min_price,
         max_price,
         currency,
-      } = req.body || {};
+      } = fields as Record<string, unknown>;
+      const photos: File[] = files.photos
+        ? Array.isArray(files.photos)
+          ? (files.photos as File[])
+          : [files.photos as File]
+        : [];
+      const destDir = path.join(process.cwd(), 'public', 'uploads', String(uuid));
+      fs.mkdirSync(destDir, { recursive: true });
+      const imagePaths: string[] = [];
+      for (const file of photos) {
+        const name = Date.now() + '-' + file.originalFilename;
+        const destPath = path.join(destDir, name);
+        fs.renameSync(file.filepath, destPath);
+        imagePaths.push(`/uploads/${uuid}/${name}`);
+      }
       const payload: ProductInput & { id?: string } = {
         uuid: String(uuid),
-        sku: sku ?? existing.sku,
-        title: title ?? existing.title,
-        vendor: { email: '', brandName: vendor ?? existing.vendor },
-        description: description ?? existing.description,
-        productType: product_type ?? existing.product_type,
-        tags: tags ?? existing.tags,
-        category: { name: category ?? existing.category, slug: '' },
+        sku: String(sku ?? existing.sku),
+        title: String(title ?? existing.title),
+        vendor: { email: '', brandName: String(vendor ?? existing.vendor) },
+        description: String(description ?? existing.description),
+        productType: String(product_type ?? existing.product_type),
+        tags: String(tags ?? existing.tags),
+        category: { name: String(category ?? existing.category), slug: '' },
         quantity:
           typeof quantity !== 'undefined'
-            ? parseInt(quantity, 10)
+            ? parseInt(String(quantity), 10)
             : existing.quantity,
         minPrice:
           typeof min_price !== 'undefined'
-            ? parseFloat(min_price)
+            ? parseFloat(String(min_price))
             : existing.min_price,
         maxPrice:
           typeof max_price !== 'undefined'
-            ? parseFloat(max_price)
+            ? parseFloat(String(max_price))
             : existing.max_price,
-        currency: currency ?? existing.currency,
+        currency: String(currency ?? existing.currency),
         status: existing.status,
-        images: [],
+        images: imagePaths.length > 0
+          ? imagePaths.map((p) => ({ url: p }))
+          : undefined,
       };
       await updateProduct(payload);
       await loadAndIndexProducts();
