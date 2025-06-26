@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import BellIcon from './icons/BellIcon';
-import type { Notification } from '../types';
+import BellIcon from '../icons/BellIcon';
+import type { Notification } from '../../types';
 
 export default function NotificationBell() {
   const [items, setItems] = useState<Notification[]>([]);
