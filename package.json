@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
-    "@prisma/client": "^6.9.0",
+    "@prisma/client": "^6.10.1",
     "@vercel/blob": "^0.23.0",
     "bcryptjs": "^3.0.2",
     "csv-parser": "^3.0.0",
@@ -65,7 +65,7 @@
     "jest-environment-jsdom": "^30.0.0-beta.3",
     "postcss": "^8.4.38",
     "prettier": "^3.5.3",
-    "prisma": "^6.9.0",
+    "prisma": "^6.10.1",
     "tailwindcss": "^3.4.1",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
