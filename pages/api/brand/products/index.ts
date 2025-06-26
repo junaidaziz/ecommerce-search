@@ -5,7 +5,6 @@ import {
   mapDbRowToProduct,
 } from '../../../../lib/products';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../../lib/utils/getQueryParam';
 import { slugify } from '../../../../lib/slugify';
 import type { Product, ProductInput, ApiMessage } from '../../../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
@@ -48,21 +47,22 @@ async function handler(
   try {
     if (req.method === 'GET') {
       const session = await getServerSession(req, res, authOptions);
-      if (!session?.user?.id) {
+      if (!session?.user || session.user.role !== 'brand') {
         return res.status(401).json({ message: 'Unauthorized' });
       }
-      const brandId = Number(session.user.id);
-      const vendor = getQueryParam(req.query.vendor);
+
       const db = getDb();
       const rows = await db.product.findMany({
-        where: {
-          vendorId: brandId,
-          ...(vendor ? { vendor: { brandName: vendor } } : {}),
-        },
+        where: { vendor: { brandName: session.user.brandName } },
         include: { category: true, vendor: true },
         orderBy: { id: 'asc' },
       });
       const products = rows.map((row) => mapDbRowToProduct(row));
+
+      if (products.length === 0) {
+        return res.status(200).json([]);
+      }
+
       return res.status(200).json(products);
     }
 
