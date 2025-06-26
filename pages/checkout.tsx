@@ -101,68 +101,67 @@ const Checkout: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <Head>
-        <title>{getPageTitle('Checkout')}</title>
-      </Head>
-      <h1 className="text-3xl font-bold mb-4">Checkout</h1>
-      <div className="mb-4 max-h-64 overflow-y-auto">
-        <ul className="space-y-2">
-          {cart.map((item) => {
-            const price = parseFloat(
-              typeof item.minPrice === 'number'
-                ? item.minPrice.toString()
-                : item.minPrice || '0'
-            );
-            const subtotal = price * item.qty;
-            return (
-              <li key={item.id} className="border p-2 flex justify-between">
-                <div>
-                  <p className="font-medium">{item.title}</p>
-                  <p className="text-sm">
-                    £{price.toFixed(2)} x {item.qty}
-                  </p>
-                </div>
-                <span>£{subtotal.toFixed(2)}</span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-      <div className="border-t pt-4 mb-4 flex justify-between">
-        <p className="font-semibold">Items: {itemCount}</p>
-        <p className="font-semibold">Total: £{discountedTotal.toFixed(2)}</p>
-      </div>
-      <form onSubmit={submit} className="space-y-3">
+    <Head>
+      <title>{getPageTitle('Checkout')}</title>
+    </Head>
+    <h1 className="text-3xl font-bold mb-4">Checkout</h1>
+
+    {step === 1 && (
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!name || !address) {
+            setError('Shipping information required');
+            return;
+          }
+          setError('');
+          setStep(2);
+        }}
+        className="space-y-3"
+      >
+        <div className="mb-4 max-h-64 overflow-y-auto">
+          <ul className="space-y-2">
+            {cart.map((item) => {
+              const price = parseFloat(typeof item.minPrice === 'number' ? item.minPrice.toString() : item.minPrice || '0');
+              const subtotal = price * item.qty;
+              return (
+                <li key={item.id} className="border p-2 flex justify-between">
+                  <div>
+                    <p className="font-medium">{item.title}</p>
+                    <p className="text-sm">£{price.toFixed(2)} x {item.qty}</p>
+                  </div>
+                  <span>£{subtotal.toFixed(2)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className="border-t pt-4">
+          <p className="font-semibold">Items: {itemCount}</p>
+          <p className="font-semibold">Subtotal: £{totalPrice.toFixed(2)}</p>
+        </div>
         <div>
-          <label className="label" htmlFor="coupon">
-            Coupon Code
-          </label>
+          <label className="label" htmlFor="coupon">Coupon Code</label>
           <div className="flex gap-2">
             <TextInput
               name="coupon"
               id="coupon"
               className="flex-1"
               value={coupon}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setCoupon(e.target.value)
-              }
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setCoupon(e.target.value)}
             />
             <button
               type="button"
               className="btn"
               onClick={async () => {
                 if (!coupon) return;
-                const res = await fetch(
-                  `/api/coupons/${encodeURIComponent(coupon)}`
-                );
+                const res = await fetch(`/api/coupons/${encodeURIComponent(coupon)}`);
                 if (res.ok) {
                   const data: Coupon = await res.json();
                   if (data.discountType === 'percent') {
                     setDiscount(data.value);
                   } else {
-                    setDiscount(
-                      totalPrice > 0 ? (data.value / totalPrice) * 100 : 0
-                    );
+                    setDiscount(totalPrice > 0 ? (data.value / totalPrice) * 100 : 0);
                   }
                 } else {
                   setDiscount(0);
@@ -173,45 +172,53 @@ const Checkout: React.FC = () => {
             </button>
           </div>
           {discount > 0 && (
-            <p className="text-sm text-green-600">
-              Discount {discount}% applied
-            </p>
+            <p className="text-sm text-green-600">Discount {discount}% applied</p>
           )}
         </div>
         <div>
-          <label className="label" htmlFor="name">
-            Name
-          </label>
+          <label className="label" htmlFor="name">Name</label>
           <TextInput
             name="name"
             id="name"
             className="w-full"
             value={name}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setName(e.target.value)
-            }
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
             required
           />
         </div>
         <div>
-          <label className="label" htmlFor="address">
-            Address
-          </label>
+          <label className="label" htmlFor="address">Address</label>
           <Textarea
             name="address"
             id="address"
             className="w-full"
             value={address}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              setAddress(e.target.value)
-            }
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)}
             required
           />
         </div>
+        {error && <p className="text-red-500">{error}</p>}
+        <div className="flex justify-end">
+          <button className="btn btn-primary" type="submit">Next</button>
+        </div>
+      </form>
+    )}
+
+    {step === 2 && (
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (paymentMethod !== 'card' && !paymentReference) {
+            setError('Payment reference required');
+            return;
+          }
+          setError('');
+          setStep(3);
+        }}
+        className="space-y-3"
+      >
         <div>
-          <label className="label" htmlFor="paymentMethod">
-            Payment Method
-          </label>
+          <label className="label" htmlFor="paymentMethod">Payment Method</label>
           <select
             id="paymentMethod"
             className="select select-bordered w-full"
@@ -227,22 +234,13 @@ const Checkout: React.FC = () => {
         {paymentMethod !== 'card' && (
           <div className="border p-3 rounded space-y-2">
             {paymentMethod === 'easypaisa' && (
-              <p>
-                Send payment to EasyPaisa account <b>0300-1234567</b> and enter
-                the transaction ID below.
-              </p>
+              <p>Send payment to EasyPaisa account <b>0300-1234567</b> and enter the transaction ID below.</p>
             )}
             {paymentMethod === 'jazzcash' && (
-              <p>
-                Send payment to JazzCash account <b>0300-7654321</b> and enter
-                the transaction ID below.
-              </p>
+              <p>Send payment to JazzCash account <b>0300-7654321</b> and enter the transaction ID below.</p>
             )}
             {paymentMethod === 'bank' && (
-              <p>
-                Transfer to Bank Account <b>PK00 TEST 1234 5678 9012 3456</b>{' '}
-                and provide reference.
-              </p>
+              <p>Transfer to Bank Account <b>PK00 TEST 1234 5678 9012 3456</b> and provide reference.</p>
             )}
             <TextInput
               name="reference"
@@ -250,9 +248,7 @@ const Checkout: React.FC = () => {
               placeholder="Transaction / Reference ID"
               className="w-full"
               value={paymentReference}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setPaymentReference(e.target.value)
-              }
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setPaymentReference(e.target.value)}
             />
             <FileUpload
               name="proof"
@@ -262,11 +258,52 @@ const Checkout: React.FC = () => {
           </div>
         )}
         {error && <p className="text-red-500">{error}</p>}
-        <button className="btn btn-primary" type="submit">
-          Place Order
-        </button>
+        <div className="flex justify-between">
+          <button type="button" className="btn" onClick={() => setStep(1)}>
+            Back
+          </button>
+          <button className="btn btn-primary" type="submit">Next</button>
+        </div>
       </form>
-    </div>
+    )}
+
+    {step === 3 && (
+      <div className="space-y-4">
+        <div className="mb-4 max-h-64 overflow-y-auto">
+          <ul className="space-y-2">
+            {cart.map((item) => {
+              const price = parseFloat(typeof item.minPrice === 'number' ? item.minPrice.toString() : item.minPrice || '0');
+              const subtotal = price * item.qty;
+              return (
+                <li key={item.id} className="border p-2 flex justify-between">
+                  <div>
+                    <p className="font-medium">{item.title}</p>
+                    <p className="text-sm">£{price.toFixed(2)} x {item.qty}</p>
+                  </div>
+                  <span>£{subtotal.toFixed(2)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className="border-t pt-4 space-y-1">
+          <p className="font-semibold">Subtotal: £{totalPrice.toFixed(2)}</p>
+          <p className="font-semibold">Discount: {discount}%</p>
+          <p className="font-semibold">Shipping: £{shippingCost.toFixed(2)}</p>
+          <p className="font-semibold">Total: £{finalTotal.toFixed(2)}</p>
+        </div>
+        {error && <p className="text-red-500">{error}</p>}
+        <div className="flex justify-between">
+          <button type="button" className="btn" onClick={() => setStep(2)}>
+            Back
+          </button>
+          <button type="button" className="btn btn-primary" onClick={submit}>
+            Confirm Order
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
   );
 };
 
