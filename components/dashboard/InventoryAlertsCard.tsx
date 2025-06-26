@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import DashboardCard from './DashboardCard';
 
 interface Props {
-  brand?: string;
+  brandId?: number;
   threshold?: number;
 }
 
@@ -12,14 +12,14 @@ interface Product {
   quantity: number;
 }
 
-const InventoryAlertsCard: React.FC<Props> = ({ brand, threshold = 10 }) => {
+const InventoryAlertsCard: React.FC<Props> = ({ brandId, threshold = 10 }) => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [error, setError] = useState<string>('');
   useEffect(() => {
     setProducts(null);
     setError('');
     const params = new URLSearchParams();
-    if (brand) params.set('brand', brand);
+    if (brandId) params.set('brandId', String(brandId));
     if (threshold) params.set('threshold', String(threshold));
     const url =
       '/api/dashboard/inventory-alerts' +
@@ -28,7 +28,7 @@ const InventoryAlertsCard: React.FC<Props> = ({ brand, threshold = 10 }) => {
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data) => setProducts(data.products))
       .catch(() => setError('Failed to load'));
-  }, [brand, threshold]);
+  }, [brandId, threshold]);
 
   return (
     <DashboardCard

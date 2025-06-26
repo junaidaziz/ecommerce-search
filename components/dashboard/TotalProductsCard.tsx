@@ -3,10 +3,10 @@ import { useRouter } from 'next/router';
 import DashboardCard from './DashboardCard';
 
 interface Props {
-  brand?: string;
+  brandId?: number;
 }
 
-const TotalProductsCard: React.FC<Props> = ({ brand }) => {
+const TotalProductsCard: React.FC<Props> = ({ brandId }) => {
   const [count, setCount] = useState<number | null>(null);
   const [error, setError] = useState<string>('');
   const router = useRouter();
@@ -17,7 +17,7 @@ const TotalProductsCard: React.FC<Props> = ({ brand }) => {
       setError('');
       const url =
         '/api/dashboard/total-products' +
-        (brand ? `?brand=${encodeURIComponent(brand)}` : '');
+        (brandId ? `?brandId=${brandId}` : '');
       try {
         const res = await fetch(url);
         if (!res.ok) throw new Error('Failed to load');
@@ -29,10 +29,10 @@ const TotalProductsCard: React.FC<Props> = ({ brand }) => {
       }
     }
     load();
-  }, [brand]);
+  }, [brandId]);
 
   const handleClick = () => {
-    router.push(brand ? '/brand/products' : '/products');
+    router.push(brandId ? '/brand/products' : '/products');
   };
 
   return (

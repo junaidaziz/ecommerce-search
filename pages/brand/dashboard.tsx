@@ -29,13 +29,13 @@ const BrandDashboard: React.FC = () => {
         Brand Dashboard
       </h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <TotalProductsCard brand={user.brandName || undefined} />
-        <TotalSalesCard brand={user.brandName || undefined} />
-        <OrdersThisMonthCard brand={user.brandName || undefined} />
+        <TotalProductsCard />
+        <TotalSalesCard />
+        <OrdersThisMonthCard />
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <BestSellersCard brand={user.brandName || undefined} />
-        <InventoryAlertsCard brand={user.brandName || undefined} />
+        <BestSellersCard />
+        <InventoryAlertsCard />
         <ExistingProductsCard />
       </div>
     </div>

@@ -14,10 +14,14 @@ async function handler(
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
     const db = getDb();
-    const user = (req as any).user as { brandName?: string } | undefined;
-    const brand = user?.brandName || getQueryParam(req.query.brand);
+    const user = (req as any).user as {
+      id?: string | number;
+      brandName?: string;
+    } | undefined;
+    const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
+    const vendorId = Number(user?.id) || brandId || undefined;
     const where: any = { status: 'completed' };
-    if (brand) where.product = { vendor: { brandName: brand } };
+    if (vendorId) where.product = { vendorId };
     const result = await db.order.aggregate({ where, _sum: { total: true } });
     return res.status(200).json({ total: result._sum.total ?? 0 });
   } catch (error) {

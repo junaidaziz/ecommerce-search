@@ -15,14 +15,18 @@ async function handler(
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
     const db = getDb();
-    const user = (req as any).user as { brandName?: string } | undefined;
-    const brand = user?.brandName || getQueryParam(req.query.brand);
+    const user = (req as any).user as {
+      id?: string | number;
+      brandName?: string;
+    } | undefined;
+    const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
+    const vendorId = Number(user?.id) || brandId || undefined;
     const start = dayjs().startOf('month').toDate();
     const where: any = {
       createdAt: { gte: start },
       status: 'completed',
     };
-    if (brand) where.product = { vendor: { brandName: brand } };
+    if (vendorId) where.product = { vendorId };
     const count = await db.order.count({ where });
     const result = await db.order.aggregate({ where, _sum: { total: true } });
     return res.status(200).json({ count, revenue: result._sum.total ?? 0 });
