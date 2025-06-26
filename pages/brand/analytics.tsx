@@ -3,6 +3,7 @@ import { AppContext } from '../../contexts/AppContext';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 import BarChart from '../../components/BarChart';
+import ChartContainer from '../../components/ChartContainer';
 import DashboardCard from '../../components/dashboard/DashboardCard';
 import TotalProductsCard from '../../components/dashboard/TotalProductsCard';
 import TotalSalesCard from '../../components/dashboard/TotalSalesCard';
@@ -80,7 +81,7 @@ const BrandAnalytics: React.FC = () => {
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <DashboardCard title="Sales Over Time">
-          <div className="h-64">
+          <ChartContainer dataLength={0} height="16rem">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={[] as any[]}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -90,10 +91,10 @@ const BrandAnalytics: React.FC = () => {
                 <Line type="monotone" dataKey="value" stroke="#8884d8" />
               </LineChart>
             </ResponsiveContainer>
-          </div>
+          </ChartContainer>
         </DashboardCard>
         <DashboardCard title="Orders by Category">
-          <div className="h-64">
+          <ChartContainer dataLength={0} height="16rem">
             <ResponsiveContainer width="100%" height="100%">
               <ReBarChart data={[] as any[]}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -103,10 +104,10 @@ const BrandAnalytics: React.FC = () => {
                 <Bar dataKey="value" fill="#8884d8" />
               </ReBarChart>
             </ResponsiveContainer>
-          </div>
+          </ChartContainer>
         </DashboardCard>
         <DashboardCard title="Inventory Status">
-          <div className="h-64">
+          <ChartContainer dataLength={0} height="16rem">
             <ResponsiveContainer width="100%" height="100%">
               <ReBarChart data={[] as any[]}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -116,7 +117,7 @@ const BrandAnalytics: React.FC = () => {
                 <Bar dataKey="value" fill="#8884d8" />
               </ReBarChart>
             </ResponsiveContainer>
-          </div>
+          </ChartContainer>
         </DashboardCard>
       </div>
       <div className="max-w-2xl mx-auto">
