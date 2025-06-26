@@ -9,6 +9,7 @@ import TotalProductsCard from '../../components/dashboard/TotalProductsCard';
 import TotalSalesCard from '../../components/dashboard/TotalSalesCard';
 import OrdersThisMonthCard from '../../components/dashboard/OrdersThisMonthCard';
 import InventoryAlertsCard from '../../components/dashboard/InventoryAlertsCard';
+import CartIcon from '../../components/icons/CartIcon';
 import {
   ResponsiveContainer,
   LineChart,
@@ -121,23 +122,29 @@ const BrandAnalytics: React.FC = () => {
         </DashboardCard>
       </div>
       <div className="max-w-2xl mx-auto">
-        <h2 className="text-xl font-semibold mt-4 mb-2">Top Products</h2>
-        <ul className="list-disc list-inside">
+        <DashboardCard title="Top Products">
           {data.topProducts.length > 0 ? (
-            data.topProducts.map((p) => (
-              <li key={p.id}>
-                {p.id} - {p.qty} sold
-              </li>
-            ))
+            <>
+              <ul className="list-disc pl-4 space-y-1">
+                {data.topProducts.map((p) => (
+                  <li key={p.id}>
+                    {p.id} - {p.qty} sold
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-4">
+                <BarChart
+                  data={data.topProducts.map((p) => ({ label: p.id, value: p.qty }))}
+                />
+              </div>
+            </>
           ) : (
-            <li>No sales yet.</li>
+            <div className="flex flex-col items-center justify-center h-32 text-gray-500">
+              <CartIcon className="w-8 h-8 mb-2" />
+              <p>No sales yet.</p>
+            </div>
           )}
-        </ul>
-        <div className="mt-4">
-          <BarChart
-            data={data.topProducts.map((p) => ({ label: p.id, value: p.qty }))}
-          />
-        </div>
+        </DashboardCard>
       </div>
     </div>
   );
