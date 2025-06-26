@@ -15,7 +15,7 @@ const BrandProductsPage: React.FC = () => {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    fetch(`/api/brand/products?vendor=${encodeURIComponent(user.brandName || '')}`)
+    fetch('/api/brand/products')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: Product[]) => setProducts(data))
       .finally(() => setLoading(false));

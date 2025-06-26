@@ -33,7 +33,7 @@ const DashboardPage: React.FC = () => {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <BestSellersCard brand={brand} />
         <InventoryAlertsCard brand={brand} />
-        {brand && <ExistingProductsCard brand={brand} />}
+        {brand && <ExistingProductsCard />}
       </div>
     </div>
   );
