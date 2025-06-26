@@ -5,25 +5,22 @@ import DashboardCard from './DashboardCard';
 import type { Product } from '../../types/product';
 
 interface Props {
-  brand?: string;
   previewCount?: number;
 }
 
-const ExistingProductsCard: React.FC<Props> = ({ brand, previewCount = 3 }) => {
+const ExistingProductsCard: React.FC<Props> = ({ previewCount = 3 }) => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [error, setError] = useState('');
   const router = useRouter();
 
   useEffect(() => {
-    if (!brand) return;
     setProducts(null);
     setError('');
-    const url = `/api/brand/products?vendor=${encodeURIComponent(brand)}`;
-    fetch(url)
+    fetch('/api/brand/products')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: Product[]) => setProducts(data))
       .catch(() => setError('Failed to load'));
-  }, [brand]);
+  }, []);
 
   const preview =
     products

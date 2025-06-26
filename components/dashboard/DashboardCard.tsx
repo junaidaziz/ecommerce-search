@@ -24,7 +24,10 @@ const DashboardCard: React.FC<Props> = ({
     >
       <h3 className="font-semibold mb-2">{title}</h3>
       {loading ? (
-        <p>Loading...</p>
+        <div className="space-y-2 animate-pulse">
+          <div className="h-4 bg-base-300 rounded w-3/4" />
+          <div className="h-3 bg-base-300 rounded w-1/2" />
+        </div>
       ) : error ? (
         <p className="text-red-600">{error}</p>
       ) : (
