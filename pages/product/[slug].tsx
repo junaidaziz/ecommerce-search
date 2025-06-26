@@ -132,6 +132,14 @@ export default function ProductDetail({
                 : product.minPrice || '0'
             ).toFixed(2)}
           </p>
+          <p className="mb-2 font-medium">
+            Stock:{' '}
+            {product.totalInventory && product.totalInventory > 10
+              ? 'In Stock'
+              : product.totalInventory && product.totalInventory > 0
+              ? 'Low Stock'
+              : 'Out of Stock'}
+          </p>
           <p className="mb-2">
             Rating: {averageRating.toFixed(1)} ({reviewCount})
           </p>
