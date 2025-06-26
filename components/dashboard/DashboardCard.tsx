@@ -16,8 +16,10 @@ const DashboardCard: React.FC<Props> = ({
   className = '',
 }) => {
   return (
-    <div className={`border rounded-lg shadow p-4 bg-base-100 ${className}`}>
-      \<h3 className="font-semibold mb-2">{title}</h3>
+    <div
+      className={`border rounded-lg shadow p-4 bg-base-100 transition-shadow duration-200 hover:shadow-md ${className}`}
+    >
+      <h3 className="font-semibold mb-2">{title}</h3>
       {loading ? (
         <p>Loading...</p>
       ) : error ? (
