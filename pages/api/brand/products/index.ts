@@ -62,28 +62,7 @@ async function handler(
         include: { category: true, vendor: true },
         orderBy: { id: 'asc' },
       });
-      const products = rows.map((row) =>
-        mapDbRowToProduct({
-          id: row.id,
-          uuid: row.uuid,
-          slug: row.slug,
-          sku: row.sku,
-          title: row.title,
-          vendor: row.vendor ?? null,
-          description: row.description,
-          productType: row.productType,
-          tags: row.tags,
-          category: row.category ?? null,
-          images: row.images,
-          quantity: row.quantity,
-          minPrice: row.minPrice,
-          maxPrice: row.maxPrice,
-          currency: row.currency,
-          status: row.status,
-          createdAt: row.createdAt,
-          updatedAt: row.updatedAt,
-        })
-      );
+      const products = rows.map((row) => mapDbRowToProduct(row));
       return res.status(200).json(products);
     }
 
