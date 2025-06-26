@@ -46,6 +46,7 @@ model User {
   deletionRequests DeletionRequest[] @relation("BrandDeletionRequests")
   searchLogs       SearchLog[]
   couponUsages     CouponUsage[]
+  PaymentMethod    PaymentMethod[]
 }
 
 model Category {
@@ -99,8 +100,9 @@ model Order {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  user    User    @relation(fields: [userId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  user    User      @relation(fields: [userId], references: [id])
+  product Product   @relation(fields: [productId], references: [id])
+  Payment Payment[]
 }
 
 model DeletionRequest {
@@ -155,32 +157,32 @@ model CouponUsage {
 }
 
 model PaymentMethod {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  provider    String
-  cardLast4   String
-  cardBrand   String
-  expMonth    Int
-  expYear     Int
-  token       String
-  isDefault   Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  provider  String
+  cardLast4 String
+  cardBrand String
+  expMonth  Int
+  expYear   Int
+  token     String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
+  user     User      @relation(fields: [userId], references: [id])
   payments Payment[]
 }
 
 model Payment {
-  id             Int      @id @default(autoincrement())
-  orderId        Int
-  amount         Float
-  provider       String
-  status         String
+  id              Int      @id @default(autoincrement())
+  orderId         Int
+  amount          Float
+  provider        String
+  status          String
   paymentMethodId Int
-  transactionId  String
-  createdAt      DateTime @default(now())
+  transactionId   String
+  createdAt       DateTime @default(now())
 
-  order         Order        @relation(fields: [orderId], references: [id])
+  order         Order         @relation(fields: [orderId], references: [id])
   paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
 }
