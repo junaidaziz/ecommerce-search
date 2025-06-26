@@ -1,0 +1,33 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { getDb } from '../../lib/db';
+import { handleApiError } from '../../lib/utils/handleApiError';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from './auth/[...nextauth]';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    if (req.method !== 'POST') {
+      res.status(405).json({ message: 'Method Not Allowed' });
+      return;
+    }
+    const { subject, message } = req.body as { subject?: string; message?: string };
+    if (!subject || !message) {
+      res.status(400).json({ message: 'subject and message required' });
+      return;
+    }
+    const session = await getServerSession(req, res, authOptions);
+    const db = getDb();
+    const ticket = await db.supportTicket.create({
+      data: {
+        subject,
+        message,
+        userId: session?.user?.email
+          ? (await db.user.findUnique({ where: { email: session.user.email } }))?.id
+          : null,
+      },
+    });
+    res.status(201).json(ticket);
+  } catch (error) {
+    handleApiError(res, error, 'Failed to create ticket');
+  }
+}
