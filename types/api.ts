@@ -60,6 +60,10 @@ export interface CategoriesResponse {
   categories: import('./category').Category[];
 }
 
+export interface TagsResponse {
+  tags: string[];
+}
+
 interface UsersResponse {
   users: (import('./user').User & { disabled?: boolean })[];
 }

@@ -586,3 +586,22 @@ export async function deleteProduct(uuid: string): Promise<void> {
   const db = getDb();
   await db.product.delete({ where: { uuid } });
 }
+
+export async function getDistinctTags(search = ''): Promise<string[]> {
+  const db = getDb();
+  const rows = await db.product.findMany({
+    where: { tags: { not: null } },
+    select: { tags: true },
+  });
+  const term = search.trim().toLowerCase();
+  const set = new Set<string>();
+  for (const row of rows) {
+    const tags = row.tags?.split(',').map((t) => t.trim()).filter(Boolean) || [];
+    for (const tag of tags) {
+      if (!term || tag.toLowerCase().includes(term)) {
+        set.add(tag);
+      }
+    }
+  }
+  return Array.from(set).sort();
+}
