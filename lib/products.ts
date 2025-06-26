@@ -144,28 +144,22 @@ async function loadProductsData(): Promise<Product[]> {
 }
 
 export function mapDbRowToProduct(row: ProductRow): Product {
+  const {
+    images,
+    quantity,
+    minPrice,
+    maxPrice,
+    currency,
+    ...rest
+  } = row;
+
   return processProductRow({
-    id: row.id,
-    uuid: row.uuid,
-    slug: row.slug,
-    sku: row.sku,
-    title: row.title,
-    vendor: row.vendor ?? null,
-    description: row.description,
-    productType: row.productType,
-    tags: row.tags,
-    category: row.category,
-    images: parseImages(row.images),
-    totalInventory: row.quantity,
+    ...rest,
+    images: parseImages(images),
+    totalInventory: quantity,
     priceRange: {
-      minVariantPrice: {
-        amount: row.minPrice,
-        currencyCode: row.currency,
-      },
-      maxVariantPrice: {
-        amount: row.maxPrice,
-        currencyCode: row.currency,
-      },
+      minVariantPrice: { amount: minPrice, currencyCode: currency },
+      maxVariantPrice: { amount: maxPrice, currencyCode: currency },
     },
   });
 }
