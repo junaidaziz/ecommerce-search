@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Controller,
   Control,
@@ -6,6 +6,7 @@ import {
   Path,
   RegisterOptions,
 } from 'react-hook-form';
+import AsyncCreatableSelect from 'react-select/async-creatable';
 
 export interface TagInputProps<T extends FieldValues> {
   name: Path<T>;
@@ -19,7 +20,36 @@ export interface TagInputProps<T extends FieldValues> {
 
 const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
   const { name, control, label, placeholder = '', disabled, error, rules } = props;
-  const [input, setInput] = useState('');
+
+  const loadOptions = async (inputValue: string) => {
+    const params = new URLSearchParams({ search: inputValue });
+    const res = await fetch(`/api/tags?${params.toString()}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.tags || []).map((t: string) => ({ label: t, value: t }));
+  };
+
+  const customComponents = {
+    MultiValueContainer: (props: any) => (
+      <span className="badge badge-outline gap-1 mr-1">
+        {props.data.label}
+        <button
+          type="button"
+          className="ml-1"
+          onClick={props.removeProps.onClick}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            props.removeProps.onMouseDown(e);
+          }}
+        >
+          ✕
+        </button>
+      </span>
+    ),
+    MultiValueLabel: () => null,
+    MultiValueRemove: () => null,
+  };
+
   return (
     <Controller
       name={name}
@@ -27,12 +57,6 @@ const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
       rules={rules}
       render={({ field }) => {
         const tags: string[] = field.value || [];
-        const addTag = () => {
-          const val = input.trim();
-          if (!val) return;
-          if (!tags.includes(val)) field.onChange([...tags, val]);
-          setInput('');
-        };
         return (
           <div className="mb-4 w-full">
             {label && (
@@ -40,33 +64,28 @@ const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
                 {label}
               </label>
             )}
-            <div className="flex flex-wrap gap-1 mb-1">
-              {tags.map((tag, idx) => (
-                <span key={idx} className="badge badge-outline gap-1">
-                  {tag}
-                  <button
-                    type="button"
-                    className="ml-1"
-                    onClick={() => field.onChange(tags.filter((_, i) => i !== idx))}
-                  >
-                    ✕
-                  </button>
-                </span>
-              ))}
-            </div>
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addTag();
+            <AsyncCreatableSelect
+              isMulti
+              inputId={`tag-input-${String(name)}`}
+              value={tags.map((t) => ({ label: t, value: t }))}
+              defaultOptions
+              loadOptions={loadOptions}
+              onChange={(val) => {
+                const arr = Array.isArray(val) ? val.map((v) => v.value) : [];
+                field.onChange(arr);
+              }}
+              onCreateOption={(val) => {
+                const newTag = val.trim();
+                if (newTag && !tags.includes(newTag)) {
+                  field.onChange([...tags, newTag]);
                 }
               }}
+              onBlur={field.onBlur}
               placeholder={placeholder}
-              disabled={disabled}
-              className={`px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${error ? 'border-red-500' : 'border-gray-300'}`}
+              isDisabled={disabled}
+              className="w-full"
+              classNamePrefix="react-select"
+              components={customComponents}
             />
             {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
           </div>

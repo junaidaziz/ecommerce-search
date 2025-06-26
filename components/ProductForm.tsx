@@ -158,7 +158,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   return (
-    <form onSubmit={onFormSubmit} className="space-y-2">
+    <form onSubmit={onFormSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <input type="hidden" {...register('id')} />
       <TextInput<ProductFormValues>
         label="SKU"
@@ -182,13 +182,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
         rules={{ required: 'Required' }}
         error={errors.title?.message}
       />
-      <Textarea<ProductFormValues>
-        label="Description"
-        name="description"
-        register={register}
-        rules={{ required: 'Required' }}
-        error={errors.description?.message}
-      />
+      <div className="md:col-span-2">
+        <Textarea<ProductFormValues>
+          label="Description"
+          name="description"
+          register={register}
+          rules={{ required: 'Required' }}
+          error={errors.description?.message}
+        />
+      </div>
       <TextInput<ProductFormValues>
         label="Product Type"
         name="productType"
@@ -196,14 +198,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
         rules={{ required: 'Required' }}
         error={errors.productType?.message}
       />
-      <TagInput<ProductFormValues>
-        label="Tags"
-        name="tags"
-        control={control}
-        placeholder="Press Enter to add"
-        error={errors.tags?.message as string}
-      />
-      <Controller
+      <div className="md:col-span-2">
+        <TagInput<ProductFormValues>
+          label="Tags"
+          name="tags"
+          control={control}
+          placeholder="Search or create tags"
+          error={errors.tags?.message as string}
+        />
+      </div>
+      <div className="md:col-span-2">
+        <Controller
         name="categoryId"
         control={control}
         rules={{ required: 'Required' }}
@@ -278,6 +283,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </>
         )}
       />
+      </div>
       {errors.categoryId && (
         <p className="text-sm text-red-600">{errors.categoryId.message}</p>
       )}
@@ -328,15 +334,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
         rules={{ required: 'Required' }}
         error={errors.currency?.message}
       />
-      <FileUpload<ProductFormValues>
-        label="Images"
-        name="images"
-        multiple
-        accept="image/*"
-        onChange={handleImagesChange}
-      />
+      <div className="md:col-span-2">
+        <FileUpload<ProductFormValues>
+          label="Images"
+          name="images"
+          multiple
+          accept="image/*"
+          onChange={handleImagesChange}
+        />
+      </div>
       {images.length > 0 && (
-        <div className="flex gap-2 flex-wrap">
+        <div className="md:col-span-2 flex gap-2 flex-wrap">
           {images.map((img, idx) => (
             <img
               key={idx}
@@ -347,7 +355,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           ))}
         </div>
       )}
-      <div className="flex gap-2 mt-2">
+      <div className="md:col-span-2 flex gap-2 mt-2">
         {onCancel && (
           <button type="button" className="btn" onClick={onCancel}>
             Cancel
