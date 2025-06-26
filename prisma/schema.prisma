@@ -186,3 +186,30 @@ model Payment {
   order         Order         @relation(fields: [orderId], references: [id])
   paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
 }
+
+model PolicyDocument {
+  id        Int      @id @default(autoincrement())
+  type      String
+  content   String
+  version   Int      @default(1)
+  updatedBy Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  updatedByUser User @relation(fields: [updatedBy], references: [id])
+
+  @@unique([type, version])
+}
+
+model SupportTicket {
+  id        Int      @id @default(autoincrement())
+  uuid      String   @unique @default(uuid())
+  userId    Int?
+  subject   String
+  message   String
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id])
+}
