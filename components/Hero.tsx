@@ -17,9 +17,10 @@ const Hero: FC = () => {
       <div className="flex-1 mt-6 md:mt-0 md:ml-6">
         <Image
           src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80"
-          alt=""
+          alt="Woman shopping"
           width={600}
           height={400}
+          priority
           className="rounded-lg object-cover w-full h-64 md:h-full"
         />
       </div>
