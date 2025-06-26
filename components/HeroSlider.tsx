@@ -53,8 +53,9 @@ const HeroSlider: FC = () => {
           <SwiperSlide key={i} className="relative">
             <Image
               src={slide.image}
-              alt=""
+              alt={slide.headline}
               fill
+              sizes="100vw"
               className="object-cover"
               priority={i === 0}
             />
