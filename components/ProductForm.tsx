@@ -118,24 +118,41 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCatName.trim()) {
+    const name = newCatName.trim();
+    const slug = newCatSlug.trim();
+    if (!name) {
       setCatError('Name required');
+      return;
+    }
+    if (!slug) {
+      setCatError('Slug required');
       return;
     }
     setCreatingCat(true);
     try {
+      const checkRes = await fetch(
+        `/api/categories/check?name=${encodeURIComponent(name)}`
+      );
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        if (checkData.exists) {
+          setCatError(`Category already exists: ${checkData.category.name}`);
+          setCreatingCat(false);
+          return;
+        }
+      }
       const createRes = await fetch('/api/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: newCatName.trim(),
-          slug: newCatSlug.trim(),
+          name,
+          slug,
         }),
       });
       if (createRes.status === 409) {
         const data = await createRes.json().catch(() => ({}));
-        const name = data.category?.name || newCatName.trim();
-        setCatError(`Category already exists: ${name}`);
+        const existingName = data.category?.name || name;
+        setCatError(`Category already exists: ${existingName}`);
         setCreatingCat(false);
         return;
       }
@@ -151,6 +168,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setCategoryOption(opt);
       setValue('categoryId', opt.value);
       setShowCatModal(false);
+      setNewCatName('');
+      setNewCatSlug('');
       setCreatingCat(false);
     } catch (err) {
       setCatError('Error');
