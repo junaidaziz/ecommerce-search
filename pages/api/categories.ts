@@ -44,7 +44,9 @@ export default async function handler(
           (slug && c.slug?.toLowerCase() === String(slug).toLowerCase())
       );
       if (exists) {
-        return res.status(409).json({ message: 'category exists' });
+        return res
+          .status(409)
+          .json({ message: 'category exists', category: exists });
       }
       const category = await createCategory(name, slug);
       return res.status(201).json({ category } as any);
