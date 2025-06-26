@@ -11,6 +11,7 @@ import type { Product, ProductInput, ApiMessage } from '../../../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
+import { withRole } from '../../../../lib/withRole';
 
 export const config = {
   api: {
@@ -37,13 +38,14 @@ async function parseBody(
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Product[] | ApiMessage>
 ): Promise<void> {
   try {
     if (req.method === 'GET') {
-      const vendor = getQueryParam(req.query.vendor);
+      const user = (req as any).user as { brandName?: string } | undefined;
+      const vendor = getQueryParam(req.query.vendor) || user?.brandName;
       if (!vendor) return res.status(400).json({ message: 'vendor required' });
       const products = await getProductsByVendorBrandName(vendor);
       return res.status(200).json(products);
@@ -111,3 +113,5 @@ export default async function handler(
     return handleApiError(res, error, 'Failed to manage products');
   }
 }
+
+export default withRole(['BRAND', 'SUPER_ADMIN'])(handler);
