@@ -20,6 +20,7 @@ export async function addUser({
   businessDescription,
   logo,
   taxId,
+  stripeAccountId,
   role = 'USER',
   verificationToken,
 }: UserInput): Promise<void> {
@@ -40,6 +41,7 @@ export async function addUser({
       businessDescription,
       logo,
       taxId,
+      stripeAccountId,
       role: role as Role,
       disabled: false,
       verificationToken,
@@ -49,6 +51,10 @@ export async function addUser({
 
 export function findUser(email: string) {
   return prisma.user.findUnique({ where: { email } });
+}
+
+export function findUserById(id: number | string) {
+  return prisma.user.findUnique({ where: { id: Number(id) } });
 }
 
 export function getAllUsers() {
