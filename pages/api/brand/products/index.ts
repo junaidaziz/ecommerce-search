@@ -1,5 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { addProduct, loadAndIndexProducts } from '../../../../lib/products';
+import {
+  addProduct,
+  loadAndIndexProducts,
+  getProductsByVendorBrandName,
+} from '../../../../lib/products';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../../lib/utils/getQueryParam';
 import { slugify } from '../../../../lib/slugify';
@@ -41,9 +45,8 @@ export default async function handler(
     if (req.method === 'GET') {
       const vendor = getQueryParam(req.query.vendor);
       if (!vendor) return res.status(400).json({ message: 'vendor required' });
-      const { products } = await loadAndIndexProducts();
-      const filtered = products.filter((p) => p.vendor.brandName === vendor);
-      return res.status(200).json(filtered);
+      const products = await getProductsByVendorBrandName(vendor);
+      return res.status(200).json(products);
     }
 
     if (req.method === 'POST') {

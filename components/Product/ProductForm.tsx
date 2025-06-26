@@ -62,6 +62,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     control,
     formState: { errors },
     setValue,
+    setFocus,
     watch,
   } = useForm<ProductFormValues>({
     defaultValues: {
@@ -157,23 +158,29 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  const onFormSubmit = handleSubmit(async (values) => {
-    const fd = new FormData();
-    fd.append('id', values.id);
-    fd.append('vendor', values.vendor);
-    fd.append('sku', values.sku);
-    fd.append('title', values.title);
-    fd.append('description', values.description);
-    fd.append('product_type', values.productType);
-    fd.append('tags', values.tags.join(','));
-    fd.append('category_id', values.categoryId);
-    fd.append('quantity', values.available ? String(values.quantity) : '0');
-    fd.append('min_price', String(values.minPrice));
-    fd.append('max_price', String(values.maxPrice));
-    fd.append('currency', values.currency);
-    images.forEach((img) => fd.append('photos', img));
-    await onSubmit(fd);
-  });
+  const onFormSubmit = handleSubmit(
+    async (values) => {
+      const fd = new FormData();
+      fd.append('id', values.id);
+      fd.append('vendor', values.vendor);
+      fd.append('sku', values.sku);
+      fd.append('title', values.title);
+      fd.append('description', values.description);
+      fd.append('product_type', values.productType);
+      fd.append('tags', values.tags.join(','));
+      fd.append('category_id', values.categoryId);
+      fd.append('quantity', values.available ? String(values.quantity) : '0');
+      fd.append('min_price', String(values.minPrice));
+      fd.append('max_price', String(values.maxPrice));
+      fd.append('currency', values.currency);
+      images.forEach((img) => fd.append('photos', img));
+      await onSubmit(fd);
+    },
+    (invalid) => {
+      const first = Object.keys(invalid)[0] as keyof ProductFormValues | undefined;
+      if (first) setFocus(first);
+    }
+  );
 
   const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
