@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
-import Header from '../components/Header';
+import Header from '../components/Layout/Header';
 import { AppContext } from '../contexts/AppContext';
 
 let mockPathname = '/';

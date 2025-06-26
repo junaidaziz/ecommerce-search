@@ -4,12 +4,12 @@ import { useContext } from 'react';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import type { FC } from 'react';
-import { AppContext } from '../contexts/AppContext';
-import MoonIcon from './icons/MoonIcon';
-import SunIcon from './icons/SunIcon';
-import UserIcon from './icons/UserIcon';
+import { AppContext } from '../../contexts/AppContext';
+import MoonIcon from '../icons/MoonIcon';
+import SunIcon from '../icons/SunIcon';
+import UserIcon from '../icons/UserIcon';
 import NotificationBell from './NotificationBell';
-import type { User } from '../types/user';
+import type { User } from '../../types/user';
 
 interface HeaderProps {
   theme?: string;

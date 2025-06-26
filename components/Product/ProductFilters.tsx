@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Category } from '../types/category';
-import InputField from './ui/InputField';
-import { Checkbox } from './form-fields';
+import type { Category } from '../../types/category';
+import InputField from '../UI/InputField';
+import { Checkbox } from '../form-fields';
 
 interface ProductFiltersProps {
   keyword: string;
