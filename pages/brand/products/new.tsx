@@ -24,17 +24,22 @@ const NewProductPage: React.FC = () => {
   const submitProduct = async (values: FormData) => {
     setServerError('');
     setLoading(true);
-    const res = await fetch('/api/brand/products', {
-      method: 'POST',
-      body: values,
-    });
-    if (res.ok) {
-      addNotification('Product added', 'success');
-      setFormKey((k) => k + 1);
-    } else {
-      const data = await res.json().catch(() => ({ error: 'Error' }));
-      setServerError(data.error || data.message || 'Error');
-      addNotification(data.error || data.message || 'Error', 'error');
+    try {
+      const res = await fetch('/api/brand/products', {
+        method: 'POST',
+        body: values,
+      });
+      if (res.ok) {
+        addNotification('Product added', 'success');
+        setFormKey((k) => k + 1);
+      } else {
+        const data = await res.json().catch(() => ({ error: 'Error' }));
+        setServerError(data.error || data.message || 'Error');
+        addNotification(data.error || data.message || 'Error', 'error');
+      }
+    } catch (err) {
+      setServerError('Error');
+      addNotification('Error', 'error');
     }
     setLoading(false);
   };
