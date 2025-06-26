@@ -19,7 +19,9 @@ const ExistingProductsCard: React.FC<Props> = ({ previewCount = 3 }) => {
     setError('');
     fetch('/api/brand/products')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data: Product[]) => setProducts(data))
+      .then((data: { products: Product[]; total: number }) =>
+        setProducts(data.products)
+      )
       .catch(() => setError('Failed to load'));
   }, []);
 

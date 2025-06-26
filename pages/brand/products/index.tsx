@@ -17,7 +17,9 @@ const BrandProductsPage: React.FC = () => {
     setLoading(true);
     fetch('/api/brand/products')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data: Product[]) => setProducts(data))
+      .then((data: { products: Product[]; total: number }) =>
+        setProducts(data.products)
+      )
       .finally(() => setLoading(false));
   }, [user]);
 
@@ -62,7 +64,10 @@ const BrandProductsPage: React.FC = () => {
         <ul className="space-y-1">
           {filtered.map((p) => (
             <li key={p.id} className="border p-2">
-              {p.title} ({p.sku}) - {typeof p.category === 'string' ? p.category : p.category?.name || p.productType}
+              {p.title} ({p.sku}) -{' '}
+              {typeof p.category === 'string'
+                ? p.category
+                : p.category?.name || p.productType}
             </li>
           ))}
           {filtered.length === 0 && <li>No products found.</li>}
