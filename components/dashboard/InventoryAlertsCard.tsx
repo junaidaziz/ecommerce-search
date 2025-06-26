@@ -37,7 +37,7 @@ const InventoryAlertsCard: React.FC<Props> = ({ brand, threshold = 10 }) => {
       error={error}
     >
       {products && products.length > 0 ? (
-        <ul className="list-disc pl-4 space-y-1">
+        <ul className="list-disc pl-4 space-y-1 max-h-40 overflow-y-auto">
           {products.map((p) => (
             <li key={p.id}>
               {p.title} - {p.quantity} left

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
+import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
 import { NotificationContext } from '../../contexts/NotificationContext';
 import type { User } from '../../types/user';
@@ -107,28 +108,36 @@ const BrandDashboard: React.FC = () => {
           </div>
         )}
 
-        <ProductForm
-          key={editing?.id || 'new'}
-          initial={editing ? {
-            sku: editing.sku,
-            title: editing.title,
-            description: editing.description,
-            productType: editing.productType,
-            tags: editing.tags,
-            categoryId:
-              typeof editing.category === 'string'
-                ? undefined
-                : String(editing.category?.id ?? ''),
-            quantity: editing.totalInventory || 0,
-            minPrice: editing.minPrice,
-            maxPrice: editing.maxPrice,
-            currency: editing.currency,
-            available: (editing.totalInventory ?? editing.quantity ?? 0) > 0,
-          } : undefined}
-          onSubmit={(fd) => submitProduct(fd, editing?.id)}
-          onCancel={editing ? () => setEditing(null) : undefined}
-          submitLabel={editing ? 'Update Product' : 'Add Product'}
-        />
+        {editing ? (
+          <ProductForm
+            key={editing.id}
+            initial={{
+              sku: editing.sku,
+              title: editing.title,
+              description: editing.description,
+              productType: editing.productType,
+              tags: editing.tags,
+              categoryId:
+                typeof editing.category === 'string'
+                  ? undefined
+                  : String(editing.category?.id ?? ''),
+              quantity: editing.totalInventory || 0,
+              minPrice: editing.minPrice,
+              maxPrice: editing.maxPrice,
+              currency: editing.currency,
+              available: (editing.totalInventory ?? editing.quantity ?? 0) > 0,
+            }}
+            onSubmit={(fd) => submitProduct(fd, editing.id)}
+            onCancel={() => setEditing(null)}
+            submitLabel="Update Product"
+          />
+        ) : (
+          <div className="text-right">
+            <Link href="/brand/products/new" className="btn btn-primary">
+              Add Product
+            </Link>
+          </div>
+        )}
         <h2 className="text-xl font-semibold">Existing Products</h2>
         <ul className="space-y-1">
           {products.map((p) => (
