@@ -1,6 +1,7 @@
 import { Order, Product } from '../types';
 import { getDb } from './db';
 import { mapDbRowToProduct } from './products';
+import { createNotification } from './notifications';
 import type { Prisma } from '@prisma/client';
 
 type OrderWithRelations = Prisma.OrderGetPayload<{
@@ -75,6 +76,16 @@ export async function addOrder({
           user: true,
           product: { include: { vendor: true, category: true } },
         },
+      })
+    )
+  );
+
+  await Promise.all(
+    createdOrders.map((o) =>
+      createNotification({
+        userId: o.product.vendor.id,
+        orderId: o.id,
+        message: `New order for ${o.product.title}`,
       })
     )
   );
