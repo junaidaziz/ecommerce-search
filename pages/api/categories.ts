@@ -1,7 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getCategoryTree, getCategoriesPaginated } from '../../lib/products';
+import {
+  getCategoryTree,
+  getCategoriesPaginated,
+  createCategory,
+  getCategoriesFlat,
+} from '../../lib/products';
 import { handleApiError } from '../../lib/utils/handleApiError';
-import type { CategoriesResponse, ApiMessage } from '../../types';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from './auth/[...nextauth]';
+import type { CategoriesResponse, ApiMessage, Category } from '../../types';
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,6 +30,24 @@ export default async function handler(
       }
       const categories = await getCategoryTree();
       return res.status(200).json({ categories });
+    }
+    if (req.method === 'POST') {
+      const session = await getServerSession(req, res, authOptions);
+      if (!session?.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      const { name, slug } = req.body as Partial<Category>;
+      if (!name) return res.status(400).json({ message: 'name required' });
+      const exists = (await getCategoriesFlat()).find(
+        (c) =>
+          c.name.toLowerCase() === name.toLowerCase() ||
+          (slug && c.slug?.toLowerCase() === String(slug).toLowerCase())
+      );
+      if (exists) {
+        return res.status(409).json({ message: 'category exists' });
+      }
+      const category = await createCategory(name, slug);
+      return res.status(201).json({ category } as any);
     }
     return res.status(405).json({ message: 'Method Not Allowed' });
   } catch (error) {
