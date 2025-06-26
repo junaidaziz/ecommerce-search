@@ -81,6 +81,8 @@ async function handler(
         min_price,
         max_price,
         currency,
+        discount_type,
+        discount_value,
       } = fields as Record<string, unknown>;
       if (!id || !sku || !title || !vendor) {
         return res
@@ -92,6 +94,34 @@ async function handler(
           ? (files.photos as File[])
           : [files.photos as File]
         : [];
+      const parsedDiscountType =
+        discount_type && String(discount_type) !== 'none'
+          ? (String(discount_type) as 'percentage' | 'fixed')
+          : null;
+      const parsedDiscountValue =
+        discount_value && String(discount_value) !== ''
+          ? parseFloat(String(discount_value))
+          : null;
+      if (parsedDiscountType === 'percentage') {
+        if (
+          parsedDiscountValue === null ||
+          parsedDiscountValue < 1 ||
+          parsedDiscountValue > 99
+        ) {
+          return res
+            .status(400)
+            .json({ message: 'Percentage discount must be between 1 and 99' });
+        }
+      }
+      if (parsedDiscountType === 'fixed') {
+        const basePrice = parseFloat(String(min_price || '0'));
+        if (parsedDiscountValue === null || parsedDiscountValue >= basePrice) {
+          return res.status(400).json({
+            message: 'Fixed discount must be less than product price',
+          });
+        }
+      }
+
       const destDir = path.join(process.cwd(), 'public', 'uploads', String(id));
       fs.mkdirSync(destDir, { recursive: true });
       const imagePaths: string[] = [];
@@ -115,6 +145,8 @@ async function handler(
         minPrice: parseFloat(String(min_price || '0')),
         maxPrice: parseFloat(String(max_price || '0')),
         currency: String(currency || 'USD'),
+        discountType: parsedDiscountType,
+        discountValue: parsedDiscountValue,
         status: 'approved',
         images: imagePaths.map((p) => ({ url: p })),
       };
