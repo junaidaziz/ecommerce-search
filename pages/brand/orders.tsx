@@ -1,21 +1,27 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
+import { useSession } from 'next-auth/react';
 import { Order } from '../../types';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 
 const BrandOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;
+  const { data: session } = useSession();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
+    const vendorId = session?.user?.id;
+    if (!vendorId) {
+      setError('Unable to determine brand ID');
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    fetch(
-      `/api/brand/orders?vendor=${encodeURIComponent(user.brandName || '')}`
-    )
+    fetch(`/api/brand/orders?vendor=${encodeURIComponent(vendorId as string)}`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: Order[]) => {
         setOrders(data);
@@ -23,7 +29,7 @@ const BrandOrders: React.FC = () => {
       })
       .catch(() => setError('Failed to load orders'))
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [user, session]);
 
   if (!user) {
     return <div className="p-4">Please log in to view orders.</div>;
@@ -52,7 +58,9 @@ const BrandOrders: React.FC = () => {
             </p>
             <p>Total: £{o.total}</p>
             <p>
-              <a className="link" href={`/messages/${o.uuid}`}>Chat</a>
+              <a className="link" href={`/messages/${o.uuid}`}>
+                Chat
+              </a>
             </p>
           </li>
         ))}
