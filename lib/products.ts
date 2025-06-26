@@ -6,6 +6,7 @@ import type { Category } from '../types/category';
 import type { Vendor } from '../types/vendor';
 import type { Prisma } from '@prisma/client';
 import client from './typesenseClient';
+import { getBestSellingProducts } from './orders';
 
 type ProductWithRelations = Prisma.ProductGetPayload<{
   include: { category: true; vendor: true };
@@ -410,6 +411,7 @@ export interface PaginatedOptions {
   inStock?: boolean;
   minPrice?: number;
   maxPrice?: number;
+  sort?: 'price_asc' | 'price_desc' | 'popularity' | 'newest';
 }
 
 export interface PaginatedResult {
@@ -443,16 +445,35 @@ export async function getProductsPaginated(
   if (typeof options.maxPrice === 'number') {
     where.minPrice = { ...(where.minPrice as any), lte: options.maxPrice };
   }
-  const [total, rows] = await Promise.all([
-    db.product.count({ where }),
-    db.product.findMany({
-      where,
-      include: { category: true, vendor: true },
-      take: options.limit,
-      skip: options.offset,
-      orderBy: { id: 'asc' },
-    }),
-  ]);
+  const orderBy: Prisma.Enumerable<Prisma.ProductOrderByWithRelationInput> = (() => {
+    switch (options.sort) {
+      case 'price_asc':
+        return { minPrice: 'asc' };
+      case 'price_desc':
+        return { minPrice: 'desc' };
+      case 'newest':
+        return { createdAt: 'desc' };
+      default:
+        return { id: 'asc' };
+    }
+  })();
+
+  if (options.sort === 'popularity') {
+    const popular = await getBestSellingProducts(options.offset + options.limit);
+    return {
+      total: popular.length,
+      products: popular.slice(options.offset, options.offset + options.limit),
+    };
+  }
+
+  let rows = await db.product.findMany({
+    where,
+    include: { category: true, vendor: true },
+    orderBy,
+  });
+
+  const total = rows.length;
+  rows = rows.slice(options.offset, options.offset + options.limit);
   return {
     total,
     products: rows.map((row) =>
