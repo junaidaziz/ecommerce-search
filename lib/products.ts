@@ -29,6 +29,8 @@ interface ProductRow {
   minPrice: number;
   maxPrice: number;
   currency: string;
+  discountType?: string | null;
+  discountValue?: number | null;
 }
 
 /**
@@ -119,7 +121,16 @@ async function loadProductsData(): Promise<Product[]> {
 }
 
 export function mapDbRowToProduct(row: ProductRow): Product {
-  const { images, quantity, minPrice, maxPrice, currency, ...rest } = row;
+  const {
+    images,
+    quantity,
+    minPrice,
+    maxPrice,
+    currency,
+    discountType,
+    discountValue,
+    ...rest
+  } = row;
 
   return processProductRow({
     ...rest,
@@ -131,6 +142,8 @@ export function mapDbRowToProduct(row: ProductRow): Product {
       minVariantPrice: { amount: minPrice, currencyCode: currency },
       maxVariantPrice: { amount: maxPrice, currencyCode: currency },
     },
+    discountType,
+    discountValue,
   });
 }
 
@@ -218,6 +231,8 @@ export async function addProduct(product: ProductInput): Promise<void> {
     minPrice: product.minPrice ?? 0,
     maxPrice: product.maxPrice ?? 0,
     currency: product.currency ?? 'USD',
+    discountType: product.discountType ?? null,
+    discountValue: product.discountValue ?? null,
     status: product.status ?? 'approved',
     vendor: { connect: { id: vendor.id } },
     category: { connect: { id: category.id } },
@@ -288,6 +303,8 @@ export async function updateProduct(
       minPrice: product.minPrice,
       maxPrice: product.maxPrice,
       currency: product.currency,
+      discountType: product.discountType,
+      discountValue: product.discountValue,
       vendor: { connect: { id: vendor.id } },
       category: { connect: { id: category.id } },
     } as Prisma.ProductUpdateInput,
