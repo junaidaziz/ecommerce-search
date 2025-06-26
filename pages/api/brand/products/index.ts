@@ -58,13 +58,13 @@ async function handler(
 
       const [rows, total] = await Promise.all([
         db.product.findMany({
-          where: { brandId: (session.user as any).brandId },
+          where: { brandId: session.user.brandId },
           include: { category: true, vendor: true },
           orderBy: { id: 'asc' },
           take: limit,
           skip,
         }),
-        db.product.count({ where: { brandId: (session.user as any).brandId } }),
+        db.product.count({ where: { brandId: session.user.brandId } }),
       ]);
 
       const products = rows.map((row) => mapDbRowToProduct(row));
