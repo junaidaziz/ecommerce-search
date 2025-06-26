@@ -36,6 +36,7 @@ const Cart: React.FC = () => {
         ),
     0
   );
+  const shippingCost = cart.length > 0 ? 5 : 0;
 
   return (
     <div className="max-w-3xl mx-auto min-h-screen p-4">
@@ -91,8 +92,10 @@ const Cart: React.FC = () => {
         <div className="border-t pt-4 flex justify-between items-center">
           <div>
             <p className="font-semibold">Total Items: {itemCount}</p>
+            <p className="font-semibold">Subtotal: £{totalPrice.toFixed(2)}</p>
+            <p className="font-semibold">Estimated Shipping: £{shippingCost.toFixed(2)}</p>
             <p className="font-semibold">
-              Total Price: £{totalPrice.toFixed(2)}
+              Total: £{(totalPrice + shippingCost).toFixed(2)}
             </p>
           </div>
           <button
