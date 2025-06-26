@@ -16,6 +16,8 @@ export * from './shared';
 export * from './forms';
 export * from './paymentMethod';
 export * from './payment';
+export * from './policy';
+export * from './support';
 
 export * from "./dashboard";
 export * from './notification';

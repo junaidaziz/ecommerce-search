@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import CreatableSelect from 'react-select/creatable';
+import AsyncCreatableSelect from 'react-select/async-creatable';
 import type { SelectOption } from './form-fields/SelectDropdown';
 import { TextInput, Textarea, FileUpload, Checkbox } from './form-fields';
 
@@ -10,7 +10,7 @@ export interface ProductFormValues {
   description: string;
   productType: string;
   tags: string;
-  category: string;
+  categoryId: string;
   quantity: number;
   minPrice: number;
   maxPrice: number;
@@ -45,7 +45,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       description: initial?.description || '',
       productType: initial?.productType || '',
       tags: initial?.tags || '',
-      category: initial?.category || '',
+      categoryId: initial?.categoryId ? String(initial.categoryId) : '',
       quantity: initial?.quantity ?? 0,
       minPrice: initial?.minPrice ?? 0,
       maxPrice: initial?.maxPrice ?? 0,
@@ -54,21 +54,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
     },
   });
   const [images, setImages] = useState<File[]>([]);
-  const [categoryOptions, setCategoryOptions] = useState<SelectOption[]>([]);
-  const loadCategories = async () => {
-    if (categoryOptions.length > 0) return;
-    const res = await fetch('/api/categories');
-    if (!res.ok) return;
+  const loadCategoryOptions = async (inputValue: string): Promise<SelectOption[]> => {
+    const params = new URLSearchParams({ search: inputValue, limit: '20' });
+    const res = await fetch(`/api/categories?${params.toString()}`);
+    if (!res.ok) return [];
     const data = await res.json();
-    const opts = (data.categories || []).map((c: any) => ({
-      label: c.name,
-      value: c.name,
-    }));
-    setCategoryOptions(opts);
+    return (data.categories || []).map((c: any) => ({ label: c.name, value: String(c.id) }));
   };
-  useEffect(() => {
-    loadCategories();
-  }, []);
 
   const onFormSubmit = handleSubmit(async (values) => {
     const fd = new FormData();
@@ -77,7 +69,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     fd.append('description', values.description);
     fd.append('product_type', values.productType);
     fd.append('tags', values.tags);
-    fd.append('category', values.category);
+    fd.append('category_id', values.categoryId);
     fd.append('quantity', values.available ? String(values.quantity) : '0');
     fd.append('min_price', String(values.minPrice));
     fd.append('max_price', String(values.maxPrice));
@@ -127,35 +119,41 @@ const ProductForm: React.FC<ProductFormProps> = ({
         error={errors.tags?.message}
       />
       <Controller
-        name="category"
+        name="categoryId"
         control={control}
         rules={{ required: 'Required' }}
         render={({ field }) => (
-          <CreatableSelect
-            {...field}
-            options={categoryOptions}
+          <AsyncCreatableSelect
+            inputId="category-select"
+            ref={field.ref}
+            name={field.name}
+            value={field.value ? { label: '', value: field.value } : null}
+            defaultOptions
+            loadOptions={loadCategoryOptions}
+            onBlur={field.onBlur}
             onChange={(val) => {
               if (!val) return field.onChange('');
               if (Array.isArray(val)) return;
               field.onChange(val.value);
             }}
             onCreateOption={async (input) => {
-              await fetch('/api/brand/categories', {
+              const res = await fetch('/api/brand/categories', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: input }),
               });
-              const opt = { label: input, value: input };
-              setCategoryOptions((prev) => [...prev, opt]);
-              field.onChange(input);
+              if (res.ok) {
+                const cat = await res.json();
+                field.onChange(String(cat.id));
+              }
             }}
             placeholder="Category"
             classNamePrefix="react-select"
           />
         )}
       />
-      {errors.category && (
-        <p className="text-sm text-red-600">{errors.category.message}</p>
+      {errors.categoryId && (
+        <p className="text-sm text-red-600">{errors.categoryId.message}</p>
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <TextInput<ProductFormValues>
