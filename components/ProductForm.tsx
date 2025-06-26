@@ -2,7 +2,13 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import type { SelectOption } from './form-fields/SelectDropdown';
-import { TextInput, Textarea, FileUpload, Checkbox, TagInput } from './form-fields';
+import {
+  TextInput,
+  Textarea,
+  FileUpload,
+  Checkbox,
+  TagInput,
+} from './form-fields';
 import { GenericInput, GenericModal } from './ui';
 import { slugify } from '../lib/slugify';
 import { AppContext } from '../contexts/AppContext';
@@ -36,7 +42,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onCancel,
   submitLabel = 'Save',
 }) => {
-  const { user } = useContext(AppContext) as { user: { brandName?: string } | null };
+  const { user } = useContext(AppContext) as {
+    user: { brandName?: string } | null;
+  };
   const {
     register,
     handleSubmit,
@@ -46,13 +54,22 @@ const ProductForm: React.FC<ProductFormProps> = ({
     watch,
   } = useForm<ProductFormValues>({
     defaultValues: {
-      id: initial?.id || (typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now())),
+      id:
+        initial?.id ||
+        (typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : String(Date.now())),
       vendor: initial?.vendor || '',
       sku: initial?.sku || '',
       title: initial?.title || '',
       description: initial?.description || '',
       productType: initial?.productType || '',
-      tags: initial?.tags ? initial.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
+      tags: initial?.tags
+        ? initial.tags
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [],
       categoryId: initial?.categoryId ? String(initial.categoryId) : '',
       quantity: initial?.quantity ?? 0,
       minPrice: initial?.minPrice ?? 0,
@@ -158,7 +175,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   return (
-    <form onSubmit={onFormSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form onSubmit={onFormSubmit} className="space-y-4">
       <input type="hidden" {...register('id')} />
       <TextInput<ProductFormValues>
         label="SKU"
@@ -182,7 +199,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         rules={{ required: 'Required' }}
         error={errors.title?.message}
       />
-      <div className="md:col-span-2">
+      <div>
         <Textarea<ProductFormValues>
           label="Description"
           name="description"
@@ -198,7 +215,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         rules={{ required: 'Required' }}
         error={errors.productType?.message}
       />
-      <div className="md:col-span-2">
+      <div>
         <TagInput<ProductFormValues>
           label="Tags"
           name="tags"
@@ -207,82 +224,84 @@ const ProductForm: React.FC<ProductFormProps> = ({
           error={errors.tags?.message as string}
         />
       </div>
-      <div className="md:col-span-2">
+      <div>
         <Controller
-        name="categoryId"
-        control={control}
-        rules={{ required: 'Required' }}
-        render={({ field }) => (
-          <>
-            <AsyncCreatableSelect
-              inputId="category-select"
-              ref={field.ref}
-              value={categoryOption}
-              defaultOptions
-              loadOptions={loadCategoryOptions}
-              onBlur={field.onBlur}
-              onChange={(val) => {
-                if (!val) {
-                  setCategoryOption(null);
-                  field.onChange('');
-                } else if (!Array.isArray(val)) {
-                  setCategoryOption(val as SelectOption);
-                  field.onChange(val.value);
+          name="categoryId"
+          control={control}
+          rules={{ required: 'Required' }}
+          render={({ field }) => (
+            <>
+              <AsyncCreatableSelect
+                inputId="category-select"
+                ref={field.ref}
+                value={categoryOption}
+                defaultOptions
+                loadOptions={loadCategoryOptions}
+                onBlur={field.onBlur}
+                onChange={(val) => {
+                  if (!val) {
+                    setCategoryOption(null);
+                    field.onChange('');
+                  } else if (!Array.isArray(val)) {
+                    setCategoryOption(val as SelectOption);
+                    field.onChange(val.value);
+                  }
+                }}
+                onCreateOption={openCreateCategory}
+                formatCreateLabel={() => 'Create New Category'}
+                isValidNewOption={(input, _value, options) =>
+                  input.trim().length > 0 && options.length === 0
                 }
-              }}
-              onCreateOption={openCreateCategory}
-              formatCreateLabel={() => 'Create New Category'}
-              isValidNewOption={(input, _value, options) =>
-                input.trim().length > 0 && options.length === 0
-              }
-              placeholder="Category"
-              classNamePrefix="react-select"
-            />
-            <GenericModal
-              isOpen={showCatModal}
-              onClose={() => setShowCatModal(false)}
-              title="Create Category"
-            >
-              <form onSubmit={handleCreateCategory} className="space-y-2">
-                <GenericInput
-                  label="Category Name"
-                  name="category-name"
-                  value={newCatName}
-                  onChange={(e) => {
-                    setNewCatName(e.target.value);
-                    setNewCatSlug(slugify(e.target.value));
-                  }}
-                  required
-                />
-                <GenericInput
-                  label="Slug"
-                  name="category-slug"
-                  value={newCatSlug}
-                  onChange={(e) => setNewCatSlug(e.target.value)}
-                  required
-                />
-                {catError && <p className="text-sm text-red-600">{catError}</p>}
-                <div className="flex justify-end gap-2">
-                  <button
-                    type="button"
-                    className="btn"
-                    onClick={() => setShowCatModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={creatingCat}
-                  >
-                    {creatingCat ? 'Saving...' : 'Save'}
-                  </button>
-                </div>
-              </form>
-            </GenericModal>
-          </>
-        )}
-      />
+                placeholder="Category"
+                classNamePrefix="react-select"
+              />
+              <GenericModal
+                isOpen={showCatModal}
+                onClose={() => setShowCatModal(false)}
+                title="Create Category"
+              >
+                <form onSubmit={handleCreateCategory} className="space-y-2">
+                  <GenericInput
+                    label="Category Name"
+                    name="category-name"
+                    value={newCatName}
+                    onChange={(e) => {
+                      setNewCatName(e.target.value);
+                      setNewCatSlug(slugify(e.target.value));
+                    }}
+                    required
+                  />
+                  <GenericInput
+                    label="Slug"
+                    name="category-slug"
+                    value={newCatSlug}
+                    onChange={(e) => setNewCatSlug(e.target.value)}
+                    required
+                  />
+                  {catError && (
+                    <p className="text-sm text-red-600">{catError}</p>
+                  )}
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={() => setShowCatModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={creatingCat}
+                    >
+                      {creatingCat ? 'Saving...' : 'Save'}
+                    </button>
+                  </div>
+                </form>
+              </GenericModal>
+            </>
+          )}
+        />
       </div>
       {errors.categoryId && (
         <p className="text-sm text-red-600">{errors.categoryId.message}</p>
@@ -313,7 +332,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
           min={0}
           step="0.01"
           register={register}
-          rules={{ required: 'Required', min: { value: 0, message: 'Must be >= 0' } }}
+          rules={{
+            required: 'Required',
+            min: { value: 0, message: 'Must be >= 0' },
+          }}
           error={errors.minPrice?.message}
         />
         <TextInput<ProductFormValues>
@@ -323,7 +345,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
           min={0}
           step="0.01"
           register={register}
-          rules={{ required: 'Required', min: { value: 0, message: 'Must be >= 0' } }}
+          rules={{
+            required: 'Required',
+            min: { value: 0, message: 'Must be >= 0' },
+          }}
           error={errors.maxPrice?.message}
         />
       </div>
@@ -334,7 +359,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         rules={{ required: 'Required' }}
         error={errors.currency?.message}
       />
-      <div className="md:col-span-2">
+      <div>
         <FileUpload<ProductFormValues>
           label="Images"
           name="images"
@@ -344,7 +369,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         />
       </div>
       {images.length > 0 && (
-        <div className="md:col-span-2 flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           {images.map((img, idx) => (
             <img
               key={idx}
@@ -355,7 +380,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           ))}
         </div>
       )}
-      <div className="md:col-span-2 flex gap-2 mt-2">
+      <div className="flex gap-2 mt-2">
         {onCancel && (
           <button type="button" className="btn" onClick={onCancel}>
             Cancel
