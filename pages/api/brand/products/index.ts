@@ -47,7 +47,7 @@ async function handler(
   try {
     if (req.method === 'GET') {
       const session = await getServerSession(req, res, authOptions);
-      if (!session?.user || session.user.role !== 'brand') {
+      if (!session?.user || session.user.role !== 'BRAND') {
         return res.status(401).json({ message: 'Unauthorized' });
       }
 
