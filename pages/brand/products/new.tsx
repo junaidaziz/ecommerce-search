@@ -17,18 +17,26 @@ const NewProductPage: React.FC = () => {
   const catResolver = useRef<
     ((cat?: { id: number | string; name: string }) => void) | undefined
   >();
+  const [formKey, setFormKey] = useState(0);
+  const [serverError, setServerError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const submitProduct = async (values: FormData) => {
+    setServerError('');
+    setLoading(true);
     const res = await fetch('/api/brand/products', {
       method: 'POST',
       body: values,
     });
     if (res.ok) {
       addNotification('Product added', 'success');
+      setFormKey((k) => k + 1);
     } else {
-      const data = await res.json().catch(() => ({ message: 'Error' }));
-      addNotification(data.message || 'Error', 'error');
+      const data = await res.json().catch(() => ({ error: 'Error' }));
+      setServerError(data.error || data.message || 'Error');
+      addNotification(data.error || data.message || 'Error', 'error');
     }
+    setLoading(false);
   };
 
   const requestNewCategory = (name: string) => {
@@ -39,6 +47,17 @@ const NewProductPage: React.FC = () => {
         catResolver.current = resolve;
       }
     );
+  };
+
+  const requestNewVendor = async (name: string) => {
+    const res = await fetch('/api/vendors/check-or-create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    if (!res.ok) return undefined;
+    const data = await res.json();
+    return data.vendor as { brandName: string };
   };
 
   const handleCatClose = () => {
@@ -72,9 +91,13 @@ const NewProductPage: React.FC = () => {
       <div className="max-w-lg mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
         <h1 className="text-2xl font-bold mb-4 text-center">Add New Product</h1>
         <ProductForm
+          key={formKey}
           onSubmit={submitProduct}
           submitLabel="Add Product"
           requestNewCategory={requestNewCategory}
+          requestNewVendor={requestNewVendor}
+          loading={loading}
+          serverError={serverError}
         />
         <CreateCategoryModal
           isOpen={catModalOpen}
