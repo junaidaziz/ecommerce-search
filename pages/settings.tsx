@@ -11,6 +11,7 @@ import {
   CountrySelect,
 } from '../components/form-fields';
 import countries from '../data/countries';
+import type { PaymentMethod } from '../types';
 
 interface ProfileFormValues {
   firstName: string;
@@ -45,14 +46,22 @@ const SettingsPage: React.FC = () => {
   const user = useRequireAuth();
   const { addNotification } = useContext(NotificationContext);
   const [active, setActive] = useState<
-    'profile' | 'password' | 'address' | 'email'
+    'profile' | 'password' | 'address' | 'email' | 'payments'
   >('profile');
   const [codeSent, setCodeSent] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
   const profileForm = useForm<ProfileFormValues>();
   const passwordForm = useForm<PasswordFormValues>();
   const addressForm = useForm<AddressFormValues>();
   const emailForm = useForm<EmailFormValues>();
+  const paymentForm = useForm<{
+    cardNumber: string;
+    expMonth: number;
+    expYear: number;
+    cvc: string;
+    isDefault: boolean;
+  }>();
 
   useEffect(() => {
     if (!user) return;
@@ -74,6 +83,14 @@ const SettingsPage: React.FC = () => {
       })
       .catch(() => {});
   }, [user, profileForm, addressForm]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetch('/api/payment-methods')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setPaymentMethods(data || []))
+      .catch(() => {});
+  }, [user]);
 
   const submitProfile: SubmitHandler<ProfileFormValues> = async (values) => {
     const res = await fetch('/api/user/profile', {
@@ -144,6 +161,28 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const addCard: SubmitHandler<{
+    cardNumber: string;
+    expMonth: number;
+    expYear: number;
+    cvc: string;
+    isDefault: boolean;
+  }> = async (values) => {
+    const res = await fetch('/api/payment-methods', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+    if (res.ok) {
+      const data: PaymentMethod = await res.json();
+      setPaymentMethods((m) => [...m, data]);
+      paymentForm.reset();
+      addNotification('Card added', 'success');
+    } else {
+      addNotification('Add failed', 'error');
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -183,6 +222,14 @@ const SettingsPage: React.FC = () => {
               onClick={() => setActive('email')}
             >
               Change Email
+            </button>
+          </li>
+          <li>
+            <button
+              className={active === 'payments' ? 'active' : ''}
+              onClick={() => setActive('payments')}
+            >
+              Payment Methods
             </button>
           </li>
         </ul>
@@ -323,6 +370,101 @@ const SettingsPage: React.FC = () => {
               Confirm
             </button>
           </form>
+        )}
+        {active === 'payments' && (
+          <div className="space-y-4 max-w-md mx-auto">
+            <h2 className="text-xl font-bold mb-2">Payment Methods</h2>
+            <ul className="space-y-2">
+              {paymentMethods.map((m) => (
+                <li
+                  key={m.id}
+                  className="border p-2 flex justify-between rounded"
+                >
+                  <span>
+                    {m.cardBrand} ****{m.cardLast4} exp {m.expMonth}/{m.expYear}
+                    {m.isDefault && ' (Default)'}
+                  </span>
+                  <div className="space-x-2">
+                    {!m.isDefault && (
+                      <button
+                        type="button"
+                        className="btn btn-xs"
+                        onClick={async () => {
+                          await fetch(`/api/payment-methods/${m.id}`, {
+                            method: 'PATCH',
+                          });
+                          setPaymentMethods((list) =>
+                            list.map((x) => ({
+                              ...x,
+                              isDefault: x.id === m.id,
+                            }))
+                          );
+                        }}
+                      >
+                        Set Default
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="btn btn-xs"
+                      onClick={async () => {
+                        await fetch(`/api/payment-methods/${m.id}`, {
+                          method: 'DELETE',
+                        });
+                        setPaymentMethods((list) =>
+                          list.filter((x) => x.id !== m.id)
+                        );
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <form
+              onSubmit={paymentForm.handleSubmit(addCard)}
+              className="space-y-2"
+            >
+              <TextInput
+                label="Card Number"
+                register={paymentForm.register}
+                name="cardNumber"
+                rules={{ required: 'Required' }}
+                error={paymentForm.formState.errors.cardNumber?.message}
+              />
+              <div className="flex gap-2">
+                <TextInput
+                  label="Exp Month"
+                  register={paymentForm.register}
+                  name="expMonth"
+                  rules={{ required: 'Required' }}
+                  error={paymentForm.formState.errors.expMonth?.message}
+                />
+                <TextInput
+                  label="Exp Year"
+                  register={paymentForm.register}
+                  name="expYear"
+                  rules={{ required: 'Required' }}
+                  error={paymentForm.formState.errors.expYear?.message}
+                />
+              </div>
+              <TextInput
+                label="CVC"
+                register={paymentForm.register}
+                name="cvc"
+                rules={{ required: 'Required' }}
+                error={paymentForm.formState.errors.cvc?.message}
+              />
+              <label className="flex items-center gap-2">
+                <input type="checkbox" {...paymentForm.register('isDefault')} />
+                Set as default
+              </label>
+              <button type="submit" className="btn btn-primary w-full">
+                Add Card
+              </button>
+            </form>
+          </div>
         )}
       </div>
     </div>
