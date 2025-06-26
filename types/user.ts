@@ -18,6 +18,7 @@ export interface User {
   businessDescription?: string;
   logo?: string;
   taxId?: string;
+  stripeAccountId?: string;
   verificationToken?: string;
   resetToken?: string;
   resetExpires?: Date;
@@ -45,6 +46,7 @@ export interface UserInput {
   businessDescription?: string;
   logo?: string;
   taxId?: string;
+  stripeAccountId?: string;
   role?: Role;
   verificationToken?: string;
 }
