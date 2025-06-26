@@ -22,6 +22,29 @@ import {
   Bar,
 } from 'recharts';
 
+const useDummyData = process.env.NEXT_PUBLIC_USE_DUMMY_DATA === 'true';
+
+const dummySalesOverTime = [
+  { name: 'Jan', value: 1200 },
+  { name: 'Feb', value: 900 },
+  { name: 'Mar', value: 1500 },
+  { name: 'Apr', value: 800 },
+  { name: 'May', value: 1600 },
+];
+
+const dummyOrdersByCategory = [
+  { name: 'Electronics', value: 120 },
+  { name: 'Clothing', value: 90 },
+  { name: 'Books', value: 60 },
+  { name: 'Furniture', value: 30 },
+];
+
+const dummyInventoryStatus = [
+  { name: 'In Stock', value: 150 },
+  { name: 'Low Stock', value: 40 },
+  { name: 'Out of Stock', value: 10 },
+];
+
 type TopProduct = {
   id: string;
   qty: number;
@@ -43,6 +66,10 @@ const BrandAnalytics: React.FC = () => {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [earnings, setEarnings] = useState<EarningsData | null>(null);
+
+  const salesData = useDummyData ? dummySalesOverTime : [];
+  const ordersData = useDummyData ? dummyOrdersByCategory : [];
+  const inventoryData = useDummyData ? dummyInventoryStatus : [];
 
   useEffect(() => {
     if (!user) return;
@@ -82,9 +109,9 @@ const BrandAnalytics: React.FC = () => {
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <DashboardCard title="Sales Over Time">
-          <ChartContainer dataLength={0} height="16rem">
+          <ChartContainer dataLength={salesData.length} height="16rem">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={[] as any[]}>
+              <LineChart data={salesData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -95,9 +122,9 @@ const BrandAnalytics: React.FC = () => {
           </ChartContainer>
         </DashboardCard>
         <DashboardCard title="Orders by Category">
-          <ChartContainer dataLength={0} height="16rem">
+          <ChartContainer dataLength={ordersData.length} height="16rem">
             <ResponsiveContainer width="100%" height="100%">
-              <ReBarChart data={[] as any[]}>
+              <ReBarChart data={ordersData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -108,9 +135,9 @@ const BrandAnalytics: React.FC = () => {
           </ChartContainer>
         </DashboardCard>
         <DashboardCard title="Inventory Status">
-          <ChartContainer dataLength={0} height="16rem">
+          <ChartContainer dataLength={inventoryData.length} height="16rem">
             <ResponsiveContainer width="100%" height="100%">
-              <ReBarChart data={[] as any[]}>
+              <ReBarChart data={inventoryData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
