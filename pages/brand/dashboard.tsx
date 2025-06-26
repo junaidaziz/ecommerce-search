@@ -98,6 +98,8 @@ const BrandDashboard: React.FC = () => {
         <ProductForm
           key={editing?.id || 'new'}
           initial={editing ? {
+            id: editing.uuid || editing.id,
+            vendor: editing.vendor?.brandName || user.brandName || '',
             sku: editing.sku,
             title: editing.title,
             description: editing.description,
