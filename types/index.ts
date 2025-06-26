@@ -16,3 +16,5 @@ export * from './shared';
 export * from './forms';
 export * from './paymentMethod';
 export * from './payment';
+
+export * from "./dashboard";
