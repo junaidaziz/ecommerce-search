@@ -52,6 +52,7 @@ const CategorySlider: FC<CategorySliderProps> = ({ categories }) => {
                 src={cat.image || placeholder}
                 alt={cat.name}
                 fill
+                sizes="100vw"
                 className={styles.image}
               />
             </div>

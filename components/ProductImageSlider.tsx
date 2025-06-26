@@ -41,6 +41,7 @@ export default function ProductImageSlider({
           src={placeholderUrl}
           alt="Placeholder product"
           fill
+          sizes="100vw"
           className={`object-cover ${imgClass}`}
         />
       </div>
@@ -55,6 +56,7 @@ export default function ProductImageSlider({
         src={errorMap[idx] ? placeholderUrl : images[idx].url}
         alt={images[idx].alt || `Image ${idx + 1}`}
         fill
+        sizes="100vw"
         className={`object-cover cursor-zoom-in ${imgClass}`}
         onClick={() => setZoom(true)}
         onError={() => setErrorMap((m) => ({ ...m, [idx]: true }))}
