@@ -120,6 +120,14 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
         {product.currency || ''}{' '}
         {product.minPrice ? product.minPrice.toFixed(2) : 'N/A'}
       </p>
+      <p className="mb-2 font-medium">
+        Stock:{' '}
+        {product.totalInventory && product.totalInventory > 10
+          ? 'In Stock'
+          : product.totalInventory && product.totalInventory > 0
+          ? 'Low Stock'
+          : 'Out of Stock'}
+      </p>
       <p className="mb-2">
         Rating: {averageRating.toFixed(1)} ({reviewCount})
       </p>

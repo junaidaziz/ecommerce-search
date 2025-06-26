@@ -7,6 +7,7 @@ import ActiveFilters from '../../components/ActiveFilters';
 import ProductGrid from '../../components/ProductGrid';
 import Loader from '../../components/Loader';
 import InfiniteLoader from '../../components/InfiniteLoader';
+import SortMenu, { SortValue } from '../../components/SortMenu';
 import { getPageTitle } from '../../lib/pageTitle';
 import {
   getProductsPaginated,
@@ -38,6 +39,7 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
   const maxPrice = context.query.maxPrice
     ? parseFloat(context.query.maxPrice as string)
     : undefined;
+  const sort = (context.query.sort as string) || 'newest';
 
   const limit = 20;
   const offset = 0;
@@ -49,6 +51,7 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
     inStock,
     minPrice,
     maxPrice,
+    sort: sort as any,
   });
 
   const categories = serializeDates(await getCategoriesFlat());
@@ -77,6 +80,9 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     typeof router.query.maxPrice === 'string' ? router.query.maxPrice : ''
   );
   const [inStock, setInStock] = useState(router.query.inStock === 'true');
+  const [sort, setSort] = useState<SortValue>(
+    (router.query.sort as SortValue) || 'newest'
+  );
   const [items, setItems] = useState<Product[]>(products);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -102,11 +108,12 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       if (minPrice) query.minPrice = minPrice;
       if (maxPrice) query.maxPrice = maxPrice;
       if (inStock) query.inStock = 'true';
+      if (sort) query.sort = sort;
       const params = new URLSearchParams(query);
       params.set('page', String(p));
       return params;
     },
-    [keyword, selectedCategories, minPrice, maxPrice, inStock]
+    [keyword, selectedCategories, minPrice, maxPrice, inStock, sort]
   );
 
   const getFilterSnapshot = useCallback(() => {
@@ -116,8 +123,9 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       minPrice,
       maxPrice,
       inStock,
+      sort,
     });
-  }, [keyword, selectedCategories, minPrice, maxPrice, inStock]);
+  }, [keyword, selectedCategories, minPrice, maxPrice, inStock, sort]);
 
   const loadProductsFn = useCallback(
     async (p: number, mode: 'reset' | 'append') => {
@@ -160,6 +168,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
           if (minPrice) query.minPrice = minPrice;
           if (maxPrice) query.maxPrice = maxPrice;
           if (inStock) query.inStock = 'true';
+          if (sort) query.sort = sort;
           router.replace({ pathname: router.pathname, query }, undefined, {
             shallow: true,
           });
@@ -181,6 +190,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       minPrice,
       maxPrice,
       inStock,
+      sort,
       router,
     ]
   );
@@ -219,7 +229,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
-  }, [keyword, selectedCategories, minPrice, maxPrice, inStock]);
+  }, [keyword, selectedCategories, minPrice, maxPrice, inStock, sort]);
 
   const toggleInStock = useCallback(() => {
     setInStock((prev) => !prev);
@@ -288,8 +298,9 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
             />
           </aside>
           <div className="flex-1">
-            <ActiveFilters filters={activeFilters} clearAll={clearAll} />
-            <div className="relative">
+          <ActiveFilters filters={activeFilters} clearAll={clearAll} />
+          <SortMenu value={sort} onChange={(v) => setSort(v)} />
+          <div className="relative">
               <ProductGrid products={items} />
               {loading && (
                 <Loader className="absolute inset-0 bg-base-200/70" />
