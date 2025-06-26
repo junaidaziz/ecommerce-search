@@ -7,6 +7,7 @@ import { AppContext } from '../../../contexts/AppContext';
 import { NotificationContext } from '../../../contexts/NotificationContext';
 import type { User } from '../../../types/user';
 import { getPageTitle } from '../../../lib/pageTitle';
+import PageContainer from '../../../components/Layout/PageContainer';
 
 const NewProductPage: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
@@ -89,11 +90,11 @@ const NewProductPage: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen h-auto overflow-auto items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center overflow-auto px-4 py-6 sm:px-6 lg:px-8">
       <Head>
         <title>{getPageTitle('New Product')}</title>
       </Head>
-      <div className="max-w-lg mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
+      <PageContainer>
         <h1 className="text-2xl font-bold mb-4 text-center">Add New Product</h1>
         <ProductForm
           key={formKey}
@@ -115,7 +116,7 @@ const NewProductPage: React.FC = () => {
             Back to Dashboard
           </Link>
         </p>
-      </div>
+      </PageContainer>
     </div>
   );
 };
