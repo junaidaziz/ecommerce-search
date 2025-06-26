@@ -47,6 +47,16 @@ const labels: Record<keyof ProductForm, string> = {
   currency: 'Currency',
 };
 
+const requiredFields: (keyof ProductForm)[] = [
+  'sku',
+  'title',
+  'vendor',
+  'category',
+  'quantity',
+  'minPrice',
+  'maxPrice',
+];
+
 const BrandDashboard: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
   const [form, setForm] = useState<ProductForm>(emptyForm);
@@ -114,6 +124,18 @@ const BrandDashboard: React.FC = () => {
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const newErrors: Partial<Record<keyof ProductForm, string>> = {};
+    requiredFields.forEach((field) => {
+      let val: any = (form as any)[field];
+      if (field === 'vendor') val = form.vendor?.brandName;
+      if (field === 'category') val = form.category?.name;
+      if (
+        val === undefined ||
+        val === null ||
+        (typeof val === 'string' && val.trim() === '')
+      ) {
+        newErrors[field] = 'This field is required';
+      }
+    });
     ['quantity', 'minPrice', 'maxPrice'].forEach((f) => {
       const val = (form as any)[f];
       if (typeof val === 'number' && val < 0) {
@@ -203,11 +225,12 @@ const BrandDashboard: React.FC = () => {
   }
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 min-h-screen py-6">
+    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
       <Head>
         <title>{getPageTitle('Brand Dashboard')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Brand Dashboard</h1>
+      <div className="max-w-lg mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
+        <h1 className="text-2xl font-bold mb-4 text-center">Brand Dashboard</h1>
       {lowStock.length > 0 && (
         <div className="alert alert-warning mb-4">
           Low stock on {lowStock.length} product{lowStock.length > 1 ? 's' : ''}
@@ -215,7 +238,7 @@ const BrandDashboard: React.FC = () => {
         </div>
       )}
       {message && <div className="mb-4 text-green-600">{message}</div>}
-      <div className="max-w-2xl mx-auto">
+      
         <form onSubmit={submit} className="space-y-2 mb-6">
           {(
             [
@@ -303,6 +326,6 @@ const BrandDashboard: React.FC = () => {
       </div>
     </div>
   );
-};
+}; 
 
 export default BrandDashboard;
