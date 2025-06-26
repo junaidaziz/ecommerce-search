@@ -211,9 +211,18 @@ export async function addProduct(product: ProductInput): Promise<void> {
         where: { brandName: product.vendor.brandName },
       })
     : null;
-  const category = product.category?.name
-    ? await db.category.findFirst({ where: { name: product.category.name } })
-    : null;
+  let category = null;
+  if (product.category?.id) {
+    category = await db.category.findUnique({
+      where: { id: Number(product.category.id) },
+    });
+  } else if (product.category?.uuid) {
+    category = await db.category.findFirst({
+      where: { uuid: product.category.uuid },
+    });
+  } else if (product.category?.name) {
+    category = await db.category.findFirst({ where: { name: product.category.name } });
+  }
 
   if (!vendor || !category) {
     throw new Error('Invalid vendor or category');
@@ -248,9 +257,18 @@ export async function updateProduct(
         where: { brandName: product.vendor.brandName },
       })
     : null;
-  const category = product.category?.name
-    ? await db.category.findFirst({ where: { name: product.category.name } })
-    : null;
+  let category = null;
+  if (product.category?.id) {
+    category = await db.category.findUnique({
+      where: { id: Number(product.category.id) },
+    });
+  } else if (product.category?.uuid) {
+    category = await db.category.findFirst({
+      where: { uuid: product.category.uuid },
+    });
+  } else if (product.category?.name) {
+    category = await db.category.findFirst({ where: { name: product.category.name } });
+  }
   if (!vendor || !category) {
     throw new Error('Invalid vendor or category');
   }
@@ -500,13 +518,35 @@ export async function getCategoryTree(): Promise<Category[]> {
   return getCategoriesFlat();
 }
 
-export async function createCategory(name: string): Promise<void> {
+export async function getCategoriesPaginated(
+  search: string,
+  limit: number,
+  offset = 0
+): Promise<{ categories: Category[]; total: number }> {
+  const db = getDb();
+  const where: Prisma.CategoryWhereInput = search
+    ? { name: { contains: search, mode: 'insensitive' } }
+    : {};
+  const [total, rows] = await Promise.all([
+    db.category.count({ where }),
+    db.category.findMany({
+      where,
+      orderBy: { name: 'asc' },
+      take: limit,
+      skip: offset,
+    }),
+  ]);
+  return { categories: rows, total };
+}
+
+export async function createCategory(name: string): Promise<Category> {
   const db = getDb();
   const existing = await db.category.findFirst({ where: { name } });
-  if (existing) return;
-  await db.category.create({
+  if (existing) return existing;
+  const cat = await db.category.create({
     data: { name, slug: name.toLowerCase().replace(/\s+/g, '-') },
   });
+  return cat;
 }
 
 export async function renameCategory(

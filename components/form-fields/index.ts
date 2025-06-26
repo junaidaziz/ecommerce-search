@@ -8,3 +8,4 @@ export { default as RadioGroup } from './RadioGroup';
 export { default as DatePicker } from './DatePicker';
 export { default as FileUpload } from './FileUpload';
 export { default as CountrySelect } from './CountrySelect';
+export { default as AsyncSelectDropdown } from './AsyncSelectDropdown';

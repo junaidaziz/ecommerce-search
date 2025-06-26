@@ -27,16 +27,16 @@ export default async function handler(
         description,
         product_type,
         tags,
-        category,
+        categoryId,
         quantity,
         min_price,
         max_price,
         currency,
       } = req.body || {};
-      if (!id || !sku || !title || !vendor) {
+      if (!id || !sku || !title || !vendor || !categoryId) {
         return res
           .status(400)
-          .json({ message: 'id, sku, title, vendor required' });
+          .json({ message: 'id, sku, title, vendor, categoryId required' });
       }
       const payload: ProductInput = {
         sku,
@@ -47,7 +47,7 @@ export default async function handler(
         description,
         productType: product_type,
         tags,
-        category: { name: category, slug: '' },
+        category: { id: categoryId ? parseInt(String(categoryId), 10) : undefined },
         quantity: quantity ? parseInt(quantity, 10) : 0,
         minPrice: parseFloat(min_price || '0'),
         maxPrice: parseFloat(max_price || '0'),

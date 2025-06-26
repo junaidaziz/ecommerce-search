@@ -28,7 +28,7 @@ export default async function handler(
         description,
         product_type,
         tags,
-        category,
+        categoryId,
         quantity,
         min_price,
         max_price,
@@ -42,7 +42,11 @@ export default async function handler(
         description: description ?? existing.description,
         productType: product_type ?? existing.product_type,
         tags: tags ?? existing.tags,
-        category: { name: category ?? existing.category, slug: '' },
+        category: {
+          id: categoryId
+            ? parseInt(String(categoryId), 10)
+            : existing.categoryId,
+        },
         quantity:
           typeof quantity !== 'undefined'
             ? parseInt(quantity, 10)

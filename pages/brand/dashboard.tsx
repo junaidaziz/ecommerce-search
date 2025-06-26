@@ -9,11 +9,13 @@ import React, {
 import { AppContext } from '../../contexts/AppContext';
 import type { User } from '../../types/user';
 import type { Product, ProductInput } from '../../types/product';
-import { TextInput } from '../../components/form-fields';
+import { TextInput, AsyncSelectDropdown } from '../../components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 
-type ProductForm = Partial<ProductInput> & { id?: string };
+type ProductForm = Partial<ProductInput> & { id?: string } & {
+  category?: { id?: number; name?: string; slug?: string } | null;
+};
 
 type ProductApi = Product;
 
@@ -25,7 +27,7 @@ const emptyForm: ProductForm = {
   description: '',
   productType: '',
   tags: '',
-  category: { name: '', slug: '' },
+  category: null,
   quantity: 0,
   minPrice: 0,
   maxPrice: 0,
@@ -98,12 +100,6 @@ const BrandDashboard: React.FC = () => {
           vendor: { ...(prev.vendor || { email: '' }), brandName: value },
         };
       }
-      if (name === 'category') {
-        return {
-          ...prev,
-          category: { ...(prev.category || { slug: '' }), name: value },
-        };
-      }
       if (name === 'quantity' || name === 'minPrice' || name === 'maxPrice') {
         const num = Number(value);
         return { ...prev, [name]: num < 0 ? 0 : num };
@@ -121,13 +117,40 @@ const BrandDashboard: React.FC = () => {
     }
   };
 
+  const loadCategoryOptions = async (inputValue: string) => {
+    const res = await fetch(
+      `/api/categories?q=${encodeURIComponent(inputValue)}&perPage=10`
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.categories || []).map((c: any) => ({
+      label: c.name,
+      value: c.id,
+    }));
+  };
+
+  const createCategoryOption = async (name: string) => {
+    const res = await fetch('/api/brand/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setForm((prev) => ({
+        ...prev,
+        category: { id: data.category.id, name: data.category.name },
+      }));
+    }
+  };
+
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const newErrors: Partial<Record<keyof ProductForm, string>> = {};
     requiredFields.forEach((field) => {
       let val: any = (form as any)[field];
       if (field === 'vendor') val = form.vendor?.brandName;
-      if (field === 'category') val = form.category?.name;
+      if (field === 'category') val = form.category?.id;
       if (
         val === undefined ||
         val === null ||
@@ -160,7 +183,7 @@ const BrandDashboard: React.FC = () => {
         description: payload.description,
         product_type: payload.productType,
         tags: payload.tags,
-        category: payload.category?.name,
+        categoryId: payload.category?.id,
         quantity: payload.quantity,
         min_price: payload.minPrice,
         max_price: payload.maxPrice,
@@ -190,10 +213,9 @@ const BrandDashboard: React.FC = () => {
       description: p.description || '',
       productType: p.productType || '',
       tags: p.tags || '',
-      category:
-        typeof p.category === 'string'
-          ? { name: p.category, slug: '' }
-          : p.category || { name: '', slug: '' },
+      category: p.category
+        ? { id: p.category.id, name: p.category.name, slug: p.category.slug }
+        : null,
       quantity: p.totalInventory || 0,
       minPrice: p.minPrice || 0,
       maxPrice: p.maxPrice || 0,
@@ -249,7 +271,6 @@ const BrandDashboard: React.FC = () => {
               'description',
               'productType',
               'tags',
-              'category',
               'quantity',
               'minPrice',
               'maxPrice',
@@ -263,9 +284,7 @@ const BrandDashboard: React.FC = () => {
               value={
                 field === 'vendor'
                   ? form.vendor?.brandName || ''
-                  : field === 'category'
-                    ? form.category?.name || ''
-                    : (form as any)[field]
+                  : (form as any)[field]
               }
               onChange={handleChange as any}
               placeholder={labels[field]}
@@ -286,6 +305,26 @@ const BrandDashboard: React.FC = () => {
               error={errors[field]}
             />
           ))}
+          <AsyncSelectDropdown
+            label={labels.category}
+            name="category"
+            value={
+              form.category
+                ? { label: form.category.name || '', value: form.category.id || '' }
+                : null
+            }
+            onChange={(opt) => {
+              if (!opt || Array.isArray(opt)) return;
+              setForm((prev) => ({
+                ...prev,
+                category: { id: Number(opt.value), name: opt.label },
+              }));
+            }}
+            loadOptions={loadCategoryOptions}
+            onCreateOption={createCategoryOption}
+            placeholder="Select category"
+            error={errors.category}
+          />
           <div className="flex gap-2">
             {editingId && (
               <button type="button" onClick={cancelEdit} className="btn">
@@ -302,7 +341,7 @@ const BrandDashboard: React.FC = () => {
           {products.map((p) => (
             <li key={p.id} className="flex justify-between items-center gap-2">
               <span>
-                {p.title} ({p.sku}) - {p.category || p.productType}
+                {p.title} ({p.sku}) - {p.category?.name || p.productType}
               </span>
               <div className="flex gap-2">
                 <button
