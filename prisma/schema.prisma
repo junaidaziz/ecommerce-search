@@ -187,6 +187,31 @@ model Payment {
   paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
 }
 
+<<<<<<< implement-notifications-and-messaging-system
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  orderId   Int
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  receiverId Int
+  orderId    Int
+  content    String
+  createdAt  DateTime @default(now())
+
+  sender   User  @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User  @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  order    Order @relation(fields: [orderId], references: [id])
+=======
 model PolicyDocument {
   id        Int      @id @default(autoincrement())
   type      String
@@ -212,4 +237,5 @@ model SupportTicket {
   updatedAt DateTime @updatedAt
 
   user User? @relation(fields: [userId], references: [id])
+>>>>>>> main
 }

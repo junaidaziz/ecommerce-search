@@ -8,6 +8,7 @@ import { AppContext } from '../contexts/AppContext';
 import MoonIcon from './icons/MoonIcon';
 import SunIcon from './icons/SunIcon';
 import UserIcon from './icons/UserIcon';
+import NotificationBell from './NotificationBell';
 import type { User } from '../types/user';
 
 interface HeaderProps {
@@ -71,6 +72,7 @@ const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           )}
         </nav>
         <nav className="flex items-center gap-2">
+          <NotificationBell />
           <label className="swap swap-rotate">
             <input
               type="checkbox"
