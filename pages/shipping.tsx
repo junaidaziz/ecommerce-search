@@ -1,17 +1,31 @@
 import Head from 'next/head';
+import ReactMarkdown from 'react-markdown';
+import { useEffect, useState } from 'react';
 import { getPageTitle } from '../lib/pageTitle';
+import { fetchJson } from '../lib/utils/fetchJson';
 
 const ShippingPage: React.FC = () => {
+  const [content, setContent] = useState('');
+
+  useEffect(() => {
+    fetchJson<{ content: string }>(`/api/policies?type=shipping`)
+      .then((d) => setContent(d.content))
+      .catch(() => setContent(''));
+  }, []);
+
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       <Head>
         <title>{getPageTitle('Shipping')}</title>
       </Head>
       <h1 className="text-2xl font-bold mb-4">Shipping</h1>
-      <p>
-        This is where your shipping information will go. It includes details on
-        delivery times, costs, and methods.
-      </p>
+      {content ? (
+        <div className="prose">
+          <ReactMarkdown>{content}</ReactMarkdown>
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
   );
 };

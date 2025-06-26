@@ -103,7 +103,10 @@ const BrandDashboard: React.FC = () => {
             description: editing.description,
             productType: editing.productType,
             tags: editing.tags,
-            category: typeof editing.category === 'string' ? editing.category : editing.category?.name,
+            categoryId:
+              typeof editing.category === 'string'
+                ? undefined
+                : String(editing.category?.id ?? ''),
             quantity: editing.totalInventory || 0,
             minPrice: editing.minPrice,
             maxPrice: editing.maxPrice,
