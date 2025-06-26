@@ -36,7 +36,7 @@ const BrandDashboard: React.FC = () => {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <BestSellersCard brand={user.brandName || undefined} />
         <InventoryAlertsCard brand={user.brandName || undefined} />
-        <ExistingProductsCard brand={user.brandName || undefined} />
+        <ExistingProductsCard />
       </div>
     </div>
   );
