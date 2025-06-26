@@ -20,6 +20,7 @@ import {
   CartesianGrid,
   BarChart as ReBarChart,
   Bar,
+  Cell,
 } from 'recharts';
 
 const useDummyData = process.env.NEXT_PUBLIC_USE_DUMMY_DATA === 'true';
@@ -44,6 +45,8 @@ const dummyInventoryStatus = [
   { name: 'Low Stock', value: 40 },
   { name: 'Out of Stock', value: 10 },
 ];
+
+const BAR_COLORS = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6'];
 
 type TopProduct = {
   id: string;
@@ -112,11 +115,23 @@ const BrandAnalytics: React.FC = () => {
           <ChartContainer dataLength={salesData.length} height="16rem">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={salesData}>
+                <defs>
+                  <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4F46E5" />
+                    <stop offset="100%" stopColor="#6366F1" />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="url(#salesGradient)"
+                  strokeWidth={3}
+                  dot
+                />
               </LineChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -129,7 +144,11 @@ const BrandAnalytics: React.FC = () => {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" fill="#8884d8" />
+                <Bar dataKey="value">
+                  {ordersData.map((_, i) => (
+                    <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />
+                  ))}
+                </Bar>
               </ReBarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -142,7 +161,11 @@ const BrandAnalytics: React.FC = () => {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" fill="#8884d8" />
+                <Bar dataKey="value">
+                  {inventoryData.map((_, i) => (
+                    <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />
+                  ))}
+                </Bar>
               </ReBarChart>
             </ResponsiveContainer>
           </ChartContainer>
