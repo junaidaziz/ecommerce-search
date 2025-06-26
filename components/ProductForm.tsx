@@ -36,6 +36,11 @@ interface ProductFormProps {
   requestNewCategory?: (
     name: string
   ) => Promise<{ id: number | string; name: string } | undefined>;
+  requestNewVendor?: (
+    name: string
+  ) => Promise<{ brandName: string } | undefined>;
+  loading?: boolean;
+  serverError?: string;
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({
@@ -44,6 +49,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onCancel,
   submitLabel = 'Save',
   requestNewCategory,
+  requestNewVendor,
+  loading = false,
+  serverError,
 }) => {
   const { user } = useContext(AppContext) as {
     user: { brandName?: string } | null;
@@ -84,9 +92,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
   useEffect(() => {
     if (user?.brandName) {
       setValue('vendor', user.brandName);
+      setVendorOption({ label: user.brandName, value: user.brandName });
     }
   }, [user, setValue]);
   const [images, setImages] = useState<File[]>([]);
+  const [vendorOption, setVendorOption] = useState<SelectOption | null>(
+    initial?.vendor ? { label: initial.vendor, value: initial.vendor } : null
+  );
   const [categoryOption, setCategoryOption] = useState<SelectOption | null>(
     initial?.categoryId
       ? { label: '', value: String(initial.categoryId) }
@@ -103,6 +115,35 @@ const ProductForm: React.FC<ProductFormProps> = ({
       label: c.name,
       value: String(c.id),
     }));
+  };
+
+  const loadVendorOptions = async (
+    inputValue: string
+  ): Promise<SelectOption[]> => {
+    const params = new URLSearchParams({ search: inputValue, limit: '20' });
+    const res = await fetch(`/api/vendors?${params.toString()}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.vendors || []).map((v: any) => ({
+      label: v.brandName,
+      value: v.brandName,
+    }));
+  };
+
+  const openCreateVendor = async (input: string) => {
+    const name = input.trim();
+    if (requestNewVendor) {
+      const v = await requestNewVendor(name);
+      if (v) {
+        const opt = { label: v.brandName, value: v.brandName } as SelectOption;
+        setVendorOption(opt);
+        setValue('vendor', opt.value);
+        return;
+      }
+    }
+    const opt = { label: name, value: name } as SelectOption;
+    setVendorOption(opt);
+    setValue('vendor', name);
   };
 
   const openCreateCategory = async (input: string) => {
@@ -149,14 +190,41 @@ const ProductForm: React.FC<ProductFormProps> = ({
         rules={{ required: 'Required' }}
         error={errors.sku?.message}
       />
-      <TextInput<ProductFormValues>
-        label="Vendor"
+      <Controller
         name="vendor"
-        register={register}
+        control={control}
         rules={{ required: 'Required' }}
-        disabled={!!user?.brandName}
-        error={errors.vendor?.message}
+        render={({ field }) => (
+          <AsyncCreatableSelect
+            inputId="vendor-select"
+            ref={field.ref}
+            value={vendorOption}
+            defaultOptions
+            loadOptions={loadVendorOptions}
+            onBlur={field.onBlur}
+            onChange={(val) => {
+              if (!val) {
+                setVendorOption(null);
+                field.onChange('');
+              } else if (!Array.isArray(val)) {
+                setVendorOption(val as SelectOption);
+                field.onChange(val.value);
+              }
+            }}
+            onCreateOption={openCreateVendor}
+            formatCreateLabel={() => 'Create New Vendor'}
+            isValidNewOption={(input, _value, options) =>
+              input.trim().length > 0 && options.length === 0
+            }
+            placeholder="Vendor"
+            classNamePrefix="react-select"
+            isDisabled={!!user?.brandName}
+          />
+        )}
       />
+      {errors.vendor && (
+        <p className="text-sm text-red-600">{errors.vendor.message}</p>
+      )}
       <TextInput<ProductFormValues>
         label="Title"
         name="title"
@@ -305,10 +373,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
             Cancel
           </button>
         )}
-        <button type="submit" className="btn btn-primary">
-          {submitLabel}
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? 'Saving...' : submitLabel}
         </button>
       </div>
+      {serverError && <p className="text-sm text-red-600">{serverError}</p>}
     </form>
   );
 };

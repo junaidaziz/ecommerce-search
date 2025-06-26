@@ -1,6 +1,8 @@
 import { getDb } from './db';
 import type { Prisma, Role } from '@prisma/client';
 import type { UserInput } from '../types/user';
+import bcrypt from 'bcryptjs';
+import { slugify } from './slugify';
 
 const prisma = getDb();
 
@@ -131,4 +133,45 @@ export async function changeEmail(
 
 export function updateUserProfile(email: string, data: Prisma.UserUpdateInput) {
   return prisma.user.update({ where: { email }, data });
+}
+
+export function findVendorByName(brandName: string) {
+  return prisma.user.findFirst({
+    where: { role: 'BRAND', brandName },
+    select: { id: true, brandName: true, email: true },
+  });
+}
+
+export function getVendors(
+  search = '',
+  limit = 20,
+  offset = 0
+) {
+  return prisma.user.findMany({
+    where: {
+      role: 'BRAND',
+      brandName: { contains: search, mode: 'insensitive' },
+    },
+    select: { id: true, brandName: true, email: true },
+    orderBy: { brandName: 'asc' },
+    take: limit,
+    skip: offset,
+  });
+}
+
+export async function createVendor(name: string) {
+  const slug = slugify(name);
+  const email = `${slug}-${Date.now()}@example.com`;
+  const password = await bcrypt.hash('password', 10);
+  return prisma.user.create({
+    data: {
+      email,
+      password,
+      firstName: name,
+      lastName: '',
+      brandName: name,
+      gender: 'OTHER',
+      role: 'BRAND',
+    },
+  });
 }
