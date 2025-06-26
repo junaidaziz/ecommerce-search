@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
-import CategoryCard from '../../components/CategoryCard';
+import CategoryCard from '../../components/Category/CategoryCard';
 import { getPageTitle } from '../../lib/pageTitle';
 import { Category } from '../../types';
 

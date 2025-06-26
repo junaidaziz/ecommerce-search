@@ -5,8 +5,8 @@ import { getPageTitle } from '../../lib/pageTitle';
 import Link from 'next/link';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { AppContext } from '../../contexts/AppContext';
-import ProductImageSlider from '../../components/ProductImageSlider';
-import RecommendedProducts from '../../components/RecommendedProducts';
+import ProductImageSlider from '../../components/Product/ProductImageSlider';
+import RecommendedProducts from '../../components/Product/RecommendedProducts';
 import {
   getProductBySlug,
   getReviewsForProduct,
