@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import type { SelectOption } from './form-fields/SelectDropdown';
-import { TextInput, Textarea, FileUpload, Checkbox } from './form-fields';
+import { TextInput, Textarea, FileUpload, Checkbox, TagInput } from './form-fields';
+import { AppContext } from '../contexts/AppContext';
 
 export interface ProductFormValues {
+  id: string;
+  vendor: string;
   sku: string;
   title: string;
   description: string;
   productType: string;
-  tags: string;
+  tags: string[];
   categoryId: string;
   quantity: number;
   minPrice: number;
@@ -31,6 +34,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onCancel,
   submitLabel = 'Save',
 }) => {
+  const { user } = useContext(AppContext) as { user: { brandName?: string } | null };
   const {
     register,
     handleSubmit,
@@ -40,11 +44,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
     watch,
   } = useForm<ProductFormValues>({
     defaultValues: {
+      id: initial?.id || (typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now())),
+      vendor: initial?.vendor || '',
       sku: initial?.sku || '',
       title: initial?.title || '',
       description: initial?.description || '',
       productType: initial?.productType || '',
-      tags: initial?.tags || '',
+      tags: initial?.tags ? initial.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
       categoryId: initial?.categoryId ? String(initial.categoryId) : '',
       quantity: initial?.quantity ?? 0,
       minPrice: initial?.minPrice ?? 0,
@@ -53,6 +59,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
       available: initial?.available ?? true,
     },
   });
+  useEffect(() => {
+    if (user?.brandName) {
+      setValue('vendor', user.brandName);
+    }
+  }, [user, setValue]);
   const [images, setImages] = useState<File[]>([]);
   const loadCategoryOptions = async (inputValue: string): Promise<SelectOption[]> => {
     const params = new URLSearchParams({ search: inputValue, limit: '20' });
@@ -64,11 +75,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   const onFormSubmit = handleSubmit(async (values) => {
     const fd = new FormData();
+    fd.append('id', values.id);
+    fd.append('vendor', values.vendor);
     fd.append('sku', values.sku);
     fd.append('title', values.title);
     fd.append('description', values.description);
     fd.append('product_type', values.productType);
-    fd.append('tags', values.tags);
+    fd.append('tags', values.tags.join(','));
     fd.append('category_id', values.categoryId);
     fd.append('quantity', values.available ? String(values.quantity) : '0');
     fd.append('min_price', String(values.minPrice));
@@ -85,12 +98,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   return (
     <form onSubmit={onFormSubmit} className="space-y-2">
+      <input type="hidden" {...register('id')} />
       <TextInput<ProductFormValues>
         label="SKU"
         name="sku"
         register={register}
         rules={{ required: 'Required' }}
         error={errors.sku?.message}
+      />
+      <TextInput<ProductFormValues>
+        label="Vendor"
+        name="vendor"
+        register={register}
+        rules={{ required: 'Required' }}
+        disabled={!!user?.brandName}
+        error={errors.vendor?.message}
       />
       <TextInput<ProductFormValues>
         label="Title"
@@ -110,13 +132,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
         label="Product Type"
         name="productType"
         register={register}
+        rules={{ required: 'Required' }}
         error={errors.productType?.message}
       />
-      <TextInput<ProductFormValues>
+      <TagInput<ProductFormValues>
         label="Tags"
         name="tags"
-        register={register}
-        error={errors.tags?.message}
+        control={control}
+        placeholder="Press Enter to add"
+        error={errors.tags?.message as string}
       />
       <Controller
         name="categoryId"
@@ -161,6 +185,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           name="quantity"
           type="number"
           min={0}
+          step={1}
           register={register}
           rules={{ min: { value: 0, message: 'Must be >= 0' } }}
           error={errors.quantity?.message}
@@ -180,7 +205,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           min={0}
           step="0.01"
           register={register}
-          rules={{ min: { value: 0, message: 'Must be >= 0' } }}
+          rules={{ required: 'Required', min: { value: 0, message: 'Must be >= 0' } }}
           error={errors.minPrice?.message}
         />
         <TextInput<ProductFormValues>
@@ -190,7 +215,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           min={0}
           step="0.01"
           register={register}
-          rules={{ min: { value: 0, message: 'Must be >= 0' } }}
+          rules={{ required: 'Required', min: { value: 0, message: 'Must be >= 0' } }}
           error={errors.maxPrice?.message}
         />
       </div>
@@ -198,6 +223,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         label="Currency"
         name="currency"
         register={register}
+        rules={{ required: 'Required' }}
         error={errors.currency?.message}
       />
       <FileUpload<ProductFormValues>
