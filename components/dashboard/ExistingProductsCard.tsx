@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import DashboardCard from './DashboardCard';
+import BoxIcon from '../icons/BoxIcon';
 import type { Product } from '../../types/product';
 
 interface Props {
@@ -37,6 +38,7 @@ const ExistingProductsCard: React.FC<Props> = ({ previewCount = 3 }) => {
       loading={!products && !error}
       error={error}
       className="space-y-2"
+      icon={<BoxIcon className="w-5 h-5" />}
       onClick={() => router.push('/brand/products')}
     >
       {products && (

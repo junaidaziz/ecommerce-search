@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import DashboardCard from './DashboardCard';
+import WarningIcon from '../icons/WarningIcon';
 
 interface Props {
   brandId?: number;
@@ -35,6 +36,7 @@ const InventoryAlertsCard: React.FC<Props> = ({ brandId, threshold = 10 }) => {
       title="Inventory Alerts"
       loading={!products && !error}
       error={error}
+      icon={<WarningIcon className="w-5 h-5" />}
     >
       {products && products.length > 0 ? (
         <div className="max-h-40 overflow-y-auto">
