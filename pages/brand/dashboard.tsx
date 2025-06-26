@@ -4,6 +4,7 @@ import { NotificationContext } from '../../contexts/NotificationContext';
 import type { User } from '../../types/user';
 import type { Product } from '../../types/product';
 import ProductForm from '../../components/ProductForm';
+import Link from 'next/link';
 import TotalProductsCard from '../../components/dashboard/TotalProductsCard';
 import TotalSalesCard from '../../components/dashboard/TotalSalesCard';
 import OrdersThisMonthCard from '../../components/dashboard/OrdersThisMonthCard';
@@ -91,7 +92,9 @@ const BrandDashboard: React.FC = () => {
       <Head>
         <title>{getPageTitle('Brand Dashboard')}</title>
       </Head>
-      <h1 className="text-2xl font-bold text-center sm:text-left">Brand Dashboard</h1>
+      <h1 className="text-2xl font-bold text-center sm:text-left">
+        Brand Dashboard
+      </h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <TotalProductsCard brand={user.brandName || undefined} />
         <TotalSalesCard brand={user.brandName || undefined} />
@@ -107,30 +110,39 @@ const BrandDashboard: React.FC = () => {
           </div>
         )}
 
-        <ProductForm
-          key={editing?.id || 'new'}
-          initial={editing ? {
-            id: editing.uuid || editing.id,
-            vendor: editing.vendor?.brandName || user.brandName || '',
-            sku: editing.sku,
-            title: editing.title,
-            description: editing.description,
-            productType: editing.productType,
-            tags: editing.tags,
-            categoryId:
-              typeof editing.category === 'string'
-                ? undefined
-                : String(editing.category?.id ?? ''),
-            quantity: editing.totalInventory || 0,
-            minPrice: editing.minPrice,
-            maxPrice: editing.maxPrice,
-            currency: editing.currency,
-            available: (editing.totalInventory ?? editing.quantity ?? 0) > 0,
-          } : undefined}
-          onSubmit={(fd) => submitProduct(fd, editing?.id)}
-          onCancel={editing ? () => setEditing(null) : undefined}
-          submitLabel={editing ? 'Update Product' : 'Add Product'}
-        />
+        {!editing && (
+          <div className="flex justify-end">
+            <Link href="/brand/products/new" className="btn btn-primary">
+              Add Product
+            </Link>
+          </div>
+        )}
+        {editing && (
+          <ProductForm
+            key={editing.id}
+            initial={{
+              id: editing.uuid || editing.id,
+              vendor: editing.vendor?.brandName || user.brandName || '',
+              sku: editing.sku,
+              title: editing.title,
+              description: editing.description,
+              productType: editing.productType,
+              tags: editing.tags,
+              categoryId:
+                typeof editing.category === 'string'
+                  ? undefined
+                  : String(editing.category?.id ?? ''),
+              quantity: editing.totalInventory || 0,
+              minPrice: editing.minPrice,
+              maxPrice: editing.maxPrice,
+              currency: editing.currency,
+              available: (editing.totalInventory ?? editing.quantity ?? 0) > 0,
+            }}
+            onSubmit={(fd) => submitProduct(fd, editing.id)}
+            onCancel={() => setEditing(null)}
+            submitLabel="Update Product"
+          />
+        )}
         <h2 className="text-xl font-semibold">Existing Products</h2>
         <ul className="space-y-1">
           {products.map((p) => (
