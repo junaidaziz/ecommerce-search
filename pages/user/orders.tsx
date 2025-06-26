@@ -50,6 +50,11 @@ const UserOrders: React.FC = () => {
               </li>
             </ul>
             <p>Total: £{o.total}</p>
+            <p>
+              <a className="link" href={`/api/orders/${o.uuid}/invoice`}>
+                Download Invoice
+              </a>
+            </p>
           </li>
         ))}
         {!loading && orders.length === 0 && <li>No orders found.</li>}

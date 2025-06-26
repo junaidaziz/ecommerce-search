@@ -162,6 +162,9 @@ export default function Admin() {
         <Link href="/admin/policies" className="btn btn-sm">
           Policies
         </Link>
+        <Link href="/admin/orders" className="btn btn-sm">
+          Orders
+        </Link>
         <Link href="/admin/support" className="btn btn-sm">
           Support
         </Link>

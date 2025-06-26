@@ -118,6 +118,39 @@ export async function getAllOrders(): Promise<Order[]> {
   return rows.map(mapOrderRow);
 }
 
+export async function getAllOrdersFiltered(params: {
+  status?: string;
+  search?: string;
+}): Promise<Order[]> {
+  const db = getDb();
+  const { status, search } = params;
+  const rows: OrderWithRelations[] = await db.order.findMany({
+    where: {
+      AND: [
+        status ? { status } : {},
+        search
+          ? {
+              OR: [
+                { user: { email: { contains: search, mode: 'insensitive' } } },
+                {
+                  product: {
+                    title: { contains: search, mode: 'insensitive' },
+                  },
+                },
+              ],
+            }
+          : {},
+      ],
+    },
+    include: {
+      user: true,
+      product: { include: { vendor: true, category: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+  return rows.map(mapOrderRow);
+}
+
 export async function getOrdersForVendor(vendor: string): Promise<Order[]> {
   const db = getDb();
   const rows: OrderWithRelations[] = await db.order.findMany({
