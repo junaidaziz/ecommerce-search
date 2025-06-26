@@ -152,3 +152,34 @@ model CouponUsage {
 
   @@unique([couponId, userId])
 }
+
+model PaymentMethod {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  provider    String
+  cardLast4   String
+  cardBrand   String
+  expMonth    Int
+  expYear     Int
+  token       String
+  isDefault   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  payments Payment[]
+}
+
+model Payment {
+  id             Int      @id @default(autoincrement())
+  orderId        Int
+  amount         Float
+  provider       String
+  status         String
+  paymentMethodId Int
+  transactionId  String
+  createdAt      DateTime @default(now())
+
+  order         Order        @relation(fields: [orderId], references: [id])
+  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+}

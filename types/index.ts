@@ -14,3 +14,5 @@ export * from './user';
 export * from './shipping';
 export * from './shared';
 export * from './forms';
+export * from './paymentMethod';
+export * from './payment';

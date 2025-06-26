@@ -11,6 +11,7 @@ import {
   CountrySelect,
 } from '../components/form-fields';
 import countries from '../data/countries';
+import type { PaymentMethod } from '../types';
 
 interface ProfileFormValues {
   firstName: string;
@@ -45,7 +46,7 @@ const SettingsPage: React.FC = () => {
   const user = useRequireAuth();
   const { addNotification } = useContext(NotificationContext);
   const [active, setActive] = useState<
-    'profile' | 'password' | 'address' | 'email'
+    'profile' | 'password' | 'address' | 'email' | 'payments'
   >('profile');
   const [codeSent, setCodeSent] = useState(false);
 
@@ -53,6 +54,14 @@ const SettingsPage: React.FC = () => {
   const passwordForm = useForm<PasswordFormValues>();
   const addressForm = useForm<AddressFormValues>();
   const emailForm = useForm<EmailFormValues>();
+  const [methods, setMethods] = useState<PaymentMethod[]>([]);
+
+  const loadMethods = () => {
+    fetch('/api/payment-methods')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setMethods(data))
+      .catch(() => {});
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -74,6 +83,11 @@ const SettingsPage: React.FC = () => {
       })
       .catch(() => {});
   }, [user, profileForm, addressForm]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (active === 'payments') loadMethods();
+  }, [user, active]);
 
   const submitProfile: SubmitHandler<ProfileFormValues> = async (values) => {
     const res = await fetch('/api/user/profile', {
@@ -183,6 +197,14 @@ const SettingsPage: React.FC = () => {
               onClick={() => setActive('email')}
             >
               Change Email
+            </button>
+          </li>
+          <li>
+            <button
+              className={active === 'payments' ? 'active' : ''}
+              onClick={() => setActive('payments')}
+            >
+              Payment Methods
             </button>
           </li>
         </ul>
@@ -323,6 +345,101 @@ const SettingsPage: React.FC = () => {
               Confirm
             </button>
           </form>
+        )}
+        {active === 'payments' && (
+          <div className="space-y-2 max-w-md mx-auto">
+            <h2 className="text-xl font-bold mb-2">Payment Methods</h2>
+            <ul className="space-y-1">
+              {methods.map((m) => (
+                <li key={m.id} className="flex justify-between items-center">
+                  <span>
+                    {m.cardBrand} ****{m.cardLast4} exp {m.expMonth}/{m.expYear}
+                    {m.isDefault && ' (default)'}
+                  </span>
+                  <div className="flex gap-2">
+                    {!m.isDefault && (
+                      <button
+                        className="btn btn-xs"
+                        onClick={() =>
+                          fetch(`/api/payment-methods/${m.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ makeDefault: true }),
+                          }).then(loadMethods)
+                        }
+                      >
+                        Make Default
+                      </button>
+                    )}
+                    <button
+                      className="btn btn-xs"
+                      onClick={() =>
+                        fetch(`/api/payment-methods/${m.id}`, {
+                          method: 'DELETE',
+                        }).then(loadMethods)
+                      }
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const form = e.currentTarget as HTMLFormElement;
+                const data = {
+                  number: (form.number as HTMLInputElement).value,
+                  expMonth: (form.expMonth as HTMLInputElement).value,
+                  expYear: (form.expYear as HTMLInputElement).value,
+                  cvc: (form.cvc as HTMLInputElement).value,
+                  setDefault: (form.default as HTMLInputElement).checked,
+                };
+                fetch('/api/payment-methods', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(data),
+                })
+                  .then(() => {
+                    form.reset();
+                    loadMethods();
+                  })
+                  .catch(() => {});
+              }}
+              className="space-y-2"
+            >
+              <input
+                name="number"
+                className="input input-bordered w-full"
+                placeholder="Card Number"
+              />
+              <div className="flex gap-2">
+                <input
+                  name="expMonth"
+                  className="input input-bordered w-full"
+                  placeholder="MM"
+                />
+                <input
+                  name="expYear"
+                  className="input input-bordered w-full"
+                  placeholder="YYYY"
+                />
+              </div>
+              <input
+                name="cvc"
+                className="input input-bordered w-full"
+                placeholder="CVC"
+              />
+              <label className="flex items-center gap-2">
+                <input type="checkbox" name="default" className="checkbox" />
+                Set as default
+              </label>
+              <button type="submit" className="btn btn-primary w-full">
+                Add Card
+              </button>
+            </form>
+          </div>
         )}
       </div>
     </div>
