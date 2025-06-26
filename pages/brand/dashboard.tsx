@@ -231,14 +231,14 @@ const BrandDashboard: React.FC = () => {
       </Head>
       <div className="max-w-lg mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
         <h1 className="text-2xl font-bold mb-4 text-center">Brand Dashboard</h1>
-      {lowStock.length > 0 && (
-        <div className="alert alert-warning mb-4">
-          Low stock on {lowStock.length} product{lowStock.length > 1 ? 's' : ''}
-          .
-        </div>
-      )}
-      {message && <div className="mb-4 text-green-600">{message}</div>}
-      
+        {lowStock.length > 0 && (
+          <div className="alert alert-warning mb-4">
+            Low stock on {lowStock.length} product
+            {lowStock.length > 1 ? 's' : ''}.
+          </div>
+        )}
+        {message && <div className="mb-4 text-green-600">{message}</div>}
+
         <form onSubmit={submit} className="space-y-2 mb-6">
           {(
             [
@@ -326,6 +326,6 @@ const BrandDashboard: React.FC = () => {
       </div>
     </div>
   );
-}; 
+};
 
 export default BrandDashboard;
