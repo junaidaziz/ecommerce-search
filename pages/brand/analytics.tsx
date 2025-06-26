@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
+import BarChart from '../../components/BarChart';
 
 type TopProduct = {
   id: string;
@@ -22,15 +23,20 @@ type EarningsData = {
 const BrandAnalytics: React.FC = () => {
   const { user } = useContext(AppContext)!;
   const [data, setData] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [earnings, setEarnings] = useState<EarningsData | null>(null);
 
   useEffect(() => {
     if (!user) return;
+    setLoading(true);
     fetch(
       `/api/brand/analytics?vendor=${encodeURIComponent(user.brandName || '')}`
     )
       .then((res) => (res.ok ? res.json() : null))
-      .then(setData);
+      .then((d) =>
+        setData(d || { totalOrders: 0, totalRevenue: 0, topProducts: [] })
+      )
+      .finally(() => setLoading(false));
     fetch(
       `/api/brand/earnings?vendor=${encodeURIComponent(user.brandName || '')}`
     )
@@ -42,7 +48,7 @@ const BrandAnalytics: React.FC = () => {
   if (user.role !== 'brand')
     return <div className="p-4">Brand access required.</div>;
 
-  if (!data) return <div className="p-4">Loading...</div>;
+  if (loading || data === null) return <div className="p-4">Loading...</div>;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -70,6 +76,11 @@ const BrandAnalytics: React.FC = () => {
           <li>No sales yet.</li>
         )}
       </ul>
+      <div className="mt-4">
+        <BarChart
+          data={data.topProducts.map((p) => ({ label: p.id, value: p.qty }))}
+        />
+      </div>
     </div>
   );
 };

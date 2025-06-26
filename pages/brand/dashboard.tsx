@@ -4,6 +4,11 @@ import { NotificationContext } from '../../contexts/NotificationContext';
 import type { User } from '../../types/user';
 import type { Product } from '../../types/product';
 import ProductForm from '../../components/ProductForm';
+import TotalProductsCard from '../../components/dashboard/TotalProductsCard';
+import TotalSalesCard from '../../components/dashboard/TotalSalesCard';
+import OrdersThisMonthCard from '../../components/dashboard/OrdersThisMonthCard';
+import BestSellersCard from '../../components/dashboard/BestSellersCard';
+import InventoryAlertsCard from '../../components/dashboard/InventoryAlertsCard';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 
@@ -82,14 +87,21 @@ const BrandDashboard: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen px-4 py-6 space-y-6">
       <Head>
         <title>{getPageTitle('Brand Dashboard')}</title>
       </Head>
-      <div className="max-w-lg mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full">
-        <h1 className="text-2xl font-bold mb-4 text-center">Brand Dashboard</h1>
+      <h1 className="text-2xl font-bold text-center sm:text-left">Brand Dashboard</h1>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <TotalProductsCard brand={user.brandName || undefined} />
+        <TotalSalesCard brand={user.brandName || undefined} />
+        <OrdersThisMonthCard brand={user.brandName || undefined} />
+        <BestSellersCard brand={user.brandName || undefined} />
+        <InventoryAlertsCard brand={user.brandName || undefined} />
+      </div>
+      <div className="max-w-4xl mx-auto border border-gray-200 rounded-lg shadow-sm p-6 bg-base-100 space-y-4">
         {lowStock.length > 0 && (
-          <div className="alert alert-warning mb-4">
+          <div className="alert alert-warning">
             Low stock on {lowStock.length} product
             {lowStock.length > 1 ? 's' : ''}.
           </div>
@@ -98,6 +110,8 @@ const BrandDashboard: React.FC = () => {
         <ProductForm
           key={editing?.id || 'new'}
           initial={editing ? {
+            id: editing.uuid || editing.id,
+            vendor: editing.vendor?.brandName || user.brandName || '',
             sku: editing.sku,
             title: editing.title,
             description: editing.description,
@@ -117,7 +131,7 @@ const BrandDashboard: React.FC = () => {
           onCancel={editing ? () => setEditing(null) : undefined}
           submitLabel={editing ? 'Update Product' : 'Add Product'}
         />
-        <h2 className="text-xl font-semibold mb-2">Existing Products</h2>
+        <h2 className="text-xl font-semibold">Existing Products</h2>
         <ul className="space-y-1">
           {products.map((p) => (
             <li key={p.id} className="flex justify-between items-center gap-2">
