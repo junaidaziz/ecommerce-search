@@ -72,6 +72,31 @@ const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           )}
         </nav>
         <nav className="flex items-center gap-2">
+          {user && (
+            <div className="flex flex-wrap gap-2 mr-2">
+              <Link
+                href="/brand/products/new"
+                title="Add a new product"
+                className="btn btn-primary btn-sm"
+              >
+                + Add Product
+              </Link>
+              <Link
+                href="/brand/orders"
+                title="View orders"
+                className={`btn btn-sm ${pathname.startsWith('/brand/orders') ? 'btn-primary' : ''}`}
+              >
+                🧾 View Orders
+              </Link>
+              <Link
+                href="/brand/analytics"
+                title="Open analytics"
+                className={`btn btn-sm ${pathname.startsWith('/brand/analytics') ? 'btn-primary' : ''}`}
+              >
+                📈 Open Analytics
+              </Link>
+            </div>
+          )}
           <NotificationBell />
           <label className="swap swap-rotate">
             <input
