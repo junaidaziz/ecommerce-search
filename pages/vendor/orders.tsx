@@ -80,6 +80,9 @@ export default function VendorOrders() {
               ))}
             </select>
             <p>Total: £{o.total}</p>
+            <p>
+              <a className="link" href={`/messages/${o.uuid}`}>Chat</a>
+            </p>
           </li>
         ))}
         {!loading && orders.length === 0 && <li>No orders found.</li>}
