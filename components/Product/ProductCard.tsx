@@ -29,7 +29,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
       ? product.totalInventory
       : (product as any).quantity;
   const isOut = typeof inventory === 'number' && inventory <= 0;
-  const onSale = product.maxPrice > product.minPrice;
+  const finalPrice =
+    product.discountType === 'percentage'
+      ? product.minPrice -
+        ((product.minPrice * (product.discountValue || 0)) / 100)
+      : product.discountType === 'fixed'
+        ? product.minPrice - (product.discountValue || 0)
+        : product.minPrice;
+  const onSale =
+    (product.discountType !== null && product.discountType !== undefined) ||
+    product.maxPrice > product.minPrice;
   const isNew = product.tags?.toLowerCase().includes('new');
   const rating = Math.round(product.averageRating || 0);
 
@@ -55,7 +64,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {(isNew || onSale || isOut) && (
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {isNew && <span className="badge badge-primary">New</span>}
-          {onSale && <span className="badge badge-secondary">Sale</span>}
+          {onSale && (
+            <span className="badge badge-secondary">
+              {product.discountType === 'percentage'
+                ? `${product.discountValue}% OFF`
+                : product.discountType === 'fixed'
+                ? `${formatCurrency(product.discountValue || 0, product.currency)} OFF`
+                : 'Sale'}
+            </span>
+          )}
           {isOut && <span className="badge">Out of stock</span>}
         </div>
       )}
@@ -87,8 +104,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
           className={`flex justify-between items-center mt-auto ${compact ? 'text-xs' : 'text-sm'}`}
         >
           <span className={`font-bold ${compact ? 'text-sm' : 'text-base'}`}>
-            {formatCurrency(product.minPrice ?? 0, product.currency)}
+            {formatCurrency(finalPrice ?? 0, product.currency)}
           </span>
+          {onSale && (
+            <span className="ml-1 line-through text-sm text-gray-500">
+              {formatCurrency(product.minPrice ?? 0, product.currency)}
+            </span>
+          )}
           {product.reviewCount > 0 && (
             <span className="text-xs">
               {'★'.repeat(rating)}

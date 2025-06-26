@@ -79,6 +79,8 @@ model Product {
   minPrice    Float    @default(0)
   maxPrice    Float    @default(0)
   currency    String   @default("USD")
+  discountType String?
+  discountValue Float?
   status      String   @default("approved")
   images      String?
   vendorId    Int

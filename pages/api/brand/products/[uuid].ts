@@ -62,7 +62,40 @@ export default async function handler(
         min_price,
         max_price,
         currency,
+        discount_type,
+        discount_value,
       } = fields as Record<string, unknown>;
+
+      const parsedDiscountType =
+        discount_type && String(discount_type) !== 'none'
+          ? (String(discount_type) as 'percentage' | 'fixed')
+          : null;
+      const parsedDiscountValue =
+        discount_value && String(discount_value) !== ''
+          ? parseFloat(String(discount_value))
+          : null;
+      if (parsedDiscountType === 'percentage') {
+        if (
+          parsedDiscountValue === null ||
+          parsedDiscountValue < 1 ||
+          parsedDiscountValue > 99
+        ) {
+          return res
+            .status(400)
+            .json({ message: 'Percentage discount must be between 1 and 99' });
+        }
+      }
+      if (parsedDiscountType === 'fixed') {
+        const basePrice =
+          typeof min_price !== 'undefined'
+            ? parseFloat(String(min_price))
+            : existing.min_price;
+        if (parsedDiscountValue === null || parsedDiscountValue >= basePrice) {
+          return res.status(400).json({
+            message: 'Fixed discount must be less than product price',
+          });
+        }
+      }
       const photos: File[] = files.photos
         ? Array.isArray(files.photos)
           ? (files.photos as File[])
@@ -104,6 +137,11 @@ export default async function handler(
             ? parseFloat(String(max_price))
             : existing.max_price,
         currency: String(currency ?? existing.currency),
+        discountType: parsedDiscountType ?? (existing as any).discount_type ?? null,
+        discountValue:
+          parsedDiscountValue !== null
+            ? parsedDiscountValue
+            : (existing as any).discount_value ?? null,
         status: existing.status,
         images: imagePaths.length > 0
           ? imagePaths.map((p) => ({ url: p }))

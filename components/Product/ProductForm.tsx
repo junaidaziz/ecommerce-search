@@ -25,6 +25,8 @@ export interface ProductFormValues {
   minPrice: number;
   maxPrice: number;
   currency: string;
+  discountType: 'percentage' | 'fixed' | 'none';
+  discountValue?: number;
   available: boolean;
 }
 
@@ -87,6 +89,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
       minPrice: initial?.minPrice ?? 0,
       maxPrice: initial?.maxPrice ?? 0,
       currency: initial?.currency || 'USD',
+      discountType: (initial?.discountType as any) || 'none',
+      discountValue:
+        typeof initial?.discountValue === 'number'
+          ? initial.discountValue
+          : undefined,
       available: initial?.available ?? true,
     },
   });
@@ -173,6 +180,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
       fd.append('min_price', String(values.minPrice));
       fd.append('max_price', String(values.maxPrice));
       fd.append('currency', values.currency);
+      if (values.discountType !== 'none') {
+        fd.append('discount_type', values.discountType);
+        if (values.discountValue !== undefined)
+          fd.append('discount_value', String(values.discountValue));
+      }
       images.forEach((img) => fd.append('photos', img));
       await onSubmit(fd);
     },
@@ -332,19 +344,50 @@ const ProductForm: React.FC<ProductFormProps> = ({
           }}
           error={errors.minPrice?.message}
         />
-        <TextInput<ProductFormValues>
-          label="Max Price"
-          name="maxPrice"
-          type="number"
-          min={0}
-          step="0.01"
-          register={register}
-          rules={{
-            required: 'Required',
-            min: { value: 0, message: 'Must be >= 0' },
-          }}
-          error={errors.maxPrice?.message}
-        />
+      <TextInput<ProductFormValues>
+        label="Max Price"
+        name="maxPrice"
+        type="number"
+        min={0}
+        step="0.01"
+        register={register}
+        rules={{
+          required: 'Required',
+          min: { value: 0, message: 'Must be >= 0' },
+        }}
+        error={errors.maxPrice?.message}
+      />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div>
+          <label className="block text-sm font-medium mb-1" htmlFor="discountType">Discount Type</label>
+          <select
+            id="discountType"
+            className="select select-bordered w-full"
+            {...register('discountType')}
+          >
+            <option value="none">None</option>
+            <option value="percentage">Percentage</option>
+            <option value="fixed">Fixed</option>
+          </select>
+        </div>
+        {watch('discountType') !== 'none' && (
+          <TextInput<ProductFormValues>
+            label="Discount Value"
+            name="discountValue"
+            type="number"
+            step="0.01"
+            register={register}
+            rules={{
+              required: 'Required',
+              validate: (v) =>
+                watch('discountType') === 'percentage'
+                  ? v > 0 && v < 100 || '1-99'
+                  : v < watch('minPrice') || 'Must be < price',
+            }}
+            error={errors.discountValue?.message}
+          />
+        )}
       </div>
       <TextInput<ProductFormValues>
         label="Currency"

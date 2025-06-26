@@ -19,6 +19,8 @@ type ProductBase = Pick<
   | 'minPrice'
   | 'maxPrice'
   | 'currency'
+  | 'discountType'
+  | 'discountValue'
   | 'status'
   | 'createdAt'
   | 'updatedAt'
@@ -53,6 +55,8 @@ export type ProductInput = Pick<
   | 'minPrice'
   | 'maxPrice'
   | 'currency'
+  | 'discountType'
+  | 'discountValue'
   | 'status'
 > &
   Partial<Pick<PrismaProduct, 'slug' | 'uuid'>> & {
