@@ -27,7 +27,7 @@ interface AddOrderParams {
   paymentProof?: string;
 }
 
-function mapOrderRow(row: OrderWithRelations): Order {
+export function mapDbRowToOrder(row: OrderWithRelations): Order {
   return {
     id: row.id,
     uuid: row.uuid,
@@ -90,7 +90,7 @@ export async function addOrder({
     )
   );
 
-  return createdOrders.map((o) => mapOrderRow(o));
+  return createdOrders.map((o) => mapDbRowToOrder(o));
 }
 
 export async function getOrdersForUser(email: string): Promise<Order[]> {
@@ -103,7 +103,7 @@ export async function getOrdersForUser(email: string): Promise<Order[]> {
     },
     orderBy: { createdAt: 'desc' },
   });
-  return rows.map(mapOrderRow);
+  return rows.map(mapDbRowToOrder);
 }
 
 export async function getAllOrders(): Promise<Order[]> {
@@ -115,7 +115,7 @@ export async function getAllOrders(): Promise<Order[]> {
     },
     orderBy: { createdAt: 'desc' },
   });
-  return rows.map(mapOrderRow);
+  return rows.map(mapDbRowToOrder);
 }
 
 export async function getAllOrdersFiltered(params: {
@@ -148,7 +148,7 @@ export async function getAllOrdersFiltered(params: {
     },
     orderBy: { createdAt: 'desc' },
   });
-  return rows.map(mapOrderRow);
+  return rows.map(mapDbRowToOrder);
 }
 
 export async function getOrdersForVendor(vendor: string): Promise<Order[]> {
@@ -161,7 +161,7 @@ export async function getOrdersForVendor(vendor: string): Promise<Order[]> {
     },
     orderBy: { createdAt: 'desc' },
   });
-  return rows.map(mapOrderRow);
+  return rows.map(mapDbRowToOrder);
 }
 
 export async function hasOrdersForProduct(
@@ -186,7 +186,7 @@ export async function getOrderByUuid(
     },
   });
   if (!row) return null;
-  const order = mapOrderRow(row);
+  const order = mapDbRowToOrder(row);
   return { ...order, userEmail: row.user.email };
 }
 
