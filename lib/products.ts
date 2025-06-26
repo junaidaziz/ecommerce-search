@@ -112,49 +112,19 @@ async function loadProductsData(): Promise<Product[]> {
       include: { category: true, vendor: true },
     });
 
-    return rows.map((row) =>
-      processProductRow({
-        id: row.id,
-        uuid: row.uuid,
-        slug: row.slug,
-        sku: row.sku,
-        title: row.title,
-        vendor: row.vendor ?? null,
-        description: row.description,
-        productType: row.productType,
-        tags: row.tags,
-        category: row.category ?? null,
-        images: parseImages(row.images),
-        totalInventory: row.quantity,
-        priceRange: {
-          minVariantPrice: {
-            amount: row.minPrice,
-            currencyCode: row.currency,
-          },
-          maxVariantPrice: {
-            amount: row.maxPrice,
-            currencyCode: row.currency,
-          },
-        },
-      })
-    );
+    return rows.map((row) => mapDbRowToProduct(row));
   } catch (error) {
     throw error;
   }
 }
 
 export function mapDbRowToProduct(row: ProductRow): Product {
-  const {
-    images,
-    quantity,
-    minPrice,
-    maxPrice,
-    currency,
-    ...rest
-  } = row;
+  const { images, quantity, minPrice, maxPrice, currency, ...rest } = row;
 
   return processProductRow({
     ...rest,
+    vendor: row.vendor ?? null,
+    category: row.category ?? null,
     images: parseImages(images),
     totalInventory: quantity,
     priceRange: {
@@ -330,25 +300,7 @@ export async function getPendingProducts(): Promise<Product[]> {
     where: { status: 'pending' },
     include: { category: true, vendor: true },
   });
-  return rows.map((row) =>
-    processProductRow({
-      id: row.id,
-      slug: row.slug,
-      sku: row.sku,
-      title: row.title,
-      vendor: row.vendor ?? null,
-      description: row.description,
-      productType: row.productType,
-      tags: row.tags,
-      category: row.category ?? null,
-      images: parseImages(row.images),
-      totalInventory: row.quantity,
-      priceRange: {
-        minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
-        maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
-      },
-    })
-  );
+  return rows.map((row) => mapDbRowToProduct(row));
 }
 
 export async function getProductsByCategorySlug(
@@ -359,26 +311,7 @@ export async function getProductsByCategorySlug(
     where: { status: 'approved', category: { slug } },
     include: { category: true, vendor: true },
   });
-  return rows.map((row) =>
-    processProductRow({
-      id: row.id,
-      uuid: row.uuid,
-      slug: row.slug,
-      sku: row.sku,
-      title: row.title,
-      vendor: row.vendor ?? null,
-      description: row.description,
-      productType: row.productType,
-      tags: row.tags,
-      category: row.category ?? null,
-      images: parseImages(row.images),
-      totalInventory: row.quantity,
-      priceRange: {
-        minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
-        maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
-      },
-    })
-  );
+  return rows.map((row) => mapDbRowToProduct(row));
 }
 
 export async function getProductsByCategorySlugPaginated(
@@ -394,26 +327,7 @@ export async function getProductsByCategorySlugPaginated(
     skip: offset,
     orderBy: { id: 'asc' },
   });
-  return rows.map((row) =>
-    processProductRow({
-      id: row.id,
-      uuid: row.uuid,
-      slug: row.slug,
-      sku: row.sku,
-      title: row.title,
-      vendor: row.vendor ?? null,
-      description: row.description,
-      productType: row.productType,
-      tags: row.tags,
-      category: row.category ?? null,
-      images: parseImages(row.images),
-      totalInventory: row.quantity,
-      priceRange: {
-        minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
-        maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
-      },
-    })
-  );
+  return rows.map((row) => mapDbRowToProduct(row));
 }
 
 export async function getApprovedProductsPaginated(
@@ -428,26 +342,7 @@ export async function getApprovedProductsPaginated(
     skip: offset,
     orderBy: { id: 'asc' },
   });
-  return rows.map((row) =>
-    processProductRow({
-      id: row.id,
-      uuid: row.uuid,
-      slug: row.slug,
-      sku: row.sku,
-      title: row.title,
-      vendor: row.vendor ?? null,
-      description: row.description,
-      productType: row.productType,
-      tags: row.tags,
-      category: row.category ?? null,
-      images: parseImages(row.images),
-      totalInventory: row.quantity,
-      priceRange: {
-        minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
-        maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
-      },
-    })
-  );
+  return rows.map((row) => mapDbRowToProduct(row));
 }
 
 export async function getProductsByVendorBrandName(
@@ -459,26 +354,7 @@ export async function getProductsByVendorBrandName(
     include: { category: true, vendor: true },
     orderBy: { id: 'asc' },
   });
-  return rows.map((row) =>
-    processProductRow({
-      id: row.id,
-      uuid: row.uuid,
-      slug: row.slug,
-      sku: row.sku,
-      title: row.title,
-      vendor: row.vendor ?? null,
-      description: row.description,
-      productType: row.productType,
-      tags: row.tags,
-      category: row.category ?? null,
-      images: parseImages(row.images),
-      totalInventory: row.quantity,
-      priceRange: {
-        minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
-        maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
-      },
-    })
-  );
+  return rows.map((row) => mapDbRowToProduct(row));
 }
 
 export interface PaginatedOptions {
@@ -557,26 +433,7 @@ export async function getProductsPaginated(
   rows = rows.slice(options.offset, options.offset + options.limit);
   return {
     total,
-    products: rows.map((row) =>
-      processProductRow({
-        id: row.id,
-        uuid: row.uuid,
-        slug: row.slug,
-        sku: row.sku,
-        title: row.title,
-        vendor: row.vendor ?? null,
-        description: row.description,
-        productType: row.productType,
-        tags: row.tags,
-        category: row.category ?? null,
-        images: parseImages(row.images),
-        totalInventory: row.quantity,
-        priceRange: {
-          minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
-          maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
-        },
-      })
-    ),
+    products: rows.map((row) => mapDbRowToProduct(row)),
   };
 }
 
@@ -670,7 +527,11 @@ export async function getDistinctTags(search = ''): Promise<string[]> {
   const term = search.trim().toLowerCase();
   const set = new Set<string>();
   for (const row of rows) {
-    const tags = row.tags?.split(',').map((t) => t.trim()).filter(Boolean) || [];
+    const tags =
+      row.tags
+        ?.split(',')
+        .map((t) => t.trim())
+        .filter(Boolean) || [];
     for (const tag of tags) {
       if (!term || tag.toLowerCase().includes(term)) {
         set.add(tag);
