@@ -4,7 +4,7 @@ import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
-import ProductImageSlider from '../../components/ProductImageSlider';
+import ProductImageSlider from '../../components/Product/ProductImageSlider';
 import type { Product } from '../../types';
 import type {
   Review,

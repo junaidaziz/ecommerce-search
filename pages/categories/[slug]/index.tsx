@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import ProductCard from '../../../components/ProductCard';
+import ProductCard from '../../../components/Product/ProductCard';
 import Head from 'next/head';
 import React from 'react';
 import { getPageTitle } from '../../../lib/pageTitle';
