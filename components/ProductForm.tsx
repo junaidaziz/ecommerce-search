@@ -9,8 +9,7 @@ import {
   Checkbox,
   TagInput,
 } from './form-fields';
-import { GenericInput, GenericModal } from './ui';
-import { slugify } from '../lib/slugify';
+
 import { AppContext } from '../contexts/AppContext';
 
 export interface ProductFormValues {
@@ -34,6 +33,9 @@ interface ProductFormProps {
   onSubmit: (data: FormData) => Promise<void> | void;
   onCancel?: () => void;
   submitLabel?: string;
+  requestNewCategory?: (
+    name: string
+  ) => Promise<{ id: number | string; name: string } | undefined>;
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({
@@ -41,6 +43,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onSubmit,
   onCancel,
   submitLabel = 'Save',
+  requestNewCategory,
 }) => {
   const { user } = useContext(AppContext) as {
     user: { brandName?: string } | null;
@@ -89,11 +92,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
       ? { label: '', value: String(initial.categoryId) }
       : null
   );
-  const [showCatModal, setShowCatModal] = useState(false);
-  const [newCatName, setNewCatName] = useState('');
-  const [newCatSlug, setNewCatSlug] = useState('');
-  const [catError, setCatError] = useState('');
-  const [creatingCat, setCreatingCat] = useState(false);
   const loadCategoryOptions = async (
     inputValue: string
   ): Promise<SelectOption[]> => {
@@ -107,72 +105,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }));
   };
 
-  const openCreateCategory = (input: string) => {
+  const openCreateCategory = async (input: string) => {
     const name = input.trim();
-    setNewCatName(name);
-    setNewCatSlug(slugify(name));
-    setCatError('');
-    setCreatingCat(false);
-    setShowCatModal(true);
-  };
-
-  const handleCreateCategory = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const name = newCatName.trim();
-    const slug = newCatSlug.trim();
-    if (!name) {
-      setCatError('Name required');
-      return;
-    }
-    if (!slug) {
-      setCatError('Slug required');
-      return;
-    }
-    setCreatingCat(true);
-    try {
-      const checkRes = await fetch(
-        `/api/categories/check?name=${encodeURIComponent(name)}`
-      );
-      if (checkRes.ok) {
-        const checkData = await checkRes.json();
-        if (checkData.exists) {
-          setCatError(`Category already exists: ${checkData.category.name}`);
-          setCreatingCat(false);
-          return;
-        }
-      }
-      const createRes = await fetch('/api/categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          slug,
-        }),
-      });
-      if (createRes.status === 409) {
-        const data = await createRes.json().catch(() => ({}));
-        const existingName = data.category?.name || name;
-        setCatError(`Category already exists: ${existingName}`);
-        setCreatingCat(false);
-        return;
-      }
-      if (!createRes.ok) {
-        const data = await createRes.json().catch(() => ({ message: 'Error' }));
-        setCatError(data.message || 'Error');
-        setCreatingCat(false);
-        return;
-      }
-      const data = await createRes.json();
-      const cat = (data.category || data) as { id: number | string; name: string };
+    if (!requestNewCategory) return;
+    const cat = await requestNewCategory(name);
+    if (cat) {
       const opt = { label: cat.name, value: String(cat.id) } as SelectOption;
       setCategoryOption(opt);
       setValue('categoryId', opt.value);
-      setShowCatModal(false);
-      setNewCatName('');
-      setNewCatSlug('');
-      setCreatingCat(false);
-    } catch (err) {
-      setCatError('Error');
     }
   };
 
@@ -255,76 +195,30 @@ const ProductForm: React.FC<ProductFormProps> = ({
           control={control}
           rules={{ required: 'Required' }}
           render={({ field }) => (
-            <>
-              <AsyncCreatableSelect
-                inputId="category-select"
-                ref={field.ref}
-                value={categoryOption}
-                defaultOptions
-                loadOptions={loadCategoryOptions}
-                onBlur={field.onBlur}
-                onChange={(val) => {
-                  if (!val) {
-                    setCategoryOption(null);
-                    field.onChange('');
-                  } else if (!Array.isArray(val)) {
-                    setCategoryOption(val as SelectOption);
-                    field.onChange(val.value);
-                  }
-                }}
-                onCreateOption={openCreateCategory}
-                formatCreateLabel={() => 'Create New Category'}
-                isValidNewOption={(input, _value, options) =>
-                  input.trim().length > 0 && options.length === 0
+            <AsyncCreatableSelect
+              inputId="category-select"
+              ref={field.ref}
+              value={categoryOption}
+              defaultOptions
+              loadOptions={loadCategoryOptions}
+              onBlur={field.onBlur}
+              onChange={(val) => {
+                if (!val) {
+                  setCategoryOption(null);
+                  field.onChange('');
+                } else if (!Array.isArray(val)) {
+                  setCategoryOption(val as SelectOption);
+                  field.onChange(val.value);
                 }
-                placeholder="Category"
-                classNamePrefix="react-select"
-              />
-              <GenericModal
-                isOpen={showCatModal}
-                onClose={() => setShowCatModal(false)}
-                title="Create Category"
-              >
-                <form onSubmit={handleCreateCategory} className="space-y-2">
-                  <GenericInput
-                    label="Category Name"
-                    name="category-name"
-                    value={newCatName}
-                    onChange={(e) => {
-                      setNewCatName(e.target.value);
-                      setNewCatSlug(slugify(e.target.value));
-                    }}
-                    required
-                  />
-                  <GenericInput
-                    label="Slug"
-                    name="category-slug"
-                    value={newCatSlug}
-                    onChange={(e) => setNewCatSlug(e.target.value)}
-                    required
-                  />
-                  {catError && (
-                    <p className="text-sm text-red-600">{catError}</p>
-                  )}
-                  <div className="flex justify-end gap-2">
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => setShowCatModal(false)}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={creatingCat}
-                    >
-                      {creatingCat ? 'Saving...' : 'Save'}
-                    </button>
-                  </div>
-                </form>
-              </GenericModal>
-            </>
+              }}
+              onCreateOption={openCreateCategory}
+              formatCreateLabel={() => 'Create New Category'}
+              isValidNewOption={(input, _value, options) =>
+                input.trim().length > 0 && options.length === 0
+              }
+              placeholder="Category"
+              classNamePrefix="react-select"
+            />
           )}
         />
       </div>
