@@ -207,18 +207,28 @@ export async function loadAndIndexProducts(): Promise<{ products: Product[] }> {
 
 export async function addProduct(product: ProductInput): Promise<void> {
   const db = getDb();
-  const vendor = product.vendor?.brandName
-    ? await db.user.findFirst({
-        where: { brandName: product.vendor.brandName },
-      })
-    : null;
-  const category = product.category?.id
+
+  if (!product.vendor?.brandName) {
+    const err = new Error('Vendor is required') as Error & { code?: string };
+    (err as any).code = 'BAD_REQUEST';
+    throw err;
+  }
+  if (!product.category || (!product.category.id && !product.category.name)) {
+    const err = new Error('Category is required') as Error & { code?: string };
+    (err as any).code = 'BAD_REQUEST';
+    throw err;
+  }
+
+  const vendor = await db.user.findFirst({
+    where: { brandName: product.vendor.brandName },
+  });
+  const category = product.category.id
     ? await db.category.findUnique({
         where: { id: Number(product.category.id) },
       })
-    : product.category?.name
-      ? await db.category.findFirst({ where: { name: product.category.name } })
-      : null;
+    : await db.category.findFirst({
+        where: { name: product.category.name },
+      });
 
   if (!vendor) {
     const err = new Error('Vendor not found') as Error & { code?: string };
@@ -255,18 +265,28 @@ export async function updateProduct(
   product: ProductInput & { id?: string | number }
 ): Promise<void> {
   const db = getDb();
-  const vendor = product.vendor?.brandName
-    ? await db.user.findFirst({
-        where: { brandName: product.vendor.brandName },
-      })
-    : null;
-  const category = product.category?.id
+  if (!product.vendor?.brandName) {
+    const err = new Error('Vendor is required') as Error & { code?: string };
+    (err as any).code = 'BAD_REQUEST';
+    throw err;
+  }
+  if (!product.category || (!product.category.id && !product.category.name)) {
+    const err = new Error('Category is required') as Error & { code?: string };
+    (err as any).code = 'BAD_REQUEST';
+    throw err;
+  }
+
+  const vendor = await db.user.findFirst({
+    where: { brandName: product.vendor.brandName },
+  });
+  const category = product.category.id
     ? await db.category.findUnique({
         where: { id: Number(product.category.id) },
       })
-    : product.category?.name
-      ? await db.category.findFirst({ where: { name: product.category.name } })
-      : null;
+    : await db.category.findFirst({
+        where: { name: product.category.name },
+      });
+
   if (!vendor) {
     const err = new Error('Vendor not found') as Error & { code?: string };
     (err as any).code = 'BAD_REQUEST';
