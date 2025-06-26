@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import DashboardCard from './DashboardCard';
 
 interface Props {
-  brand?: string;
+  brandId?: number;
 }
 
-const TotalSalesCard: React.FC<Props> = ({ brand }) => {
+const TotalSalesCard: React.FC<Props> = ({ brandId }) => {
   const [total, setTotal] = useState<number | null>(null);
   const [error, setError] = useState<string>('');
   useEffect(() => {
@@ -13,12 +13,12 @@ const TotalSalesCard: React.FC<Props> = ({ brand }) => {
     setError('');
     const url =
       '/api/dashboard/total-sales' +
-      (brand ? `?brand=${encodeURIComponent(brand)}` : '');
+      (brandId ? `?brandId=${brandId}` : '');
     fetch(url)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data) => setTotal(data.total))
       .catch(() => setError('Failed to load'));
-  }, [brand]);
+  }, [brandId]);
 
   return (
     <DashboardCard

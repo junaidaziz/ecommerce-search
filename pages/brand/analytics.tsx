@@ -102,10 +102,10 @@ const BrandAnalytics: React.FC = () => {
       </Head>
       <h1 className="text-2xl font-bold text-center sm:text-left">Analytics</h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <TotalProductsCard brand={user.brandName || undefined} />
-        <TotalSalesCard brand={user.brandName || undefined} />
-        <OrdersThisMonthCard brand={user.brandName || undefined} />
-        <InventoryAlertsCard brand={user.brandName || undefined} />
+        <TotalProductsCard />
+        <TotalSalesCard />
+        <OrdersThisMonthCard />
+        <InventoryAlertsCard />
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <DashboardCard title="Sales Over Time">
