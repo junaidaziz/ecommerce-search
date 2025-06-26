@@ -4,6 +4,34 @@ import { handleApiError } from '../../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../../lib/utils/getQueryParam';
 import { slugify } from '../../../../lib/slugify';
 import type { Product, ProductInput, ApiMessage } from '../../../../types';
+import formidable, { type Fields, type Files, type File } from 'formidable';
+import fs from 'fs';
+import path from 'path';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+async function parseBody(
+  req: NextApiRequest
+): Promise<{ fields: Fields; files: Files }> {
+  const type = req.headers['content-type'] || '';
+  if (type.includes('application/json')) {
+    const buffers: Uint8Array[] = [];
+    for await (const chunk of req) buffers.push(chunk);
+    const body = Buffer.concat(buffers).toString();
+    return { fields: JSON.parse(body || '{}') as Fields, files: {} as Files };
+  }
+  return new Promise<{ fields: Fields; files: Files }>((resolve, reject) => {
+    const form = formidable({ multiples: true });
+    form.parse(req, (err, fields, files) => {
+      if (err) reject(err);
+      else resolve({ fields, files });
+    });
+  });
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -19,6 +47,7 @@ export default async function handler(
     }
 
     if (req.method === 'POST') {
+      const { fields, files } = await parseBody(req);
       const {
         id,
         sku,
@@ -32,28 +61,42 @@ export default async function handler(
         min_price,
         max_price,
         currency,
-      } = req.body || {};
+      } = fields as Record<string, unknown>;
       if (!id || !sku || !title || !vendor) {
         return res
           .status(400)
           .json({ message: 'id, sku, title, vendor required' });
       }
+      const photos: File[] = files.photos
+        ? Array.isArray(files.photos)
+          ? (files.photos as File[])
+          : [files.photos as File]
+        : [];
+      const destDir = path.join(process.cwd(), 'public', 'uploads', String(id));
+      fs.mkdirSync(destDir, { recursive: true });
+      const imagePaths: string[] = [];
+      for (const file of photos) {
+        const name = Date.now() + '-' + file.originalFilename;
+        const destPath = path.join(destDir, name);
+        fs.renameSync(file.filepath, destPath);
+        imagePaths.push(`/uploads/${id}/${name}`);
+      }
       const payload: ProductInput = {
-        sku,
-        title,
-        slug: slugify(title || String(id)),
+        sku: String(sku),
+        title: String(title),
+        slug: slugify(String(title || id)),
         uuid: String(id),
-        vendor: { email: '', brandName: vendor },
-        description,
-        productType: product_type,
-        tags,
-        category: { name: category, slug: '' },
-        quantity: quantity ? parseInt(quantity, 10) : 0,
-        minPrice: parseFloat(min_price || '0'),
-        maxPrice: parseFloat(max_price || '0'),
-        currency: currency || 'USD',
+        vendor: { email: '', brandName: String(vendor) },
+        description: String(description || ''),
+        productType: String(product_type || ''),
+        tags: String(tags || ''),
+        category: { name: String(category || ''), slug: '' },
+        quantity: quantity ? parseInt(String(quantity), 10) : 0,
+        minPrice: parseFloat(String(min_price || '0')),
+        maxPrice: parseFloat(String(max_price || '0')),
+        currency: String(currency || 'USD'),
         status: 'approved',
-        images: [],
+        images: imagePaths.map((p) => ({ url: p })),
       };
       await addProduct(payload);
       await loadAndIndexProducts();
