@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   addProduct,
   loadAndIndexProducts,
-  getProductsByVendorBrandName,
+  mapDbRowToProduct,
 } from '../../../../lib/products';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../../lib/utils/getQueryParam';
@@ -12,6 +12,9 @@ import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import { withRole } from '../../../../lib/withRole';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../../auth/[...nextauth]';
+import { getDb } from '../../../../lib/db';
 
 export const config = {
   api: {
@@ -44,10 +47,43 @@ async function handler(
 ): Promise<void> {
   try {
     if (req.method === 'GET') {
-      const user = (req as any).user as { brandName?: string } | undefined;
-      const vendor = getQueryParam(req.query.vendor) || user?.brandName;
-      if (!vendor) return res.status(400).json({ message: 'vendor required' });
-      const products = await getProductsByVendorBrandName(vendor);
+      const session = await getServerSession(req, res, authOptions);
+      if (!session?.user?.id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      const brandId = Number(session.user.id);
+      const vendor = getQueryParam(req.query.vendor);
+      const db = getDb();
+      const rows = await db.product.findMany({
+        where: {
+          vendorId: brandId,
+          ...(vendor ? { vendor: { brandName: vendor } } : {}),
+        },
+        include: { category: true, vendor: true },
+        orderBy: { id: 'asc' },
+      });
+      const products = rows.map((row) =>
+        mapDbRowToProduct({
+          id: row.id,
+          uuid: row.uuid,
+          slug: row.slug,
+          sku: row.sku,
+          title: row.title,
+          vendor: row.vendor ?? null,
+          description: row.description,
+          productType: row.productType,
+          tags: row.tags,
+          category: row.category ?? null,
+          images: row.images,
+          quantity: row.quantity,
+          minPrice: row.minPrice,
+          maxPrice: row.maxPrice,
+          currency: row.currency,
+          status: row.status,
+          createdAt: row.createdAt,
+          updatedAt: row.updatedAt,
+        })
+      );
       return res.status(200).json(products);
     }
 
