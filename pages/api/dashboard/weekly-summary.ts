@@ -21,22 +21,14 @@ async function handler(
     } | undefined;
     const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
     const vendorId = Number(user?.id) || brandId || undefined;
-    const monthOffset = parseInt(getQueryParam(req.query.monthOffset) || '0', 10);
-    const start = dayjs()
-      .startOf('month')
-      .subtract(monthOffset, 'month')
-      .toDate();
-    const end = dayjs(start).endOf('month').toDate();
-    const where: any = {
-      createdAt: { gte: start, lte: end },
-      status: 'completed',
-    };
+    const start = dayjs().subtract(7, 'day').startOf('day').toDate();
+    const where: any = { createdAt: { gte: start }, status: 'completed' };
     if (vendorId) where.product = { vendorId };
     const count = await db.order.count({ where });
     const result = await db.order.aggregate({ where, _sum: { total: true } });
     return res.status(200).json({ count, revenue: result._sum.total ?? 0 });
   } catch (error) {
-    return handleApiError(res, error, 'Failed to load orders');
+    return handleApiError(res, error, 'Failed to load weekly summary');
   }
 }
 
