@@ -106,31 +106,47 @@ const ProductForm: React.FC<ProductFormProps> = ({
       return;
     }
     setCreatingCat(true);
-    const res = await fetch('/api/categories/check-or-create', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: newCatName.trim(),
-        slug: newCatSlug.trim(),
-      }),
-    });
-    setCreatingCat(false);
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({ message: 'Error' }));
-      setCatError(data.message || 'Error');
-      return;
-    }
-    const data = await res.json();
-    if (data.exists) {
-      setCatError(`Category "${data.name}" already exists`);
-      return;
-    }
-    if (data.success && data.category) {
-      const cat = data.category as { id: number | string; name: string };
+    try {
+      const checkRes = await fetch(
+        `/api/categories/check?name=${encodeURIComponent(newCatName.trim())}`
+      );
+      if (!checkRes.ok) {
+        const data = await checkRes.json().catch(() => ({ message: 'Error' }));
+        setCatError(data.message || 'Error');
+        setCreatingCat(false);
+        return;
+      }
+      const checkData = await checkRes.json();
+      if (checkData.exists) {
+        const name = checkData.category?.name || newCatName.trim();
+        setCatError(`Category already exists: ${name}`);
+        setCreatingCat(false);
+        return;
+      }
+
+      const createRes = await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newCatName.trim(),
+          slug: newCatSlug.trim(),
+        }),
+      });
+      setCreatingCat(false);
+      if (!createRes.ok) {
+        const data = await createRes.json().catch(() => ({ message: 'Error' }));
+        setCatError(data.message || 'Error');
+        return;
+      }
+      const data = await createRes.json();
+      const cat = (data.category || data) as { id: number | string; name: string };
       const opt = { label: cat.name, value: String(cat.id) } as SelectOption;
       setCategoryOption(opt);
       setValue('categoryId', opt.value);
       setShowCatModal(false);
+    } catch (err) {
+      setCatError('Error');
+      setCreatingCat(false);
     }
   };
 
