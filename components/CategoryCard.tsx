@@ -21,6 +21,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
           src={CATEGORY_IMAGES[category.name] || placeholder}
           alt={category.name}
           fill
+          sizes="100vw"
           className="object-cover"
         />
       </div>
