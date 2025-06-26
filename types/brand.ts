@@ -8,3 +8,9 @@ export interface Brand {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface EarningsData {
+  totalEarned: number;
+  pending: number;
+  orders: import('./order').Order[];
+}
