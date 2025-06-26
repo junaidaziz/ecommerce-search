@@ -76,6 +76,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [newCatName, setNewCatName] = useState('');
   const [newCatSlug, setNewCatSlug] = useState('');
   const [catError, setCatError] = useState('');
+  const [creatingCat, setCreatingCat] = useState(false);
   const loadCategoryOptions = async (
     inputValue: string
   ): Promise<SelectOption[]> => {
@@ -94,6 +95,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     setNewCatName(name);
     setNewCatSlug(slugify(name));
     setCatError('');
+    setCreatingCat(false);
     setShowCatModal(true);
   };
 
@@ -103,7 +105,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setCatError('Name required');
       return;
     }
-    const res = await fetch('/api/brand/categories', {
+    setCreatingCat(true);
+    const res = await fetch('/api/categories/check-or-create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -111,15 +114,23 @@ const ProductForm: React.FC<ProductFormProps> = ({
         slug: newCatSlug.trim(),
       }),
     });
-    if (res.ok) {
-      const cat = await res.json();
+    setCreatingCat(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({ message: 'Error' }));
+      setCatError(data.message || 'Error');
+      return;
+    }
+    const data = await res.json();
+    if (data.exists) {
+      setCatError(`Category "${data.name}" already exists`);
+      return;
+    }
+    if (data.success && data.category) {
+      const cat = data.category as { id: number | string; name: string };
       const opt = { label: cat.name, value: String(cat.id) } as SelectOption;
       setCategoryOption(opt);
       setValue('categoryId', opt.value);
       setShowCatModal(false);
-    } else {
-      const data = await res.json().catch(() => ({ message: 'Error' }));
-      setCatError(data.message || 'Error');
     }
   };
 
@@ -254,8 +265,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   >
                     Cancel
                   </button>
-                  <button type="submit" className="btn btn-primary">
-                    Save
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={creatingCat}
+                  >
+                    {creatingCat ? 'Saving...' : 'Save'}
                   </button>
                 </div>
               </form>
