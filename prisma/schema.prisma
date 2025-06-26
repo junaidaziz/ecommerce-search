@@ -31,6 +31,7 @@ model User {
   businessDescription String?
   logo                String?
   taxId               String?
+  stripeAccountId     String?
   role                Role      @default(USER)
   verified            Boolean   @default(false)
   disabled            Boolean   @default(false)
