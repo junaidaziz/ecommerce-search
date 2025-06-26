@@ -14,7 +14,7 @@ const BrandOrders: React.FC = () => {
 
   useEffect(() => {
     if (!user || status === 'loading') return;
-    const vendorId = user.brandName || (session?.user as any)?.brandName;
+    const vendorId = user.brandName || session?.user?.brandName;
     if (!vendorId) {
       setError('Unable to determine brand ID');
       setLoading(false);

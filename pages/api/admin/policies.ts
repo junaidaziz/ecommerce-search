@@ -1,9 +1,9 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { withRole } from '../../../lib/withRole';
+import type { NextApiResponse } from 'next';
+import { withRole, AuthedNextApiRequest } from '../../../lib/withRole';
 import { getDb } from '../../../lib/db';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: AuthedNextApiRequest, res: NextApiResponse) {
   try {
     const db = getDb();
     if (req.method === 'GET') {
@@ -28,7 +28,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         res.status(400).json({ message: 'type and content required' });
         return;
       }
-      const adminEmail = (req as any).user?.email as string | undefined;
+      const adminEmail = req.user?.email as string | undefined;
       const admin = adminEmail
         ? await db.user.findUnique({ where: { email: adminEmail } })
         : null;
