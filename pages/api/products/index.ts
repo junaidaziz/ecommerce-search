@@ -15,6 +15,7 @@ export interface ProductsQuery {
   page?: string | string[];
   limit?: string | string[];
   offset?: string | string[];
+  sort?: string | string[];
 }
 
 export interface ProductsResponse {
@@ -44,6 +45,12 @@ export default async function handler(
   const maxPriceQuery = getQueryParam(req.query.maxPrice);
   const minPrice = minPriceQuery ? parseFloat(minPriceQuery) : undefined;
   const maxPrice = maxPriceQuery ? parseFloat(maxPriceQuery) : undefined;
+  const sort = getQueryParam(req.query.sort) as
+    | 'price_asc'
+    | 'price_desc'
+    | 'popularity'
+    | 'newest'
+    | undefined;
   try {
     const result = await getProductsPaginated({
       limit,
@@ -53,6 +60,7 @@ export default async function handler(
       inStock,
       minPrice,
       maxPrice,
+      sort,
     });
     return res
       .status(200)
