@@ -9,7 +9,7 @@ import { handleApiError } from '../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import { slugify } from '../../../lib/slugify';
 import { Product, ApiMessage } from '../../../types';
-import { parseImages } from '../../../lib/utils/parseImages';
+import { mapDbRowToProduct } from '../../../lib/products';
 
 export const config = {
   api: {
@@ -170,36 +170,7 @@ async function handler(
         where,
         include: { category: true, vendor: true },
       });
-      const data: Product[] = rows.map(
-        (p: any): Product => ({
-          id: String(p.id),
-          slug: p.slug,
-          sku: p.sku,
-          title: p.title,
-          vendor: p.vendor?.brandName ?? String(p.vendorId),
-          description: p.description,
-          productType: p.productType,
-          tags: p.tags,
-          category: p.category?.name,
-          images: parseImages(p.images),
-          totalInventory: p.quantity,
-          priceRange: {
-            minVariantPrice: { amount: p.minPrice, currencyCode: p.currency },
-            maxVariantPrice: { amount: p.maxPrice, currencyCode: p.currency },
-          },
-          minPrice: p.minPrice,
-          maxPrice: p.maxPrice,
-          currency: p.currency,
-          soldCount: 0,
-          reviewCount: 0,
-          averageRating: 0,
-          quantity: p.quantity,
-          status: p.status,
-          uuid: p.uuid,
-          createdAt: p.createdAt,
-          updatedAt: p.updatedAt,
-        })
-      );
+      const data: Product[] = rows.map((p) => mapDbRowToProduct(p as any));
       res.status(200).json(data);
       return;
     }

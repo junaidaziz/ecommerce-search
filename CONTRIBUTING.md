@@ -52,6 +52,8 @@ npm run dev
 - Maintain consistency with existing code structure and formatting.
 - Run `npm run lint` and `npm run format` before pushing.
 - Add comments to complex logic, especially in `lib/products.js`.
+- Prefer using the provided `mapDbRowTo*` helpers with the full DB row object
+  instead of manually mapping each property.
 
 ---
 
