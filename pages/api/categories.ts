@@ -9,7 +9,7 @@ export default async function handler(
 ): Promise<void> {
   try {
     if (req.method === 'GET') {
-      const { search = '', page, limit } = req.query;
+      const { search = '', page, limit } = req.query || {};
       if (page || limit || search) {
         const pageNum = parseInt(String(page || '1'), 10);
         const limitNum = parseInt(String(limit || '20'), 10);
