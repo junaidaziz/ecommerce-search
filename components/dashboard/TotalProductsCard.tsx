@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import DashboardCard from './DashboardCard';
+import CartIcon from '../icons/CartIcon';
 
 interface Props {
   brand?: string;
@@ -41,8 +42,14 @@ const TotalProductsCard: React.FC<Props> = ({ brand }) => {
       loading={count === null && !error}
       error={error}
       onClick={handleClick}
+      className="bg-indigo-50"
     >
-      {count !== null && <p className="text-3xl font-bold">{count}</p>}
+      {count !== null && (
+        <div className="flex items-center gap-2">
+          <CartIcon className="w-5 h-5 text-indigo-600" />
+          <p className="text-3xl font-bold">{count}</p>
+        </div>
+      )}
     </DashboardCard>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import DashboardCard from './DashboardCard';
+import ArrowTrendingUpIcon from '../icons/ArrowTrendingUpIcon';
 
 interface Props {
   brand?: string;
@@ -31,11 +32,15 @@ const OrdersThisMonthCard: React.FC<Props> = ({ brand }) => {
       title="Orders This Month"
       loading={!data && !error}
       error={error}
+      className="bg-yellow-50"
     >
       {data && (
-        <div>
-          <p className="text-3xl font-bold">{data.count}</p>
-          <p className="text-sm">£{data.revenue.toFixed(2)}</p>
+        <div className="flex items-center gap-2">
+          <ArrowTrendingUpIcon className="w-5 h-5 text-yellow-600" />
+          <div>
+            <p className="text-3xl font-bold">{data.count}</p>
+            <p className="text-sm">£{data.revenue.toFixed(2)}</p>
+          </div>
         </div>
       )}
     </DashboardCard>
