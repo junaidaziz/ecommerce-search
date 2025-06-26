@@ -4,9 +4,10 @@ import type { Product, ProductInput } from '../types/product';
 import { parseImages } from './utils/parseImages';
 import type { Category } from '../types/category';
 import type { Vendor } from '../types/vendor';
-import type { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import client from './typesenseClient';
 import { getBestSellingProducts } from './orders';
+import { slugify } from './slugify';
 
 type ProductWithRelations = Prisma.ProductGetPayload<{
   include: { category: true; vendor: true };
@@ -233,7 +234,7 @@ export async function addProduct(product: ProductInput): Promise<void> {
 
   const data: Prisma.ProductCreateInput = {
     uuid: product.uuid,
-    slug: product.slug ?? '',
+    slug: product.slug?.trim() || slugify(product.title || product.uuid),
     sku: product.sku,
     title: product.title,
     description: product.description ?? '',
@@ -248,7 +249,21 @@ export async function addProduct(product: ProductInput): Promise<void> {
     category: { connect: { id: category.id } },
   };
 
-  await db.product.create({ data });
+  try {
+    await db.product.create({ data });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      const err = new Error(
+        'Product with the same name or slug already exists.'
+      ) as Error & { code?: string };
+      (err as any).code = 'BAD_REQUEST';
+      throw err;
+    }
+    throw error;
+  }
 }
 
 export async function updateProduct(
@@ -397,6 +412,37 @@ export async function getApprovedProductsPaginated(
     include: { category: true, vendor: true },
     take: limit,
     skip: offset,
+    orderBy: { id: 'asc' },
+  });
+  return rows.map((row) =>
+    processProductRow({
+      id: row.id,
+      uuid: row.uuid,
+      slug: row.slug,
+      sku: row.sku,
+      title: row.title,
+      vendor: row.vendor ?? null,
+      description: row.description,
+      productType: row.productType,
+      tags: row.tags,
+      category: row.category ?? null,
+      images: parseImages(row.images),
+      totalInventory: row.quantity,
+      priceRange: {
+        minVariantPrice: { amount: row.minPrice, currencyCode: row.currency },
+        maxVariantPrice: { amount: row.maxPrice, currencyCode: row.currency },
+      },
+    })
+  );
+}
+
+export async function getProductsByVendorBrandName(
+  brandName: string
+): Promise<Product[]> {
+  const db = getDb();
+  const rows: ProductWithRelations[] = await db.product.findMany({
+    where: { status: 'approved', vendor: { brandName } },
+    include: { category: true, vendor: true },
     orderBy: { id: 'asc' },
   });
   return rows.map((row) =>
