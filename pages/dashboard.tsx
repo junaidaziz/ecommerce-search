@@ -7,6 +7,7 @@ import TotalSalesCard from '../components/dashboard/TotalSalesCard';
 import OrdersThisMonthCard from '../components/dashboard/OrdersThisMonthCard';
 import BestSellersCard from '../components/dashboard/BestSellersCard';
 import InventoryAlertsCard from '../components/dashboard/InventoryAlertsCard';
+import ExistingProductsCard from '../components/dashboard/ExistingProductsCard';
 
 const DashboardPage: React.FC = () => {
   const { user } = useContext(AppContext) as { user: any };
@@ -28,8 +29,11 @@ const DashboardPage: React.FC = () => {
         <TotalProductsCard brand={brand} />
         <TotalSalesCard brand={brand} />
         <OrdersThisMonthCard brand={brand} />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <BestSellersCard brand={brand} />
         <InventoryAlertsCard brand={brand} />
+        {brand && <ExistingProductsCard brand={brand} />}
       </div>
     </div>
   );
