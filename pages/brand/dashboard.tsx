@@ -1,72 +1,20 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useCallback,
-  ChangeEvent,
-  FormEvent,
-} from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { AppContext } from '../../contexts/AppContext';
+import { NotificationContext } from '../../contexts/NotificationContext';
 import type { User } from '../../types/user';
-import type { Product, ProductInput } from '../../types/product';
-import { TextInput } from '../../components/form-fields';
+import type { Product } from '../../types/product';
+import ProductForm from '../../components/ProductForm';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 
-type ProductForm = Partial<ProductInput> & { id?: string };
-
 type ProductApi = Product;
-
-const emptyForm: ProductForm = {
-  id: '',
-  sku: '',
-  title: '',
-  vendor: { email: '', brandName: '' },
-  description: '',
-  productType: '',
-  tags: '',
-  category: { name: '', slug: '' },
-  quantity: 0,
-  minPrice: 0,
-  maxPrice: 0,
-  currency: 'USD',
-};
-
-const labels: Record<keyof ProductForm, string> = {
-  id: 'ID',
-  sku: 'SKU',
-  title: 'Title',
-  vendor: 'Vendor',
-  description: 'Description',
-  productType: 'Product Type',
-  tags: 'Tags',
-  category: 'Category',
-  quantity: 'Quantity',
-  minPrice: 'Min Price',
-  maxPrice: 'Max Price',
-  currency: 'Currency',
-};
-
-const requiredFields: (keyof ProductForm)[] = [
-  'sku',
-  'title',
-  'vendor',
-  'category',
-  'quantity',
-  'minPrice',
-  'maxPrice',
-];
 
 const BrandDashboard: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
-  const [form, setForm] = useState<ProductForm>(emptyForm);
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof ProductForm, string>>
-  >({});
+  const [editing, setEditing] = useState<ProductApi | null>(null);
   const [products, setProducts] = useState<ProductApi[]>([]);
   const [lowStock, setLowStock] = useState<ProductApi[]>([]);
-  const [message, setMessage] = useState<string>('');
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const { addNotification } = useContext(NotificationContext);
 
   const fetchProducts = useCallback(async () => {
     if (!user) return;
@@ -88,123 +36,29 @@ const BrandDashboard: React.FC = () => {
     fetchProducts();
   }, [fetchProducts]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setErrors((prev) => ({ ...prev, [name]: undefined }));
-    setForm((prev) => {
-      if (name === 'vendor') {
-        return {
-          ...prev,
-          vendor: { ...(prev.vendor || { email: '' }), brandName: value },
-        };
-      }
-      if (name === 'category') {
-        return {
-          ...prev,
-          category: { ...(prev.category || { slug: '' }), name: value },
-        };
-      }
-      if (name === 'quantity' || name === 'minPrice' || name === 'maxPrice') {
-        const num = Number(value);
-        return { ...prev, [name]: num < 0 ? 0 : num };
-      }
-      return { ...prev, [name]: value };
-    });
-    if (name === 'quantity' || name === 'minPrice' || name === 'maxPrice') {
-      const num = Number(value);
-      if (num < 0) {
-        setErrors((prev) => ({
-          ...prev,
-          [name]: 'Value must be non-negative',
-        }));
-      }
-    }
-  };
-
-  const submit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const newErrors: Partial<Record<keyof ProductForm, string>> = {};
-    requiredFields.forEach((field) => {
-      let val: any = (form as any)[field];
-      if (field === 'vendor') val = form.vendor?.brandName;
-      if (field === 'category') val = form.category?.name;
-      if (
-        val === undefined ||
-        val === null ||
-        (typeof val === 'string' && val.trim() === '')
-      ) {
-        newErrors[field] = 'This field is required';
-      }
-    });
-    ['quantity', 'minPrice', 'maxPrice'].forEach((f) => {
-      const val = (form as any)[f];
-      if (typeof val === 'number' && val < 0) {
-        newErrors[f as keyof ProductForm] = 'Value must be non-negative';
-      }
-    });
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
-    const payload = editingId ? { ...form, id: editingId } : form;
-    const url = editingId
-      ? `/api/brand/products/${editingId}`
-      : '/api/brand/products';
-    const method = editingId ? 'PUT' : 'POST';
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: payload.id,
-        sku: payload.sku,
-        title: payload.title,
-        vendor: payload.vendor?.brandName,
-        description: payload.description,
-        product_type: payload.productType,
-        tags: payload.tags,
-        category: payload.category?.name,
-        quantity: payload.quantity,
-        min_price: payload.minPrice,
-        max_price: payload.maxPrice,
-        currency: payload.currency,
-      }),
-    });
+  const submitProduct = async (
+    values: FormData,
+    id?: string
+  ): Promise<void> => {
+    const url = id ? `/api/brand/products/${id}` : '/api/brand/products';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, { method, body: values });
     if (res.ok) {
-      setMessage(editingId ? 'Product updated' : 'Product added');
-      setForm(emptyForm);
-      setEditingId(null);
+      addNotification(id ? 'Product updated' : 'Product added', 'success');
+      setEditing(null);
       fetchProducts();
     } else {
-      const data = await res.json();
-      setMessage(data.message || 'Error');
+      const data = await res.json().catch(() => ({ message: 'Error' }));
+      addNotification(data.message || 'Error', 'error');
     }
   };
 
   const handleEdit = (p: ProductApi) => {
-    setForm({
-      id: p.id,
-      sku: p.sku || '',
-      title: p.title || '',
-      vendor:
-        typeof p.vendor === 'string'
-          ? { email: '', brandName: p.vendor }
-          : p.vendor || { email: '', brandName: '' },
-      description: p.description || '',
-      productType: p.productType || '',
-      tags: p.tags || '',
-      category:
-        typeof p.category === 'string'
-          ? { name: p.category, slug: '' }
-          : p.category || { name: '', slug: '' },
-      quantity: p.totalInventory || 0,
-      minPrice: p.minPrice || 0,
-      maxPrice: p.maxPrice || 0,
-      currency: p.currency || 'USD',
-    });
-    setEditingId(p.id);
+    setEditing(p);
   };
 
   const cancelEdit = () => {
-    setEditingId(null);
-    setForm(emptyForm);
+    setEditing(null);
   };
 
   const handleDelete = async (id: string) => {
@@ -213,7 +67,10 @@ const BrandDashboard: React.FC = () => {
       method: 'DELETE',
     });
     if (res.ok) {
+      addNotification('Product deleted', 'success');
       fetchProducts();
+    } else {
+      addNotification('Delete failed', 'error');
     }
   };
 
@@ -237,66 +94,26 @@ const BrandDashboard: React.FC = () => {
             {lowStock.length > 1 ? 's' : ''}.
           </div>
         )}
-        {message && <div className="mb-4 text-green-600">{message}</div>}
 
-        <form onSubmit={submit} className="space-y-2 mb-6">
-          {(
-            [
-              'id',
-              'sku',
-              'title',
-              'vendor',
-              'description',
-              'productType',
-              'tags',
-              'category',
-              'quantity',
-              'minPrice',
-              'maxPrice',
-              'currency',
-            ] as (keyof ProductForm)[]
-          ).map((field) => (
-            <TextInput
-              key={field}
-              label={labels[field]}
-              name={field as keyof ProductForm}
-              value={
-                field === 'vendor'
-                  ? form.vendor?.brandName || ''
-                  : field === 'category'
-                    ? form.category?.name || ''
-                    : (form as any)[field]
-              }
-              onChange={handleChange as any}
-              placeholder={labels[field]}
-              type={
-                field === 'quantity' ||
-                field === 'minPrice' ||
-                field === 'maxPrice'
-                  ? 'number'
-                  : 'text'
-              }
-              min={
-                field === 'quantity' ||
-                field === 'minPrice' ||
-                field === 'maxPrice'
-                  ? 0
-                  : undefined
-              }
-              error={errors[field]}
-            />
-          ))}
-          <div className="flex gap-2">
-            {editingId && (
-              <button type="button" onClick={cancelEdit} className="btn">
-                Cancel
-              </button>
-            )}
-            <button type="submit" className="btn btn-primary">
-              {editingId ? 'Update Product' : 'Add Product'}
-            </button>
-          </div>
-        </form>
+        <ProductForm
+          key={editing?.id || 'new'}
+          initial={editing ? {
+            sku: editing.sku,
+            title: editing.title,
+            description: editing.description,
+            productType: editing.productType,
+            tags: editing.tags,
+            category: typeof editing.category === 'string' ? editing.category : editing.category?.name,
+            quantity: editing.totalInventory || 0,
+            minPrice: editing.minPrice,
+            maxPrice: editing.maxPrice,
+            currency: editing.currency,
+            available: (editing.totalInventory ?? editing.quantity ?? 0) > 0,
+          } : undefined}
+          onSubmit={(fd) => submitProduct(fd, editing?.id)}
+          onCancel={editing ? () => setEditing(null) : undefined}
+          submitLabel={editing ? 'Update Product' : 'Add Product'}
+        />
         <h2 className="text-xl font-semibold mb-2">Existing Products</h2>
         <ul className="space-y-1">
           {products.map((p) => (
