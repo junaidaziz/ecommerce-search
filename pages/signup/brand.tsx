@@ -12,7 +12,7 @@ import {
   EmailInput,
   PasswordInput,
   TextInput,
-} from '../../components/form-fields';
+} from '../../components/UI/form-fields';
 import useEmailAvailability from '../../hooks/useEmailAvailability';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

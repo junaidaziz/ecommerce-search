@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
 import { getPageTitle } from '../lib/pageTitle';
-import { EmailInput, PasswordInput } from '../components/form-fields';
+import { EmailInput, PasswordInput } from '../components/UI/form-fields';
 import GoogleIcon from '../components/icons/GoogleIcon';
 import GithubIcon from '../components/icons/GithubIcon';
 import { User } from '../types';

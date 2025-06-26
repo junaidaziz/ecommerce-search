@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import type { Product } from '../../types';
-import { TextInput } from '../../components/form-fields';
+import { TextInput } from '../../components/UI/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 

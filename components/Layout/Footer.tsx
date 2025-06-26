@@ -2,9 +2,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { FC } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import VisaIcon from './icons/VisaIcon';
-import MastercardIcon from './icons/MastercardIcon';
-import PaypalIcon from './icons/PaypalIcon';
+import VisaIcon from '../icons/VisaIcon';
+import MastercardIcon from '../icons/MastercardIcon';
+import PaypalIcon from '../icons/PaypalIcon';
 
 const Footer: FC = () => {
   type NewsletterForm = { email: string };

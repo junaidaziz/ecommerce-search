@@ -6,8 +6,8 @@ import { getPageTitle } from '../lib/pageTitle';
 import { AppContext, AppContextValue } from '../contexts/AppContext';
 import type { User } from '../types/user';
 import type { Coupon } from '../types';
-import { TextInput, Textarea } from '../components/form-fields';
-import FileUpload from '../components/form-fields/FileUpload';
+import { TextInput, Textarea } from '../components/UI/form-fields';
+import FileUpload from '../components/UI/form-fields/FileUpload';
 
 // Types for cart item and user
 type CartItem = {

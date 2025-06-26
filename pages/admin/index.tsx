@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { AppContext } from '../../contexts/AppContext';
 import { Product, ProductInput, ApiMessage } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
-import { TextInput } from '../../components/form-fields';
+import { TextInput } from '../../components/UI/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 

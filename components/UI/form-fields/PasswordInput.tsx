@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import EyeIcon from '../icons/EyeIcon';
-import EyeOffIcon from '../icons/EyeOffIcon';
+import EyeIcon from '../../icons/EyeIcon';
+import EyeOffIcon from '../../icons/EyeOffIcon';
 import {
   UseFormRegister,
   RegisterOptions,

@@ -2,7 +2,7 @@ import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import { Category, CategoryInput, ApiMessage } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
-import { TextInput } from '../../components/form-fields';
+import { TextInput } from '../../components/UI/form-fields';
 import { slugify } from '../../lib/slugify';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';

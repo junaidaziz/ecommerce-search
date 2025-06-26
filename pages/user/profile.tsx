@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { CountrySelect } from '../../components/form-fields';
+import { CountrySelect } from '../../components/UI/form-fields';
 import { useRouter } from 'next/router';
 import { AppContext } from '../../contexts/AppContext';
 import type { User } from '../../types/user';

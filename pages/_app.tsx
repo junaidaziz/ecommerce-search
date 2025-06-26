@@ -1,6 +1,6 @@
 import '../styles/globals.css';
 import { AppProvider } from '../contexts/AppContext';
-import Layout from '../components/Layout';
+import Layout from '../components/Layout/Layout';
 import { SessionProvider } from 'next-auth/react';
 import { NotificationProvider } from '../contexts/NotificationContext';
 

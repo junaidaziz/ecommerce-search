@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
-import TagInput from '../components/form-fields/TagInput';
+import TagInput from '../components/UI/form-fields/TagInput';
 
 interface FormValues {
   tags: string[];

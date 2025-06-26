@@ -9,7 +9,7 @@ import {
   EmailInput,
   PasswordInput,
   CountrySelect,
-} from '../components/form-fields';
+} from '../components/UI/form-fields';
 import countries from '../data/countries';
 import type { PaymentMethod } from '../types';
 

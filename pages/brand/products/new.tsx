@@ -1,8 +1,8 @@
 import React, { useContext, useRef, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import ProductForm from '../../../components/ProductForm';
-import CreateCategoryModal from '../../../components/CreateCategoryModal';
+import ProductForm from '../../../components/Product/ProductForm';
+import CreateCategoryModal from '../../../components/Category/CreateCategoryModal';
 import { AppContext } from '../../../contexts/AppContext';
 import { NotificationContext } from '../../../contexts/NotificationContext';
 import type { User } from '../../../types/user';

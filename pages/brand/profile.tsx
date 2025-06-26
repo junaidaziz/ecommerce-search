@@ -12,7 +12,7 @@ import {
   TextInput,
   Textarea,
   CountrySelect,
-} from '../../components/form-fields';
+} from '../../components/UI/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 

@@ -4,14 +4,14 @@ import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
-import ProductImageSlider from '../../components/ProductImageSlider';
+import ProductImageSlider from '../../components/Product/ProductImageSlider';
 import type { Product } from '../../types';
 import type {
   Review,
   ReviewsResponse,
   ReviewAddedResponse,
 } from '../../types/review';
-import { SelectDropdown, Textarea } from '../../components/form-fields';
+import { SelectDropdown, Textarea } from '../../components/UI/form-fields';
 
 interface ProductDetailProps {}
 

@@ -13,7 +13,7 @@ import {
   TextInput,
   CountrySelect,
   FileUpload,
-} from '../../components/form-fields';
+} from '../../components/UI/form-fields';
 import type { User } from '../../types/user';
 
 interface FormValues {

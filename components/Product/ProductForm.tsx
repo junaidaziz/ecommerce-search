@@ -1,16 +1,16 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import type { SelectOption } from './form-fields/SelectDropdown';
+import type { SelectOption } from '../UI/form-fields/SelectDropdown';
 import {
   TextInput,
   Textarea,
   FileUpload,
   Checkbox,
   TagInput,
-} from './form-fields';
+} from '../UI/form-fields';
 
-import { AppContext } from '../contexts/AppContext';
+import { AppContext } from '../../contexts/AppContext';
 
 export interface ProductFormValues {
   id: string;

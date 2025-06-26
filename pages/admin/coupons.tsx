@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, ChangeEvent } from 'react';
 import Head from 'next/head';
 import { AppContext } from '../../contexts/AppContext';
-import { TextInput } from '../../components/form-fields';
+import { TextInput } from '../../components/UI/form-fields';
 import type { Coupon } from '../../types';
 import { getPageTitle } from '../../lib/pageTitle';
 
