@@ -213,10 +213,12 @@ export async function addProduct(product: ProductInput): Promise<void> {
       })
     : null;
   const category = product.category?.id
-    ? await db.category.findUnique({ where: { id: Number(product.category.id) } })
+    ? await db.category.findUnique({
+        where: { id: Number(product.category.id) },
+      })
     : product.category?.name
-    ? await db.category.findFirst({ where: { name: product.category.name } })
-    : null;
+      ? await db.category.findFirst({ where: { name: product.category.name } })
+      : null;
 
   if (!vendor || !category) {
     throw new Error('Invalid vendor or category');
@@ -252,10 +254,12 @@ export async function updateProduct(
       })
     : null;
   const category = product.category?.id
-    ? await db.category.findUnique({ where: { id: Number(product.category.id) } })
+    ? await db.category.findUnique({
+        where: { id: Number(product.category.id) },
+      })
     : product.category?.name
-    ? await db.category.findFirst({ where: { name: product.category.name } })
-    : null;
+      ? await db.category.findFirst({ where: { name: product.category.name } })
+      : null;
   if (!vendor || !category) {
     throw new Error('Invalid vendor or category');
   }
@@ -445,21 +449,24 @@ export async function getProductsPaginated(
   if (typeof options.maxPrice === 'number') {
     where.minPrice = { ...(where.minPrice as any), lte: options.maxPrice };
   }
-  const orderBy: Prisma.Enumerable<Prisma.ProductOrderByWithRelationInput> = (() => {
-    switch (options.sort) {
-      case 'price_asc':
-        return { minPrice: 'asc' };
-      case 'price_desc':
-        return { minPrice: 'desc' };
-      case 'newest':
-        return { createdAt: 'desc' };
-      default:
-        return { id: 'asc' };
-    }
-  })();
+  const orderBy: Prisma.Enumerable<Prisma.ProductOrderByWithRelationInput> =
+    (() => {
+      switch (options.sort) {
+        case 'price_asc':
+          return { minPrice: 'asc' };
+        case 'price_desc':
+          return { minPrice: 'desc' };
+        case 'newest':
+          return { createdAt: 'desc' };
+        default:
+          return { id: 'asc' };
+      }
+    })();
 
   if (options.sort === 'popularity') {
-    const popular = await getBestSellingProducts(options.offset + options.limit);
+    const popular = await getBestSellingProducts(
+      options.offset + options.limit
+    );
     return {
       total: popular.length,
       products: popular.slice(options.offset, options.offset + options.limit),
@@ -542,13 +549,17 @@ export async function getCategoriesPaginated(
   });
 }
 
-export async function createCategory(name: string): Promise<Category> {
+export async function createCategory(
+  name: string,
+  slug?: string
+): Promise<Category> {
   const db = getDb();
-  const existing = await db.category.findFirst({ where: { name } });
-  if (existing) return existing;
-  return db.category.create({
-    data: { name, slug: name.toLowerCase().replace(/\s+/g, '-') },
+  const slugValue = slug || name.toLowerCase().replace(/\s+/g, '-');
+  const existing = await db.category.findFirst({
+    where: { OR: [{ name }, { slug: slugValue }] },
   });
+  if (existing) return existing;
+  return db.category.create({ data: { name, slug: slugValue } });
 }
 
 export async function renameCategory(

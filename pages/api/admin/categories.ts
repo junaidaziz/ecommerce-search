@@ -22,16 +22,18 @@ async function handler(
       return;
     }
     if (req.method === 'POST') {
-      const { name } = req.body as CategoryInput;
+      const { name, slug } = req.body as CategoryInput;
       if (!name) return res.status(400).json({ message: 'name required' });
       const exists = (await getCategoriesFlat()).find(
-        (c: Category) => c.name.toLowerCase() === name.toLowerCase()
+        (c: Category) =>
+          c.name.toLowerCase() === name.toLowerCase() ||
+          (slug && c.slug?.toLowerCase() === slug.toLowerCase())
       );
       if (exists) {
         return res.status(409).json({ message: 'category exists' });
       }
-      await createCategory(name);
-      logAudit('create_category', { name });
+      await createCategory(name, slug);
+      logAudit('create_category', { name, slug });
       res.status(201).json({ message: 'category created' });
       return;
     }

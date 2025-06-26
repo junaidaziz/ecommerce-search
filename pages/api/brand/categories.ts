@@ -17,14 +17,16 @@ export default async function handler(
     if (!session?.user || session.user.role !== 'BRAND') {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-    const { name } = req.body || {};
+    const { name, slug } = req.body || {};
     if (!name) return res.status(400).json({ message: 'name required' });
     const exists = (await getCategoriesFlat()).find(
-      (c) => c.name.toLowerCase() === name.toLowerCase()
+      (c) =>
+        c.name.toLowerCase() === name.toLowerCase() ||
+        (slug && c.slug?.toLowerCase() === String(slug).toLowerCase())
     );
     let category: Category | null = exists ?? null;
     if (!category) {
-      category = await createCategory(name);
+      category = await createCategory(name, slug);
     }
     return res.status(201).json(category);
   } catch (error) {

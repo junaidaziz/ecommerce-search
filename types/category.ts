@@ -8,4 +8,7 @@ export interface Category {
   subcategories?: string[];
 }
 
-export type CategoryInput = Pick<Category, 'name'>;
+export type CategoryInput = {
+  name: string;
+  slug?: string;
+};
