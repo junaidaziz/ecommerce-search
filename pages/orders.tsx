@@ -15,13 +15,21 @@ const Orders: React.FC<OrdersProps> = (_props) => {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    fetch('/api/user/orders')
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
+    fetch('/api/orders')
+      .then(async (res) => {
+        if (!res.ok) {
+          const d = await res.json().catch(() => null);
+          return Promise.reject(d?.message || 'Failed to load orders');
+        }
+        return res.json();
+      })
       .then((data: Order[]) => {
         setOrders(data);
         setError(null);
       })
-      .catch(() => setError('Failed to load orders'))
+      .catch((err) =>
+        setError(typeof err === 'string' ? err : 'Failed to load orders')
+      )
       .finally(() => setLoading(false));
   }, [user]);
 
@@ -46,13 +54,13 @@ const Orders: React.FC<OrdersProps> = (_props) => {
           <table className="table w-full">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Product</th>
+                <th>Order #</th>
+                <th>Items</th>
+                <th>Buyer</th>
                 <th>Status</th>
                 <th>Total</th>
                 <th>Date</th>
-                <th>Chat</th>
-                <th>Invoice</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -69,8 +77,16 @@ const Orders: React.FC<OrdersProps> = (_props) => {
                         alt={o.product.title}
                         className="w-10 h-10 object-cover rounded"
                       />
-                      <span>{o.product.title}</span>
+                      <span className="whitespace-nowrap">
+                        {o.product.title}
+                      </span>
                     </div>
+                  </td>
+                  <td>
+                    {o.user
+                      ? `${o.user.firstName || ''} ${o.user.lastName || ''}`.trim() ||
+                        o.user.email
+                      : '-'}
                   </td>
                   <td>
                     <span
@@ -87,14 +103,11 @@ const Orders: React.FC<OrdersProps> = (_props) => {
                   </td>
                   <td>£{o.total}</td>
                   <td>{new Date(o.createdAt).toLocaleDateString()}</td>
-                  <td>
-                    <a className="link" href={`/messages/${o.uuid}`}>Chat</a>
-                  </td>
-                  <td>
-                    <a
-                      className="link"
-                      href={`/api/orders/${o.uuid}/invoice`}
-                    >
+                  <td className="space-x-2">
+                    <a className="btn btn-sm" href={`/orders/${o.uuid}`}>
+                      View
+                    </a>
+                    <a className="link" href={`/api/orders/${o.uuid}/invoice`}>
                       PDF
                     </a>
                   </td>
