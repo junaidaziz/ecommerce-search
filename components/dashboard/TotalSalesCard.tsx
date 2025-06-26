@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import DashboardCard from './DashboardCard';
 import MoneyIcon from '../icons/MoneyIcon';
+import ArrowTrendingUpIcon from '../icons/ArrowTrendingUpIcon';
 
 interface Props {
   brandId?: number;
@@ -45,9 +46,13 @@ const TotalSalesCard: React.FC<Props> = ({ brandId }) => {
       error={error}
       icon={<MoneyIcon className="w-5 h-5" />}
       trend={trend !== null ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}%` : undefined}
+      className="bg-green-50"
     >
       {total !== null && (
-        <p className="text-3xl font-bold">£{total.toFixed(2)}</p>
+        <div className="flex items-center gap-2">
+          <ArrowTrendingUpIcon className="w-5 h-5 text-green-600" />
+          <p className="text-3xl font-bold">£{total.toFixed(2)}</p>
+        </div>
       )}
     </DashboardCard>
   );
