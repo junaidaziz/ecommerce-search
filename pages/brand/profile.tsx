@@ -35,6 +35,7 @@ export const BrandProfile: React.FC = () => {
   );
   const [taxId, setTaxId] = useState<string>(user?.taxId || '');
   const [message, setMessage] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (user) {
@@ -50,6 +51,8 @@ export const BrandProfile: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
+    if (!user) return;
+    setLoading(true);
     fetch('/api/brand/profile')
       .then((res) => (res.ok ? res.json() : null))
       .then((data: Vendor | null) => {
@@ -63,8 +66,9 @@ export const BrandProfile: React.FC = () => {
         setBusinessDescription(data.description || '');
         setTaxId(data.taxId || '');
       })
-      .catch(() => {});
-  }, []);
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [user]);
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -90,6 +94,12 @@ export const BrandProfile: React.FC = () => {
   if (!user) return <div className="p-4">Please log in.</div>;
   if (user.role !== 'brand')
     return <div className="p-4">Brand access required.</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center my-4">
+        <span className="loading loading-spinner" />
+      </div>
+    );
 
   return (
     <div className="max-w-sm mx-auto">
