@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import DashboardCard from './DashboardCard';
 import type { Product } from '../../types/product';
 
@@ -11,6 +12,7 @@ interface Props {
 const ExistingProductsCard: React.FC<Props> = ({ brand, previewCount = 3 }) => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [error, setError] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     if (!brand) return;
@@ -38,6 +40,7 @@ const ExistingProductsCard: React.FC<Props> = ({ brand, previewCount = 3 }) => {
       loading={!products && !error}
       error={error}
       className="space-y-2"
+      onClick={() => router.push('/brand/products')}
     >
       {products && (
         <p>
