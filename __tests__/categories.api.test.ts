@@ -1,3 +1,6 @@
+jest.mock('next-auth/next', () => ({ getServerSession: jest.fn() }));
+jest.mock('../pages/api/auth/[...nextauth]', () => ({ authOptions: {} }));
+
 import handler from '../pages/api/categories';
 import { getCategoryTree } from '../lib/products';
 
