@@ -3,6 +3,7 @@ import { AppContext } from '../../contexts/AppContext';
 import { Category, CategoryInput, ApiMessage } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
 import { TextInput } from '../../components/form-fields';
+import { slugify } from '../../lib/slugify';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 
@@ -28,6 +29,7 @@ export default function Categories() {
     if (!newCat.trim()) return;
     const payload: CategoryInput = {
       name: newCat,
+      slug: slugify(newCat),
     };
     await fetchJson<ApiMessage>('/api/admin/categories', {
       method: 'POST',
