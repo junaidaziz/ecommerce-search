@@ -3,6 +3,22 @@ import { AppContext } from '../../contexts/AppContext';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
 import BarChart from '../../components/BarChart';
+import DashboardCard from '../../components/dashboard/DashboardCard';
+import TotalProductsCard from '../../components/dashboard/TotalProductsCard';
+import TotalSalesCard from '../../components/dashboard/TotalSalesCard';
+import OrdersThisMonthCard from '../../components/dashboard/OrdersThisMonthCard';
+import InventoryAlertsCard from '../../components/dashboard/InventoryAlertsCard';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  BarChart as ReBarChart,
+  Bar,
+} from 'recharts';
 
 type TopProduct = {
   id: string;
@@ -51,35 +67,76 @@ const BrandAnalytics: React.FC = () => {
   if (loading || data === null) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen px-4 py-6 space-y-6">
       <Head>
         <title>{getPageTitle('Brand Analytics')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Sales Summary</h1>
-      <p>Total Orders: {data.totalOrders}</p>
-      <p>Total Revenue: £{data.totalRevenue.toFixed(2)}</p>
-      {earnings && (
-        <div className="my-2 space-y-1">
-          <p>Total Earned: £{earnings.totalEarned.toFixed(2)}</p>
-          <p>Pending Payouts: £{earnings.pending.toFixed(2)}</p>
+      <h1 className="text-2xl font-bold text-center sm:text-left">Analytics</h1>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <TotalProductsCard brand={user.brandName || undefined} />
+        <TotalSalesCard brand={user.brandName || undefined} />
+        <OrdersThisMonthCard brand={user.brandName || undefined} />
+        <InventoryAlertsCard brand={user.brandName || undefined} />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <DashboardCard title="Sales Over Time">
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={[] as any[]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#8884d8" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </DashboardCard>
+        <DashboardCard title="Orders by Category">
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <ReBarChart data={[] as any[]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#8884d8" />
+              </ReBarChart>
+            </ResponsiveContainer>
+          </div>
+        </DashboardCard>
+        <DashboardCard title="Inventory Status">
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <ReBarChart data={[] as any[]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#8884d8" />
+              </ReBarChart>
+            </ResponsiveContainer>
+          </div>
+        </DashboardCard>
+      </div>
+      <div className="max-w-2xl mx-auto">
+        <h2 className="text-xl font-semibold mt-4 mb-2">Top Products</h2>
+        <ul className="list-disc list-inside">
+          {data.topProducts.length > 0 ? (
+            data.topProducts.map((p) => (
+              <li key={p.id}>
+                {p.id} - {p.qty} sold
+              </li>
+            ))
+          ) : (
+            <li>No sales yet.</li>
+          )}
+        </ul>
+        <div className="mt-4">
+          <BarChart
+            data={data.topProducts.map((p) => ({ label: p.id, value: p.qty }))}
+          />
         </div>
-      )}
-      <h2 className="text-xl font-semibold mt-4 mb-2">Top Products</h2>
-      <ul className="list-disc list-inside">
-        {data.topProducts.length > 0 ? (
-          data.topProducts.map((p) => (
-            <li key={p.id}>
-              {p.id} - {p.qty} sold
-            </li>
-          ))
-        ) : (
-          <li>No sales yet.</li>
-        )}
-      </ul>
-      <div className="mt-4">
-        <BarChart
-          data={data.topProducts.map((p) => ({ label: p.id, value: p.qty }))}
-        />
       </div>
     </div>
   );
