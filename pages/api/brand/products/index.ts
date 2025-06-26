@@ -42,7 +42,7 @@ async function parseBody(
 
 async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Product[] | ApiMessage>
+  res: NextApiResponse<{ products: Product[]; total: number } | ApiMessage>
 ): Promise<void> {
   try {
     if (req.method === 'GET') {
@@ -52,18 +52,24 @@ async function handler(
       }
 
       const db = getDb();
-      const rows = await db.product.findMany({
-        where: { vendor: { brandName: session.user.brandName } },
-        include: { category: true, vendor: true },
-        orderBy: { id: 'asc' },
-      });
+      const page = parseInt(String((req.query.page as string) || '1'), 10);
+      const limit = parseInt(String((req.query.limit as string) || '20'), 10);
+      const skip = (page - 1) * limit;
+
+      const [rows, total] = await Promise.all([
+        db.product.findMany({
+          where: { brandId: (session.user as any).brandId },
+          include: { category: true, vendor: true },
+          orderBy: { id: 'asc' },
+          take: limit,
+          skip,
+        }),
+        db.product.count({ where: { brandId: (session.user as any).brandId } }),
+      ]);
+
       const products = rows.map((row) => mapDbRowToProduct(row));
 
-      if (products.length === 0) {
-        return res.status(200).json([]);
-      }
-
-      return res.status(200).json(products);
+      return res.status(200).json({ products, total });
     }
 
     if (req.method === 'POST') {
