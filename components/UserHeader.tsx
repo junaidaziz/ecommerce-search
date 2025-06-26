@@ -246,17 +246,51 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
         </div>
 
         <nav className="flex items-center gap-2">
-          <Link
-            href="/cart"
-            className="relative p-2 transition-colors transition-transform duration-200 hover:text-white hover:scale-105"
-          >
-            <CartIcon className="w-5 h-5" />
-            {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
-                {itemCount}
-              </span>
-            )}
-          </Link>
+          <div className="dropdown dropdown-end">
+            <label
+              tabIndex={0}
+              className="relative p-2 cursor-pointer transition-colors transition-transform duration-200 hover:text-white hover:scale-105"
+            >
+              <CartIcon className="w-5 h-5" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+                  {itemCount}
+                </span>
+              )}
+            </label>
+            <div
+              tabIndex={0}
+              className="dropdown-content card card-compact w-64 bg-base-100 shadow z-50"
+            >
+              <div className="card-body">
+                {cart.length === 0 ? (
+                  <p className="text-sm">Your cart is empty</p>
+                ) : (
+                  <>
+                    <ul className="space-y-1 max-h-40 overflow-y-auto text-sm">
+                      {cart.map((item) => {
+                        const price = parseFloat(typeof item.minPrice === 'number' ? item.minPrice.toString() : item.minPrice || '0');
+                        return (
+                          <li key={item.id} className="flex justify-between">
+                            <span>
+                              {item.title} x{item.qty}
+                            </span>
+                            <span>£{(price * item.qty).toFixed(2)}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <p className="font-semibold mt-2">
+                      Total: £{cart.reduce((s, i) => s + i.qty * parseFloat(typeof i.minPrice === 'number' ? i.minPrice.toString() : i.minPrice || '0'), 0).toFixed(2)}
+                    </p>
+                    <Link href="/cart" className="btn btn-primary btn-sm mt-2">
+                      View Cart
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
 
           <label className="swap swap-rotate">
             <input

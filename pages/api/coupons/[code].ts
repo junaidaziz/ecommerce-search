@@ -15,8 +15,17 @@ export default async function handler(
       return;
     }
     const coupon = await findCouponByCode(String(code));
-    if (!coupon) {
+    if (!coupon || !coupon.isActive) {
       res.status(404).json({ message: 'Invalid code' });
+      return;
+    }
+    const now = new Date();
+    if (coupon.expirationDate && new Date(coupon.expirationDate) < now) {
+      res.status(400).json({ message: 'Coupon expired' });
+      return;
+    }
+    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+      res.status(400).json({ message: 'Coupon usage limit reached' });
       return;
     }
     res.status(200).json(coupon as unknown as Coupon);
