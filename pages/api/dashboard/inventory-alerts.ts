@@ -1,12 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import { getDb } from '../../../lib/db';
-import { withRole } from '../../../lib/withRole';
+import { withRole, AuthedNextApiRequest } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import type { ApiMessage } from '../../../types';
 
 async function handler(
-  req: NextApiRequest,
+  req: AuthedNextApiRequest,
   res: NextApiResponse<
     { products: { id: string; title: string; quantity: number }[] } | ApiMessage
   >
@@ -16,10 +16,7 @@ async function handler(
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
     const db = getDb();
-    const user = (req as any).user as {
-      id?: string | number;
-      brandName?: string;
-    } | undefined;
+    const user = req.user;
     const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
     const vendorId = Number(user?.id) || brandId || undefined;
     const threshold = parseInt(getQueryParam(req.query.threshold) || '10', 10);
