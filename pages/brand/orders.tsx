@@ -46,11 +46,14 @@ const BrandOrders: React.FC = () => {
       )}
       <ul className="space-y-2">
         {orders.map((o) => (
-          <li key={o.id} className="border p-2">
+          <li key={o.id} className="border p-2 space-y-1">
             <p>
               Order #{o.id} - {o.status}
             </p>
             <p>Total: £{o.total}</p>
+            <p>
+              <a className="link" href={`/messages/${o.uuid}`}>Chat</a>
+            </p>
           </li>
         ))}
         {!loading && orders.length === 0 && <li>No orders found.</li>}

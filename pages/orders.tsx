@@ -51,6 +51,7 @@ const Orders: React.FC<OrdersProps> = (_props) => {
                 <th>Status</th>
                 <th>Total</th>
                 <th>Date</th>
+                <th>Chat</th>
               </tr>
             </thead>
             <tbody>
@@ -85,6 +86,9 @@ const Orders: React.FC<OrdersProps> = (_props) => {
                   </td>
                   <td>£{o.total}</td>
                   <td>{new Date(o.createdAt).toLocaleDateString()}</td>
+                  <td>
+                    <a className="link" href={`/messages/${o.uuid}`}>Chat</a>
+                  </td>
                 </tr>
               ))}
             </tbody>
