@@ -14,9 +14,13 @@ async function handler(
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
     const db = getDb();
-    const user = (req as any).user as { brandName?: string } | undefined;
-    const brand = user?.brandName || getQueryParam(req.query.brand);
-    const where = brand ? { vendor: { brandName: brand } } : {};
+    const user = (req as any).user as {
+      id?: string | number;
+      brandName?: string;
+    } | undefined;
+    const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
+    const vendorId = Number(user?.id) || brandId || undefined;
+    const where = vendorId ? { vendorId } : {};
     const count = await db.product.count({ where });
     return res.status(200).json({ count });
   } catch (error) {

@@ -53,8 +53,8 @@ const ExistingProductsCard: React.FC<Props> = ({ previewCount = 3 }) => {
         </ul>
       )}
       <div>
-        <Link href="/brand/products" className="btn btn-primary btn-sm">
-          Go to Products
+        <Link href="/brand/products" className="btn btn-primary btn-sm gap-1">
+          View <span aria-hidden>↗</span>
         </Link>
       </div>
     </DashboardCard>

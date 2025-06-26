@@ -16,11 +16,15 @@ async function handler(
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
     const db = getDb();
-    const user = (req as any).user as { brandName?: string } | undefined;
-    const brand = user?.brandName || getQueryParam(req.query.brand);
+    const user = (req as any).user as {
+      id?: string | number;
+      brandName?: string;
+    } | undefined;
+    const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
+    const vendorId = Number(user?.id) || brandId || undefined;
     const threshold = parseInt(getQueryParam(req.query.threshold) || '10', 10);
     const where: any = { quantity: { lt: threshold } };
-    if (brand) where.vendor = { brandName: brand };
+    if (vendorId) where.vendorId = vendorId;
     const products = await db.product.findMany({
       where,
       select: { id: true, title: true, quantity: true },

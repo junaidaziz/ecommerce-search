@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import DashboardCard from './DashboardCard';
 
 interface Props {
-  brand?: string;
+  brandId?: number;
 }
 
 interface Product {
@@ -11,26 +12,32 @@ interface Product {
   quantity: number;
 }
 
-const BestSellersCard: React.FC<Props> = ({ brand }) => {
+const BestSellersCard: React.FC<Props> = ({ brandId }) => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [error, setError] = useState<string>('');
+  const router = useRouter();
   useEffect(() => {
     setProducts(null);
     setError('');
     const url =
       '/api/dashboard/best-sellers' +
-      (brand ? `?brand=${encodeURIComponent(brand)}` : '');
+      (brandId ? `?brandId=${brandId}` : '');
     fetch(url)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data) => setProducts(data.products))
       .catch(() => setError('Failed to load'));
-  }, [brand]);
+  }, [brandId]);
+
+  const handleClick = () => {
+    router.push('/brand/orders');
+  };
 
   return (
     <DashboardCard
       title="Best-Selling Products"
       loading={!products && !error}
       error={error}
+      onClick={handleClick}
     >
       {products && products.length > 0 ? (
         <ul className="list-disc pl-4 space-y-1">
@@ -43,6 +50,9 @@ const BestSellersCard: React.FC<Props> = ({ brand }) => {
       ) : (
         !error && <p>No sales yet.</p>
       )}
+      <div className="mt-2 text-right text-sm">
+        <span className="link">View ↗</span>
+      </div>
     </DashboardCard>
   );
 };
