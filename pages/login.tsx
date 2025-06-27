@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
 import { AppContext } from '../contexts/AppContext';
-import type { AppContextValue } from '../contexts/AppContext';
+import type { AppContextValue } from '../types';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';

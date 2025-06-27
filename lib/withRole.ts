@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth/next';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import { authOptions } from '../pages/api/auth/[...nextauth]';
 
-interface AuthedNextApiRequest extends NextApiRequest {
+export interface AuthedNextApiRequest extends NextApiRequest {
   user?: {
     email?: string | null;
     role?: string;

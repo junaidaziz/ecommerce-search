@@ -7,6 +7,7 @@ import {
   RegisterOptions,
 } from 'react-hook-form';
 import AsyncCreatableSelect from 'react-select/async-creatable';
+import type { MultiValueGenericProps } from 'react-select';
 
 export interface TagInputProps<T extends FieldValues> {
   name: Path<T>;
@@ -38,7 +39,9 @@ const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
   };
 
   const customComponents = {
-    MultiValueContainer: (props: any) => {
+    MultiValueContainer: (
+      props: MultiValueGenericProps<{ label: string; value: string }, true>
+    ) => {
       if (!props.removeProps) {
         // eslint-disable-next-line no-console
         console.error('TagInput: removeProps not provided');

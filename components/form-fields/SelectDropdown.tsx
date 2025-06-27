@@ -6,7 +6,7 @@ import {
   FieldValues,
   Path,
 } from 'react-hook-form';
-import Select from 'react-select';
+import Select, { type Props as SelectProps, type Components } from 'react-select';
 
 export interface SelectOption {
   label: string;
@@ -26,7 +26,7 @@ export interface SelectDropdownProps<T extends FieldValues> {
   error?: string;
   className?: string;
   icon?: React.ReactNode;
-  components?: any;
+  components?: Components<SelectOption, boolean>;
   control?: Control<T>;
   rules?: RegisterOptions<T, Path<T>>;
   [key: string]: unknown;
@@ -80,7 +80,7 @@ const SelectDropdown = <T extends FieldValues>(
               <Select<SelectOption, boolean>
                 inputId={inputId}
                 {...field}
-                value={field.value as any}
+                value={field.value as SelectOption | SelectOption[] | null}
                 onChange={(val) => field.onChange(val)}
                 onBlur={field.onBlur}
                 options={options}
@@ -104,7 +104,7 @@ const SelectDropdown = <T extends FieldValues>(
           <Select<SelectOption, boolean>
             inputId={inputId}
             name={name}
-            value={value as any}
+            value={value as SelectOption | SelectOption[] | null}
             onChange={(val) => {
               if (Array.isArray(val)) {
                 // Cast readonly array to mutable array
