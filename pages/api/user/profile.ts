@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { updateUserProfile, findUser } from '../../../lib/users';
+import { updateUserProfile, findUser } from '@lib/users';
 import bcrypt from 'bcryptjs';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { handleApiError } from '@utils/handleApiError';
 import type { User, ApiMessage } from '../../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';

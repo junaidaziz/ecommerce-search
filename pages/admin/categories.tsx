@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import { Category, CategoryInput, ApiMessage } from '../../types';
-import { fetchJson } from '../../lib/utils/fetchJson';
-import { TextInput } from '../../components/form-fields';
-import { slugify } from '../../lib/slugify';
+import { fetchJson } from '@utils/fetchJson';
+import { TextInput } from '@components/form-fields';
+import { slugify } from '@lib/slugify';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 export default function Categories() {
   const { user } = useContext(AppContext)!;

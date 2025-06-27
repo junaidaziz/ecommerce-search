@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
-import useRequireAuth from '../hooks/useRequireAuth';
-import { getPageTitle } from '../lib/pageTitle';
-import type { User } from '../types/user';
+import useRequireAuth from '@hooks/useRequireAuth';
+import { getPageTitle } from '@lib/pageTitle';
+import type { User } from '@types/user';
 import type { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './api/auth/[...nextauth]';

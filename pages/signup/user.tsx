@@ -2,19 +2,19 @@ import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import { signIn } from 'next-auth/react';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
-import PageContainer from '../../components/Layout/PageContainer';
-import GoogleIcon from '../../components/icons/GoogleIcon';
-import GithubIcon from '../../components/icons/GithubIcon';
+import { getPageTitle } from '@lib/pageTitle';
+import PageContainer from '@components/Layout/PageContainer';
+import GoogleIcon from '@components/icons/GoogleIcon';
+import GithubIcon from '@components/icons/GithubIcon';
 import {
   EmailInput,
   PasswordInput,
   TextInput,
-} from '../../components/form-fields';
-import useEmailAvailability from '../../hooks/useEmailAvailability';
+} from '@components/form-fields';
+import useEmailAvailability from '@hooks/useEmailAvailability';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;

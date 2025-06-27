@@ -5,16 +5,16 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
-import useRequireAuth from '../../hooks/useRequireAuth';
-import { getPageTitle } from '../../lib/pageTitle';
+import useRequireAuth from '@hooks/useRequireAuth';
+import { getPageTitle } from '@lib/pageTitle';
 import {
   EmailInput,
   PasswordInput,
   TextInput,
   CountrySelect,
   FileUpload,
-} from '../../components/form-fields';
-import type { User } from '../../types/user';
+} from '@components/form-fields';
+import type { User } from '@types/user';
 
 interface FormValues {
   firstName: string;

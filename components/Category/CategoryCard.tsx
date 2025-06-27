@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Category } from '../../types';
-import CATEGORY_IMAGES from '../../lib/categoryImages';
+import CATEGORY_IMAGES from '@lib/categoryImages';
 
 interface CategoryCardProps {
   category: Category;

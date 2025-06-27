@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getOrderByUuid } from '../../../../lib/orders';
-import { generateInvoice } from '../../../../lib/invoice';
-import { handleApiError } from '../../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../../lib/utils/getQueryParam';
-import { withRole } from '../../../../lib/withRole';
+import { getOrderByUuid } from '@lib/orders';
+import { generateInvoice } from '@lib/invoice';
+import { handleApiError } from '@utils/handleApiError';
+import { getQueryParam } from '@utils/getQueryParam';
+import { withRole } from '@lib/withRole';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

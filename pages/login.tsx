@@ -1,17 +1,17 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
-import { AppContext } from '../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import type { AppContextValue } from '../types';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
-import { getPageTitle } from '../lib/pageTitle';
-import { EmailInput, PasswordInput } from '../components/form-fields';
-import GoogleIcon from '../components/icons/GoogleIcon';
-import GithubIcon from '../components/icons/GithubIcon';
+import { getPageTitle } from '@lib/pageTitle';
+import { EmailInput, PasswordInput } from '@components/form-fields';
+import GoogleIcon from '@components/icons/GoogleIcon';
+import GithubIcon from '@components/icons/GithubIcon';
 import { User } from '../types';
-import PageContainer from '../components/Layout/PageContainer';
+import PageContainer from '@components/Layout/PageContainer';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

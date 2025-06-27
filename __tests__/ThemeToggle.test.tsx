@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Layout from '../components/Layout/Layout';
-import { AppContext } from '../contexts/AppContext';
+import Layout from '@components/Layout/Layout';
+import { AppContext } from '@contexts/AppContext';
 
 jest.mock('next/router', () => ({
   useRouter: () => ({ push: jest.fn(), pathname: '/' }),

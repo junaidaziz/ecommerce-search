@@ -1,15 +1,15 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
-import { getPageTitle } from '../../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import ProductCard from '../../../components/Product/ProductCard';
+import ProductCard from '@components/Product/ProductCard';
 import type { Product, Category } from '../../../types';
 import {
   getCategoryBySlug,
   getProductsByCategorySlug,
-} from '../../../lib/products';
-import { serializeDates } from '../../../lib/utils/serializeDates';
+} from '@lib/products';
+import { serializeDates } from '@utils/serializeDates';
 
 interface CategoryProductsProps {
   products: Product[];

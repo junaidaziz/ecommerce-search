@@ -1,15 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../../contexts/AppContext';
-import type { User } from '../../types/user';
-import ExistingProductsCard from '../../components/dashboard/ExistingProductsCard';
-import TotalProductsCard from '../../components/dashboard/TotalProductsCard';
-import TotalSalesCard from '../../components/dashboard/TotalSalesCard';
-import OrdersThisMonthCard from '../../components/dashboard/OrdersThisMonthCard';
-import BestSellersCard from '../../components/dashboard/BestSellersCard';
-import InventoryAlertsCard from '../../components/dashboard/InventoryAlertsCard';
-import WeeklySummaryCard from '../../components/dashboard/WeeklySummaryCard';
+import { AppContext } from '@contexts/AppContext';
+import type { User } from '@types/user';
+import ExistingProductsCard from '@components/dashboard/ExistingProductsCard';
+import TotalProductsCard from '@components/dashboard/TotalProductsCard';
+import TotalSalesCard from '@components/dashboard/TotalSalesCard';
+import OrdersThisMonthCard from '@components/dashboard/OrdersThisMonthCard';
+import BestSellersCard from '@components/dashboard/BestSellersCard';
+import InventoryAlertsCard from '@components/dashboard/InventoryAlertsCard';
+import WeeklySummaryCard from '@components/dashboard/WeeklySummaryCard';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 import Link from 'next/link';
 
 const BrandDashboard: React.FC = () => {

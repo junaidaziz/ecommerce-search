@@ -3,17 +3,17 @@ import {
   addProduct,
   loadAndIndexProducts,
   mapDbRowToProduct,
-} from '../../../../lib/products';
-import { handleApiError } from '../../../../lib/utils/handleApiError';
-import { slugify } from '../../../../lib/slugify';
+} from '@lib/products';
+import { handleApiError } from '@utils/handleApiError';
+import { slugify } from '@lib/slugify';
 import type { Product, ProductInput, ApiMessage } from '../../../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
-import { withRole, type AuthedNextApiRequest } from '../../../../lib/withRole';
+import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]';
-import { getDb } from '../../../../lib/db';
+import { getDb } from '@lib/db';
 
 export const config = {
   api: {

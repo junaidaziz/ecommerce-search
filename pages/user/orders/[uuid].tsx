@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import type { Order } from '../../../types';
 import Head from 'next/head';
-import { getPageTitle } from '../../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 export default function UserOrderDetail() {
   const router = useRouter();

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { EmailInput } from '../../components/form-fields';
+import { EmailInput } from '@components/form-fields';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
-import PageContainer from '../../components/Layout/PageContainer';
+import { getPageTitle } from '@lib/pageTitle';
+import PageContainer from '@components/Layout/PageContainer';
 
 interface ForgotPasswordForm {
   email: string;

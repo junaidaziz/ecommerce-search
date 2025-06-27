@@ -4,14 +4,14 @@ import {
   addReview,
   getReviewsForProduct,
   getAverageRating,
-} from '../../../../lib/db';
-import { handleApiError } from '../../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../../lib/utils/getQueryParam';
+} from '@lib/db';
+import { handleApiError } from '@utils/handleApiError';
+import { getQueryParam } from '@utils/getQueryParam';
 import type {
   Review,
   ReviewsResponse,
   ReviewAddedResponse,
-} from '../../../../types/review';
+} from '@types/review';
 import type { ApiMessage } from '../../../../types';
 
 export default async function handler(

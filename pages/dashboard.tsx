@@ -1,13 +1,13 @@
 import React, { useContext } from 'react';
 import Head from 'next/head';
-import { AppContext } from '../contexts/AppContext';
-import { getPageTitle } from '../lib/pageTitle';
-import TotalProductsCard from '../components/dashboard/TotalProductsCard';
-import TotalSalesCard from '../components/dashboard/TotalSalesCard';
-import OrdersThisMonthCard from '../components/dashboard/OrdersThisMonthCard';
-import BestSellersCard from '../components/dashboard/BestSellersCard';
-import InventoryAlertsCard from '../components/dashboard/InventoryAlertsCard';
-import ExistingProductsCard from '../components/dashboard/ExistingProductsCard';
+import { AppContext } from '@contexts/AppContext';
+import { getPageTitle } from '@lib/pageTitle';
+import TotalProductsCard from '@components/dashboard/TotalProductsCard';
+import TotalSalesCard from '@components/dashboard/TotalSalesCard';
+import OrdersThisMonthCard from '@components/dashboard/OrdersThisMonthCard';
+import BestSellersCard from '@components/dashboard/BestSellersCard';
+import InventoryAlertsCard from '@components/dashboard/InventoryAlertsCard';
+import ExistingProductsCard from '@components/dashboard/ExistingProductsCard';
 
 const DashboardPage: React.FC = () => {
   const { user } = useContext(AppContext) as { user: any };

@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
-import { getOrderByUuid } from '../../../../lib/orders';
-import { handleApiError } from '../../../../lib/utils/handleApiError';
+import { getOrderByUuid } from '@lib/orders';
+import { handleApiError } from '@utils/handleApiError';
 import type { Order, ApiMessage } from '../../../../types';
 
 export default async function handler(
