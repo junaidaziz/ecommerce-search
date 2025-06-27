@@ -77,6 +77,7 @@ model Product {
   productType   String
   tags          String?
   quantity      Int      @default(0)
+  lowStockThreshold Int? @default(5)
   minPrice      Float    @default(0)
   maxPrice      Float    @default(0)
   currency      String   @default("USD")

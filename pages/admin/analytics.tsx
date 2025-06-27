@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 import Link from 'next/link';
-import { AnalyticsData } from '../../types';
+import { AnalyticsData, LowStockProduct } from '../../types';
 import { fetchJson } from '../../lib/utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
@@ -11,16 +11,31 @@ export default function AdminAnalytics() {
   const { user } = useContext(AppContext)!;
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [start, setStart] = useState('');
+  const [end, setEnd] = useState('');
+  const [lowStock, setLowStock] = useState<LowStockProduct[]>([]);
 
-  useEffect(() => {
+  const load = () => {
     if (!user) return;
     setLoading(true);
-    fetchJson<AnalyticsData>('/api/admin/analytics')
+    const params = new URLSearchParams();
+    if (start) params.set('start', start);
+    if (end) params.set('end', end);
+    fetchJson<AnalyticsData>(
+      '/api/admin/analytics' + (params.toString() ? `?${params}` : '')
+    )
       .then((res) => setData(res))
       .catch(() =>
         setData({ totalOrders: 0, totalRevenue: 0, topProducts: [] })
       )
       .finally(() => setLoading(false));
+    fetchJson<{ products: LowStockProduct[] }>('/api/admin/low-stock')
+      .then((res) => setLowStock(res.products))
+      .catch(() => setLowStock([]));
+  };
+
+  useEffect(() => {
+    load();
   }, [user]);
 
   if (!user) return <div className="p-4">Please log in to view analytics.</div>;
@@ -49,6 +64,29 @@ export default function AdminAnalytics() {
           Search Logs
         </Link>
       </div>
+      <form
+        className="flex flex-wrap gap-2 mb-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          load();
+        }}
+      >
+        <input
+          type="date"
+          value={start}
+          onChange={(e) => setStart(e.target.value)}
+          className="input input-sm input-bordered"
+        />
+        <input
+          type="date"
+          value={end}
+          onChange={(e) => setEnd(e.target.value)}
+          className="input input-sm input-bordered"
+        />
+        <button type="submit" className="btn btn-sm btn-primary">
+          Apply
+        </button>
+      </form>
       <p>Total Orders: {data.totalOrders}</p>
       <p>Total Revenue: £{data.totalRevenue.toFixed(2)}</p>
       <h2 className="text-xl font-semibold mt-4 mb-2">Top Products</h2>
@@ -65,6 +103,18 @@ export default function AdminAnalytics() {
           data={data.topProducts.map((p) => ({ label: p.id, value: p.qty }))}
         />
       </div>
+      {lowStock.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-2">Low Stock Products</h2>
+          <ul className="list-disc list-inside text-rose-600">
+            {lowStock.map((p) => (
+              <li key={p.id}>
+                {p.title} - {p.quantity} left
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
