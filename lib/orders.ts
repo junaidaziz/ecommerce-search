@@ -164,6 +164,19 @@ export async function getOrdersForVendor(vendor: string): Promise<Order[]> {
   return rows.map(mapDbRowToOrder);
 }
 
+export async function getOrdersForVendorId(vendorId: number): Promise<Order[]> {
+  const db = getDb();
+  const rows: OrderWithRelations[] = await db.order.findMany({
+    where: { product: { vendorId } },
+    include: {
+      user: true,
+      product: { include: { vendor: true, category: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+  return rows.map(mapDbRowToOrder);
+}
+
 export async function hasOrdersForProduct(
   productUuid: string
 ): Promise<boolean> {
