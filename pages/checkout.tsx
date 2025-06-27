@@ -160,9 +160,24 @@ const Checkout: React.FC = () => {
                 if (res.ok) {
                   const data: Coupon = await res.json();
                   if (data.discountType === 'percent') {
-                    setDiscount(data.value);
+                    setDiscount(data.amount);
+                  } else if (data.discountType === 'bogo') {
+                    if (cart.length >= 2) {
+                      const cheapest = Math.min(
+                        ...cart.map((item) =>
+                          parseFloat(
+                            typeof item.minPrice === 'number'
+                              ? item.minPrice.toString()
+                              : item.minPrice || '0'
+                          )
+                        )
+                      );
+                      setDiscount((cheapest / totalPrice) * 100);
+                    } else {
+                      setDiscount(0);
+                    }
                   } else {
-                    setDiscount(totalPrice > 0 ? (data.value / totalPrice) * 100 : 0);
+                    setDiscount(totalPrice > 0 ? (data.amount / totalPrice) * 100 : 0);
                   }
                 } else {
                   setDiscount(0);

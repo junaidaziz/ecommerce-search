@@ -17,12 +17,22 @@ const ExistingProductsCard: React.FC<Props> = ({ previewCount = 3 }) => {
   useEffect(() => {
     setProducts(null);
     setError('');
-    fetch('/api/brand/products')
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data: { products: Product[]; total: number }) =>
-        setProducts(data.products)
-      )
-      .catch(() => setError('Failed to load'));
+    async function load() {
+      try {
+        const res = await fetch('/api/brand/products');
+        if (res.ok) {
+          const data: { products: Product[]; total: number } = await res.json();
+          setProducts(data.products);
+        } else if (res.status === 404) {
+          setError('No data available');
+        } else {
+          throw new Error('err');
+        }
+      } catch {
+        setError('Failed to load');
+      }
+    }
+    load();
   }, []);
 
   const preview =

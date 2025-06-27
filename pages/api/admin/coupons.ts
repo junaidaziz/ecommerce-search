@@ -16,7 +16,7 @@ async function handler(
     }
 
     if (req.method === 'POST') {
-      const { code, discountType, amount, expirationDate, usageLimit } =
+      const { code, discountType, amount, minOrderValue, expirationDate, usageLimit } =
         req.body as Partial<Coupon>;
       if (!code || !discountType || amount === undefined) {
         res
@@ -28,6 +28,7 @@ async function handler(
         code: code.toUpperCase(),
         discountType,
         amount,
+        minOrderValue: minOrderValue ?? null,
         expirationDate: expirationDate ? new Date(expirationDate) : undefined,
         usageLimit: usageLimit ?? null,
       });
@@ -44,6 +45,7 @@ async function handler(
       await updateCoupon(Number(id), {
         ...rest,
         code: rest.code?.toUpperCase(),
+        minOrderValue: rest.minOrderValue ?? null,
         expirationDate: rest.expirationDate
           ? new Date(rest.expirationDate)
           : undefined,

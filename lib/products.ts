@@ -1,6 +1,7 @@
 import { JSDOM } from 'jsdom';
 import { getDb } from './db';
 import type { Product, ProductInput } from '../types/product';
+import type { Variant } from '../types/variant';
 import { parseImages } from './utils/parseImages';
 import type { Category } from '../types/category';
 import type { Vendor } from '../types/vendor';
@@ -10,7 +11,7 @@ import { getBestSellingProducts } from './orders';
 import { slugify } from './slugify';
 
 type ProductWithRelations = Prisma.ProductGetPayload<{
-  include: { category: true; vendor: true };
+  include: { category: true; vendor: true; variants: true };
 }>;
 
 interface ProductRow {
@@ -31,6 +32,7 @@ interface ProductRow {
   currency: string;
   discountType?: string | null;
   discountValue?: number | null;
+  variants?: Variant[];
 }
 
 /**
@@ -111,7 +113,7 @@ async function loadProductsData(): Promise<Product[]> {
   try {
     const rows: ProductWithRelations[] = await db.product.findMany({
       where: { status: 'approved' },
-      include: { category: true, vendor: true },
+      include: { category: true, vendor: true, variants: true },
     });
 
     return rows.map((row) => mapDbRowToProduct(row));
@@ -138,6 +140,7 @@ export function mapDbRowToProduct(row: ProductRow): Product {
     category: row.category ?? null,
     images: parseImages(images),
     totalInventory: quantity,
+    variants: row.variants,
     priceRange: {
       minVariantPrice: { amount: minPrice, currencyCode: currency },
       maxVariantPrice: { amount: maxPrice, currencyCode: currency },
@@ -327,7 +330,7 @@ export async function getPendingProducts(): Promise<Product[]> {
   const db = getDb();
   const rows: ProductWithRelations[] = await db.product.findMany({
     where: { status: 'pending' },
-    include: { category: true, vendor: true },
+    include: { category: true, vendor: true, variants: true },
   });
   return rows.map((row) => mapDbRowToProduct(row));
 }
@@ -338,7 +341,7 @@ export async function getProductsByCategorySlug(
   const db = getDb();
   const rows: ProductWithRelations[] = await db.product.findMany({
     where: { status: 'approved', category: { slug } },
-    include: { category: true, vendor: true },
+    include: { category: true, vendor: true, variants: true },
   });
   return rows.map((row) => mapDbRowToProduct(row));
 }
@@ -351,7 +354,7 @@ export async function getProductsByCategorySlugPaginated(
   const db = getDb();
   const rows: ProductWithRelations[] = await db.product.findMany({
     where: { status: 'approved', category: { slug } },
-    include: { category: true, vendor: true },
+    include: { category: true, vendor: true, variants: true },
     take: limit,
     skip: offset,
     orderBy: { id: 'asc' },
@@ -366,7 +369,7 @@ export async function getApprovedProductsPaginated(
   const db = getDb();
   const rows: ProductWithRelations[] = await db.product.findMany({
     where: { status: 'approved' },
-    include: { category: true, vendor: true },
+    include: { category: true, vendor: true, variants: true },
     take: limit,
     skip: offset,
     orderBy: { id: 'asc' },
@@ -380,7 +383,7 @@ export async function getProductsByVendorBrandName(
   const db = getDb();
   const rows: ProductWithRelations[] = await db.product.findMany({
     where: { status: 'approved', vendor: { brandName } },
-    include: { category: true, vendor: true },
+    include: { category: true, vendor: true, variants: true },
     orderBy: { id: 'asc' },
   });
   return rows.map((row) => mapDbRowToProduct(row));
@@ -455,7 +458,7 @@ export async function getProductsPaginated(
 
   let rows = await db.product.findMany({
     where,
-    include: { category: true, vendor: true },
+    include: { category: true, vendor: true, variants: true },
     orderBy,
   });
 

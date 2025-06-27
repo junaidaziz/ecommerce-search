@@ -14,14 +14,8 @@ const BrandOrders: React.FC = () => {
 
   useEffect(() => {
     if (!user || status === 'loading') return;
-    const vendorId = user.brandName || session?.user?.brandName;
-    if (!vendorId) {
-      setError('Unable to determine brand ID');
-      setLoading(false);
-      return;
-    }
     setLoading(true);
-    fetch(`/api/brand/orders?vendor=${encodeURIComponent(vendorId)}`)
+    fetch('/api/brand/orders')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: Order[]) => {
         setOrders(data);

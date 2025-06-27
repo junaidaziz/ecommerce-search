@@ -87,6 +87,8 @@ export default function ProductDetail({
   if (!appCtx) return null;
   const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } =
     appCtx;
+  const [variantId, setVariantId] = useState<string>('');
+  const selectedVariant = product.variants?.find((v) => String(v.id) === variantId);
 
   return (
     <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md min-h-screen">
@@ -130,8 +132,24 @@ export default function ProductDetail({
               typeof product.minPrice === 'number'
                 ? product.minPrice.toString()
                 : product.minPrice || '0'
-            ).toFixed(2)}
+          ).toFixed(2)}
           </p>
+          {product.variants && product.variants.length > 0 && (
+            <select
+              className="select select-bordered mb-2"
+              value={variantId}
+              onChange={(e) => setVariantId(e.target.value)}
+            >
+              <option value="">Select Variant</option>
+              {product.variants.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {Object.entries(v.attributes)
+                    .map(([k, val]) => `${k}: ${val}`)
+                    .join(', ')} - Stock {v.quantity}
+                </option>
+              ))}
+            </select>
+          )}
           <p className="mb-2 font-medium">
             Stock:{' '}
             {product.totalInventory && product.totalInventory > 10
@@ -146,7 +164,8 @@ export default function ProductDetail({
           <div className="flex gap-2">
             <button
               className="btn btn-primary transition-all duration-200"
-              onClick={() => addToCart(product)}
+              onClick={() => addToCart(product, selectedVariant)}
+              disabled={product.variants && !selectedVariant}
             >
               Add to Cart
             </button>
