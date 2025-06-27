@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import Head from 'next/head';
 import ReactMarkdown from 'react-markdown';
-import { AppContext } from '../../contexts/AppContext';
-import { fetchJson } from '../../lib/utils/fetchJson';
-import { getPageTitle } from '../../lib/pageTitle';
+import { AppContext } from '@contexts/AppContext';
+import { fetchJson } from '@utils/fetchJson';
+import { getPageTitle } from '@lib/pageTitle';
 
 const TYPES = [
   { value: 'terms', label: 'Terms & Conditions' },

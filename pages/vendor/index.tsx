@@ -6,11 +6,11 @@ import {
   ChangeEvent,
   FormEvent,
 } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import type { Product } from '../../types';
-import { TextInput } from '../../components/form-fields';
+import { TextInput } from '@components/form-fields';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 export default function VendorDashboard() {
   const { user } = useContext(AppContext)!;

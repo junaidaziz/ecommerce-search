@@ -1,5 +1,5 @@
 import React, { FC, useContext } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import { useSession } from 'next-auth/react';
 import UserHeader from './UserHeader';
 import BrandHeader from './BrandHeader';

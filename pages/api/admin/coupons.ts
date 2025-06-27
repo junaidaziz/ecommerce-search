@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { withRole } from '../../../lib/withRole';
-import { handleApiError } from '../../../lib/utils/handleApiError';
-import { createCoupon, listCoupons, updateCoupon } from '../../../lib/coupons';
+import { withRole } from '@lib/withRole';
+import { handleApiError } from '@utils/handleApiError';
+import { createCoupon, listCoupons, updateCoupon } from '@lib/coupons';
 import type { Coupon, ApiMessage } from '../../../types';
 
 async function handler(

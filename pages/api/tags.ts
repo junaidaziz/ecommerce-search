@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getDistinctTags } from '../../lib/products';
-import { handleApiError } from '../../lib/utils/handleApiError';
+import { getDistinctTags } from '@lib/products';
+import { handleApiError } from '@utils/handleApiError';
 import type { ApiMessage } from '../../types';
 
 export default async function handler(

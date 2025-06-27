@@ -1,7 +1,7 @@
 import type { NextApiResponse } from 'next';
-import { withRole, AuthedNextApiRequest } from '../../../lib/withRole';
-import { getDb } from '../../../lib/db';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { withRole, AuthedNextApiRequest } from '@lib/withRole';
+import { getDb } from '@lib/db';
+import { handleApiError } from '@utils/handleApiError';
 
 async function handler(req: AuthedNextApiRequest, res: NextApiResponse) {
   try {

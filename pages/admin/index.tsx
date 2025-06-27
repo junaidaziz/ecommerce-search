@@ -6,12 +6,12 @@ import {
   ChangeEvent,
 } from 'react';
 import Link from 'next/link';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import { Product, ProductInput, ApiMessage } from '../../types';
-import { fetchJson } from '../../lib/utils/fetchJson';
-import { TextInput } from '../../components/form-fields';
+import { fetchJson } from '@utils/fetchJson';
+import { TextInput } from '@components/form-fields';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 export default function Admin() {
   const { user } = useContext(AppContext)!;

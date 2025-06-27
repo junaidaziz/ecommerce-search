@@ -3,9 +3,9 @@ import {
   getPendingProducts,
   approveProduct,
   rejectProduct,
-} from '../../../lib/products';
-import { withRole } from '../../../lib/withRole';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+} from '@lib/products';
+import { withRole } from '@lib/withRole';
+import { handleApiError } from '@utils/handleApiError';
 import { PendingProduct, ApiMessage } from '../../../types';
 
 async function handler(

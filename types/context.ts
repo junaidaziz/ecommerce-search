@@ -1,7 +1,7 @@
 import type { Product } from './product';
 import type { Variant } from './variant';
 import type { ShippingInfo } from './shipping';
-import type { UserInfo } from '../lib/types';
+import type { UserInfo } from '@lib/types';
 import type { WishlistItem } from './wishlist';
 
 export interface AppContextValue {

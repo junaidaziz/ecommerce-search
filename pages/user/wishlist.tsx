@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import Link from 'next/link';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import type { AppContextValue, WishlistItem } from '../../types';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 const UserWishlist: React.FC = () => {
   const context = useContext<AppContextValue | undefined>(AppContext);

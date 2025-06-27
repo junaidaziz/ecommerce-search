@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { GenericInput } from '../UI';
 import GenericModal from '../Modals/GenericModal';
-import { slugify } from '../../lib/slugify';
+import { slugify } from '@lib/slugify';
 
 interface CreateCategoryModalProps {
   isOpen: boolean;

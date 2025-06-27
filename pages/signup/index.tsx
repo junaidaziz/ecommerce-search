@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
-import PageContainer from '../../components/Layout/PageContainer';
+import { getPageTitle } from '@lib/pageTitle';
+import PageContainer from '@components/Layout/PageContainer';
 
 export default function Signup() {
   return (

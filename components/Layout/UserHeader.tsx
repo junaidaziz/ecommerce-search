@@ -4,7 +4,7 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import type { FC } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import CartIcon from '../icons/CartIcon';
 import MoonIcon from '../icons/MoonIcon';
 import SunIcon from '../icons/SunIcon';
@@ -16,11 +16,11 @@ import FashionIcon from '../icons/FashionIcon';
 import HomeIcon from '../icons/HomeIcon';
 import ToysIcon from '../icons/ToysIcon';
 import SportsIcon from '../icons/SportsIcon';
+import DEFAULT_CATEGORIES from '@lib/defaultCategories';
 import TrashIcon from '../icons/TrashIcon';
-import DEFAULT_CATEGORIES from '../../lib/defaultCategories';
 import SearchBar from './SearchBar';
-import type { Category } from '../../types/category';
-import type { User } from '../../types/user';
+import type { Category } from '@types/category';
+import type { User } from '@types/user';
 
 interface HeaderProps {
   theme?: string;

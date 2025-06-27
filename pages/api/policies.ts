@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getDb } from '../../lib/db';
-import { handleApiError } from '../../lib/utils/handleApiError';
+import { getDb } from '@lib/db';
+import { handleApiError } from '@utils/handleApiError';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

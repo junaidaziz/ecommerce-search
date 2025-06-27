@@ -1,18 +1,18 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState, useContext, FormEvent, ChangeEvent } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import Link from 'next/link';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
-import ProductImageSlider from '../../components/Product/ProductImageSlider';
+import { getPageTitle } from '@lib/pageTitle';
+import ProductImageSlider from '@components/Product/ProductImageSlider';
 import type { Product } from '../../types';
 import type {
   Review,
   ReviewsResponse,
   ReviewAddedResponse,
-} from '../../types/review';
-import { SelectDropdown, Textarea } from '../../components/form-fields';
-import type { SelectOption } from '../../components/form-fields/SelectDropdown';
+} from '@types/review';
+import { SelectDropdown, Textarea } from '@components/form-fields';
+import type { SelectOption } from '@components/form-fields/SelectDropdown';
 
 interface ProductDetailProps {}
 

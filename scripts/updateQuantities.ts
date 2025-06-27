@@ -1,5 +1,5 @@
-import { prisma } from '../lib/prisma';
-import { loadAndIndexProducts } from '../lib/products';
+import { prisma } from '@lib/prisma';
+import { loadAndIndexProducts } from '@lib/products';
 
 async function main() {
   const products = await prisma.product.findMany({ select: { id: true } });

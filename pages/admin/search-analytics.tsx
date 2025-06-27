@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import Link from 'next/link';
 import { SearchAnalyticsResponse } from '../../types';
-import { fetchJson } from '../../lib/utils/fetchJson';
+import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 export default function SearchAnalytics() {
   const { user } = useContext(AppContext)!;

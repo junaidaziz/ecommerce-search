@@ -2,9 +2,9 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { PasswordInput } from '../../components/form-fields';
+import { PasswordInput } from '@components/form-fields';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 const ResetToken: React.FC = () => {
   const router = useRouter();

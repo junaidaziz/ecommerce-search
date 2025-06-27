@@ -5,11 +5,11 @@ import {
   deleteUser,
   addUser,
   setUserDisabled,
-} from '../../../lib/users';
+} from '@lib/users';
 import type { Role } from '@prisma/client';
-import { withRole } from '../../../lib/withRole';
-import { handleApiError } from '../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../lib/utils/getQueryParam';
+import { withRole } from '@lib/withRole';
+import { handleApiError } from '@utils/handleApiError';
+import { getQueryParam } from '@utils/getQueryParam';
 import {
   AdminUser,
   UserRoleUpdateRequest,

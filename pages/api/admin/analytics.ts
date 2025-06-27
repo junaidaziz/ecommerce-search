@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { withRole } from '../../../lib/withRole';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { withRole } from '@lib/withRole';
+import { handleApiError } from '@utils/handleApiError';
 import { AnalyticsData, ApiMessage } from '../../../types';
-import { getDb } from '../../../lib/db';
-import { getQueryParam } from '../../../lib/utils/getQueryParam';
+import { getDb } from '@lib/db';
+import { getQueryParam } from '@utils/getQueryParam';
 
 async function handler(
   req: NextApiRequest,
