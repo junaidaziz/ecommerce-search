@@ -102,7 +102,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
 
   return (
     <header className="relative bg-base-300 mb-6 py-4">
-      <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2">
         <Link
           href="/"
           className="p-0 flex items-center cursor-pointer transition-transform duration-300 ease-out hover:scale-110 hover:-translate-y-1 hover:shadow-xl"
@@ -117,9 +117,10 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           />
         </Link>
 
-        <div className="flex-1 flex items-center gap-x-4 relative">
-          <button
+        <div className="flex-1 flex items-center gap-x-6 relative">
+        <button
             type="button"
+            aria-label="Toggle categories"
             className="md:hidden btn btn-ghost"
             aria-controls="mobile-cat-menu"
             aria-expanded={mobileOpen}
@@ -136,6 +137,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
               >
                 <button
                   type="button"
+                  aria-label="Categories menu"
                   className="flex items-center gap-1"
                   onClick={() => setMenuOpen((prev) => !prev)}
                   onMouseEnter={handleMenuEnter}
@@ -240,7 +242,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           {!isAuthRoute && (
             <SearchBar placeholder="Search for products, brands..." />
           )}
-          <nav className="hidden lg:flex gap-4 ml-4">
+          <nav className="hidden lg:flex gap-6 ml-4">
             <Link
               href="/products"
               className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname.startsWith('/products') ? 'text-primary underline font-semibold' : ''}`}
@@ -262,15 +264,16 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           </nav>
         </div>
 
-        <nav className="flex items-center gap-2">
+        <nav className="flex items-center gap-4">
           <div className="dropdown dropdown-end dropdown-hover">
             <label
               tabIndex={0}
+              aria-label="Shopping cart"
               className="relative p-2 cursor-pointer transition-colors transition-transform duration-200 hover:text-primary hover:scale-105"
             >
               <CartIcon className="w-5 h-5" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+                <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs rounded-full px-1">
                   {itemCount}
                 </span>
               )}
@@ -382,10 +385,14 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           ) : (
             !isAuthRoute && (
               <>
-                <Link href="/login" className="btn btn-ghost">
+                <Link href="/login" aria-label="Login" className="btn btn-ghost">
                   Login
                 </Link>
-                <Link href="/signup" className="btn btn-primary">
+                <Link
+                  href="/signup"
+                  aria-label="Create an account"
+                  className="btn btn-primary px-4 hover:opacity-90"
+                >
                   Signup
                 </Link>
               </>
