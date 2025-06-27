@@ -269,14 +269,16 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
             <label
               tabIndex={0}
               aria-label="Shopping cart"
-              className="relative p-2 cursor-pointer transition-colors transition-transform duration-200 hover:text-primary hover:scale-105"
+              className="p-2 cursor-pointer transition-colors transition-transform duration-200 hover:text-primary hover:scale-105"
             >
-              <CartIcon className="w-5 h-5" />
-              {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
-                  {itemCount}
-                </span>
-              )}
+              <div className="relative flex items-center">
+                <CartIcon className="w-5 h-5" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 text-xs h-4 w-4 rounded-full flex items-center justify-center bg-red-500 text-white">
+                    {itemCount}
+                  </span>
+                )}
+              </div>
             </label>
             <div
               tabIndex={0}
