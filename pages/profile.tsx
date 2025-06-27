@@ -1,3 +1,4 @@
+import React from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
@@ -9,6 +10,11 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from './api/auth/[...nextauth]';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import UserIcon from '@components/icons/UserIcon';
+import HomeIcon from '@components/icons/HomeIcon';
+import BoxIcon from '@components/icons/BoxIcon';
+import CheckCircleIcon from '@components/icons/CheckCircleIcon';
+import PencilIcon from '@components/icons/PencilIcon';
 
 dayjs.extend(relativeTime);
 
@@ -24,10 +30,39 @@ const Profile: React.FC = () => {
   }, [user]);
   if (!user) return null;
 
-  const display = (value: unknown): string =>
-    value !== null && value !== undefined && value !== ''
-      ? String(value)
-      : 'Not provided';
+  const display = (value: unknown): React.ReactNode =>
+    value !== null && value !== undefined && value !== '' ? (
+      String(value)
+    ) : (
+      <span className="text-gray-400">&#8212;</span>
+    );
+
+  const Field: React.FC<{
+    label: string;
+    value: React.ReactNode;
+  }> = ({ label, value }) => (
+    <div className="flex items-start justify-between gap-2">
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-gray-500">{label}</p>
+        <p className="font-medium break-words">{value}</p>
+      </div>
+      <PencilIcon className="w-4 h-4 text-gray-400" />
+    </div>
+  );
+
+  const Section: React.FC<{
+    title: string;
+    icon: React.ReactNode;
+    children: React.ReactNode;
+  }> = ({ title, icon, children }) => (
+    <section className="bg-base-100 border rounded shadow p-4 space-y-4">
+      <h2 className="text-lg font-semibold flex items-center gap-2 border-b pb-2">
+        {icon}
+        {title}
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>
+    </section>
+  );
 
   const lastUpdated = profile?.updatedAt
     ? `Updated ${dayjs(profile.updatedAt).fromNow()}`
@@ -42,7 +77,12 @@ const Profile: React.FC = () => {
       <Head>
         <title>{getPageTitle('My Profile')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">My Profile</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">My Profile</h1>
+        <Link href="/profile/edit" className="btn btn-primary">
+          Update Profile
+        </Link>
+      </div>
 
       <div className="flex items-center gap-4">
         {profile?.logo ? (
@@ -62,84 +102,32 @@ const Profile: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
-        <div>
-          <p className="text-sm text-gray-500">Full Name</p>
-          <p className="font-medium">{display(fullName)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Email</p>
-          <p className="font-medium">{display(profile?.email || user.email)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Phone</p>
-          <p className="font-medium">{display(profile?.phoneNumber)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Address</p>
-          <p className="font-medium">{display(profile?.address)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">City</p>
-          <p className="font-medium">{display(profile?.city)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">State</p>
-          <p className="font-medium">{display((profile as Record<string, string> | undefined)?.state)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Postal Code</p>
-          <p className="font-medium">{display((profile as Record<string, string> | undefined)?.postalCode)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Country</p>
-          <p className="font-medium">{display(profile?.country)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Brand Name</p>
-          <p className="font-medium">{display(profile?.brandName)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Business Address</p>
-          <p className="font-medium">{display(profile?.businessAddress)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Website</p>
-          <p className="font-medium">{display(profile?.website)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Description</p>
-          <p className="font-medium">{display(profile?.businessDescription)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Tax ID</p>
-          <p className="font-medium">{display(profile?.taxId)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Role</p>
-          <p className="font-medium">{display(profile?.role)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Verified</p>
-          <p className="font-medium">
-            {profile ? (profile.verified ? 'Yes' : 'No') : 'Not provided'}
-          </p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Disabled</p>
-          <p className="font-medium">
-            {profile ? (profile.disabled ? 'Yes' : 'No') : 'Not provided'}
-          </p>
-        </div>
-        <div className="md:col-span-2">
-          <p className="text-sm text-gray-500">Last updated</p>
-          <p className="font-medium">{lastUpdated}</p>
-        </div>
+      <div className="space-y-4 mt-4">
+        <Section title="Personal Info" icon={<UserIcon className="w-5 h-5" />}>
+          <Field label="Full Name" value={display(fullName)} />
+          <Field label="Email" value={display(profile?.email || user.email)} />
+          <Field label="Gender" value={display(profile?.gender)} />
+          <Field label="Phone" value={display(profile?.phoneNumber)} />
+        </Section>
+        <Section title="Location Info" icon={<HomeIcon className="w-5 h-5" />}>
+          <Field label="Address" value={display(profile?.address)} />
+          <Field label="City" value={display(profile?.city)} />
+          <Field label="State" value={display((profile as Record<string, string> | undefined)?.state)} />
+          <Field label="Country" value={display(profile?.country)} />
+        </Section>
+        <Section title="Brand Info" icon={<BoxIcon className="w-5 h-5" />}>
+          <Field label="Brand Name" value={display(profile?.brandName)} />
+          <Field label="Website" value={display(profile?.website)} />
+          <Field label="Business Address" value={display(profile?.businessAddress)} />
+          <Field label="Tax ID" value={display(profile?.taxId)} />
+        </Section>
+        <Section title="System Info" icon={<CheckCircleIcon className="w-5 h-5" />}>
+          <Field label="Role" value={display(profile?.role)} />
+          <Field label="Status" value={profile ? (profile.disabled ? 'Disabled' : 'Active') : display(undefined)} />
+          <Field label="Verified" value={profile ? (profile.verified ? 'Yes' : 'No') : display(undefined)} />
+          <Field label="Last Updated" value={lastUpdated} />
+        </Section>
       </div>
-
-      <Link href="/profile/edit" className="btn btn-primary mt-4">
-        Update Profile
-      </Link>
     </div>
   );
 };
