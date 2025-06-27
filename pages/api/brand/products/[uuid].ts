@@ -3,11 +3,11 @@ import {
   updateProduct,
   deleteProduct,
   loadAndIndexProducts,
-} from '../../../../lib/products';
-import { getProductByUuid } from '../../../../lib/db';
-import { hasOrdersForProduct } from '../../../../lib/orders';
-import { handleApiError } from '../../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../../lib/utils/getQueryParam';
+} from '@lib/products';
+import { getProductByUuid } from '@lib/db';
+import { hasOrdersForProduct } from '@lib/orders';
+import { handleApiError } from '@utils/handleApiError';
+import { getQueryParam } from '@utils/getQueryParam';
 import type { ApiMessage, ProductInput } from '../../../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';

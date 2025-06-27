@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
-import CategoryCard from '../../components/Category/CategoryCard';
-import { getPageTitle } from '../../lib/pageTitle';
+import CategoryCard from '@components/Category/CategoryCard';
+import { getPageTitle } from '@lib/pageTitle';
 import { Category } from '../../types';
 
 const Categories: React.FC = () => {

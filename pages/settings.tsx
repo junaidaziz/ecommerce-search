@@ -1,15 +1,15 @@
 import { useState, useEffect, useContext } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Head from 'next/head';
-import { getPageTitle } from '../lib/pageTitle';
-import useRequireAuth from '../hooks/useRequireAuth';
-import { NotificationContext } from '../contexts/NotificationContext';
+import { getPageTitle } from '@lib/pageTitle';
+import useRequireAuth from '@hooks/useRequireAuth';
+import { NotificationContext } from '@contexts/NotificationContext';
 import {
   TextInput,
   EmailInput,
   PasswordInput,
   CountrySelect,
-} from '../components/form-fields';
+} from '@components/form-fields';
 import countries from '../data/countries';
 import type { PaymentMethod } from '../types';
 

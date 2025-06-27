@@ -1,8 +1,8 @@
 import type { NextApiResponse } from 'next';
-import { getDb } from '../../../lib/db';
-import { withRole, AuthedNextApiRequest } from '../../../lib/withRole';
-import { handleApiError } from '../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../lib/utils/getQueryParam';
+import { getDb } from '@lib/db';
+import { withRole, AuthedNextApiRequest } from '@lib/withRole';
+import { handleApiError } from '@utils/handleApiError';
+import { getQueryParam } from '@utils/getQueryParam';
 import type { ApiMessage } from '../../../types';
 
 async function handler(

@@ -1,8 +1,8 @@
 import Head from 'next/head';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
-import { getPageTitle } from '../lib/pageTitle';
-import { fetchJson } from '../lib/utils/fetchJson';
+import { getPageTitle } from '@lib/pageTitle';
+import { fetchJson } from '@utils/fetchJson';
 
 const TermsPage: React.FC = () => {
   const [content, setContent] = useState('');

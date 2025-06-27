@@ -1,15 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
-import BarChart from '../../components/BarChart';
-import ChartContainer from '../../components/ChartContainer';
-import DashboardCard from '../../components/dashboard/DashboardCard';
-import TotalProductsCard from '../../components/dashboard/TotalProductsCard';
-import TotalSalesCard from '../../components/dashboard/TotalSalesCard';
-import OrdersThisMonthCard from '../../components/dashboard/OrdersThisMonthCard';
-import InventoryAlertsCard from '../../components/dashboard/InventoryAlertsCard';
-import CartIcon from '../../components/icons/CartIcon';
+import { getPageTitle } from '@lib/pageTitle';
+import BarChart from '@components/BarChart';
+import ChartContainer from '@components/ChartContainer';
+import DashboardCard from '@components/dashboard/DashboardCard';
+import TotalProductsCard from '@components/dashboard/TotalProductsCard';
+import TotalSalesCard from '@components/dashboard/TotalSalesCard';
+import OrdersThisMonthCard from '@components/dashboard/OrdersThisMonthCard';
+import InventoryAlertsCard from '@components/dashboard/InventoryAlertsCard';
+import CartIcon from '@components/icons/CartIcon';
 import {
   ResponsiveContainer,
   LineChart,

@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
-import { findUser } from '../../../../lib/users';
-import { removeWishlistItem } from '../../../../lib/wishlist';
-import { handleApiError } from '../../../../lib/utils/handleApiError';
+import { findUser } from '@lib/users';
+import { removeWishlistItem } from '@lib/wishlist';
+import { handleApiError } from '@utils/handleApiError';
 import type { ApiMessage } from '../../../../types';
 
 export default async function handler(

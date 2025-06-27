@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getAllOrdersFiltered, updateOrderStatus } from '../../../lib/orders';
-import { withRole } from '../../../lib/withRole';
-import { handleApiError } from '../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../lib/utils/getQueryParam';
+import { getAllOrdersFiltered, updateOrderStatus } from '@lib/orders';
+import { withRole } from '@lib/withRole';
+import { handleApiError } from '@utils/handleApiError';
+import { getQueryParam } from '@utils/getQueryParam';
 import type { Order, ApiMessage } from '../../../types';
 
 async function handler(

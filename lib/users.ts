@@ -1,6 +1,6 @@
 import { getDb } from './db';
 import type { Prisma, Role } from '@prisma/client';
-import type { UserInput } from '../types/user';
+import type { UserInput } from '@types/user';
 import bcrypt from 'bcryptjs';
 import { slugify } from './slugify';
 

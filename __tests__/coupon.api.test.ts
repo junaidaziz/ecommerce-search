@@ -1,7 +1,7 @@
-import handler from '../pages/api/coupons/[code]';
-import { findCouponByCode } from '../lib/coupons';
+import handler from '@pages/api/coupons/[code]';
+import { findCouponByCode } from '@lib/coupons';
 
-jest.mock('../lib/coupons', () => ({
+jest.mock('@lib/coupons', () => ({
   findCouponByCode: jest.fn(),
 }));
 

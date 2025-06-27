@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getQueryParam } from '../../../lib/utils/getQueryParam';
-import { handleApiError } from '../../../lib/utils/handleApiError';
-import { findCouponByCode } from '../../../lib/coupons';
+import { getQueryParam } from '@utils/getQueryParam';
+import { handleApiError } from '@utils/handleApiError';
+import { findCouponByCode } from '@lib/coupons';
 import type { Coupon, ApiMessage } from '../../../types';
 
 export default async function handler(

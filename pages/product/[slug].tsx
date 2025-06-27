@@ -1,21 +1,21 @@
 import { useContext, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 import Link from 'next/link';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
-import { AppContext } from '../../contexts/AppContext';
-import ProductImageSlider from '../../components/Product/ProductImageSlider';
-import RecommendedProducts from '../../components/Product/RecommendedProducts';
+import { AppContext } from '@contexts/AppContext';
+import ProductImageSlider from '@components/Product/ProductImageSlider';
+import RecommendedProducts from '@components/Product/RecommendedProducts';
 import {
   getProductBySlug,
   getReviewsForProduct,
   getAverageRating,
-} from '../../lib/db';
-import { mapDbRowToProduct } from '../../lib/products';
+} from '@lib/db';
+import { mapDbRowToProduct } from '@lib/products';
 import { Product, Review } from '../../types';
-import { SelectDropdown, Textarea } from '../../components/form-fields';
-import { serializeDates } from '../../lib/utils/serializeDates';
+import { SelectDropdown, Textarea } from '@components/form-fields';
+import { serializeDates } from '@utils/serializeDates';
 
 type ProductDetailProps = {
   product: Product;

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import type { InfiniteLoaderProps } from '../types/shared';
+import type { InfiniteLoaderProps } from '@types/shared';
 
 const InfiniteLoader: React.FC<InfiniteLoaderProps> = ({
   onLoadMore,

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { addGuestOrder, getGuestOrder } from '../../lib/guestOrders';
-import { handleApiError } from '../../lib/utils/handleApiError';
+import { addGuestOrder, getGuestOrder } from '@lib/guestOrders';
+import { handleApiError } from '@utils/handleApiError';
 
 export default async function handler(
   req: NextApiRequest,

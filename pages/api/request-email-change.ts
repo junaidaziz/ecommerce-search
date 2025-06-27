@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { setResetToken, findUser } from '../../lib/users';
+import { setResetToken, findUser } from '@lib/users';
 import crypto from 'crypto';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
-import { handleApiError } from '../../lib/utils/handleApiError';
+import { handleApiError } from '@utils/handleApiError';
 import type { ResetTokenResponse, ApiMessage } from '../../types';
 
 export default async function handler(
