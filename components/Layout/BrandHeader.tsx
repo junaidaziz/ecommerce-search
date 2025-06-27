@@ -33,7 +33,7 @@ const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
 
   return (
     <header className="relative bg-base-300 mb-6 py-4">
-      <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2">
         <Link
           href="/"
           className="p-0 flex items-center cursor-pointer transition-transform duration-300 ease-out hover:scale-110 hover:-translate-y-1 hover:shadow-xl"
@@ -47,7 +47,7 @@ const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
             priority
           />
         </Link>
-        <nav className="flex-1 flex items-center gap-4 ml-4">
+        <nav className="flex-1 flex items-center gap-6 ml-4">
           {user && (
             <>
               <Link
@@ -71,7 +71,7 @@ const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
             </>
           )}
         </nav>
-        <nav className="flex items-center gap-2">
+        <nav className="flex items-center gap-4">
           {user && (
             <div className="flex flex-wrap gap-2 mr-2">
               <Link
@@ -154,10 +154,14 @@ const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           ) : (
             !isAuthRoute && (
               <>
-                <Link href="/login" className="btn btn-ghost">
+                <Link href="/login" aria-label="Login" className="btn btn-ghost">
                   Login
                 </Link>
-                <Link href="/signup" className="btn btn-primary">
+                <Link
+                  href="/signup"
+                  aria-label="Create an account"
+                  className="btn btn-primary px-4 hover:opacity-90"
+                >
                   Signup
                 </Link>
               </>
