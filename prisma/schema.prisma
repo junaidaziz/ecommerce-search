@@ -30,6 +30,7 @@ model User {
   website             String?
   businessDescription String?
   logo                String?
+  profileImage        String?
   taxId               String?
   stripeAccountId     String?
   role                Role      @default(USER)

@@ -12,4 +12,5 @@ export type UserInfo = Pick<
   | 'address'
   | 'city'
   | 'country'
+  | 'profileImage'
 > & { role: string };
