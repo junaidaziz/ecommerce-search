@@ -11,24 +11,7 @@ import {
 } from '../form-fields';
 
 import { AppContext } from '../../contexts/AppContext';
-
-export interface ProductFormValues {
-  id: string;
-  vendor: string;
-  sku: string;
-  title: string;
-  description: string;
-  productType: string;
-  tags: string[];
-  categoryId: string;
-  quantity: number;
-  minPrice: number;
-  maxPrice: number;
-  currency: string;
-  discountType: 'percentage' | 'fixed' | 'none';
-  discountValue?: number;
-  available: boolean;
-}
+import type { ProductFormValues } from '../../types';
 
 interface ProductFormProps {
   initial?: Partial<ProductFormValues>;
@@ -89,7 +72,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
       minPrice: initial?.minPrice ?? 0,
       maxPrice: initial?.maxPrice ?? 0,
       currency: initial?.currency || 'USD',
-      discountType: (initial?.discountType as any) || 'none',
+      discountType:
+        (initial?.discountType as ProductFormValues['discountType'] | undefined) ??
+        'none',
       discountValue:
         typeof initial?.discountValue === 'number'
           ? initial.discountValue
@@ -118,8 +103,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const params = new URLSearchParams({ search: inputValue, limit: '20' });
     const res = await fetch(`/api/categories?${params.toString()}`);
     if (!res.ok) return [];
-    const data = await res.json();
-    return (data.categories || []).map((c: any) => ({
+    const data: import('../../types').CategoriesResponse = await res.json();
+    return (data.categories || []).map((c) => ({
       label: c.name,
       value: String(c.id),
     }));
@@ -131,8 +116,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const params = new URLSearchParams({ search: inputValue, limit: '20' });
     const res = await fetch(`/api/vendors?${params.toString()}`);
     if (!res.ok) return [];
-    const data = await res.json();
-    return (data.vendors || []).map((v: any) => ({
+    const data: import('../../types').VendorsResponse = await res.json();
+    return (data.vendors || []).map((v) => ({
       label: v.brandName,
       value: v.brandName,
     }));
