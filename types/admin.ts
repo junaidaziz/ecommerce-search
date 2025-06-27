@@ -52,3 +52,9 @@ export interface AnalyticsData {
   totalRevenue: number;
   topProducts: { id: string; qty: number }[];
 }
+
+export interface LowStockProduct {
+  id: string;
+  title: string;
+  quantity: number;
+}
