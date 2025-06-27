@@ -273,7 +273,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
             >
               <CartIcon className="w-5 h-5" />
               {itemCount > 0 && (
-                <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs rounded-full px-1">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
                   {itemCount}
                 </span>
               )}
