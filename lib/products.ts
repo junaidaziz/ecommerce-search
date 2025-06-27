@@ -259,6 +259,9 @@ export async function updateProduct(
   product: ProductInput & { id?: string | number }
 ): Promise<void> {
   const db = getDb();
+  const existing = await db.product.findUnique({
+    where: { uuid: product.uuid || String(product.id) },
+  });
   if (!product.vendor?.brandName) {
     const err = new Error('Vendor is required') as Error & { code?: string };
     err.code = 'BAD_REQUEST';
@@ -309,6 +312,15 @@ export async function updateProduct(
       category: { connect: { id: category.id } },
     } as Prisma.ProductUpdateInput,
   });
+  if (existing && existing.quantity <= 0 && (product.quantity ?? 0) > 0) {
+    try {
+      await import('./wishlist').then(({ notifyBackInStock }) =>
+        notifyBackInStock(existing.id)
+      );
+    } catch {
+      // ignore
+    }
+  }
 }
 
 export async function getPendingProducts(): Promise<Product[]> {

@@ -10,6 +10,7 @@ import type { UserInfo } from '../lib/types';
 import type { AppContextValue } from '../types';
 import { Product } from '../types/product';
 import type { ShippingInfo } from '../types/shipping';
+import type { WishlistItem } from '../types/wishlist';
 
 export const AppContext = createContext<AppContextValue | undefined>(undefined);
 
@@ -21,7 +22,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const { data: session } = useSession();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [cart, setCart] = useState<(Product & { qty: number })[]>([]);
-  const [wishlist, setWishlist] = useState<Product[]>([]);
+  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const { addNotification } = useContext(NotificationContext);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export function AppProvider({ children }: AppProviderProps) {
         if (Array.isArray(data)) setCart(data);
       })
       .catch(() => {});
-    fetch('/api/wishlist')
+    fetch('/api/user/wishlist')
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
         if (Array.isArray(data)) setWishlist(data);
@@ -81,11 +82,6 @@ export function AppProvider({ children }: AppProviderProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items: cart }),
-      }).catch(() => {});
-      fetch('/api/wishlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: wishlist }),
       }).catch(() => {});
     }
   }, [cart, wishlist, user]);
@@ -183,16 +179,45 @@ export function AppProvider({ children }: AppProviderProps) {
     addNotification('Removed from cart', 'info');
   };
 
-  const addToWishlist = (product: Product) => {
+  const addToWishlist = (product: Product, notifyOnStock = false) => {
     setWishlist((prev) => {
-      if (prev.find((p) => p.id === product.id)) return prev;
-      return [...prev, product];
+      if (prev.find((p) => p.product.id === product.id)) return prev;
+      const temp: WishlistItem = {
+        id: Date.now(),
+        userId: 0,
+        productId: product.id,
+        variantId: null,
+        notifyOnStock,
+        createdAt: new Date(),
+        product,
+      };
+      return [...prev, temp];
     });
+    if (user) {
+      fetch('/api/user/wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: product.id, notifyOnStock }),
+      })
+        .then((res) => res.json())
+        .then((item) => {
+          setWishlist((prev) =>
+            prev.map((w) =>
+              w.product.id === product.id ? { ...w, id: item.id } : w
+            )
+          );
+        })
+        .catch(() => {});
+    }
     addNotification('Added to wishlist', 'success');
   };
 
-  const removeFromWishlist = (id: string) => {
-    setWishlist((prev) => prev.filter((item) => item.id !== id));
+  const removeFromWishlist = (productId: string | number) => {
+    const item = wishlist.find((w) => w.product.id === productId);
+    if (item && user) {
+      fetch(`/api/user/wishlist/${item.id}`, { method: 'DELETE' }).catch(() => {});
+    }
+    setWishlist((prev) => prev.filter((w) => w.product.id !== productId));
     addNotification('Removed from wishlist', 'warning');
   };
 
