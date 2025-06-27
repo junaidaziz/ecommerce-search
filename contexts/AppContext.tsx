@@ -166,11 +166,7 @@ export function AppProvider({ children }: AppProviderProps) {
       }
       return [...prev, { ...product, qty, variant }];
     });
-    addNotification(
-      `✅ ${product.title} added to cart!`,
-      'success',
-      'top-right'
-    );
+    addNotification(`✅ ${product.title} added to cart!`, 'success');
   };
 
   const changeQty = (id: string, delta: number, variantId?: number) => {
@@ -183,7 +179,7 @@ export function AppProvider({ children }: AppProviderProps) {
         )
         .filter((item) => item.qty > 0);
     });
-    addNotification('✅ Quantity updated', 'success', 'top-left');
+    addNotification('✅ Quantity updated', 'success');
   };
 
   const removeFromCart = (id: string, variantId?: number) => {
@@ -193,7 +189,7 @@ export function AppProvider({ children }: AppProviderProps) {
           !(item.id === id && (!variantId || item.variant?.id === variantId))
       )
     );
-    addNotification('❌ Product removed from cart', 'error', 'top-left');
+    addNotification('❌ Product removed from cart', 'error');
   };
 
   const addToWishlist = (product: Product, notifyOnStock = false) => {
