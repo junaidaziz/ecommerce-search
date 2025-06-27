@@ -68,40 +68,40 @@ model Category {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  uuid        String   @unique @default(uuid())
-  slug        String   @unique
-  sku         String   @unique
-  title       String
-  description String
-  productType String
-  tags        String?
-  quantity    Int      @default(0)
-  minPrice    Float    @default(0)
-  maxPrice    Float    @default(0)
-  currency    String   @default("USD")
-  discountType String?
+  id            Int      @id @default(autoincrement())
+  uuid          String   @unique @default(uuid())
+  slug          String   @unique
+  sku           String   @unique
+  title         String
+  description   String
+  productType   String
+  tags          String?
+  quantity      Int      @default(0)
+  minPrice      Float    @default(0)
+  maxPrice      Float    @default(0)
+  currency      String   @default("USD")
+  discountType  String?
   discountValue Float?
-  status      String   @default("approved")
-  images      String?
-  vendorId    Int
-  categoryId  Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status        String   @default("approved")
+  images        String?
+  vendorId      Int
+  categoryId    Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  vendor   User     @relation(fields: [vendorId], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
-  orders   Order[]
+  vendor        User           @relation(fields: [vendorId], references: [id])
+  category      Category       @relation(fields: [categoryId], references: [id])
+  orders        Order[]
   wishlistItems WishlistItem[]
-  variants Variant[]
+  variants      Variant[]
 }
 
 model Variant {
-  id          Int      @id @default(autoincrement())
-  uuid        String   @unique @default(uuid())
-  productId   Int
-  attributes  Json
-  quantity    Int      @default(0)
+  id            Int    @id @default(autoincrement())
+  uuid          String @unique @default(uuid())
+  productId     Int
+  attributes    Json
+  quantity      Int    @default(0)
   priceModifier Float?
 
   product Product @relation(fields: [productId], references: [id])
@@ -264,13 +264,13 @@ model SupportTicket {
 }
 
 model WishlistItem {
-  id           Int      @id @default(autoincrement())
-  uuid         String   @unique @default(uuid())
-  userId       Int
-  productId    Int
-  variantId    String?
-  notifyOnStock Boolean @default(false)
-  createdAt    DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  uuid          String   @unique @default(uuid())
+  userId        Int
+  productId     Int
+  variantId     String?
+  notifyOnStock Boolean  @default(false)
+  createdAt     DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id])
   product Product @relation(fields: [productId], references: [id])

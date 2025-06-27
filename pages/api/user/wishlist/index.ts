@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/[...nextauth]';
 import { findUser } from '../../../../lib/users';
 import {
   addWishlistItem,
@@ -8,6 +7,7 @@ import {
 } from '../../../../lib/wishlist';
 import { handleApiError } from '../../../../lib/utils/handleApiError';
 import type { WishlistItem, ApiMessage } from '../../../../types';
+import { authOptions } from '../../auth/[...nextauth]';
 
 export default async function handler(
   req: NextApiRequest,
