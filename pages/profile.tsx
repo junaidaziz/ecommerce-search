@@ -201,7 +201,7 @@ const Profile: React.FC = () => {
         </div>
       </div>
 
-      <Link href="/profile/edit" className="btn btn-primary mt-4">
+      <Link href="/settings" className="btn btn-primary mt-4">
         Update Profile
       </Link>
     </div>
