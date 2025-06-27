@@ -9,3 +9,4 @@ export { default as DatePicker } from './DatePicker';
 export { default as FileUpload } from './FileUpload';
 export { default as CountrySelect } from './CountrySelect';
 export { default as TagInput } from './TagInput';
+export { default as AddressAutocomplete } from './AddressAutocomplete';
