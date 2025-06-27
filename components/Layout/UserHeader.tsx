@@ -19,6 +19,7 @@ import SportsIcon from '../icons/SportsIcon';
 import DEFAULT_CATEGORIES from '@lib/defaultCategories';
 import TrashIcon from '../icons/TrashIcon';
 import SearchBar from './SearchBar';
+import DropdownMenu from '@components/common/DropdownMenu';
 import type { Category } from '@types/category';
 import type { User } from '@types/user';
 
@@ -75,6 +76,14 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
 
   const itemCount = cart.reduce((sum, item) => sum + (item.qty || 0), 0);
   const logout = () => signOut({ callbackUrl: '/', redirect: true });
+
+  const menuItems = [
+    { label: 'My Orders', href: '/orders' },
+    { label: 'Profile', href: '/profile' },
+    { label: 'Update Profile', href: '/profile/edit' },
+    { label: 'Settings', href: '/settings' },
+    { label: 'Logout', onClick: logout, isButton: true },
+  ];
 
   const iconMap: Record<string, JSX.Element> = {
     Electronics: <ElectronicsIcon className="h-5 w-5 mr-1" />,
@@ -361,51 +370,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                     : user.email}
                 </span>
               </label>
-              <ul
-                tabIndex={0}
-                className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded w-40"
-              >
-                <li>
-                  <Link
-                    href="/orders"
-                    className="transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105"
-                  >
-                    My Orders
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/profile"
-                    className="transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105"
-                  >
-                    Profile
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/profile/edit"
-                    className="transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105"
-                  >
-                    Update Profile
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/settings"
-                    className="transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105"
-                  >
-                    Settings
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    onClick={logout}
-                    className="transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105"
-                  >
-                    Logout
-                  </button>
-                </li>
-              </ul>
+              <DropdownMenu items={menuItems} />
             </div>
           ) : (
             !isAuthRoute && (
