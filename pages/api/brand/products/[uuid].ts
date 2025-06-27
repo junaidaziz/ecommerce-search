@@ -10,7 +10,7 @@ import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import type { ApiMessage, ProductInput } from '../../../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
-import fs from 'fs';
+import { uploadFileToS3 } from '@lib/s3';
 import path from 'path';
 
 export const config = {
@@ -101,14 +101,16 @@ export default async function handler(
           ? (files.photos as File[])
           : [files.photos as File]
         : [];
-      const destDir = path.join(process.cwd(), 'public', 'uploads', String(uuid));
-      fs.mkdirSync(destDir, { recursive: true });
       const imagePaths: string[] = [];
       for (const file of photos) {
-        const name = Date.now() + '-' + file.originalFilename;
-        const destPath = path.join(destDir, name);
-        fs.renameSync(file.filepath, destPath);
-        imagePaths.push(`/uploads/${uuid}/${name}`);
+        const name = Date.now() + '-' + (file.originalFilename || 'image');
+        const key = `products/${uuid}/${name}`;
+        const url = await uploadFileToS3(
+          file.filepath,
+          key,
+          file.mimetype || undefined
+        );
+        imagePaths.push(url);
       }
       const payload: ProductInput & { id?: string } = {
         uuid: String(uuid),
@@ -138,11 +140,12 @@ export default async function handler(
         discountValue:
           parsedDiscountValue !== null
             ? parsedDiscountValue
-            : existing.discountValue ?? null,
+            : (existing.discountValue ?? null),
         status: existing.status,
-        images: imagePaths.length > 0
-          ? imagePaths.map((p) => ({ url: p }))
-          : undefined,
+        images:
+          imagePaths.length > 0
+            ? imagePaths.map((p) => ({ url: p }))
+            : undefined,
       };
       await updateProduct(payload);
       await loadAndIndexProducts();
