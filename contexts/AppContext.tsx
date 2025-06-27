@@ -53,9 +53,10 @@ export function AppProvider({ children }: AppProviderProps) {
 
   useEffect(() => {
     if (session?.user) {
-      const { email, name, role, brandName, gender } = session.user;
+      const { email, name, role, brandName, gender, brandId } = session.user;
       const [firstName = '', lastName = ''] = (name || '').split(' ');
       setUser({
+        id: brandId,
         email: email ?? '',
         firstName,
         lastName,

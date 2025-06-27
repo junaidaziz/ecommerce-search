@@ -17,8 +17,11 @@ async function handler(
     const db = getDb();
     const user = req.user;
     const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
-    const vendorId = Number(user?.id) || brandId || undefined;
-    const monthOffset = parseInt(getQueryParam(req.query.monthOffset) || '0', 10);
+    const vendorId = user?.brandId ?? brandId || undefined;
+    const monthOffset = parseInt(
+      getQueryParam(req.query.monthOffset) || '0',
+      10
+    );
     const start = dayjs()
       .startOf('month')
       .subtract(monthOffset, 'month')

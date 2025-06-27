@@ -18,7 +18,7 @@ async function handler(
     const db = getDb();
     const user = req.user;
     const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
-    const vendorId = Number(user?.id) || brandId || undefined;
+    const vendorId = user?.brandId ?? brandId || undefined;
     const threshold = parseInt(getQueryParam(req.query.threshold) || '10', 10);
     const where: any = { quantity: { lt: threshold } };
     if (vendorId) where.vendorId = vendorId;

@@ -18,7 +18,7 @@ async function handler(
     const db = getDb();
     const user = req.user;
     const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
-    const vendorId = Number(user?.id) || brandId || undefined;
+    const vendorId = user?.brandId ?? brandId || undefined;
     const where: any = {};
     if (vendorId) where.product = { vendorId };
     const grouped = await db.order.groupBy({
