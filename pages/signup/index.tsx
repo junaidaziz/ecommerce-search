@@ -5,11 +5,11 @@ import PageContainer from '@components/Layout/PageContainer';
 
 export default function Signup() {
   return (
-    <div className="min-h-screen flex items-center justify-center overflow-auto px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center overflow-auto px-4 py-4 sm:px-6 lg:px-8">
       <Head>
         <title>{getPageTitle('Signup')}</title>
       </Head>
-      <PageContainer className="space-y-4 max-w-sm -mt-8">
+      <PageContainer className="space-y-4 max-w-md">
         <h1 className="text-2xl font-bold mb-4 text-center">
           Choose Signup Type
         </h1>
