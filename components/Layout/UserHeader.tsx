@@ -168,16 +168,17 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                   <div className="flex gap-6">
                     <div className="pr-4 border-r border-base-200 grid grid-cols-2 sm:grid-cols-3 gap-2 min-w-[220px] max-w-sm">
                       {categories.map((cat) => (
-                        <button
+                        <Link
                           key={cat.name}
-                          type="button"
+                          href={`/categories/${encodeURIComponent(cat.name)}`}
                           role="menuitem"
                           aria-haspopup={!!cat.subcategories?.length}
                           aria-expanded={hoveredCat?.name === cat.name}
                           onFocus={() => setHoveredCat(cat)}
                           onMouseEnter={() => setHoveredCat(cat)}
+                          onClick={() => setMenuOpen(false)}
                           title={cat.name}
-                          className="flex items-center gap-1 px-2 py-1 rounded text-left font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 focus:outline-none capitalize whitespace-normal line-clamp-2 hover:bg-base-200 hover:text-primary hover:underline hover:scale-105"
+                          className="flex items-center gap-1 px-2 py-1 rounded text-left font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 focus:outline-none capitalize whitespace-normal line-clamp-2 hover:bg-base-200 hover:text-primary hover:underline hover:scale-105 cursor-pointer"
                         >
                           {iconMap[cat.name] || null}
                           <span>{cat.name}</span>
@@ -186,7 +187,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                               className={`w-3 h-3 ml-auto transition-transform ${hoveredCat?.name === cat.name ? 'rotate-180' : ''}`}
                             />
                           ) : null}
-                        </button>
+                        </Link>
                       ))}
                       {categories.length === 0 && <span>No categories found</span>}
                     </div>
@@ -229,7 +230,13 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                     className="flex items-center gap-2 py-2 cursor-pointer list-none transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 hover:bg-base-200 rounded"
                   >
                     {iconMap[cat.name] || null}
-                    <span className="capitalize line-clamp-2 whitespace-normal">{cat.name}</span>
+                    <Link
+                      href={`/categories/${encodeURIComponent(cat.name)}`}
+                      className="capitalize line-clamp-2 whitespace-normal flex-1 cursor-pointer"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {cat.name}
+                    </Link>
                   </summary>
                   {cat.subcategories?.length && (
                     <ul className="pl-4 py-2 space-y-1">
