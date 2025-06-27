@@ -73,26 +73,28 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       <Head>
         <title>{getPageTitle('Login')}</title>
       </Head>
-      <PageContainer className="space-y-4">
-        <h1 className="text-2xl font-bold mb-4">Login</h1>
-        <button
-          type="button"
-          className="btn w-full mb-2 hover:bg-red-600 hover:text-white flex items-center justify-center gap-2"
-          onClick={() => signIn('google')}
-        >
-          <GoogleIcon className="h-5 w-5" />
-          Login with Google
-        </button>
-        <button
-          type="button"
-          className="btn w-full mb-2 hover:bg-gray-800 hover:text-white flex items-center justify-center gap-2"
-          onClick={() => signIn('github')}
-        >
-          <GithubIcon className="h-5 w-5" />
-          Login with GitHub
-        </button>
+      <PageContainer className="space-y-4 max-w-sm -mt-8">
+        <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+        <div className="flex flex-col gap-4 mb-4">
+          <button
+            type="button"
+            className="btn w-full hover:bg-red-600 hover:text-white flex items-center justify-center gap-2"
+            onClick={() => signIn('google')}
+          >
+            <GoogleIcon className="h-5 w-5" />
+            Login with Google
+          </button>
+          <button
+            type="button"
+            className="btn w-full hover:bg-gray-800 hover:text-white flex items-center justify-center gap-2"
+            onClick={() => signIn('github')}
+          >
+            <GithubIcon className="h-5 w-5" />
+            Login with GitHub
+          </button>
+        </div>
         {formError && <div className="text-red-500 mb-2">{formError}</div>}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <EmailInput
             name="email"
             placeholder="Email"
