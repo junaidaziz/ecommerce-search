@@ -99,9 +99,9 @@ export default function UserSignup() {
       <Head>
         <title>{getPageTitle('User Signup')}</title>
       </Head>
-      <PageContainer>
+      <PageContainer className="max-w-sm -mt-8">
         <h1 className="text-2xl font-bold mb-4 text-center">User Sign Up</h1>
-        <div className="flex flex-col gap-6 mb-4">
+        <div className="flex flex-col gap-4 mb-4">
           <button
             type="button"
             className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white"
@@ -120,7 +120,7 @@ export default function UserSignup() {
           </button>
         </div>
         {formError && <div className="text-red-500 mb-2">{formError}</div>}
-        <form onSubmit={handleSubmit(submit)} className="space-y-2">
+        <form onSubmit={handleSubmit(submit)} className="space-y-4">
           <TextInput
             name="firstName"
             placeholder="First Name"
