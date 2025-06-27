@@ -60,3 +60,21 @@ export const defaultSelectFieldProps: Partial<SelectFieldProps> = {
   isMulti: false,
   className: '',
 };
+
+export interface ProductFormValues {
+  id: string;
+  vendor: string;
+  sku: string;
+  title: string;
+  description: string;
+  productType: string;
+  tags: string[];
+  categoryId: string;
+  quantity: number;
+  minPrice: number;
+  maxPrice: number;
+  currency: string;
+  discountType: 'percentage' | 'fixed' | 'none';
+  discountValue?: number;
+  available: boolean;
+}

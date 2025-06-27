@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import {
   addProduct,
   loadAndIndexProducts,
@@ -10,7 +10,7 @@ import type { Product, ProductInput, ApiMessage } from '../../../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
-import { withRole } from '../../../../lib/withRole';
+import { withRole, type AuthedNextApiRequest } from '../../../../lib/withRole';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]';
 import { getDb } from '../../../../lib/db';
@@ -41,7 +41,7 @@ async function parseBody(
 }
 
 async function handler(
-  req: NextApiRequest,
+  req: AuthedNextApiRequest,
   res: NextApiResponse<{ products: Product[]; total: number } | ApiMessage>
 ): Promise<void> {
   try {
@@ -56,15 +56,16 @@ async function handler(
       const limit = parseInt(String((req.query.limit as string) || '20'), 10);
       const skip = (page - 1) * limit;
 
+      const brandId = (session.user as { brandId?: number }).brandId;
       const [rows, total] = await Promise.all([
         db.product.findMany({
-          where: { brandId: (session.user as any).brandId },
+          where: { brandId: brandId },
           include: { category: true, vendor: true },
           orderBy: { id: 'asc' },
           take: limit,
           skip,
         }),
-        db.product.count({ where: { brandId: (session.user as any).brandId } }),
+        db.product.count({ where: { brandId: brandId } }),
       ]);
 
       const products = rows.map((row) => mapDbRowToProduct(row));

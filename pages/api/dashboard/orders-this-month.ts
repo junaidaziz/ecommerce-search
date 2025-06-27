@@ -1,13 +1,13 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import dayjs from 'dayjs';
 import { getDb } from '../../../lib/db';
-import { withRole } from '../../../lib/withRole';
+import { withRole, type AuthedNextApiRequest } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import type { ApiMessage } from '../../../types';
 
 async function handler(
-  req: NextApiRequest,
+  req: AuthedNextApiRequest,
   res: NextApiResponse<{ count: number; revenue: number } | ApiMessage>
 ) {
   try {
@@ -15,7 +15,7 @@ async function handler(
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
     const db = getDb();
-    const user = (req as any).user as {
+    const user = req.user as {
       id?: string | number;
       brandName?: string;
     } | undefined;

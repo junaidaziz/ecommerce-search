@@ -67,3 +67,22 @@ export interface TagsResponse {
 interface UsersResponse {
   users: (import('./user').User & { disabled?: boolean })[];
 }
+export interface CategoryResponse {
+  category: import('./category').Category;
+}
+
+export interface VendorsResponse {
+  vendors: import('./vendor').Vendor[];
+}
+
+export interface CategoryCheckResponse {
+  exists: boolean;
+  category?: import('./category').Category;
+}
+
+export interface CategoryCheckOrCreateResponse {
+  exists?: boolean;
+  success?: boolean;
+  name?: string;
+  category?: import('./category').Category;
+}

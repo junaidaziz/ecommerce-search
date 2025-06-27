@@ -207,7 +207,7 @@ export default function Admin() {
                       ? form.vendor?.brandName || ''
                       : field === 'category'
                         ? form.category?.name || ''
-                        : (form as any)[field]
+                        : (form[field as keyof FormState] as unknown as string)
                   }
                   onChange={handleChange}
                   placeholder={field}

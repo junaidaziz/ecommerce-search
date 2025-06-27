@@ -2,7 +2,8 @@ import { useContext } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { getPageTitle } from '../lib/pageTitle';
-import { AppContext, AppContextValue } from '../contexts/AppContext';
+import { AppContext } from '../contexts/AppContext';
+import type { AppContextValue } from '../types';
 
 // Define the type for a cart item
 type CartItem = {
