@@ -17,6 +17,7 @@ import {
 import type { Product } from '@types/product';
 import type { Category } from '@types/category';
 import { serializeDates } from '@utils/serializeDates';
+import { NotificationContext } from '../../contexts/NotificationContext';
 
 interface ProductsProps {
   products: Product[];
@@ -65,6 +66,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   categories,
 }) => {
   const router = useRouter();
+  const { addNotification } = useContext(NotificationContext);
   const [keyword, setKeyword] = useState(
     typeof router.query.q === 'string' ? router.query.q : ''
   );
@@ -268,10 +270,12 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     setMinPrice('');
     setMaxPrice('');
     setInStock(false);
+    setSort('newest');
     router.replace({ pathname: router.pathname, query: {} }, undefined, {
       shallow: true,
     });
-  }, [router]);
+    addNotification('Filters cleared', 'success');
+  }, [router, addNotification]);
 
   return (
     <div className="min-h-screen bg-base-200 py-10">
@@ -298,9 +302,9 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
             />
           </aside>
           <div className="flex-1">
-          <ActiveFilters filters={activeFilters} clearAll={clearAll} />
-          <SortMenu value={sort} onChange={(v) => setSort(v)} />
-          <div className="relative">
+            <ActiveFilters filters={activeFilters} clearAll={clearAll} />
+            <SortMenu value={sort} onChange={(v) => setSort(v)} />
+            <div className="relative">
               <ProductGrid products={items} />
               {loading && (
                 <Loader className="absolute inset-0 bg-base-200/70" />
