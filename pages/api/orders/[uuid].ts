@@ -25,7 +25,10 @@ async function handler(
 
     if (req.method === 'PATCH') {
       const { status } = req.body || {};
-      if (!status || !['pending', 'shipped', 'completed'].includes(status)) {
+      if (
+        !status ||
+        !['processing', 'shipped', 'delivered', 'cancelled'].includes(status)
+      ) {
         return res.status(400).json({ message: 'invalid status' });
       }
       await updateOrderStatus(String(uuid), status);
