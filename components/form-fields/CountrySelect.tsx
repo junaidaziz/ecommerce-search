@@ -73,7 +73,14 @@ const CountrySelect = <T extends FieldValues>(props: CountrySelectProps<T>) => {
           name={props.name}
           control={props.control}
           rules={props.rules}
-          render={({ field }) => select(field)}
+          render={({ field }) =>
+            select({
+              ...field,
+              value: countries.find((c) => c.value === field.value),
+              onChange: (option: CountryInfo | null) =>
+                field.onChange(option ? option.value : ''),
+            })
+          }
         />
       ) : (
         select({
