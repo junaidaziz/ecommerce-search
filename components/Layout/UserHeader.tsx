@@ -16,6 +16,7 @@ import FashionIcon from '../icons/FashionIcon';
 import HomeIcon from '../icons/HomeIcon';
 import ToysIcon from '../icons/ToysIcon';
 import SportsIcon from '../icons/SportsIcon';
+import XCircleIcon from '../icons/XCircleIcon';
 import DEFAULT_CATEGORIES from '../../lib/defaultCategories';
 import SearchBar from './SearchBar';
 import type { Category } from '../../types/category';
@@ -246,7 +247,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
         </div>
 
         <nav className="flex items-center gap-2">
-          <div className="dropdown dropdown-end">
+          <div className="dropdown dropdown-end dropdown-hover">
             <label
               tabIndex={0}
               className="relative p-2 cursor-pointer transition-colors transition-transform duration-200 hover:text-white hover:scale-105"
@@ -260,22 +261,56 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
             </label>
             <div
               tabIndex={0}
-              className="dropdown-content card card-compact w-64 bg-base-100 shadow z-50"
+              className="dropdown-content card card-compact w-80 bg-base-100 shadow z-50"
             >
               <div className="card-body">
                 {cart.length === 0 ? (
                   <p className="text-sm">Your cart is empty</p>
                 ) : (
                   <>
-                    <ul className="space-y-1 max-h-40 overflow-y-auto text-sm">
+                    <ul className="space-y-2 max-h-40 overflow-y-auto text-sm">
                       {cart.map((item) => {
-                        const price = parseFloat(typeof item.minPrice === 'number' ? item.minPrice.toString() : item.minPrice || '0');
+                        const price = parseFloat(
+                          typeof item.minPrice === 'number'
+                            ? item.minPrice.toString()
+                            : item.minPrice || '0'
+                        );
                         return (
-                          <li key={item.id} className="flex justify-between">
-                            <span>
-                              {item.title} x{item.qty}
-                            </span>
-                            <span>£{(price * item.qty).toFixed(2)}</span>
+                          <li key={item.id} className="flex items-center gap-2">
+                            <img
+                              src={item.featuredImage?.url || '/placeholder.png'}
+                              alt={item.title}
+                              className="w-10 h-10 object-cover rounded"
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium truncate">{item.title}</p>
+                              <p className="text-xs">£{price.toFixed(2)}</p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                className="btn btn-xs"
+                                onClick={() => changeQty(item.id as string, -1, item.variant?.id)}
+                              >
+                                -
+                              </button>
+                              <span className="px-1">{item.qty}</span>
+                              <button
+                                type="button"
+                                className="btn btn-xs"
+                                onClick={() => changeQty(item.id as string, 1, item.variant?.id)}
+                              >
+                                +
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-ghost btn-xs text-error"
+                                onClick={() => removeFromCart(item.id as string, item.variant?.id)}
+                              >
+                                <XCircleIcon className="w-4 h-4" />
+                                <span className="sr-only">Remove</span>
+                              </button>
+                            </div>
                           </li>
                         );
                       })}

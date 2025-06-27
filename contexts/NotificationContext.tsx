@@ -2,7 +2,7 @@ import React, { createContext, useState, useCallback, ReactNode } from 'react';
 import { Toast } from '@/components/UI';
 
 type NotificationType = 'info' | 'success' | 'warning' | 'error';
-type NotificationPosition = 'center' | 'end' | string;
+type NotificationPosition = 'center' | 'top-right' | 'top-left' | 'end' | string;
 
 interface Notification {
   id: number;
@@ -77,10 +77,25 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
               />
             ))}
         </div>
+        <div className="absolute left-5 top-5 space-y-2">
+          {notifs
+            .filter((n) => n.position === 'top-left')
+            .map((n) => (
+              <Toast
+                key={n.id}
+                message={n.message}
+                type={n.type}
+                onClose={() => removeNotification(n.id)}
+              />
+            ))}
+        </div>
         <div className="absolute right-5 bottom-5 space-y-2">
           {notifs
             .filter(
-              (n) => n.position !== 'center' && n.position !== 'top-right'
+              (n) =>
+                n.position !== 'center' &&
+                n.position !== 'top-right' &&
+                n.position !== 'top-left'
             )
             .map((n) => (
               <Toast
