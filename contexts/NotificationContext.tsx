@@ -1,25 +1,10 @@
-import React, { createContext, useState, useCallback, ReactNode } from 'react';
-// Update the import path below to the actual location of your Toast component.
-// For example, if Toast is in components/UI/Toast.tsx, use:
-import Toast from '@components/UI/Toast';
-// Or adjust the path as needed for your project structure.
+import React, { createContext, ReactNode } from 'react';
+import { toast } from 'sonner';
 
 type NotificationType = 'info' | 'success' | 'warning' | 'error';
-type NotificationPosition = 'center' | 'top-right' | 'top-left' | 'end' | string;
-
-interface Notification {
-  id: number;
-  message: string;
-  type: NotificationType;
-  position: NotificationPosition;
-}
 
 interface NotificationContextType {
-  addNotification: (
-    message: string,
-    type?: NotificationType,
-    position?: NotificationPosition
-  ) => void;
+  addNotification: (message: string, type?: NotificationType) => void;
 }
 
 export const NotificationContext = createContext<NotificationContextType>({
@@ -31,85 +16,28 @@ interface NotificationProviderProps {
 }
 
 export function NotificationProvider({ children }: NotificationProviderProps) {
-  const [notifs, setNotifs] = useState<Notification[]>([]);
-
-  const addNotification = useCallback(
-    (
-      message: string,
-      type: NotificationType = 'info',
-      position: NotificationPosition = 'top-right'
-    ) => {
-      const id = Date.now() + Math.random();
-      setNotifs((prev) => [...prev, { id, message, type, position }]);
-      setTimeout(() => {
-        setNotifs((prev) => prev.filter((n) => n.id !== id));
-      }, 5000);
-    },
-    []
-  );
-
-  const removeNotification = useCallback((id: number) => {
-    setNotifs((prev) => prev.filter((n) => n.id !== id));
-  }, []);
+  const addNotification = (
+    message: string,
+    type: NotificationType = 'info'
+  ) => {
+    switch (type) {
+      case 'success':
+        toast.success(message);
+        break;
+      case 'error':
+        toast.error(message);
+        break;
+      case 'warning':
+        toast.warning(message);
+        break;
+      default:
+        toast(message);
+    }
+  };
 
   return (
     <NotificationContext.Provider value={{ addNotification }}>
       {children}
-      <div className="fixed inset-0 pointer-events-none z-50">
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 space-y-2">
-          {notifs
-            .filter((n) => n.position === 'center')
-            .map((n) => (
-              <Toast
-                key={n.id}
-                message={n.message}
-                type={n.type}
-                onClose={() => removeNotification(n.id)}
-              />
-            ))}
-        </div>
-        <div className="absolute right-5 top-5 space-y-2">
-          {notifs
-            .filter((n) => n.position === 'top-right')
-            .map((n) => (
-              <Toast
-                key={n.id}
-                message={n.message}
-                type={n.type}
-                onClose={() => removeNotification(n.id)}
-              />
-            ))}
-        </div>
-        <div className="absolute left-5 top-5 space-y-2">
-          {notifs
-            .filter((n) => n.position === 'top-left')
-            .map((n) => (
-              <Toast
-                key={n.id}
-                message={n.message}
-                type={n.type}
-                onClose={() => removeNotification(n.id)}
-              />
-            ))}
-        </div>
-        <div className="absolute right-5 bottom-5 space-y-2">
-          {notifs
-            .filter(
-              (n) =>
-                n.position !== 'center' &&
-                n.position !== 'top-right' &&
-                n.position !== 'top-left'
-            )
-            .map((n) => (
-              <Toast
-                key={n.id}
-                message={n.message}
-                type={n.type}
-                onClose={() => removeNotification(n.id)}
-              />
-            ))}
-        </div>
-      </div>
     </NotificationContext.Provider>
   );
 }
