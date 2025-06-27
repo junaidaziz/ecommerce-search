@@ -20,7 +20,7 @@ interface ProductRow {
   slug?: string | null;
   sku: string;
   title: string;
-  vendor?: Vendor | null;
+  vendor?: (Vendor & { brandName: string | null }) | null;
   description?: string | null;
   productType?: string | null;
   tags?: string | null;
@@ -136,7 +136,9 @@ export function mapDbRowToProduct(row: ProductRow): Product {
 
   return processProductRow({
     ...rest,
-    vendor: row.vendor ?? null,
+    vendor: row.vendor
+      ? { ...row.vendor, brandName: row.vendor.brandName ?? '' }
+      : null,
     category: row.category ?? null,
     images: parseImages(images),
     totalInventory: quantity,
@@ -224,7 +226,7 @@ export async function addProduct(product: ProductInput): Promise<void> {
 
   const data: Prisma.ProductCreateInput = {
     uuid: product.uuid,
-    slug: product.slug?.trim() || slugify(product.title || product.uuid),
+    slug: (product.slug ?? '').trim() || slugify(product.title || product.uuid),
     sku: product.sku,
     title: product.title,
     description: product.description ?? '',
