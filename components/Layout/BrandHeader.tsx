@@ -14,9 +14,14 @@ import type { User } from '@types/user';
 interface HeaderProps {
   theme?: string;
   setTheme?: React.Dispatch<React.SetStateAction<string>>;
+  maxWidthClass?: string;
 }
 
-const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
+const BrandHeader: FC<HeaderProps> = ({
+  theme = 'light',
+  setTheme,
+  maxWidthClass,
+}) => {
   const router = useRouter();
   const { data: session } = useSession();
   const appContext = useContext(AppContext);
@@ -33,7 +38,11 @@ const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
 
   return (
     <header className="relative bg-base-300 mb-6 py-4">
-      <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2">
+      <div
+        className={`w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2 mx-auto ${
+          maxWidthClass ?? 'max-w-[95%] 2xl:max-w-[1440px]'
+        }`}
+      >
         <Link
           href="/"
           className="p-0 flex items-center cursor-pointer transition-transform duration-300 ease-out hover:scale-110 hover:-translate-y-1 hover:shadow-xl"
@@ -154,7 +163,11 @@ const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           ) : (
             !isAuthRoute && (
               <>
-                <Link href="/login" aria-label="Login" className="btn btn-ghost">
+                <Link
+                  href="/login"
+                  aria-label="Login"
+                  className="btn btn-ghost"
+                >
                   Login
                 </Link>
                 <Link
