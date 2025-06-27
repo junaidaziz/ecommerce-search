@@ -1,23 +1,39 @@
 export const DEFAULT_CATEGORIES = [
   {
     name: 'Electronics',
-    subcategories: ['Phones', 'Computers', 'Cameras'],
+    subcategories: [
+      { name: 'Phones' },
+      { name: 'Computers' },
+      { name: 'Cameras' },
+    ],
   },
   {
     name: 'Fashion',
-    subcategories: ['Men', 'Women', 'Kids'],
+    subcategories: [{ name: 'Men' }, { name: 'Women' }, { name: 'Kids' }],
   },
   {
     name: 'Home',
-    subcategories: ['Furniture', 'Kitchen', 'Decor'],
+    subcategories: [
+      { name: 'Furniture' },
+      { name: 'Kitchen' },
+      { name: 'Decor' },
+    ],
   },
   {
     name: 'Toys',
-    subcategories: ['Games', 'Stuffed Animals', 'Educational'],
+    subcategories: [
+      { name: 'Games' },
+      { name: 'Stuffed Animals' },
+      { name: 'Educational' },
+    ],
   },
   {
     name: 'Sports',
-    subcategories: ['Fitness', 'Outdoor', 'Team Sports'],
+    subcategories: [
+      { name: 'Fitness' },
+      { name: 'Outdoor' },
+      { name: 'Team Sports' },
+    ],
   },
 ];
 export default DEFAULT_CATEGORIES;
