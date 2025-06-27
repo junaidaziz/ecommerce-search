@@ -23,7 +23,9 @@ export function AppProvider({ children }: AppProviderProps) {
   const { data: session } = useSession();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
-  const [cart, setCart] = useState<(Product & { qty: number; variant?: Variant })[]>([]);
+  const [cart, setCart] = useState<
+    (Product & { qty: number; variant?: Variant })[]
+  >([]);
   const { addNotification } = useContext(NotificationContext);
 
   useEffect(() => {
@@ -165,9 +167,9 @@ export function AppProvider({ children }: AppProviderProps) {
       return [...prev, { ...product, qty, variant }];
     });
     addNotification(
-      `Added ${product.title} (x${qty}) to cart`,
+      `✅ ${product.title} added to cart!`,
       'success',
-      'center'
+      'top-right'
     );
   };
 
@@ -186,7 +188,8 @@ export function AppProvider({ children }: AppProviderProps) {
   const removeFromCart = (id: string, variantId?: number) => {
     setCart((prev) =>
       prev.filter(
-        (item) => !(item.id === id && (!variantId || item.variant?.id === variantId))
+        (item) =>
+          !(item.id === id && (!variantId || item.variant?.id === variantId))
       )
     );
     addNotification('Removed from cart', 'info');
@@ -228,7 +231,9 @@ export function AppProvider({ children }: AppProviderProps) {
   const removeFromWishlist = (productId: string | number) => {
     const item = wishlist.find((w) => w.product.id === productId);
     if (item && user) {
-      fetch(`/api/user/wishlist/${item.id}`, { method: 'DELETE' }).catch(() => {});
+      fetch(`/api/user/wishlist/${item.id}`, { method: 'DELETE' }).catch(
+        () => {}
+      );
     }
     setWishlist((prev) => prev.filter((w) => w.product.id !== productId));
     addNotification('Removed from wishlist', 'warning');
