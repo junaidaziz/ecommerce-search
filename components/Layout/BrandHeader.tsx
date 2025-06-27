@@ -133,9 +133,10 @@ const BrandHeader: FC<HeaderProps> = ({
                   <UserIcon className="w-5 h-5" />
                 )}
                 <span>
-                  {user.firstName || user.lastName
-                    ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
-                    : user.email}
+                  {user.name?.trim() ||
+                    (user.firstName || user.lastName
+                      ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
+                      : user.email)}
                 </span>
               </label>
               <ul

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, Fragment } from 'react';
 import useRequireAuth from '@hooks/useRequireAuth';
 import type { Order } from '../types';
 import Head from 'next/head';
@@ -11,6 +11,22 @@ const Orders: React.FC<OrdersProps> = (_props) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<number | null>(null);
+
+  const groupedOrders = useMemo(() => {
+    const map = new Map<string, { order: Order; items: Order[] }>();
+    for (const o of orders) {
+      const key =
+        o.paymentReference || new Date(o.createdAt).toISOString().split('.')[0];
+      const existing = map.get(key);
+      if (existing) {
+        existing.items.push(o);
+      } else {
+        map.set(key, { order: o, items: [o] });
+      }
+    }
+    return Array.from(map.values());
+  }, [orders]);
 
   useEffect(() => {
     if (!user) return;
@@ -64,56 +80,82 @@ const Orders: React.FC<OrdersProps> = (_props) => {
               </tr>
             </thead>
             <tbody>
-              {orders.map((o) => (
-                <tr key={o.id} className="hover">
-                  <td>{o.id}</td>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={
-                          o.product.featuredImage?.url ||
-                          `https://picsum.photos/seed/${o.product.id}/40/40`
-                        }
-                        alt={o.product.title}
-                        className="w-10 h-10 object-cover rounded"
-                      />
-                      <span className="whitespace-nowrap">
-                        {o.product.title}
+              {groupedOrders.map((group, idx) => (
+                <Fragment key={group.order.id}>
+                  <tr
+                    className="hover cursor-pointer"
+                    onClick={() => setExpanded(expanded === idx ? null : idx)}
+                  >
+                    <td>{group.order.id}</td>
+                    <td>{group.items.length}</td>
+                    <td>
+                      {group.order.user
+                        ? `${group.order.user.firstName || ''} ${
+                            group.order.user.lastName || ''
+                          }`.trim() || group.order.user.email
+                        : '-'}
+                    </td>
+                    <td>
+                      <span
+                        className={`badge ${
+                          group.order.status === 'processing'
+                            ? 'badge-warning'
+                            : group.order.status === 'shipped'
+                              ? 'badge-info'
+                              : group.order.status === 'delivered'
+                                ? 'badge-success'
+                                : 'badge-error'
+                        }`}
+                      >
+                        {group.order.status}
                       </span>
-                    </div>
-                  </td>
-                  <td>
-                    {o.user
-                      ? `${o.user.firstName || ''} ${o.user.lastName || ''}`.trim() ||
-                        o.user.email
-                      : '-'}
-                  </td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        o.status === 'processing'
-                          ? 'badge-warning'
-                          : o.status === 'shipped'
-                          ? 'badge-info'
-                          : o.status === 'delivered'
-                          ? 'badge-success'
-                          : 'badge-error'
-                      }`}
-                    >
-                      {o.status}
-                    </span>
-                  </td>
-                  <td>£{o.total}</td>
-                  <td>{new Date(o.createdAt).toLocaleDateString()}</td>
-                  <td className="space-x-2">
-                    <a className="btn btn-sm" href={`/orders/${o.uuid}`}>
-                      View
-                    </a>
-                    <a className="link" href={`/api/orders/${o.uuid}/invoice`}>
-                      PDF
-                    </a>
-                  </td>
-                </tr>
+                    </td>
+                    <td>£{group.order.total}</td>
+                    <td>
+                      {new Date(group.order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="space-x-2">
+                      <a
+                        className="btn btn-sm"
+                        href={`/orders/${group.order.uuid}`}
+                      >
+                        View
+                      </a>
+                      <a
+                        className="link"
+                        href={`/api/orders/${group.order.uuid}/invoice`}
+                      >
+                        PDF
+                      </a>
+                    </td>
+                  </tr>
+                  {expanded === idx && (
+                    <tr className="bg-base-200">
+                      <td colSpan={7} className="p-2">
+                        <ul className="space-y-1">
+                          {group.items.map((item) => (
+                            <li
+                              key={item.uuid}
+                              className="flex items-center gap-2"
+                            >
+                              <img
+                                src={
+                                  item.product.featuredImage?.url ||
+                                  `https://picsum.photos/seed/${item.product.id}/40/40`
+                                }
+                                alt={item.product.title}
+                                className="w-10 h-10 object-cover rounded"
+                              />
+                              <span className="flex-1 whitespace-nowrap">
+                                {item.product.title} x {item.quantity}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               ))}
             </tbody>
           </table>
