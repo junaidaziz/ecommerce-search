@@ -11,15 +11,18 @@ const BrandProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    fetch('/api/brand/products')
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
+    setError('');
+    fetch('/api/brand/products', { credentials: 'include' })
+      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
       .then((data: { products: Product[]; total: number }) =>
         setProducts(data.products)
       )
+      .catch(() => setError('Failed to load products'))
       .finally(() => setLoading(false));
   }, [user]);
 
@@ -60,6 +63,8 @@ const BrandProductsPage: React.FC = () => {
         <div className="flex justify-center my-4">
           <span className="loading loading-spinner"></span>
         </div>
+      ) : error ? (
+        <div className="text-error py-4">{error}</div>
       ) : (
         <ul className="space-y-1">
           {filtered.map((p) => (

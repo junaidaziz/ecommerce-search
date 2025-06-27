@@ -56,16 +56,21 @@ async function handler(
       const limit = parseInt(String((req.query.limit as string) || '20'), 10);
       const skip = (page - 1) * limit;
 
-      const brandId = (session.user as { brandId?: number }).brandId;
+      const vendorId = (session.user as { brandId?: number }).brandId;
+      if (!vendorId) {
+        console.warn('Missing brandId for brand user', session.user);
+        return res.status(400).json({ message: 'Invalid session data' });
+      }
+
       const [rows, total] = await Promise.all([
         db.product.findMany({
-          where: { brandId: session.user.brandId },
+          where: { vendorId },
           include: { category: true, vendor: true },
           orderBy: { id: 'asc' },
           take: limit,
           skip,
         }),
-        db.product.count({ where: { brandId: session.user.brandId } }),
+        db.product.count({ where: { vendorId } }),
       ]);
 
       const products = rows.map((row: any) => mapDbRowToProduct(row));
