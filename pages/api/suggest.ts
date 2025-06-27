@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import client from '../../lib/typesenseClient';
-import { handleApiError } from '../../lib/utils/handleApiError';
+import client from '@lib/typesenseClient';
+import { handleApiError } from '@utils/handleApiError';
 import { ObjectNotFound } from 'typesense/lib/Typesense/Errors';
 import type { SuggestionsResponse, ApiMessage } from '../../types';
 

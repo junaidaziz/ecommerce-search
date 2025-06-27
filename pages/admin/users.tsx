@@ -1,14 +1,14 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import {
   AdminUser,
   UserRoleUpdateRequest,
   UserDisabledUpdateRequest,
   ApiMessage,
 } from '../../types';
-import { fetchJson } from '../../lib/utils/fetchJson';
+import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 export default function ManageUsers() {
   const { user } = useContext(AppContext)!;

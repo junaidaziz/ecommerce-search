@@ -4,7 +4,7 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import type { FC } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import CartIcon from '../icons/CartIcon';
 import MoonIcon from '../icons/MoonIcon';
 import SunIcon from '../icons/SunIcon';
@@ -16,11 +16,11 @@ import FashionIcon from '../icons/FashionIcon';
 import HomeIcon from '../icons/HomeIcon';
 import ToysIcon from '../icons/ToysIcon';
 import SportsIcon from '../icons/SportsIcon';
-import XCircleIcon from '../icons/XCircleIcon';
-import DEFAULT_CATEGORIES from '../../lib/defaultCategories';
+import DEFAULT_CATEGORIES from '@lib/defaultCategories';
+import TrashIcon from '../icons/TrashIcon';
 import SearchBar from './SearchBar';
-import type { Category } from '../../types/category';
-import type { User } from '../../types/user';
+import type { Category } from '@types/category';
+import type { User } from '@types/user';
 
 interface HeaderProps {
   theme?: string;
@@ -261,14 +261,14 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
             </label>
             <div
               tabIndex={0}
-              className="dropdown-content card card-compact w-80 bg-base-100 shadow z-50"
+              className="dropdown-content card card-compact w-80 sm:w-96 bg-base-100 shadow z-50"
             >
-              <div className="card-body">
+              <div className="card-body p-4">
                 {cart.length === 0 ? (
                   <p className="text-sm">Your cart is empty</p>
                 ) : (
-                  <>
-                    <ul className="space-y-2 max-h-40 overflow-y-auto text-sm">
+                  <div className="flex flex-col h-72">
+                    <ul className="flex-1 overflow-y-auto divide-y divide-base-200 text-sm">
                       {cart.map((item) => {
                         const price = parseFloat(
                           typeof item.minPrice === 'number'
@@ -276,13 +276,13 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                             : item.minPrice || '0'
                         );
                         return (
-                          <li key={item.id} className="flex items-center gap-2">
+                          <li key={item.id} className="flex items-center gap-2 py-2">
                             <img
                               src={item.featuredImage?.url || '/placeholder.png'}
                               alt={item.title}
-                              className="w-10 h-10 object-cover rounded"
+                              className="w-12 h-12 object-cover rounded"
                             />
-                            <div className="flex-1">
+                            <div className="flex flex-col flex-1">
                               <p className="font-medium truncate">{item.title}</p>
                               <p className="text-xs">£{price.toFixed(2)}</p>
                             </div>
@@ -302,26 +302,28 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                               >
                                 +
                               </button>
-                              <button
-                                type="button"
-                                className="btn btn-ghost btn-xs text-error"
-                                onClick={() => removeFromCart(item.id as string, item.variant?.id)}
-                              >
-                                <XCircleIcon className="w-4 h-4" />
-                                <span className="sr-only">Remove</span>
-                              </button>
                             </div>
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-xs text-error hover:text-red-600"
+                              onClick={() => removeFromCart(item.id as string, item.variant?.id)}
+                            >
+                              <TrashIcon className="w-4 h-4" />
+                              <span className="sr-only">Remove</span>
+                            </button>
                           </li>
                         );
                       })}
                     </ul>
-                    <p className="font-semibold mt-2">
-                      Total: £{cart.reduce((s, i) => s + i.qty * parseFloat(typeof i.minPrice === 'number' ? i.minPrice.toString() : i.minPrice || '0'), 0).toFixed(2)}
-                    </p>
-                    <Link href="/cart" className="btn btn-primary btn-sm mt-2">
-                      View Cart
-                    </Link>
-                  </>
+                    <div className="pt-2 mt-2 border-t">
+                      <p className="font-semibold">
+                        Total: £{cart.reduce((s, i) => s + i.qty * parseFloat(typeof i.minPrice === 'number' ? i.minPrice.toString() : i.minPrice || '0'), 0).toFixed(2)}
+                      </p>
+                      <Link href="/cart" className="btn btn-primary btn-sm w-full mt-2">
+                        View Cart
+                      </Link>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

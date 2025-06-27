@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { getPageTitle } from '../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 const AboutPage: React.FC = () => {
   return (

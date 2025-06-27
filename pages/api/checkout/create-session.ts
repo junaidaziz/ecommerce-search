@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
-import { getProductByUuid } from '../../../lib/db';
-import { findUserById } from '../../../lib/users';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getProductByUuid } from '@lib/db';
+import { findUserById } from '@lib/users';
+import { handleApiError } from '@utils/handleApiError';
 import type { CheckoutSessionResponse, ApiMessage } from '../../../types';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SelectDropdown, {
   SelectOption,
-} from '../components/form-fields/SelectDropdown';
+} from '@components/form-fields/SelectDropdown';
 
 const options: SelectOption[] = [
   { label: 'Apple', value: 'apple' },

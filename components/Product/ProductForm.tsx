@@ -10,7 +10,7 @@ import {
   TagInput,
 } from '../form-fields';
 
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import type { ProductFormValues } from '../../types';
 
 interface ProductFormProps {

@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import Link from 'next/link';
 import { AnalyticsData, LowStockProduct } from '../../types';
-import { fetchJson } from '../../lib/utils/fetchJson';
+import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
-import BarChart from '../../components/BarChart';
+import { getPageTitle } from '@lib/pageTitle';
+import BarChart from '@components/BarChart';
 
 export default function AdminAnalytics() {
   const { user } = useContext(AppContext)!;

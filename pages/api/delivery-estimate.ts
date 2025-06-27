@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { estimateDelivery, formatDelivery } from '../../lib/delivery';
-import { handleApiError } from '../../lib/utils/handleApiError';
+import { estimateDelivery, formatDelivery } from '@lib/delivery';
+import { handleApiError } from '@utils/handleApiError';
 
 export default async function handler(
   req: NextApiRequest,

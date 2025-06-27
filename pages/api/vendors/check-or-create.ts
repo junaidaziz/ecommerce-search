@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { findVendorByName, createVendor } from '../../../lib/users';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { findVendorByName, createVendor } from '@lib/users';
+import { handleApiError } from '@utils/handleApiError';
 import type { Vendor, ApiMessage } from '../../../types';
 
 interface CheckCreateResponse {

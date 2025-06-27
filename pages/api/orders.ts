@@ -4,16 +4,16 @@ import {
   getOrdersForUser,
   getAllOrders,
   getOrdersForVendor,
-} from '../../lib/orders';
-import { findUser } from '../../lib/users';
+} from '@lib/orders';
+import { findUser } from '@lib/users';
 import {
   getProductByUuid,
   decreaseProductQuantity,
   clearCart,
-} from '../../lib/db';
-import { withRole } from '../../lib/withRole';
-import { sendOrderConfirmation } from '../../lib/email';
-import { handleApiError } from '../../lib/utils/handleApiError';
+} from '@lib/db';
+import { withRole } from '@lib/withRole';
+import { sendOrderConfirmation } from '@lib/email';
+import { handleApiError } from '@utils/handleApiError';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import type { Order, OrderPlacedResponse, ApiMessage } from '../../types';

@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getProductByUuid, getAverageRating } from '../../../lib/db';
-import { mapDbRowToProduct } from '../../../lib/products';
-import { Product } from '../../../types/product';
-import { handleApiError } from '../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../lib/utils/getQueryParam';
+import { getProductByUuid, getAverageRating } from '@lib/db';
+import { mapDbRowToProduct } from '@lib/products';
+import { Product } from '@types/product';
+import { handleApiError } from '@utils/handleApiError';
+import { getQueryParam } from '@utils/getQueryParam';
 import type { ApiMessage } from '../../../types';
 
 export interface ProductParams {

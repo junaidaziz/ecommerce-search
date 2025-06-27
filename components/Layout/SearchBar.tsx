@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import type { FC } from 'react';
 import SearchIcon from '../icons/SearchIcon';
-import type { TrendingResponse, SuggestionsResponse } from '../../types/api';
+import type { TrendingResponse, SuggestionsResponse } from '@types/api';
 
 interface SearchBarProps {
   placeholder?: string;

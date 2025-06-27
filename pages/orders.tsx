@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import useRequireAuth from '../hooks/useRequireAuth';
+import useRequireAuth from '@hooks/useRequireAuth';
 import type { Order } from '../types';
 import Head from 'next/head';
-import { getPageTitle } from '../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 type OrdersProps = {};
 

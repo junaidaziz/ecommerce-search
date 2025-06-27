@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
-import { AppContext } from '../../../contexts/AppContext';
-import type { User } from '../../../types/user';
-import type { Product } from '../../../types/product';
-import { getPageTitle } from '../../../lib/pageTitle';
+import { AppContext } from '@contexts/AppContext';
+import type { User } from '@types/user';
+import type { Product } from '@types/product';
+import { getPageTitle } from '@lib/pageTitle';
 
 const BrandProductsPage: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };

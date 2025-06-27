@@ -4,8 +4,8 @@ import GoogleProvider from 'next-auth/providers/google';
 import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import { findUser, addUser } from '../../../lib/users';
-import type { User as AppUser } from '../../../types/user';
+import { findUser, addUser } from '@lib/users';
+import type { User as AppUser } from '@types/user';
 
 // Extend the User type to include 'role'
 declare module 'next-auth' {

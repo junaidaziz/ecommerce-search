@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getOrdersForVendorId } from '../../../lib/orders';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getOrdersForVendorId } from '@lib/orders';
+import { handleApiError } from '@utils/handleApiError';
 import type { EarningsData, ApiMessage } from '../../../types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';

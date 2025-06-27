@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { getPageTitle } from '../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 interface ContactForm {
   name: string;
