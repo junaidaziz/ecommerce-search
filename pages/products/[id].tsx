@@ -10,7 +10,7 @@ import type {
   Review,
   ReviewsResponse,
   ReviewAddedResponse,
-} from '@types/review';
+} from '@/types/review';
 import { SelectDropdown, Textarea } from '@components/form-fields';
 import type { SelectOption } from '@components/form-fields/SelectDropdown';
 

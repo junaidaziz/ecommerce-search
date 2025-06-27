@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import DashboardCard from './DashboardCard';
 import BoxIcon from '../icons/BoxIcon';
-import type { Product } from '@types/product';
+import type { Product } from '@/types/product';
 
 interface Props {
   previewCount?: number;
