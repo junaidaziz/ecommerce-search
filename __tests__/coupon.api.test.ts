@@ -11,6 +11,7 @@ test('returns coupon data', async () => {
     code: 'SAVE',
     discountType: 'percent',
     amount: 10,
+    minOrderValue: 50,
     isActive: true,
     usedCount: 0,
   });
@@ -25,6 +26,7 @@ test('returns coupon data', async () => {
     code: 'SAVE',
     discountType: 'percent',
     amount: 10,
+    minOrderValue: 50,
     isActive: true,
     usedCount: 0,
   });
