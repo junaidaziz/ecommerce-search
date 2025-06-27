@@ -11,6 +11,7 @@ import SunIcon from '../icons/SunIcon';
 import UserIcon from '../icons/UserIcon';
 import MenuIcon from '../icons/MenuIcon';
 import ChevronDownIcon from '../icons/ChevronDownIcon';
+import ChevronRightIcon from '../icons/ChevronRightIcon';
 import ElectronicsIcon from '../icons/ElectronicsIcon';
 import FashionIcon from '../icons/FashionIcon';
 import HomeIcon from '../icons/HomeIcon';
@@ -20,8 +21,8 @@ import DEFAULT_CATEGORIES from '@lib/defaultCategories';
 import TrashIcon from '../icons/TrashIcon';
 import SearchBar from './SearchBar';
 import DropdownMenu from '@components/common/DropdownMenu';
-import type { Category } from '@types/category';
-import type { User } from '@types/user';
+import type { Category } from '@/types/category';
+import type { User } from '@/types/user';
 
 interface HeaderProps {
   theme?: string;
@@ -84,7 +85,13 @@ const Header: FC<HeaderProps> = ({
     fetch('/api/categories')
       .then((res) => res.json())
       .then((data) => {
-        const cats: Category[] = data.categories || data || DEFAULT_CATEGORIES;
+        const catsRaw: Category[] = data.categories || data || DEFAULT_CATEGORIES;
+        const cats = catsRaw.map((c) => ({
+          ...c,
+          subcategories: Array.isArray(c.subcategories)
+            ? c.subcategories.map((s) => (typeof s === 'string' ? { name: s } : s))
+            : undefined,
+        }));
         setCategories(filterCats(cats));
       })
       .catch(() => setCategories(filterCats(DEFAULT_CATEGORIES)));
@@ -192,9 +199,7 @@ const Header: FC<HeaderProps> = ({
                           {iconMap[cat.name] || null}
                           <span>{cat.name}</span>
                           {cat.subcategories?.length ? (
-                            <ChevronDownIcon
-                              className={`w-3 h-3 ml-auto transition-transform ${hoveredCat?.name === cat.name ? 'rotate-180' : ''}`}
-                            />
+                            <ChevronRightIcon className="w-3 h-3 ml-auto" />
                           ) : null}
                         </Link>
                       ))}
@@ -202,25 +207,28 @@ const Header: FC<HeaderProps> = ({
                         <span>No categories found</span>
                       )}
                     </div>
-                    {hoveredCat?.subcategories &&
-                      hoveredCat.subcategories.length > 0 && (
-                        <ul
-                          className="min-w-[200px] pl-4 space-y-1"
-                          role="menu"
-                        >
-                          {hoveredCat.subcategories.map((sub) => (
-                            <li key={sub} className="capitalize" role="none">
-                              <Link
-                                href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub)}`}
-                                role="menuitem"
-                                className="block font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 whitespace-nowrap truncate hover:text-primary hover:underline hover:scale-105"
-                              >
-                                {sub}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                    {hoveredCat?.subcategories && hoveredCat.subcategories.length > 0 ? (
+                      <ul
+                        className="min-w-[200px] pl-4 space-y-1 fade-in"
+                        role="menu"
+                      >
+                        {hoveredCat.subcategories.map((sub) => (
+                          <li key={sub.name} className="capitalize" role="none">
+                            <Link
+                              href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub.name)}`}
+                              role="menuitem"
+                              className="block font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 whitespace-nowrap truncate hover:text-primary hover:underline hover:scale-105"
+                            >
+                              {sub.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className="min-w-[200px] pl-4 flex items-center text-sm text-gray-500">
+                        No sub-categories
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -252,12 +260,12 @@ const Header: FC<HeaderProps> = ({
                   {cat.subcategories?.length && (
                     <ul className="pl-4 py-2 space-y-1">
                       {cat.subcategories.map((sub) => (
-                        <li key={sub} className="capitalize">
+                        <li key={sub.name} className="capitalize">
                           <Link
-                            href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub)}`}
+                            href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub.name)}`}
                             className="block py-1 transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105"
                           >
-                            {sub}
+                            {sub.name}
                           </Link>
                         </li>
                       ))}
@@ -319,7 +327,7 @@ const Header: FC<HeaderProps> = ({
                   <p className="text-sm">Your cart is empty</p>
                 ) : (
                   <div className="flex flex-col h-72">
-                    <ul className="flex-1 overflow-y-auto divide-y divide-base-200 text-sm">
+                    <ul className="flex-1 overflow-y-auto divide-y divide-base-200 text-sm space-y-1">
                       {cart.map((item) => {
                         const price = parseFloat(
                           typeof item.minPrice === 'number'
@@ -329,7 +337,7 @@ const Header: FC<HeaderProps> = ({
                         return (
                           <li
                             key={item.id}
-                            className="flex items-center gap-2 py-2"
+                            className="flex items-center justify-between gap-3 py-2 px-1 hover:bg-base-200 rounded"
                           >
                             <img
                               src={
@@ -338,13 +346,13 @@ const Header: FC<HeaderProps> = ({
                               alt={item.title}
                               className="w-12 h-12 object-cover rounded"
                             />
-                            <div className="flex flex-col flex-1">
-                              <p className="font-medium truncate">
+                            <div className="flex flex-col flex-1 min-w-0">
+                              <p className="font-medium text-sm line-clamp-2 break-words" title={item.title}>
                                 {item.title}
                               </p>
-                              <p className="text-xs">£{price.toFixed(2)}</p>
+                              <p className="text-xs mt-0.5">£{price.toFixed(2)}</p>
                             </div>
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 min-w-[80px] justify-center">
                               <button
                                 type="button"
                                 className="btn btn-xs"
@@ -375,7 +383,7 @@ const Header: FC<HeaderProps> = ({
                             </div>
                             <button
                               type="button"
-                              className="btn btn-ghost btn-xs text-error hover:text-red-600"
+                              className="btn btn-ghost btn-xs text-error hover:text-red-600 ml-2"
                               onClick={() =>
                                 removeFromCart(
                                   item.id as string,

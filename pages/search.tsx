@@ -12,7 +12,7 @@ import { getPageTitle } from '@lib/pageTitle';
 import HeroSlider from '@components/HeroSlider';
 import ProductCard from '@components/Product/ProductCard';
 import DEFAULT_CATEGORIES from '@lib/defaultCategories';
-import { Product } from '@types/product';
+import { Product } from '@/types/product';
 
 interface SearchResult extends Product {
   highlights?: { field: string; snippet: string }[];
