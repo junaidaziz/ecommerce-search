@@ -8,7 +8,7 @@ import { handleApiError } from '@utils/handleApiError';
 import { slugify } from '@lib/slugify';
 import type { Product, ProductInput, ApiMessage } from '../../../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
-import fs from 'fs';
+import { uploadFileToS3 } from '@lib/s3';
 import path from 'path';
 import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
 import { getServerSession } from 'next-auth/next';
@@ -134,14 +134,16 @@ async function handler(
         }
       }
 
-      const destDir = path.join(process.cwd(), 'public', 'uploads', String(id));
-      fs.mkdirSync(destDir, { recursive: true });
       const imagePaths: string[] = [];
       for (const file of photos) {
-        const name = Date.now() + '-' + file.originalFilename;
-        const destPath = path.join(destDir, name);
-        fs.renameSync(file.filepath, destPath);
-        imagePaths.push(`/uploads/${id}/${name}`);
+        const name = Date.now() + '-' + (file.originalFilename || 'image');
+        const key = `products/${id}/${name}`;
+        const url = await uploadFileToS3(
+          file.filepath,
+          key,
+          file.mimetype || undefined
+        );
+        imagePaths.push(url);
       }
       const payload: ProductInput = {
         sku: String(sku),
