@@ -85,11 +85,14 @@ const Header: FC<HeaderProps> = ({
     fetch('/api/categories')
       .then((res) => res.json())
       .then((data) => {
-        const catsRaw: Category[] = data.categories || data || DEFAULT_CATEGORIES;
+        const catsRaw: Category[] =
+          data.categories || data || DEFAULT_CATEGORIES;
         const cats = catsRaw.map((c) => ({
           ...c,
           subcategories: Array.isArray(c.subcategories)
-            ? c.subcategories.map((s) => (typeof s === 'string' ? { name: s } : s))
+            ? c.subcategories.map((s) =>
+                typeof s === 'string' ? { name: s } : s
+              )
             : undefined,
         }));
         setCategories(filterCats(cats));
@@ -207,7 +210,8 @@ const Header: FC<HeaderProps> = ({
                         <span>No categories found</span>
                       )}
                     </div>
-                    {hoveredCat?.subcategories && hoveredCat.subcategories.length > 0 ? (
+                    {hoveredCat?.subcategories &&
+                    hoveredCat.subcategories.length > 0 ? (
                       <ul
                         className="min-w-[200px] pl-4 space-y-1 fade-in"
                         role="menu"
@@ -347,10 +351,15 @@ const Header: FC<HeaderProps> = ({
                               className="w-12 h-12 object-cover rounded"
                             />
                             <div className="flex flex-col flex-1 min-w-0">
-                              <p className="font-medium text-sm line-clamp-2 break-words" title={item.title}>
+                              <p
+                                className="font-medium text-sm line-clamp-2 break-words"
+                                title={item.title}
+                              >
                                 {item.title}
                               </p>
-                              <p className="text-xs mt-0.5">£{price.toFixed(2)}</p>
+                              <p className="text-xs mt-0.5">
+                                £{price.toFixed(2)}
+                              </p>
                             </div>
                             <div className="flex items-center gap-1 min-w-[80px] justify-center">
                               <button
@@ -455,9 +464,10 @@ const Header: FC<HeaderProps> = ({
                   <UserIcon className="w-5 h-5" />
                 )}
                 <span>
-                  {user.firstName || user.lastName
-                    ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
-                    : user.email}
+                  {user.name?.trim() ||
+                    (user.firstName || user.lastName
+                      ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
+                      : user.email)}
                 </span>
               </label>
               <DropdownMenu items={menuItems} />
