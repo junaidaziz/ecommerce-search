@@ -37,7 +37,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     (
       message: string,
       type: NotificationType = 'info',
-      position: NotificationPosition = 'end'
+      position: NotificationPosition = 'top-right'
     ) => {
       const id = Date.now() + Math.random();
       setNotifs((prev) => [...prev, { id, message, type, position }]);
