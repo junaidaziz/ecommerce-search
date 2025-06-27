@@ -17,7 +17,7 @@ async function handler(
     const db = getDb();
     const user = req.user;
     const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
-    const vendorId = Number(user?.id) || brandId || undefined;
+    const vendorId = user?.brandId ?? brandId || undefined;
     const start = dayjs().subtract(7, 'day').startOf('day').toDate();
     const where: any = { createdAt: { gte: start }, status: 'completed' };
     if (vendorId) where.product = { vendorId };
