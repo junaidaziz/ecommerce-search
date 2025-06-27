@@ -150,7 +150,7 @@ export default function ProductDetail({
             >
               Add to Cart
             </button>
-            {wishlist?.some((w) => w.id === product.id) ? (
+            {wishlist?.some((w) => w.product.id === product.id) ? (
               <button
                 className="btn transition-all duration-200"
                 onClick={() => removeFromWishlist(product.id)}
