@@ -42,7 +42,20 @@ const UserOrders: React.FC = () => {
         {orders.map((o) => (
           <li key={o.id} className="border p-2">
             <p>
-              Order #{o.id} - {o.status}
+              Order #{o.id} -
+              <span
+                className={`badge ml-2 ${
+                  o.status === 'processing'
+                    ? 'badge-warning'
+                    : o.status === 'shipped'
+                    ? 'badge-info'
+                    : o.status === 'delivered'
+                    ? 'badge-success'
+                    : 'badge-error'
+                }`}
+              >
+                {o.status}
+              </span>
             </p>
             <ul className="list-disc pl-4 text-sm mb-1">
               <li>
@@ -50,10 +63,21 @@ const UserOrders: React.FC = () => {
               </li>
             </ul>
             <p>Total: £{o.total}</p>
-            <p>
+            <p className="space-x-2">
+              <a className="btn btn-sm" href={`/user/orders/${o.uuid}`}>View</a>
               <a className="link" href={`/api/orders/${o.uuid}/invoice`}>
-                Download Invoice
+                Invoice
               </a>
+              <button
+                className="btn btn-sm"
+                onClick={() =>
+                  fetch(`/api/user/orders/${o.uuid}/reorder`, {
+                    method: 'POST',
+                  }).then(() => window.location.assign('/cart'))
+                }
+              >
+                Reorder
+              </button>
             </p>
           </li>
         ))}

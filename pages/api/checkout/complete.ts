@@ -29,7 +29,7 @@ export default async function handler(
       userEmail: metadata.email,
       items: JSON.parse(metadata.items || '[]'),
       total: (session.amount_total ?? 0) / 100,
-      status: 'completed',
+      status: 'processing',
     });
     const orderId =
       Array.isArray(orders) && orders.length > 0 ? orders[0].id : '';

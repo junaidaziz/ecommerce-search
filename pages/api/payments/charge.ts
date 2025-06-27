@@ -36,7 +36,7 @@ export default async function handler(
     if (charge.status === 'succeeded') {
       await db.order.update({
         where: { id: Number(orderId) },
-        data: { status: 'completed' },
+        data: { status: 'processing' },
       });
     }
     return res.status(200).json(charge);
