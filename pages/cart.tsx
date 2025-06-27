@@ -66,21 +66,21 @@ const Cart: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <button
                   className="btn btn-xs"
-                  onClick={() => changeQty(item.id, -1)}
+                  onClick={() => changeQty(item.id as string, -1, item.variant?.id)}
                 >
                   -
                 </button>
                 <span>{item.qty}</span>
                 <button
                   className="btn btn-xs"
-                  onClick={() => changeQty(item.id, 1)}
+                  onClick={() => changeQty(item.id as string, 1, item.variant?.id)}
                 >
                   +
                 </button>
                 <span className="ml-2">£{subtotal.toFixed(2)}</span>
                 <button
                   className="btn btn-xs btn-error"
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeFromCart(item.id as string, item.variant?.id)}
                 >
                   Remove
                 </button>

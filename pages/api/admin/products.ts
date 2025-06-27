@@ -8,7 +8,7 @@ import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import { slugify } from '../../../lib/slugify';
-import { Product, ApiMessage } from '../../../types';
+import { Product, ApiMessage, Variant } from '../../../types';
 import { mapDbRowToProduct } from '../../../lib/products';
 
 export const config = {
@@ -58,7 +58,26 @@ async function handler(
         min_price,
         max_price,
         currency,
+        variants,
       } = fields as Record<string, unknown>;
+
+      let variantList: Variant[] = [];
+      if (variants) {
+        try {
+          variantList = typeof variants === 'string' ? JSON.parse(variants) : (variants as any);
+          if (!Array.isArray(variantList)) variantList = [];
+        } catch {
+          variantList = [];
+        }
+      }
+
+      const seen = new Set<string>();
+      variantList = variantList.filter((v) => {
+        const key = JSON.stringify(v.attributes);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
       if (!id || !title || !sku) {
         res.status(400).json({ message: 'id, sku and title are required' });
         return;
@@ -130,12 +149,33 @@ async function handler(
       }
 
       if (req.method === 'POST') {
-        await db.product.create({ data });
+        const product = await db.product.create({ data });
+        if (variantList.length > 0) {
+          await db.variant.createMany({
+            data: variantList.map((v) => ({
+              productId: product.id,
+              attributes: v.attributes,
+              quantity: v.quantity || 0,
+              priceModifier: v.priceModifier ?? null,
+            })),
+          });
+        }
         res.status(201).json({ message: 'Product added' });
         return;
       }
 
       await db.product.update({ where: { id: Number(id) }, data });
+      await db.variant.deleteMany({ where: { productId: Number(id) } });
+      if (variantList.length > 0) {
+        await db.variant.createMany({
+          data: variantList.map((v) => ({
+            productId: Number(id),
+            attributes: v.attributes,
+            quantity: v.quantity || 0,
+            priceModifier: v.priceModifier ?? null,
+          })),
+        });
+      }
       res.status(200).json({ message: 'Product updated' });
       return;
     }
@@ -168,7 +208,7 @@ async function handler(
       if (vendor) where.vendor = { brandName: vendor };
       const rows = await db.product.findMany({
         where,
-        include: { category: true, vendor: true },
+        include: { category: true, vendor: true, variants: true },
       });
       const data: Product[] = rows.map((p) => mapDbRowToProduct(p));
       res.status(200).json(data);
