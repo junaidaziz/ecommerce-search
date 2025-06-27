@@ -6,8 +6,7 @@ import { authOptions } from '../auth/[...nextauth]';
 import { handleApiError } from '@utils/handleApiError';
 import type { User, ApiMessage } from '../../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
-import fs from 'fs';
-import path from 'path';
+import { uploadFileToS3 } from '@lib/s3';
 
 export const config = {
   api: {
@@ -71,23 +70,33 @@ export default async function handler(
       };
       if (email) update.email = email;
       if (password) update.password = await bcrypt.hash(String(password), 10);
-      const profileImageFile = (files.profileImage || files.logo) as File | File[] | undefined;
+      const profileImageFile = (files.profileImage || files.logo) as
+        | File
+        | File[]
+        | undefined;
       if (profileImageFile) {
-        const file = Array.isArray(profileImageFile) ? profileImageFile[0] : profileImageFile;
+        const file = Array.isArray(profileImageFile)
+          ? profileImageFile[0]
+          : profileImageFile;
         if (
-          file.mimetype && !['image/jpeg', 'image/png'].includes(file.mimetype)
+          file.mimetype &&
+          !['image/jpeg', 'image/png'].includes(file.mimetype)
         ) {
-          return res.status(400).json({ message: 'Only JPEG/PNG images are allowed' });
+          return res
+            .status(400)
+            .json({ message: 'Only JPEG/PNG images are allowed' });
         }
         if (file.size && file.size > 2 * 1024 * 1024) {
           return res.status(400).json({ message: 'File size exceeds 2MB' });
         }
-        const dir = path.join(process.cwd(), 'public', 'avatars', String(session.user.id));
-        fs.mkdirSync(dir, { recursive: true });
-        const name = Date.now() + '-' + file.originalFilename;
-        const dest = path.join(dir, name);
-        fs.renameSync(file.filepath, dest);
-        update.profileImage = `/avatars/${session.user.id}/${name}`;
+        const name = Date.now() + '-' + (file.originalFilename || 'avatar');
+        const key = `users/${session.user.id}/${name}`;
+        const url = await uploadFileToS3(
+          file.filepath,
+          key,
+          file.mimetype || undefined
+        );
+        update.profileImage = url;
       }
       await updateUserProfile(session.user.email, update);
       return res.status(200).json({ message: 'updated' });
