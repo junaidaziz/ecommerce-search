@@ -140,7 +140,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
         >
           Add to Cart
         </button>
-        {(wishlist ?? []).some((w: Product) => w.id === product.id) ? (
+        {(wishlist ?? []).some((w) => w.product.id === product.id) ? (
           <button
             className="btn"
             onClick={() => removeFromWishlist?.(product.id)}
