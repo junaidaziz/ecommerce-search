@@ -1,4 +1,4 @@
-import { useContext, useState, FormEvent, ChangeEvent } from 'react';
+import { useContext, useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -7,7 +7,12 @@ import { AppContext } from '../contexts/AppContext';
 import type { AppContextValue } from '../types';
 import type { User } from '../types/user';
 import type { Coupon } from '../types';
-import { TextInput, Textarea } from '../components/form-fields';
+import {
+  TextInput,
+  Textarea,
+  CountrySelect,
+  AddressAutocomplete,
+} from '../components/form-fields';
 import FileUpload from '../components/form-fields/FileUpload';
 
 // Types for cart item and user
@@ -31,13 +36,17 @@ const Checkout: React.FC = () => {
   const [name, setName] = useState(
     user ? `${user.firstName} ${user.lastName}` : ''
   );
+  const [email, setEmail] = useState(user?.email || '');
   const [address, setAddress] = useState('');
+  const [country, setCountry] = useState(user?.country || '');
   const [error, setError] = useState('');
   const [coupon, setCoupon] = useState('');
   const [discount, setDiscount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [paymentReference, setPaymentReference] = useState('');
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
+  const [step, setStep] = useState(1);
+  const [deliveryDate, setDeliveryDate] = useState('');
 
   const itemCount = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce(
@@ -52,48 +61,67 @@ const Checkout: React.FC = () => {
     0
   );
   const discountedTotal = totalPrice * (1 - discount / 100);
+  const shippingCost = cart.length > 0 ? 5 : 0;
+  const finalTotal = discountedTotal + shippingCost;
 
-  if (!user)
-    return (
-      <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center space-y-4 py-10">
-        <p className="text-lg">Please log in to checkout.</p>
-        <Link href="/login" className="btn btn-primary">
-          Login
-        </Link>
-      </div>
-    );
+  useEffect(() => {
+    if (!country) return;
+    fetch(`/api/delivery-estimate?country=${country}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((d) => setDeliveryDate(d.date))
+      .catch(() => setDeliveryDate(''));
+  }, [country]);
+
   if (cart.length === 0) return <div className="p-4">Your cart is empty.</div>;
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     try {
-      if (paymentMethod === 'card') {
-        const res = await fetch('/api/checkout/create-session', {
+      if (user) {
+        if (paymentMethod === 'card') {
+          const res = await fetch('/api/checkout/create-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              items: cart,
+              email: user.email,
+              shipping: { name, address },
+              discount,
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || 'Checkout failed');
+          window.location.href = data.url;
+        } else {
+          const fd = new FormData();
+          fd.append('email', user.email);
+          fd.append('items', JSON.stringify(cart));
+          fd.append('total', discountedTotal.toString());
+          fd.append('paymentMethod', paymentMethod);
+          if (paymentReference) fd.append('paymentReference', paymentReference);
+          if (paymentProof) fd.append('paymentProof', paymentProof);
+          const res = await fetch('/api/orders', { method: 'POST', body: fd });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || 'Checkout failed');
+          router.push('/orders');
+        }
+      } else {
+        const res = await fetch('/api/guest-orders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            name,
+            email,
+            address,
+            country,
             items: cart,
-            email: user.email,
-            shipping: { name, address },
-            discount,
+            total: finalTotal,
           }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Checkout failed');
-        window.location.href = data.url;
-      } else {
-        const fd = new FormData();
-        fd.append('email', user.email);
-        fd.append('items', JSON.stringify(cart));
-        fd.append('total', discountedTotal.toString());
-        fd.append('paymentMethod', paymentMethod);
-        if (paymentReference) fd.append('paymentReference', paymentReference);
-        if (paymentProof) fd.append('paymentProof', paymentProof);
-        const res = await fetch('/api/orders', { method: 'POST', body: fd });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Checkout failed');
-        router.push('/orders');
+        router.push(`/confirm?guest=${data.id}`);
       }
     } catch (e: any) {
       setError(e.message || 'Order failed');
@@ -111,7 +139,7 @@ const Checkout: React.FC = () => {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (!name || !address) {
+          if (!name || !address || (!user && !email) || !country) {
             setError('Shipping information required');
             return;
           }
@@ -202,17 +230,34 @@ const Checkout: React.FC = () => {
             required
           />
         </div>
+        {!user && (
+          <div>
+            <label className="label" htmlFor="email">Email</label>
+            <TextInput
+              name="email"
+              id="email"
+              className="w-full"
+              value={email}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              required
+              type="email"
+            />
+          </div>
+        )}
         <div>
           <label className="label" htmlFor="address">Address</label>
-          <Textarea
-            name="address"
-            id="address"
-            className="w-full"
+          <AddressAutocomplete
             value={address}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)}
-            required
+            onChange={setAddress}
+            className="w-full"
           />
         </div>
+        <div>
+          <CountrySelect value={country} onChange={setCountry} label="Country" />
+        </div>
+        {deliveryDate && (
+          <p className="text-sm">Estimated Delivery: {deliveryDate}</p>
+        )}
         {error && <p className="text-red-500">{error}</p>}
         <div className="flex justify-end">
           <button className="btn btn-primary" type="submit">Next</button>
