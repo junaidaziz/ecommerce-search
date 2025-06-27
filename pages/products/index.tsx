@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import ProductFilters from '@components/Product/ProductFilters';
 import ActiveFilters from '@components/ActiveFilters';
 import ProductGrid from '@components/Product/ProductGrid';
