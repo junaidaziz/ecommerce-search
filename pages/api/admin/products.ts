@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getDb } from '@lib/db';
 import { hasOrdersForProduct } from '@lib/orders';
 import formidable, { type Fields, type Files, type File } from 'formidable';
-import fs from 'fs';
+import { uploadFileToS3 } from '@lib/s3';
 import path from 'path';
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
@@ -64,7 +64,10 @@ async function handler(
       let variantList: Variant[] = [];
       if (variants) {
         try {
-          variantList = typeof variants === 'string' ? JSON.parse(variants) : (variants as any);
+          variantList =
+            typeof variants === 'string'
+              ? JSON.parse(variants)
+              : (variants as any);
           if (!Array.isArray(variantList)) variantList = [];
         } catch {
           variantList = [];
@@ -87,14 +90,16 @@ async function handler(
           ? (files.photos as File[])
           : [files.photos as File]
         : [];
-      const destDir = path.join(process.cwd(), 'public', 'uploads', String(id));
-      fs.mkdirSync(destDir, { recursive: true });
       const imagePaths: string[] = [];
       for (const file of photos) {
-        const name = Date.now() + '-' + file.originalFilename;
-        const destPath = path.join(destDir, name);
-        fs.renameSync(file.filepath, destPath);
-        imagePaths.push(`/uploads/${id}/${name}`);
+        const name = Date.now() + '-' + (file.originalFilename || 'image');
+        const key = `products/${id}/${name}`;
+        const url = await uploadFileToS3(
+          file.filepath,
+          key,
+          file.mimetype || undefined
+        );
+        imagePaths.push(url);
       }
       let existing = null;
       if (req.method === 'PUT') {

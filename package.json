@@ -19,6 +19,7 @@
     "update:quantities": "ts-node scripts/updateQuantities.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.837.0",
     "@hookform/resolvers": "^3.3.4",
     "@prisma/client": "^6.10.1",
     "@vercel/blob": "^0.23.0",
