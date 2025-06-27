@@ -1,8 +1,9 @@
 export interface Coupon {
   id?: string | number;
   code: string;
-  discountType: 'percent' | 'amount';
+  discountType: 'percent' | 'amount' | 'bogo';
   amount: number;
+  minOrderValue?: number;
   expirationDate?: string;
   usageLimit?: number;
   usedCount?: number;
