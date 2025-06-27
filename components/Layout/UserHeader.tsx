@@ -67,12 +67,22 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   };
 
   useEffect(() => {
+    const filterCats = (cats: Category[]) =>
+      cats.filter(
+        (c) =>
+          c.name &&
+          c.name.toLowerCase() !== 'uncategorized' &&
+          c.name.trim() !== '1' &&
+          !/^[0-9]+$/.test(c.name)
+      );
+
     fetch('/api/categories')
       .then((res) => res.json())
-      .then((data) =>
-        setCategories(data.categories || data || DEFAULT_CATEGORIES)
-      )
-      .catch(() => setCategories(DEFAULT_CATEGORIES));
+      .then((data) => {
+        const cats: Category[] = data.categories || data || DEFAULT_CATEGORIES;
+        setCategories(filterCats(cats));
+      })
+      .catch(() => setCategories(filterCats(DEFAULT_CATEGORIES)));
   }, []);
 
   useEffect(() => {
@@ -152,11 +162,11 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                   role="menu"
                   onMouseEnter={handleMenuEnter}
                   onMouseLeave={handleMenuLeave}
-                  className={`absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 bg-opacity-100 border border-base-200 shadow-lg rounded w-screen max-w-3xl transition-all transform ${menuOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 -translate-y-2'}`}
+                  className={`absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 bg-opacity-100 border border-base-200 shadow-lg rounded w-screen max-w-sm sm:max-w-xl md:max-w-3xl transition-all transform ${menuOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 -translate-y-2'}`}
                   aria-hidden={!menuOpen}
                 >
                   <div className="flex gap-6">
-                    <div className="w-56 pr-4 space-y-2 border-r border-base-200">
+                    <div className="pr-4 border-r border-base-200 grid grid-cols-2 sm:grid-cols-3 gap-2 min-w-[220px] max-w-sm">
                       {categories.map((cat) => (
                         <button
                           key={cat.name}
@@ -166,10 +176,11 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                           aria-expanded={hoveredCat?.name === cat.name}
                           onFocus={() => setHoveredCat(cat)}
                           onMouseEnter={() => setHoveredCat(cat)}
-                          className="w-full flex items-center gap-1 text-left font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 focus:outline-none capitalize whitespace-nowrap truncate hover:text-primary hover:underline hover:scale-105"
+                          title={cat.name}
+                          className="flex items-center gap-1 px-2 py-1 rounded text-left font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 focus:outline-none capitalize whitespace-normal line-clamp-2 hover:bg-base-200 hover:text-primary hover:underline hover:scale-105"
                         >
                           {iconMap[cat.name] || null}
-                          {cat.name}
+                          <span>{cat.name}</span>
                           {cat.subcategories?.length ? (
                             <ChevronDownIcon
                               className={`w-3 h-3 ml-auto transition-transform ${hoveredCat?.name === cat.name ? 'rotate-180' : ''}`}
@@ -177,9 +188,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                           ) : null}
                         </button>
                       ))}
-                      {categories.length === 0 && (
-                        <span>No categories found</span>
-                      )}
+                      {categories.length === 0 && <span>No categories found</span>}
                     </div>
                     {hoveredCat?.subcategories &&
                       hoveredCat.subcategories.length > 0 && (
@@ -215,9 +224,12 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                   key={cat.name}
                   className="border-b border-base-200 last:border-none"
                 >
-                  <summary className="flex items-center gap-2 py-2 cursor-pointer list-none transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105">
+                  <summary
+                    title={cat.name}
+                    className="flex items-center gap-2 py-2 cursor-pointer list-none transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 hover:bg-base-200 rounded"
+                  >
                     {iconMap[cat.name] || null}
-                    <span className="capitalize">{cat.name}</span>
+                    <span className="capitalize line-clamp-2 whitespace-normal">{cat.name}</span>
                   </summary>
                   {cat.subcategories?.length && (
                     <ul className="pl-4 py-2 space-y-1">
