@@ -26,9 +26,14 @@ import type { User } from '@types/user';
 interface HeaderProps {
   theme?: string;
   setTheme?: React.Dispatch<React.SetStateAction<string>>;
+  maxWidthClass?: string;
 }
 
-const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
+const Header: FC<HeaderProps> = ({
+  theme = 'light',
+  setTheme,
+  maxWidthClass,
+}) => {
   const router = useRouter();
   const { data: session } = useSession();
   const appContext = useContext(AppContext);
@@ -112,7 +117,11 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
 
   return (
     <header className="relative bg-base-300 mb-6 py-4">
-      <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2">
+      <div
+        className={`w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2 mx-auto ${
+          maxWidthClass ?? 'max-w-[95%] 2xl:max-w-[1440px]'
+        }`}
+      >
         <Link
           href="/"
           className="p-0 flex items-center cursor-pointer transition-transform duration-300 ease-out hover:scale-110 hover:-translate-y-1 hover:shadow-xl"
@@ -128,7 +137,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
         </Link>
 
         <div className="flex-1 flex items-center gap-x-6 relative">
-        <button
+          <button
             type="button"
             aria-label="Toggle categories"
             className="md:hidden btn btn-ghost"
@@ -189,7 +198,9 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                           ) : null}
                         </Link>
                       ))}
-                      {categories.length === 0 && <span>No categories found</span>}
+                      {categories.length === 0 && (
+                        <span>No categories found</span>
+                      )}
                     </div>
                     {hoveredCat?.subcategories &&
                       hoveredCat.subcategories.length > 0 && (
@@ -316,21 +327,34 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                             : item.minPrice || '0'
                         );
                         return (
-                          <li key={item.id} className="flex items-center gap-2 py-2">
+                          <li
+                            key={item.id}
+                            className="flex items-center gap-2 py-2"
+                          >
                             <img
-                              src={item.featuredImage?.url || '/placeholder.png'}
+                              src={
+                                item.featuredImage?.url || '/placeholder.png'
+                              }
                               alt={item.title}
                               className="w-12 h-12 object-cover rounded"
                             />
                             <div className="flex flex-col flex-1">
-                              <p className="font-medium truncate">{item.title}</p>
+                              <p className="font-medium truncate">
+                                {item.title}
+                              </p>
                               <p className="text-xs">£{price.toFixed(2)}</p>
                             </div>
                             <div className="flex items-center gap-1">
                               <button
                                 type="button"
                                 className="btn btn-xs"
-                                onClick={() => changeQty(item.id as string, -1, item.variant?.id)}
+                                onClick={() =>
+                                  changeQty(
+                                    item.id as string,
+                                    -1,
+                                    item.variant?.id
+                                  )
+                                }
                               >
                                 -
                               </button>
@@ -338,7 +362,13 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                               <button
                                 type="button"
                                 className="btn btn-xs"
-                                onClick={() => changeQty(item.id as string, 1, item.variant?.id)}
+                                onClick={() =>
+                                  changeQty(
+                                    item.id as string,
+                                    1,
+                                    item.variant?.id
+                                  )
+                                }
                               >
                                 +
                               </button>
@@ -346,7 +376,12 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                             <button
                               type="button"
                               className="btn btn-ghost btn-xs text-error hover:text-red-600"
-                              onClick={() => removeFromCart(item.id as string, item.variant?.id)}
+                              onClick={() =>
+                                removeFromCart(
+                                  item.id as string,
+                                  item.variant?.id
+                                )
+                              }
                             >
                               <TrashIcon className="w-4 h-4" />
                               <span className="sr-only">Remove</span>
@@ -357,9 +392,25 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                     </ul>
                     <div className="pt-2 mt-2 border-t">
                       <p className="font-semibold">
-                        Total: £{cart.reduce((s, i) => s + i.qty * parseFloat(typeof i.minPrice === 'number' ? i.minPrice.toString() : i.minPrice || '0'), 0).toFixed(2)}
+                        Total: £
+                        {cart
+                          .reduce(
+                            (s, i) =>
+                              s +
+                              i.qty *
+                                parseFloat(
+                                  typeof i.minPrice === 'number'
+                                    ? i.minPrice.toString()
+                                    : i.minPrice || '0'
+                                ),
+                            0
+                          )
+                          .toFixed(2)}
                       </p>
-                      <Link href="/cart" className="btn btn-primary btn-sm w-full mt-2">
+                      <Link
+                        href="/cart"
+                        className="btn btn-primary btn-sm w-full mt-2"
+                      >
                         View Cart
                       </Link>
                     </div>
@@ -406,7 +457,11 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           ) : (
             !isAuthRoute && (
               <>
-                <Link href="/login" aria-label="Login" className="btn btn-ghost">
+                <Link
+                  href="/login"
+                  aria-label="Login"
+                  className="btn btn-ghost"
+                >
                   Login
                 </Link>
                 <Link
