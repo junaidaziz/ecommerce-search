@@ -7,9 +7,14 @@ import BrandHeader from './BrandHeader';
 interface HeaderProps {
   theme?: string;
   setTheme?: React.Dispatch<React.SetStateAction<string>>;
+  maxWidthClass?: string;
 }
 
-const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
+const Header: FC<HeaderProps> = ({
+  theme = 'light',
+  setTheme,
+  maxWidthClass,
+}) => {
   const app = useContext(AppContext);
   const { data: session } = useSession();
   const role =
@@ -18,9 +23,21 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
       (session?.user as { role?: string } | undefined)?.role || ''
     ).toLowerCase();
   if (role === 'brand') {
-    return <BrandHeader theme={theme} setTheme={setTheme} />;
+    return (
+      <BrandHeader
+        theme={theme}
+        setTheme={setTheme}
+        maxWidthClass={maxWidthClass}
+      />
+    );
   }
-  return <UserHeader theme={theme} setTheme={setTheme} />;
+  return (
+    <UserHeader
+      theme={theme}
+      setTheme={setTheme}
+      maxWidthClass={maxWidthClass}
+    />
+  );
 };
 
 export default Header;
