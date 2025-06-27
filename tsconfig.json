@@ -112,7 +112,8 @@
       "@styles/*": ["styles/*"],
       "@contexts/*": ["contexts/*"],
       "@/types/*": ["types/*"],
-      "@test-utils/*": ["test-utils/*"]
+      "@test-utils/*": ["test-utils/*"],
+      "@lib/prisma": ["lib/prisma"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
