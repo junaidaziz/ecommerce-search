@@ -1,4 +1,5 @@
 import React, { createContext, useState, useCallback, ReactNode } from 'react';
+import { Toast } from '@/components/UI';
 
 type NotificationType = 'info' | 'success' | 'warning' | 'error';
 type NotificationPosition = 'center' | 'end' | string;
@@ -56,38 +57,38 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
           {notifs
             .filter((n) => n.position === 'center')
             .map((n) => (
-              <div
+              <Toast
                 key={n.id}
-                className={`alert alert-${n.type} shadow-md relative`}
-              >
-                {n.message}
-                <button
-                  type="button"
-                  className="absolute right-2 top-1"
-                  onClick={() => removeNotification(n.id)}
-                >
-                  ✕
-                </button>
-              </div>
+                message={n.message}
+                type={n.type}
+                onClose={() => removeNotification(n.id)}
+              />
+            ))}
+        </div>
+        <div className="absolute right-5 top-5 space-y-2">
+          {notifs
+            .filter((n) => n.position === 'top-right')
+            .map((n) => (
+              <Toast
+                key={n.id}
+                message={n.message}
+                type={n.type}
+                onClose={() => removeNotification(n.id)}
+              />
             ))}
         </div>
         <div className="absolute right-5 bottom-5 space-y-2">
           {notifs
-            .filter((n) => n.position !== 'center')
+            .filter(
+              (n) => n.position !== 'center' && n.position !== 'top-right'
+            )
             .map((n) => (
-              <div
+              <Toast
                 key={n.id}
-                className={`alert alert-${n.type} shadow-md relative`}
-              >
-                {n.message}
-                <button
-                  type="button"
-                  className="absolute right-2 top-1"
-                  onClick={() => removeNotification(n.id)}
-                >
-                  ✕
-                </button>
-              </div>
+                message={n.message}
+                type={n.type}
+                onClose={() => removeNotification(n.id)}
+              />
             ))}
         </div>
       </div>
