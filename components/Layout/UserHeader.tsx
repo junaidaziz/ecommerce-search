@@ -157,7 +157,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                           aria-expanded={hoveredCat?.name === cat.name}
                           onFocus={() => setHoveredCat(cat)}
                           onMouseEnter={() => setHoveredCat(cat)}
-                          className="w-full flex items-center gap-1 text-left font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 focus:outline-none capitalize whitespace-nowrap truncate hover:text-white hover:underline hover:scale-105"
+                          className="w-full flex items-center gap-1 text-left font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 focus:outline-none capitalize whitespace-nowrap truncate hover:text-primary hover:underline hover:scale-105"
                         >
                           {iconMap[cat.name] || null}
                           {cat.name}
@@ -183,7 +183,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                               <Link
                                 href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub)}`}
                                 role="menuitem"
-                                className="block font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 whitespace-nowrap truncate hover:text-white hover:underline hover:scale-105"
+                                className="block font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 whitespace-nowrap truncate hover:text-primary hover:underline hover:scale-105"
                               >
                                 {sub}
                               </Link>
@@ -206,7 +206,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                   key={cat.name}
                   className="border-b border-base-200 last:border-none"
                 >
-                  <summary className="flex items-center gap-2 py-2 cursor-pointer list-none transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105">
+                  <summary className="flex items-center gap-2 py-2 cursor-pointer list-none transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105">
                     {iconMap[cat.name] || null}
                     <span className="capitalize">{cat.name}</span>
                   </summary>
@@ -216,7 +216,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                         <li key={sub} className="capitalize">
                           <Link
                             href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub)}`}
-                            className="block py-1 transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105"
+                            className="block py-1 transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105"
                           >
                             {sub}
                           </Link>
@@ -236,19 +236,19 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           <nav className="hidden lg:flex gap-4 ml-4">
             <Link
               href="/products"
-              className={`transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105 ${pathname.startsWith('/products') ? 'text-primary underline font-semibold' : ''}`}
+              className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname.startsWith('/products') ? 'text-primary underline font-semibold' : ''}`}
             >
               Shop
             </Link>
             <Link
               href="/about"
-              className={`transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105 ${pathname === '/about' ? 'text-primary underline font-semibold' : ''}`}
+              className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname === '/about' ? 'text-primary underline font-semibold' : ''}`}
             >
               About
             </Link>
             <Link
               href="/contact"
-              className={`transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105 ${pathname === '/contact' ? 'text-primary underline font-semibold' : ''}`}
+              className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname === '/contact' ? 'text-primary underline font-semibold' : ''}`}
             >
               Contact
             </Link>
@@ -259,7 +259,7 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
           <div className="dropdown dropdown-end dropdown-hover">
             <label
               tabIndex={0}
-              className="relative p-2 cursor-pointer transition-colors transition-transform duration-200 hover:text-white hover:scale-105"
+              className="relative p-2 cursor-pointer transition-colors transition-transform duration-200 hover:text-primary hover:scale-105"
             >
               <CartIcon className="w-5 h-5" />
               {itemCount > 0 && (

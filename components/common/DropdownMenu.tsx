@@ -22,7 +22,7 @@ const DropdownMenu: FC<DropdownMenuProps> = ({ items }) => (
         <li key={index}>
           <button
             onClick={item.onClick}
-            className="transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105"
+            className="transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105"
           >
             {item.label}
           </button>
@@ -31,7 +31,7 @@ const DropdownMenu: FC<DropdownMenuProps> = ({ items }) => (
         <li key={index}>
           <Link
             href={item.href || '#'}
-            className="transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105"
+            className="transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105"
           >
             {item.label}
           </Link>
