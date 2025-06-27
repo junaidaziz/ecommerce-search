@@ -109,7 +109,6 @@ const Header: FC<HeaderProps> = ({
   const menuItems = [
     { label: 'My Orders', href: '/orders' },
     { label: 'Profile', href: '/profile' },
-    { label: 'Update Profile', href: '/profile/edit' },
     { label: 'Settings', href: '/settings' },
     { label: 'Logout', onClick: logout, isButton: true },
   ];
