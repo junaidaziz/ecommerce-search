@@ -99,9 +99,9 @@ export default function BrandSignup() {
       <Head>
         <title>{getPageTitle('Brand Signup')}</title>
       </Head>
-      <PageContainer className="max-w-sm -mt-8">
+      <PageContainer className="max-w-xs -mt-12">
         <h1 className="text-2xl font-bold mb-4 text-center">Brand Sign Up</h1>
-        <div className="flex flex-col gap-4 mb-4">
+        <div className="flex flex-col gap-4 mb-6">
           <button
             type="button"
             className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white"
@@ -181,13 +181,13 @@ export default function BrandSignup() {
             Sign Up
           </button>
         </form>
-        <p className="text-center mt-4">
+        <p className="text-center mt-6">
           Already have an account?{' '}
           <Link href="/login" className="link">
             Login
           </Link>
         </p>
-        <p className="text-sm text-center mt-4 text-gray-600">
+        <p className="text-sm text-center mt-2 text-gray-600">
           Not a brand?{' '}
           <Link href="/signup/user" className="text-blue-600 hover:underline">
             Sign up as a user instead
