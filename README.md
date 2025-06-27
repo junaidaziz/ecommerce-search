@@ -142,6 +142,12 @@ create a persistent volume and deploy the container.
 
 Returns matching products in enriched format.
 
+Common error responses include:
+
+```json
+{ "error": "shipping zip code required" }
+```
+
 ---
 
 ## 📂 Project Structure

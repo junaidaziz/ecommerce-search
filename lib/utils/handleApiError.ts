@@ -1,5 +1,9 @@
 import type { NextApiResponse } from 'next';
 
+export const ERROR_MESSAGES = {
+  MISSING_ZIP_CODE: 'shipping zip code required',
+} as const;
+
 export function handleApiError(
   res: NextApiResponse,
   error: unknown,
