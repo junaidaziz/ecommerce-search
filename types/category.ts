@@ -5,7 +5,7 @@ export interface Category {
   slug?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  subcategories?: string[];
+  subcategories?: Category[];
 }
 
 export type CategoryInput = {
