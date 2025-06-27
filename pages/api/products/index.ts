@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getProductsPaginated } from '@lib/products';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { Product } from '@types/product';
+import type { Product } from '@/types/product';
 import type { ApiMessage } from '../../../types';
 
 export interface ProductsQuery {

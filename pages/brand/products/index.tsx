@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 import { AppContext } from '@contexts/AppContext';
-import type { User } from '@types/user';
-import type { Product } from '@types/product';
+import type { User } from '@/types/user';
+import type { Product } from '@/types/product';
 import { getPageTitle } from '@lib/pageTitle';
 
 const BrandProductsPage: React.FC = () => {

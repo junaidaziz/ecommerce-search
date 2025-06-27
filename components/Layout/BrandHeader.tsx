@@ -9,7 +9,7 @@ import MoonIcon from '../icons/MoonIcon';
 import SunIcon from '../icons/SunIcon';
 import UserIcon from '../icons/UserIcon';
 import NotificationBell from './NotificationBell';
-import type { User } from '@types/user';
+import type { User } from '@/types/user';
 
 interface HeaderProps {
   theme?: string;
