@@ -69,11 +69,11 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center overflow-auto px-4 py-4 sm:px-6 lg:px-8">
       <Head>
         <title>{getPageTitle('Login')}</title>
       </Head>
-      <PageContainer className="space-y-4 max-w-sm">
+      <PageContainer className="space-y-4 max-w-md">
         <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
         <div className="flex flex-col gap-4 mb-6">
           <button
