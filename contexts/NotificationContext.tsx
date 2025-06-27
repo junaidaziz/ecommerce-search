@@ -1,5 +1,8 @@
 import React, { createContext, useState, useCallback, ReactNode } from 'react';
-import { Toast } from '@/components/UI';
+// Update the import path below to the actual location of your Toast component.
+// For example, if Toast is in components/UI/Toast.tsx, use:
+import Toast from '../components/UI/Toast';
+// Or adjust the path as needed for your project structure.
 
 type NotificationType = 'info' | 'success' | 'warning' | 'error';
 type NotificationPosition = 'center' | 'end' | string;
