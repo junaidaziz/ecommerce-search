@@ -1,4 +1,4 @@
-import type { NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   addProduct,
   loadAndIndexProducts,
@@ -58,7 +58,7 @@ async function handler(
 
       const brandId = (session.user as { brandId?: number }).brandId;
       const [rows, total] = await Promise.all([
-        db.product.findMany({=======
+        db.product.findMany({
           where: { brandId: session.user.brandId },
           include: { category: true, vendor: true },
           orderBy: { id: 'asc' },
@@ -68,7 +68,7 @@ async function handler(
         db.product.count({ where: { brandId: session.user.brandId } }),
       ]);
 
-      const products = rows.map((row) => mapDbRowToProduct(row));
+      const products = rows.map((row: any) => mapDbRowToProduct(row));
 
       return res.status(200).json({ products, total });
     }
@@ -147,7 +147,7 @@ async function handler(
         description: String(description || ''),
         productType: String(product_type || ''),
         tags: String(tags || ''),
-        category: { id: parseInt(String(category_id || '0'), 10) },
+        category: { id: parseInt(String(category_id || '0'), 10), name: '' },
         quantity: quantity ? parseInt(String(quantity), 10) : 0,
         minPrice: parseFloat(String(min_price || '0')),
         maxPrice: parseFloat(String(max_price || '0')),
