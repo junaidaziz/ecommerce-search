@@ -2,18 +2,18 @@ import { useContext, useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
-import { getPageTitle } from '../lib/pageTitle';
-import { AppContext } from '../contexts/AppContext';
+import { getPageTitle } from '@lib/pageTitle';
+import { AppContext } from '@contexts/AppContext';
 import type { AppContextValue } from '../types';
-import type { User } from '../types/user';
+import type { User } from '@types/user';
 import type { Coupon } from '../types';
 import {
   TextInput,
   Textarea,
   CountrySelect,
   AddressAutocomplete,
-} from '../components/form-fields';
-import FileUpload from '../components/form-fields/FileUpload';
+} from '@components/form-fields';
+import FileUpload from '@components/form-fields/FileUpload';
 
 // Types for cart item and user
 type CartItem = {

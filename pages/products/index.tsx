@@ -2,21 +2,21 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import ProductFilters from '../../components/Product/ProductFilters';
-import ActiveFilters from '../../components/ActiveFilters';
-import ProductGrid from '../../components/Product/ProductGrid';
-import Loader from '../../components/Loader';
-import InfiniteLoader from '../../components/InfiniteLoader';
-import SortMenu, { SortValue } from '../../components/SortMenu';
-import { getPageTitle } from '../../lib/pageTitle';
+import ProductFilters from '@components/Product/ProductFilters';
+import ActiveFilters from '@components/ActiveFilters';
+import ProductGrid from '@components/Product/ProductGrid';
+import Loader from '@components/Loader';
+import InfiniteLoader from '@components/InfiniteLoader';
+import SortMenu, { SortValue } from '@components/SortMenu';
+import { getPageTitle } from '@lib/pageTitle';
 import {
   getProductsPaginated,
   PaginatedResult,
   getCategoriesFlat,
-} from '../../lib/products';
-import type { Product } from '../../types/product';
-import type { Category } from '../../types/category';
-import { serializeDates } from '../../lib/utils/serializeDates';
+} from '@lib/products';
+import type { Product } from '@types/product';
+import type { Category } from '@types/category';
+import { serializeDates } from '@utils/serializeDates';
 
 interface ProductsProps {
   products: Product[];
@@ -51,7 +51,7 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
     inStock,
     minPrice,
     maxPrice,
-    sort: sort as import('../../lib/products').PaginatedOptions['sort'],
+    sort: sort as import('@lib/products').PaginatedOptions['sort'],
   });
 
   const categories = serializeDates(await getCategoriesFlat());

@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
-import { findUser } from '../../../../lib/users';
+import { findUser } from '@lib/users';
 import {
   addWishlistItem,
   getWishlistForUser,
-} from '../../../../lib/wishlist';
-import { handleApiError } from '../../../../lib/utils/handleApiError';
+} from '@lib/wishlist';
+import { handleApiError } from '@utils/handleApiError';
 import type { WishlistItem, ApiMessage } from '../../../../types';
 import { authOptions } from '../../auth/[...nextauth]';
 

@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
 import Head from 'next/head';
-import { AppContext } from '../../contexts/AppContext';
-import { fetchJson } from '../../lib/utils/fetchJson';
-import { getPageTitle } from '../../lib/pageTitle';
+import { AppContext } from '@contexts/AppContext';
+import { fetchJson } from '@utils/fetchJson';
+import { getPageTitle } from '@lib/pageTitle';
 import type { SupportTicket } from '../../types';
 
 export default function SupportTickets() {

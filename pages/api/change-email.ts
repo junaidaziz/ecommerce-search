@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { changeEmail } from '../../lib/users';
-import { handleApiError } from '../../lib/utils/handleApiError';
+import { changeEmail } from '@lib/users';
+import { handleApiError } from '@utils/handleApiError';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import type { ApiMessage } from '../../types';

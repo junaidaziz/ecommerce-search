@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { loadAndIndexProducts } from '../../../lib/products';
-import { handleApiError } from '../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../lib/utils/getQueryParam';
+import { loadAndIndexProducts } from '@lib/products';
+import { handleApiError } from '@utils/handleApiError';
+import { getQueryParam } from '@utils/getQueryParam';
 import type { Product, ApiMessage } from '../../../types';
 
 export default async function handler(

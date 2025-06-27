@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Head from 'next/head';
-import { fetchJson } from '../lib/utils/fetchJson';
-import { getPageTitle } from '../lib/pageTitle';
+import { fetchJson } from '@utils/fetchJson';
+import { getPageTitle } from '@lib/pageTitle';
 
 export default function SupportPage() {
   const [subject, setSubject] = useState('');

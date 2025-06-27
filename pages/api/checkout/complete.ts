@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
-import { addOrder } from '../../../lib/orders';
-import { sendOrderConfirmation } from '../../../lib/email';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { addOrder } from '@lib/orders';
+import { sendOrderConfirmation } from '@lib/email';
+import { handleApiError } from '@utils/handleApiError';
 import type { OrderIdResponse, ApiMessage } from '../../../types';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {

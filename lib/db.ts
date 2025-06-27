@@ -1,6 +1,6 @@
 import { prisma } from './prisma';
-import type { Product } from '../types/product';
-import type { Review } from '../types/review';
+import type { Product } from '@types/product';
+import type { Review } from '@types/review';
 
 const cartStore = new Map<string, (Product & { qty: number })[]>();
 const wishlistStore = new Map<string, Product[]>();

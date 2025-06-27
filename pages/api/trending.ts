@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { handleApiError } from '../../lib/utils/handleApiError';
+import { handleApiError } from '@utils/handleApiError';
 import type { TrendingResponse } from '../../types';
 
 const trendingKeywords = [

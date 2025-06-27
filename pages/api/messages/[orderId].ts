@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
-import { createMessage, getMessagesForOrder } from '../../../lib/messages';
-import { getOrderByUuid } from '../../../lib/orders';
-import { findUser } from '../../../lib/users';
-import { handleApiError } from '../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../lib/utils/getQueryParam';
+import { createMessage, getMessagesForOrder } from '@lib/messages';
+import { getOrderByUuid } from '@lib/orders';
+import { findUser } from '@lib/users';
+import { handleApiError } from '@utils/handleApiError';
+import { getQueryParam } from '@utils/getQueryParam';
 import type { Message, ApiMessage } from '../../../types';
 
 export default async function handler(

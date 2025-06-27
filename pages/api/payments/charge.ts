@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
-import { paymentProvider } from '../../../lib/paymentProvider';
-import { recordPayment } from '../../../lib/payments';
-import { getDb } from '../../../lib/db';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { paymentProvider } from '@lib/paymentProvider';
+import { recordPayment } from '@lib/payments';
+import { getDb } from '@lib/db';
+import { handleApiError } from '@utils/handleApiError';
 
 export default async function handler(
   req: NextApiRequest,
