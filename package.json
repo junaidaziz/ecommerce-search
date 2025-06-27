@@ -16,7 +16,8 @@
     "init:typesense": "ts-node scripts/initTypesense.ts",
     "generate:erd": "ts-node scripts/generateErd.ts",
     "seed:products": "ts-node scripts/seedProducts.ts",
-    "update:quantities": "ts-node scripts/updateQuantities.ts"
+    "update:quantities": "ts-node scripts/updateQuantities.ts",
+    "link:products-brand": "ts-node scripts/linkProductsToBrand.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
