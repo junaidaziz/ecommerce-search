@@ -4,6 +4,7 @@ import type { Vendor } from './vendor';
 import type { Brand } from './brand';
 import type { Image } from './image';
 import type { PriceRange } from './price';
+import type { Variant } from './variant';
 
 type ProductBase = Pick<
   PrismaProduct,
@@ -31,6 +32,7 @@ export interface Product extends ProductBase {
   category: Category;
   brand?: Brand;
   images?: Image[];
+  variants?: Variant[];
   priceRange?: PriceRange;
   soldCount: number;
   reviewCount: number;

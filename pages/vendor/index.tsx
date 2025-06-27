@@ -44,6 +44,15 @@ export default function VendorDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [message, setMessage] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  interface VariantForm {
+    size: string;
+    color: string;
+    material: string;
+    quantity: number;
+    priceModifier: number;
+    id?: number;
+  }
+  const [variants, setVariants] = useState<VariantForm[]>([]);
 
   const fetchProducts = useCallback(async (): Promise<void> => {
     if (!user) return;
@@ -64,6 +73,30 @@ export default function VendorDashboard() {
     setForm({ ...form, [key]: e.target.value });
   };
 
+  const addVariantRow = () => {
+    setVariants((prev) => [
+      ...prev,
+      { size: '', color: '', material: '', quantity: 0, priceModifier: 0 },
+    ]);
+  };
+
+  const updateVariant = (
+    index: number,
+    field: keyof VariantForm,
+    value: string
+  ) => {
+    setVariants((prev) => {
+      const next = [...prev];
+      // @ts-ignore
+      next[index][field] = field === 'quantity' || field === 'priceModifier' ? Number(value) : value;
+      return next;
+    });
+  };
+
+  const removeVariantRow = (index: number) => {
+    setVariants((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const payload = editingId ? { ...form, id: editingId } : form;
@@ -82,11 +115,13 @@ export default function VendorDashboard() {
         min_price: payload.minPrice,
         max_price: payload.maxPrice,
         currency: payload.currency,
+        variants,
       }),
     });
     if (res.ok) {
       setMessage(editingId ? 'Product updated' : 'Product added');
       setForm(emptyForm);
+      setVariants([]);
       setEditingId(null);
       fetchProducts();
     } else {
@@ -109,12 +144,23 @@ export default function VendorDashboard() {
       maxPrice: p.maxPrice || 0,
       currency: p.currency || 'USD',
     });
+    setVariants(
+      p.variants?.map((v) => ({
+        id: v.id,
+        size: v.attributes.size || '',
+        color: v.attributes.color || '',
+        material: v.attributes.material || '',
+        quantity: v.quantity,
+        priceModifier: v.priceModifier || 0,
+      })) || []
+    );
     setEditingId(p.id);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setVariants([]);
   };
 
   const handleDelete = async (id: string): Promise<void> => {
@@ -164,6 +210,55 @@ export default function VendorDashboard() {
             placeholder={field}
           />
         ))}
+        <div>
+          <h4 className="font-semibold">Variants</h4>
+          {variants.map((v, idx) => (
+            <div key={idx} className="flex gap-2 mb-1">
+              <input
+                className="input input-sm input-bordered"
+                placeholder="Size"
+                value={v.size}
+                onChange={(e) => updateVariant(idx, 'size', e.target.value)}
+              />
+              <input
+                className="input input-sm input-bordered"
+                placeholder="Color"
+                value={v.color}
+                onChange={(e) => updateVariant(idx, 'color', e.target.value)}
+              />
+              <input
+                className="input input-sm input-bordered"
+                placeholder="Material"
+                value={v.material}
+                onChange={(e) => updateVariant(idx, 'material', e.target.value)}
+              />
+              <input
+                type="number"
+                className="input input-sm input-bordered w-20"
+                placeholder="Qty"
+                value={v.quantity}
+                onChange={(e) => updateVariant(idx, 'quantity', e.target.value)}
+              />
+              <input
+                type="number"
+                className="input input-sm input-bordered w-24"
+                placeholder="Price +"
+                value={v.priceModifier}
+                onChange={(e) => updateVariant(idx, 'priceModifier', e.target.value)}
+              />
+              <button
+                type="button"
+                className="btn btn-xs btn-error"
+                onClick={() => removeVariantRow(idx)}
+              >
+                X
+              </button>
+            </div>
+          ))}
+          <button type="button" className="btn btn-xs" onClick={addVariantRow}>
+            Add Variant
+          </button>
+        </div>
         <div className="flex gap-2">
           {editingId && (
             <button type="button" onClick={cancelEdit} className="btn">

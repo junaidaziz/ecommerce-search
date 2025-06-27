@@ -23,3 +23,4 @@ export * from "./dashboard";
 export * from './notification';
 export * from './message';
 export * from './context';
+export * from './variant';

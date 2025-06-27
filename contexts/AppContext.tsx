@@ -9,6 +9,7 @@ import { NotificationContext } from './NotificationContext';
 import type { UserInfo } from '../lib/types';
 import type { AppContextValue } from '../types';
 import { Product } from '../types/product';
+import { Variant } from '../types/variant';
 import type { ShippingInfo } from '../types/shipping';
 
 export const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -20,7 +21,7 @@ interface AppProviderProps {
 export function AppProvider({ children }: AppProviderProps) {
   const { data: session } = useSession();
   const [user, setUser] = useState<UserInfo | null>(null);
-  const [cart, setCart] = useState<(Product & { qty: number })[]>([]);
+  const [cart, setCart] = useState<(Product & { qty: number; variant?: Variant })[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const { addNotification } = useContext(NotificationContext);
 
@@ -151,15 +152,21 @@ export function AppProvider({ children }: AppProviderProps) {
     return true;
   };
 
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, variant?: Variant) => {
     let qty = 1;
     setCart((prev) => {
-      const existing = prev.find((p) => p.id === product.id);
+      const existing = prev.find(
+        (p) => p.id === product.id && (!variant || p.variant?.id === variant.id)
+      );
       if (existing) {
         qty = existing.qty + 1;
-        return prev.map((p) => (p.id === product.id ? { ...p, qty } : p));
+        return prev.map((p) =>
+          p.id === product.id && (!variant || p.variant?.id === variant.id)
+            ? { ...p, qty }
+            : p
+        );
       }
-      return [...prev, { ...product, qty }];
+      return [...prev, { ...product, qty, variant }];
     });
     addNotification(
       `Added ${product.title} (x${qty}) to cart`,
@@ -168,18 +175,24 @@ export function AppProvider({ children }: AppProviderProps) {
     );
   };
 
-  const changeQty = (id: string, delta: number) => {
+  const changeQty = (id: string, delta: number, variantId?: number) => {
     setCart((prev) => {
       return prev
         .map((item) =>
-          item.id === id ? { ...item, qty: item.qty + delta } : item
+          item.id === id && (!variantId || item.variant?.id === variantId)
+            ? { ...item, qty: item.qty + delta }
+            : item
         )
         .filter((item) => item.qty > 0);
     });
   };
 
-  const removeFromCart = (id: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  const removeFromCart = (id: string, variantId?: number) => {
+    setCart((prev) =>
+      prev.filter(
+        (item) => !(item.id === id && (!variantId || item.variant?.id === variantId))
+      )
+    );
     addNotification('Removed from cart', 'info');
   };
 
