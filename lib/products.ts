@@ -188,12 +188,12 @@ export async function addProduct(product: ProductInput): Promise<void> {
 
   if (!product.vendor?.brandName) {
     const err = new Error('Vendor is required') as Error & { code?: string };
-    (err as any).code = 'BAD_REQUEST';
+    err.code = 'BAD_REQUEST';
     throw err;
   }
   if (!product.category || (!product.category.id && !product.category.name)) {
     const err = new Error('Category is required') as Error & { code?: string };
-    (err as any).code = 'BAD_REQUEST';
+    err.code = 'BAD_REQUEST';
     throw err;
   }
 
@@ -210,12 +210,12 @@ export async function addProduct(product: ProductInput): Promise<void> {
 
   if (!vendor) {
     const err = new Error('Vendor not found') as Error & { code?: string };
-    (err as any).code = 'BAD_REQUEST';
+    err.code = 'BAD_REQUEST';
     throw err;
   }
   if (!category) {
     const err = new Error('Category not found') as Error & { code?: string };
-    (err as any).code = 'BAD_REQUEST';
+    err.code = 'BAD_REQUEST';
     throw err;
   }
 
@@ -248,7 +248,7 @@ export async function addProduct(product: ProductInput): Promise<void> {
       const err = new Error(
         'Product with the same name or slug already exists.'
       ) as Error & { code?: string };
-      (err as any).code = 'BAD_REQUEST';
+      err.code = 'BAD_REQUEST';
       throw err;
     }
     throw error;
@@ -261,12 +261,12 @@ export async function updateProduct(
   const db = getDb();
   if (!product.vendor?.brandName) {
     const err = new Error('Vendor is required') as Error & { code?: string };
-    (err as any).code = 'BAD_REQUEST';
+    err.code = 'BAD_REQUEST';
     throw err;
   }
   if (!product.category || (!product.category.id && !product.category.name)) {
     const err = new Error('Category is required') as Error & { code?: string };
-    (err as any).code = 'BAD_REQUEST';
+    err.code = 'BAD_REQUEST';
     throw err;
   }
 
@@ -283,12 +283,12 @@ export async function updateProduct(
 
   if (!vendor) {
     const err = new Error('Vendor not found') as Error & { code?: string };
-    (err as any).code = 'BAD_REQUEST';
+    err.code = 'BAD_REQUEST';
     throw err;
   }
   if (!category) {
     const err = new Error('Category not found') as Error & { code?: string };
-    (err as any).code = 'BAD_REQUEST';
+    err.code = 'BAD_REQUEST';
     throw err;
   }
   await db.product.update({
@@ -414,7 +414,8 @@ export async function getProductsPaginated(
     where.maxPrice = { gte: options.minPrice };
   }
   if (typeof options.maxPrice === 'number') {
-    where.minPrice = { ...(where.minPrice as any), lte: options.maxPrice };
+    const current = typeof where.minPrice === 'object' ? where.minPrice : {};
+    where.minPrice = { ...current, lte: options.maxPrice };
   }
   const orderBy: Prisma.Enumerable<Prisma.ProductOrderByWithRelationInput> =
     (() => {

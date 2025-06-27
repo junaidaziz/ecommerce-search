@@ -12,6 +12,7 @@ import type {
   ReviewAddedResponse,
 } from '../../types/review';
 import { SelectDropdown, Textarea } from '../../components/form-fields';
+import type { SelectOption } from '../../components/form-fields/SelectDropdown';
 
 interface ProductDetailProps {}
 
@@ -198,7 +199,9 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
                 name="rating"
                 value={{ label: String(myRating), value: String(myRating) }}
                 onChange={(opt) =>
-                  setMyRating(opt ? parseInt((opt as any).value) : 5)
+                  setMyRating(
+                    opt ? parseInt((opt as SelectOption).value) : 5
+                  )
                 }
                 options={[1, 2, 3, 4, 5].map((n) => ({
                   label: String(n),

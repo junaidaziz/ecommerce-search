@@ -51,7 +51,7 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
     inStock,
     minPrice,
     maxPrice,
-    sort: sort as any,
+    sort: sort as import('../../lib/products').PaginatedOptions['sort'],
   });
 
   const categories = serializeDates(await getCategoriesFlat());
