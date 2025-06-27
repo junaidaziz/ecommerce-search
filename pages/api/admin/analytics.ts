@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getAllOrders } from '../../../lib/orders';
 import { withRole } from '../../../lib/withRole';
 import { handleApiError } from '../../../lib/utils/handleApiError';
-import { AnalyticsData, ApiMessage, Order } from '../../../types';
+import { AnalyticsData, ApiMessage } from '../../../types';
+import { getDb } from '../../../lib/db';
+import { getQueryParam } from '../../../lib/utils/getQueryParam';
 
 async function handler(
   req: NextApiRequest,
@@ -13,21 +14,50 @@ async function handler(
     return;
   }
   try {
-    const orders: Order[] = await getAllOrders();
-    const summary: AnalyticsData = {
-      totalOrders: orders.length,
-      totalRevenue: 0,
-      topProducts: [],
-    };
-    const counts: Record<string, number> = {};
-    for (const o of orders) {
-      summary.totalRevenue += o.total ?? 0;
-      counts[o.product.id] = (counts[o.product.id] ?? 0) + o.quantity;
+    const db = getDb();
+    const startParam = getQueryParam(req.query.start);
+    const endParam = getQueryParam(req.query.end);
+    const brandIdParam = getQueryParam(req.query.brandId);
+    const categoryParam = getQueryParam(req.query.categoryId);
+    const where: any = {};
+    if (startParam || endParam) {
+      const start = startParam ? new Date(startParam) : new Date(0);
+      const end = endParam ? new Date(endParam) : new Date();
+      where.createdAt = { gte: start, lte: end };
     }
-    summary.topProducts = Object.entries(counts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 5)
-      .map(([id, qty]): { id: string; qty: number } => ({ id, qty }));
+    if (brandIdParam) {
+      const id = parseInt(brandIdParam, 10);
+      if (!isNaN(id)) where.product = { ...(where.product || {}), vendorId: id };
+    }
+    if (categoryParam) {
+      const cid = parseInt(categoryParam, 10);
+      if (!isNaN(cid))
+        where.product = { ...(where.product || {}), categoryId: cid };
+    }
+
+    const totalOrders = await db.order.count({ where });
+    const revenueAgg = await db.order.aggregate({ where, _sum: { total: true } });
+    const grouped = await db.order.groupBy({
+      by: ['productId'],
+      where,
+      _sum: { quantity: true },
+      orderBy: { _sum: { quantity: 'desc' } },
+      take: 5,
+    });
+    const ids = grouped.map((g) => g.productId);
+    const products = await db.product.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, title: true },
+    });
+    const titles = new Map(products.map((p) => [p.id, p.title]));
+    const summary: AnalyticsData = {
+      totalOrders,
+      totalRevenue: revenueAgg._sum.total ?? 0,
+      topProducts: grouped.map((g) => ({
+        id: String(titles.get(g.productId) ?? g.productId),
+        qty: g._sum.quantity || 0,
+      })),
+    };
     res.status(200).json(summary);
   } catch (error) {
     handleApiError(res, error, 'Failed to load analytics');
