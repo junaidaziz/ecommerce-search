@@ -2,6 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { FC } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { useContext } from 'react';
+import { NotificationContext } from '@contexts/NotificationContext';
 import VisaIcon from '../icons/VisaIcon';
 import MastercardIcon from '../icons/MastercardIcon';
 import PaypalIcon from '../icons/PaypalIcon';
@@ -12,15 +14,19 @@ const Footer: FC = () => {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<NewsletterForm>();
+  const { addNotification } = useContext(NotificationContext);
 
   const submit: SubmitHandler<NewsletterForm> = (data) => {
     // TODO: send to newsletter API
     console.log(data);
+    addNotification('Thanks for subscribing!', 'success');
+    reset();
   };
   return (
-    <footer className="bg-base-300 mt-12 py-8 text-base-content px-4 sm:px-6 lg:px-8">
-      <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-base-300 mt-12 border-t border-base-200 py-10 text-base-content px-4 sm:px-6 lg:px-8">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
         <div>
           <Link
             href="/"
@@ -29,19 +35,17 @@ const Footer: FC = () => {
             <Image
               src="/images/logo-medium.png"
               alt="Logo"
-              width={120}
-              height={40}
-              className="mb-2 max-h-10 w-auto"
+              width={140}
+              height={50}
+              className="mb-3 max-h-12 w-auto"
               priority
             />
           </Link>
-          <p className="text-sm text-gray-600">
-            Everything you need, all in one place.
-          </p>
+          <p className="text-sm text-gray-600">Everything you need, all in one place.</p>
           <div className="mt-4 text-sm space-y-1">
             <p>123 Market Street, London</p>
             <p>
-              <a href="mailto:info@shopverse.com" className="link">
+              <a href="mailto:info@shopverse.com" className="link link-hover">
                 info@shopverse.com
               </a>
             </p>
@@ -52,13 +56,19 @@ const Footer: FC = () => {
           <h4 className="font-semibold mb-2">Useful Links</h4>
           <ul className="space-y-1">
             <li>
-              <Link href="/shipping">Shipping</Link>
+              <Link className="link link-hover" href="/shipping">
+                Shipping
+              </Link>
             </li>
             <li>
-              <Link href="/privacy-policy">Privacy Policy</Link>
+              <Link className="link link-hover" href="/privacy-policy">
+                Privacy Policy
+              </Link>
             </li>
             <li>
-              <Link href="/terms-and-conditions">Terms &amp; Conditions</Link>
+              <Link className="link link-hover" href="/terms-and-conditions">
+                Terms &amp; Conditions
+              </Link>
             </li>
           </ul>
         </div>
@@ -68,28 +78,29 @@ const Footer: FC = () => {
             <label className="label">
               <span className="label-text">Email</span>
             </label>
-            <div className="join">
+            <div className="join w-full">
               <input
                 type="email"
                 placeholder="you@example.com"
-                className="input input-bordered join-item"
+                className="input input-bordered rounded-full join-item grow"
                 {...register('email', { required: 'Email is required' })}
               />
-              <button type="submit" className="btn join-item">
+              <button type="submit" className="btn btn-primary rounded-full join-item">
                 Subscribe
               </button>
             </div>
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
+              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
             )}
           </form>
         </div>
-        <div className="flex items-end justify-end gap-4">
-          <VisaIcon size={36} className="text-blue-600 cursor-pointer" />
-          <MastercardIcon size={36} className="cursor-pointer" />
-          <PaypalIcon size={36} className="text-blue-500 cursor-pointer" />
+        <div className="flex flex-col items-start sm:items-end gap-2">
+          <span className="text-sm font-medium">We accept</span>
+          <div className="flex items-center gap-4">
+            <VisaIcon size={40} className="text-blue-600" />
+            <MastercardIcon size={40} />
+            <PaypalIcon size={40} className="text-blue-500" />
+          </div>
         </div>
       </div>
     </footer>
