@@ -34,7 +34,7 @@ async function handler(
     const end = dayjs(start).endOf('month').toDate();
     const where: any = {
       createdAt: { gte: start, lte: end },
-      status: 'completed',
+      status: 'delivered',
     };
     if (vendorId) where.product = { vendorId };
     const count = await db.order.count({ where });

@@ -73,7 +73,7 @@ export default function VendorOrders() {
               value={o.status}
               onChange={(e) => updateStatus(o.id, e.target.value)}
             >
-              {['pending', 'shipped', 'completed'].map((s) => (
+              {['processing', 'shipped', 'delivered', 'cancelled'].map((s) => (
                 <option key={s} value={s}>
                   {s}
                 </option>

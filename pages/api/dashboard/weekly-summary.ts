@@ -24,7 +24,7 @@ async function handler(
       return res.status(401).json({ message: 'Unauthorized' });
     }
     const start = dayjs().subtract(7, 'day').startOf('day').toDate();
-    const where: any = { createdAt: { gte: start }, status: 'completed' };
+    const where: any = { createdAt: { gte: start }, status: 'delivered' };
     if (vendorId) where.product = { vendorId };
     const count = await db.order.count({ where });
     const result = await db.order.aggregate({ where, _sum: { total: true } });
