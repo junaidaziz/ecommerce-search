@@ -10,6 +10,7 @@ import {
   PasswordInput,
   CountrySelect,
 } from '@components/form-fields';
+import PageContainer from '@components/Layout/PageContainer';
 import countries from '../data/countries';
 import type { PaymentMethod } from '../types';
 
@@ -55,6 +56,11 @@ const SettingsPage: React.FC = () => {
   const addressForm = useForm<AddressFormValues>();
   const emailForm = useForm<EmailFormValues>();
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
+
+  const tabButtonClass = (tab: typeof active) =>
+    `w-full text-left px-2 py-2 rounded transition-colors hover:bg-base-200 ${
+      active === tab ? 'text-primary underline font-semibold' : ''
+    }`;
 
   const loadMethods = () => {
     fetch('/api/payment-methods')
@@ -161,15 +167,16 @@ const SettingsPage: React.FC = () => {
   if (!user) return null;
 
   return (
-    <div className="flex flex-col md:flex-row gap-6">
-      <Head>
-        <title>{getPageTitle('Settings')}</title>
-      </Head>
-      <aside className="md:w-48 w-full">
-        <ul className="menu menu-vertical bg-base-100 rounded-box">
+    <PageContainer>
+      <div className="flex flex-col md:flex-row gap-6 items-start">
+        <Head>
+          <title>{getPageTitle('Settings')}</title>
+        </Head>
+        <aside className="md:w-48 w-full">
+        <ul className="menu menu-vertical bg-base-100 rounded-box p-2 space-y-1">
           <li>
             <button
-              className={active === 'profile' ? 'active' : ''}
+              className={tabButtonClass('profile')}
               onClick={() => setActive('profile')}
             >
               Update Profile
@@ -177,7 +184,7 @@ const SettingsPage: React.FC = () => {
           </li>
           <li>
             <button
-              className={active === 'password' ? 'active' : ''}
+              className={tabButtonClass('password')}
               onClick={() => setActive('password')}
             >
               Change Password
@@ -185,7 +192,7 @@ const SettingsPage: React.FC = () => {
           </li>
           <li>
             <button
-              className={active === 'address' ? 'active' : ''}
+              className={tabButtonClass('address')}
               onClick={() => setActive('address')}
             >
               Manage Address
@@ -193,7 +200,7 @@ const SettingsPage: React.FC = () => {
           </li>
           <li>
             <button
-              className={active === 'email' ? 'active' : ''}
+              className={tabButtonClass('email')}
               onClick={() => setActive('email')}
             >
               Change Email
@@ -201,7 +208,7 @@ const SettingsPage: React.FC = () => {
           </li>
           <li>
             <button
-              className={active === 'payments' ? 'active' : ''}
+              className={tabButtonClass('payments')}
               onClick={() => setActive('payments')}
             >
               Payment Methods
@@ -442,7 +449,7 @@ const SettingsPage: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 };
 
