@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
-import { Product } from '@types/product';
-import type { SearchResults } from '@types/api';
+import { Product } from '@/types/product';
+import type { SearchResults } from '@/types/api';
 
 interface RecommendedProductsProps {
   category?: string;

@@ -20,8 +20,8 @@ import DEFAULT_CATEGORIES from '@lib/defaultCategories';
 import TrashIcon from '../icons/TrashIcon';
 import SearchBar from './SearchBar';
 import DropdownMenu from '@components/common/DropdownMenu';
-import type { Category } from '@types/category';
-import type { User } from '@types/user';
+import type { Category } from '@/types/category';
+import type { User } from '@/types/user';
 
 interface HeaderProps {
   theme?: string;

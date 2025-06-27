@@ -110,8 +110,8 @@
       "@hooks/*": ["hooks/*"],
       "@pages/*": ["pages/*"],
       "@styles/*": ["styles/*"],
-      "@contexts/*": ["contexts/*"]
-      ,"@types/*": ["types/*"],
+      "@contexts/*": ["contexts/*"],
+      "@/types/*": ["types/*"],
       "@test-utils/*": ["test-utils/*"]
     }
   },

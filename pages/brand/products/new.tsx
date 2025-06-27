@@ -5,7 +5,7 @@ import ProductForm from '@components/Product/ProductForm';
 import CreateCategoryModal from '@components/Category/CreateCategoryModal';
 import { AppContext } from '@contexts/AppContext';
 import { NotificationContext } from '@contexts/NotificationContext';
-import type { User } from '@types/user';
+import type { User } from '@/types/user';
 import { getPageTitle } from '@lib/pageTitle';
 import PageContainer from '@components/Layout/PageContainer';
 

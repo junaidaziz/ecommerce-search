@@ -14,8 +14,8 @@ import {
   PaginatedResult,
   getCategoriesFlat,
 } from '@lib/products';
-import type { Product } from '@types/product';
-import type { Category } from '@types/category';
+import type { Product } from '@/types/product';
+import type { Category } from '@/types/category';
 import { serializeDates } from '@utils/serializeDates';
 import { NotificationContext } from '../../contexts/NotificationContext';
 

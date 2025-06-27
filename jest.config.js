@@ -13,7 +13,7 @@ module.exports = {
     '^@pages/(.*)$': '<rootDir>/pages/$1',
     '^@styles/(.*)$': '<rootDir>/styles/$1',
     '^@contexts/(.*)$': '<rootDir>/contexts/$1',
-    '^@types/(.*)$': '<rootDir>/types/$1',
+    '^@/types/(.*)$': '<rootDir>/types/$1',
     '^@test-utils/(.*)$': '<rootDir>/test-utils/$1',
   },
   transform: {

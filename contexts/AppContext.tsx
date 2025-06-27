@@ -8,10 +8,10 @@ import { NotificationContext } from './NotificationContext';
 
 import type { UserInfo } from '@lib/types';
 import type { AppContextValue } from '../types';
-import { Product } from '@types/product';
-import { Variant } from '@types/variant';
-import type { ShippingInfo } from '@types/shipping';
-import type { WishlistItem } from '@types/wishlist';
+import { Product } from '@/types/product';
+import { Variant } from '@/types/variant';
+import type { ShippingInfo } from '@/types/shipping';
+import type { WishlistItem } from '@/types/wishlist';
 
 export const AppContext = createContext<AppContextValue | undefined>(undefined);
 
