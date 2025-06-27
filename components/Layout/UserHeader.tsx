@@ -32,7 +32,14 @@ const Header: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
   const router = useRouter();
   const { data: session } = useSession();
   const appContext = useContext(AppContext);
-  const cart = appContext?.cart ?? [];
+
+  if (!appContext) {
+    throw new Error(
+      'AppContext is undefined. Make sure your component is wrapped in an AppContext.Provider.'
+    );
+  }
+
+  const { cart, changeQty, removeFromCart } = appContext;
   const user = session?.user as User | undefined;
   const pathname = router.pathname;
   const isAuthRoute = [
