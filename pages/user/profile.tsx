@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { CountrySelect } from '@components/form-fields';
 import { useRouter } from 'next/router';
 import { AppContext } from '@contexts/AppContext';
-import type { User } from '@types/user';
+import type { User } from '@/types/user';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 

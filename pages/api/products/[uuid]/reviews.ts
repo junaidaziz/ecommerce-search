@@ -11,7 +11,7 @@ import type {
   Review,
   ReviewsResponse,
   ReviewAddedResponse,
-} from '@types/review';
+} from '@/types/review';
 import type { ApiMessage } from '../../../../types';
 
 export default async function handler(

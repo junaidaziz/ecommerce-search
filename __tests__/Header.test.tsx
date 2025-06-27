@@ -73,7 +73,7 @@ test('renders categories from API', async () => {
     Promise.resolve({
       ok: true,
       json: () =>
-        Promise.resolve([{ name: 'Electronics', subcategories: ['Phones'] }]),
+        Promise.resolve([{ name: 'Electronics', subcategories: [{ name: 'Phones' }] }]),
     })
   );
   renderWithContext(<Header theme="light" setTheme={() => {}} />);

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import type { User } from '@types/user';
+import type { User } from '@/types/user';
 import ExistingProductsCard from '@components/dashboard/ExistingProductsCard';
 import TotalProductsCard from '@components/dashboard/TotalProductsCard';
 import TotalSalesCard from '@components/dashboard/TotalSalesCard';
