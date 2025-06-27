@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 import { useSession } from 'next-auth/react';
 import { Order } from '../../types';
 import Head from 'next/head';
-import { getPageTitle } from '../../lib/pageTitle';
+import { getPageTitle } from '@lib/pageTitle';
 
 const BrandOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;

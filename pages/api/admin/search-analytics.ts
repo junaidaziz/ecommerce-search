@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { SearchAnalyticsResponse, ApiMessage } from '../../../types';
-import { getDb } from '../../../lib/db';
-import { withRole } from '../../../lib/withRole';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getDb } from '@lib/db';
+import { withRole } from '@lib/withRole';
+import { handleApiError } from '@utils/handleApiError';
 
 interface SearchLog {
   query: string;

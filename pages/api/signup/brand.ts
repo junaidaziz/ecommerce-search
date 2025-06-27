@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { addUser, findUser } from '../../../lib/users';
+import { addUser, findUser } from '@lib/users';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { handleApiError } from '@utils/handleApiError';
 import type { SignupTokenResponse, ApiMessage } from '../../../types';
 
 export default async function handler(

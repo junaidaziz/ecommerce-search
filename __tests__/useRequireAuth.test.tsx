@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import useRequireAuth from '../hooks/useRequireAuth';
-import { AppContext } from '../contexts/AppContext';
+import useRequireAuth from '@hooks/useRequireAuth';
+import { AppContext } from '@contexts/AppContext';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 

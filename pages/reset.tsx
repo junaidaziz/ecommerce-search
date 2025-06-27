@@ -1,9 +1,9 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import Link from 'next/link';
-import { TextInput } from '../components/form-fields';
+import { TextInput } from '@components/form-fields';
 import Head from 'next/head';
-import { getPageTitle } from '../lib/pageTitle';
-import PageContainer from '../components/Layout/PageContainer';
+import { getPageTitle } from '@lib/pageTitle';
+import PageContainer from '@components/Layout/PageContainer';
 
 const RequestReset: React.FC = () => {
   const [email, setEmail] = useState<string>('');

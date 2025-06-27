@@ -2,9 +2,9 @@ import { createReadStream, existsSync } from 'fs';
 import path from 'path';
 import csv from 'csv-parser';
 import bcrypt from 'bcryptjs';
-import { prisma } from '../lib/prisma';
-import { slugify } from '../lib/slugify';
-import { loadAndIndexProducts } from '../lib/products';
+import { prisma } from '@lib/prisma';
+import { slugify } from '@lib/slugify';
+import { loadAndIndexProducts } from '@lib/products';
 
 interface CsvRow {
   TITLE?: string;

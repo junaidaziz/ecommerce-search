@@ -4,11 +4,11 @@ import {
   createCategory,
   renameCategory,
   removeCategory,
-} from '../../../lib/products';
-import { withRole } from '../../../lib/withRole';
-import { logAudit } from '../../../lib/audit';
-import { handleApiError } from '../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../lib/utils/getQueryParam';
+} from '@lib/products';
+import { withRole } from '@lib/withRole';
+import { logAudit } from '@lib/audit';
+import { handleApiError } from '@utils/handleApiError';
+import { getQueryParam } from '@utils/getQueryParam';
 import { Category, CategoryInput, ApiMessage } from '../../../types';
 
 async function handler(

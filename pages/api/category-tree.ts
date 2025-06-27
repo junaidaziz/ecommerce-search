@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getCategoryTree } from '../../lib/products';
-import { handleApiError } from '../../lib/utils/handleApiError';
+import { getCategoryTree } from '@lib/products';
+import { handleApiError } from '@utils/handleApiError';
 import type { CategoriesResponse, ApiMessage } from '../../types';
 
 export default async function handler(

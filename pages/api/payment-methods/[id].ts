@@ -5,8 +5,8 @@ import {
   setDefaultPaymentMethod,
   deletePaymentMethod,
   getPaymentMethodsForUser,
-} from '../../../lib/paymentMethods';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+} from '@lib/paymentMethods';
+import { handleApiError } from '@utils/handleApiError';
 
 export default async function handler(
   req: NextApiRequest,

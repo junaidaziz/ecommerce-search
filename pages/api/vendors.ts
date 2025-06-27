@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getVendors } from '../../lib/users';
-import { handleApiError } from '../../lib/utils/handleApiError';
+import { getVendors } from '@lib/users';
+import { handleApiError } from '@utils/handleApiError';
 import type { Vendor, ApiMessage } from '../../types';
 
 export interface VendorsResponse {

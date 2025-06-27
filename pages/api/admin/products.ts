@@ -1,15 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getDb } from '../../../lib/db';
-import { hasOrdersForProduct } from '../../../lib/orders';
+import { getDb } from '@lib/db';
+import { hasOrdersForProduct } from '@lib/orders';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
-import { withRole } from '../../../lib/withRole';
-import { handleApiError } from '../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../lib/utils/getQueryParam';
-import { slugify } from '../../../lib/slugify';
+import { withRole } from '@lib/withRole';
+import { handleApiError } from '@utils/handleApiError';
+import { getQueryParam } from '@utils/getQueryParam';
+import { slugify } from '@lib/slugify';
 import { Product, ApiMessage, Variant } from '../../../types';
-import { mapDbRowToProduct } from '../../../lib/products';
+import { mapDbRowToProduct } from '@lib/products';
 
 export const config = {
   api: {

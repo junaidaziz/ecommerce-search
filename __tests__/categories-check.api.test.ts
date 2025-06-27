@@ -1,7 +1,7 @@
-import handler from '../pages/api/categories/check';
-import { getCategoriesFlat } from '../lib/products';
+import handler from '@pages/api/categories/check';
+import { getCategoriesFlat } from '@lib/products';
 
-jest.mock('../lib/products', () => ({
+jest.mock('@lib/products', () => ({
   getCategoriesFlat: jest.fn(),
 }));
 

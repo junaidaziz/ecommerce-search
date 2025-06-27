@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { updateUserProfile, findUser } from '../../../lib/users';
+import { updateUserProfile, findUser } from '@lib/users';
 import type { Vendor, ApiMessage } from '../../../types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { handleApiError } from '@utils/handleApiError';
 
 export default async function handler(
   req: NextApiRequest,

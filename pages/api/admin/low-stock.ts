@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getDb } from '../../../lib/db';
-import { withRole } from '../../../lib/withRole';
-import { handleApiError } from '../../../lib/utils/handleApiError';
+import { getDb } from '@lib/db';
+import { withRole } from '@lib/withRole';
+import { handleApiError } from '@utils/handleApiError';
 import type { ApiMessage, LowStockProduct } from '../../../types';
-import { DEFAULT_LOW_STOCK_THRESHOLD } from '../../../lib/config';
+import { DEFAULT_LOW_STOCK_THRESHOLD } from '@lib/config';
 
 async function handler(
   req: NextApiRequest,

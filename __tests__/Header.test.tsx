@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
-import Header from '../components/Layout/Header';
-import { AppContext } from '../contexts/AppContext';
+import Header from '@components/Layout/Header';
+import { AppContext } from '@contexts/AppContext';
 
 let mockPathname = '/';
 jest.mock('next/router', () => ({

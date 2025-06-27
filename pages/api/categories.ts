@@ -4,8 +4,8 @@ import {
   getCategoriesPaginated,
   createCategory,
   getCategoriesFlat,
-} from '../../lib/products';
-import { handleApiError } from '../../lib/utils/handleApiError';
+} from '@lib/products';
+import { handleApiError } from '@utils/handleApiError';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import type {
