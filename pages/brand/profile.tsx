@@ -1,55 +1,65 @@
-import React, {
-  useContext,
-  useState,
-  useEffect,
-  ChangeEvent,
-  FormEvent,
-} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { AppContext } from '../../contexts/AppContext';
 import type { User, Vendor } from '../../types';
-import {
-  TextInput,
-  Textarea,
-  CountrySelect,
-} from '../../components/form-fields';
+import { TextInput, Textarea, CountrySelect } from '../../components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import PageContainer from '../../components/Layout/PageContainer';
 
 export const BrandProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
   const router = useRouter();
   const showComplete = router.query.complete === '1';
-  const [brandName, setBrandName] = useState<string>(user?.brandName || '');
-  const [phoneNumber, setPhoneNumber] = useState<string>(
-    user?.phoneNumber || ''
-  );
-  const [businessAddress, setBusinessAddress] = useState<string>(
-    user?.businessAddress || ''
-  );
-  const [city, setCity] = useState<string>(user?.city || '');
-  const [country, setCountry] = useState<string>(user?.country || '');
-  const [website, setWebsite] = useState<string>(user?.website || '');
-  const [businessDescription, setBusinessDescription] = useState<string>(
-    user?.businessDescription || ''
-  );
-  const [taxId, setTaxId] = useState<string>(user?.taxId || '');
+
+  interface FormValues {
+    brandName: string;
+    phoneNumber: string;
+    businessAddress: string;
+    city: string;
+    country: string;
+    website: string;
+    businessDescription: string;
+    taxId: string;
+  }
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      brandName: user?.brandName || '',
+      phoneNumber: user?.phoneNumber || '',
+      businessAddress: user?.businessAddress || '',
+      city: user?.city || '',
+      country: user?.country || '',
+      website: user?.website || '',
+      businessDescription: user?.businessDescription || '',
+      taxId: user?.taxId || '',
+    },
+  });
+
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (user) {
-      setBrandName(user.brandName || '');
-      setPhoneNumber(user.phoneNumber || '');
-      setBusinessAddress(user.businessAddress || '');
-      setCity(user.city || '');
-      setCountry(user.country || '');
-      setWebsite(user.website || '');
-      setBusinessDescription(user.businessDescription || '');
-      setTaxId(user.taxId || '');
+      reset({
+        brandName: user.brandName || '',
+        phoneNumber: user.phoneNumber || '',
+        businessAddress: user.businessAddress || '',
+        city: user.city || '',
+        country: user.country || '',
+        website: user.website || '',
+        businessDescription: user.businessDescription || '',
+        taxId: user.taxId || '',
+      });
     }
-  }, [user]);
+  }, [user, reset]);
 
   useEffect(() => {
     if (!user) return;
@@ -58,35 +68,27 @@ export const BrandProfile: React.FC = () => {
       .then((res) => (res.ok ? res.json() : null))
       .then((data: Vendor | null) => {
         if (!data) return;
-        setBrandName(data.brandName || '');
-        setPhoneNumber(data.phoneNumber || '');
-        setBusinessAddress(data.businessAddress || '');
-        setCity(data.city || '');
-        setCountry(data.country || '');
-        setWebsite(data.website || '');
-        setBusinessDescription(data.description || '');
-        setTaxId(data.taxId || '');
+        reset({
+          brandName: data.brandName || '',
+          phoneNumber: data.phoneNumber || '',
+          businessAddress: data.businessAddress || '',
+          city: data.city || '',
+          country: data.country || '',
+          website: data.website || '',
+          businessDescription: data.description || '',
+          taxId: data.taxId || '',
+        });
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [user, reset]);
 
-  const submit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const submit: SubmitHandler<FormValues> = async (values) => {
     setMessage('');
     const res = await fetch('/api/brand/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        brandName,
-        phoneNumber,
-        businessAddress,
-        city,
-        country,
-        website,
-        businessDescription,
-        taxId,
-      }),
+      body: JSON.stringify(values),
     });
     if (res.ok) setMessage('Profile updated');
     else setMessage('Update failed');
@@ -115,63 +117,54 @@ export const BrandProfile: React.FC = () => {
         </div>
       )}
       {message && <div className="mb-2 text-green-600">{message}</div>}
-      <form onSubmit={submit} className="space-y-2">
+      <form onSubmit={handleSubmit(submit)} className="space-y-2">
         <TextInput
           name="brandName"
-          value={brandName}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setBrandName(e.target.value)
-          }
+          register={register}
+          rules={{ required: 'Required' }}
+          error={errors.brandName?.message}
           placeholder="Brand Name"
         />
         <TextInput
           name="phoneNumber"
-          value={phoneNumber}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setPhoneNumber(e.target.value)
-          }
+          register={register}
           placeholder="Phone Number"
+          error={errors.phoneNumber?.message}
         />
         <TextInput
           name="businessAddress"
-          value={businessAddress}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setBusinessAddress(e.target.value)
-          }
+          register={register}
           placeholder="Business Address"
+          error={errors.businessAddress?.message}
         />
         <TextInput
           name="city"
-          value={city}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setCity(e.target.value)
-          }
+          register={register}
           placeholder="City"
+          error={errors.city?.message}
         />
-        <CountrySelect value={country} onChange={(val) => setCountry(val)} />
+        <CountrySelect<FormValues>
+          name="country"
+          control={control}
+          error={errors.country?.message as string}
+        />
         <TextInput
           name="website"
-          value={website}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setWebsite(e.target.value)
-          }
+          register={register}
           placeholder="Website"
+          error={errors.website?.message}
         />
         <Textarea
           name="businessDescription"
-          value={businessDescription}
-          onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-            setBusinessDescription(e.target.value)
-          }
+          register={register}
           placeholder="Business Description"
+          error={errors.businessDescription?.message}
         />
         <TextInput
           name="taxId"
-          value={taxId}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setTaxId(e.target.value)
-          }
+          register={register}
           placeholder="Tax ID"
+          error={errors.taxId?.message}
         />
         <button className="btn btn-primary w-full" type="submit">
           Update
