@@ -9,7 +9,7 @@ export default function Signup() {
       <Head>
         <title>{getPageTitle('Signup')}</title>
       </Head>
-      <PageContainer className="space-y-4 -mt-8">
+      <PageContainer className="space-y-4 max-w-sm -mt-8">
         <h1 className="text-2xl font-bold mb-4 text-center">
           Choose Signup Type
         </h1>
