@@ -76,20 +76,26 @@ const BrandAnalytics: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
-    setLoading(true);
-    fetch(
-      `/api/brand/analytics?vendor=${encodeURIComponent(user.brandName || '')}`
-    )
-      .then((res) => (res.ok ? res.json() : null))
-      .then((d) =>
-        setData(d || { totalOrders: 0, totalRevenue: 0, topProducts: [] })
-      )
-      .finally(() => setLoading(false));
-    fetch(
-      `/api/brand/earnings?vendor=${encodeURIComponent(user.brandName || '')}`
-    )
-      .then((res) => (res.ok ? res.json() : null))
-      .then(setEarnings);
+    async function load() {
+      try {
+        setLoading(true);
+        const analyticsRes = await fetch('/api/brand/analytics');
+        const analyticsData = analyticsRes.ok
+          ? await analyticsRes.json()
+          : null;
+        setData(
+          analyticsData || { totalOrders: 0, totalRevenue: 0, topProducts: [] }
+        );
+        const earningsRes = await fetch('/api/brand/earnings');
+        setEarnings(earningsRes.ok ? await earningsRes.json() : null);
+      } catch {
+        setData({ totalOrders: 0, totalRevenue: 0, topProducts: [] });
+        setEarnings(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
   }, [user]);
 
   if (!user) return <div className="p-4">Please log in.</div>;

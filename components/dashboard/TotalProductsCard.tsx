@@ -22,9 +22,15 @@ const TotalProductsCard: React.FC<Props> = ({ brandId }) => {
         (brandId ? `?brandId=${brandId}` : '');
       try {
         const res = await fetch(url);
-        if (!res.ok) throw new Error('Failed to load');
-        const data = await res.json();
-        setCount(data.count);
+        if (res.ok) {
+          const data = await res.json();
+          setCount(data.count);
+        } else if (res.status === 404) {
+          setError('No data available');
+          setCount(0);
+        } else {
+          throw new Error('err');
+        }
       } catch {
         setError('Failed to load');
         setCount(0);
