@@ -69,13 +69,13 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center overflow-auto px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
       <Head>
         <title>{getPageTitle('Login')}</title>
       </Head>
-      <PageContainer className="space-y-4 max-w-sm -mt-8">
+      <PageContainer className="space-y-4 max-w-sm">
         <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
-        <div className="flex flex-col gap-4 mb-4">
+        <div className="flex flex-col gap-4 mb-6">
           <button
             type="button"
             className="btn w-full hover:bg-red-600 hover:text-white flex items-center justify-center gap-2"
@@ -100,6 +100,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             placeholder="Email"
             required
             register={register}
+            className="bg-base-200 border-base-300"
             rules={{
               required: 'Email is required',
               pattern: { value: emailRegex, message: 'Invalid email format' },
@@ -111,10 +112,11 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             placeholder="Password"
             required
             register={register}
+            className="bg-base-200 border-base-300"
             rules={{ required: 'Password is required' }}
             error={errors.password?.message as string}
           />
-          <div className="text-right -mt-2 mb-2">
+          <div className="text-right mt-1">
             <Link href="/auth/forgot-password" className="link text-sm">
               Forgot Password?
             </Link>
