@@ -52,19 +52,19 @@ const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
             <>
               <Link
                 href="/brand/dashboard"
-                className={`transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105 ${pathname === '/brand/dashboard' ? 'text-primary underline font-semibold' : ''}`}
+                className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname === '/brand/dashboard' ? 'text-primary underline font-semibold' : ''}`}
               >
                 Dashboard
               </Link>
               <Link
                 href="/brand/orders"
-                className={`transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105 ${pathname === '/brand/orders' ? 'text-primary underline font-semibold' : ''}`}
+                className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname === '/brand/orders' ? 'text-primary underline font-semibold' : ''}`}
               >
                 Orders
               </Link>
               <Link
                 href="/brand/analytics"
-                className={`transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105 ${pathname === '/brand/analytics' ? 'text-primary underline font-semibold' : ''}`}
+                className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname === '/brand/analytics' ? 'text-primary underline font-semibold' : ''}`}
               >
                 Analytics
               </Link>
@@ -136,7 +136,7 @@ const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 <li>
                   <Link
                     href="/brand/profile"
-                    className="transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105"
+                    className="transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105"
                   >
                     Profile
                   </Link>
@@ -144,7 +144,7 @@ const BrandHeader: FC<HeaderProps> = ({ theme = 'light', setTheme }) => {
                 <li>
                   <button
                     onClick={logout}
-                    className="transition-colors transition-transform duration-200 hover:text-white hover:underline hover:scale-105"
+                    className="transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105"
                   >
                     Logout
                   </button>
