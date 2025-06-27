@@ -98,7 +98,7 @@ export const authOptions: AuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user }) {
+   async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
         if ('brandId' in user && typeof (user as any).brandId === 'number') {
@@ -106,6 +106,7 @@ export const authOptions: AuthOptions = {
         } else if (typeof user.email === 'string') {
           const dbUser = await findUser(user.email);
           if (dbUser) token.brandId = dbUser.id;
+          if (dbUser) token.profileImage = dbUser.profileImage;
         }
       } else {
         if (token.brandId === undefined && typeof token.email === 'string') {
@@ -113,6 +114,7 @@ export const authOptions: AuthOptions = {
           if (dbUser) {
             token.brandId = dbUser.id;
             if (!token.role) token.role = dbUser.role;
+            token.profileImage = dbUser.profileImage;
           }
         }
       }
@@ -124,6 +126,7 @@ export const authOptions: AuthOptions = {
         if (typeof token.brandId === 'number') {
           (session.user as { brandId?: number }).brandId = token.brandId;
         }
+        (session.user as { profileImage?: string }).profileImage = token.profileImage as string | undefined;
       }
       return session;
     },

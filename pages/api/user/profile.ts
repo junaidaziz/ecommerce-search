@@ -71,15 +71,23 @@ export default async function handler(
       };
       if (email) update.email = email;
       if (password) update.password = await bcrypt.hash(String(password), 10);
-      const logoFile = files.logo as File | File[] | undefined;
-      if (logoFile) {
-        const file = Array.isArray(logoFile) ? logoFile[0] : logoFile;
+      const profileImageFile = (files.profileImage || files.logo) as File | File[] | undefined;
+      if (profileImageFile) {
+        const file = Array.isArray(profileImageFile) ? profileImageFile[0] : profileImageFile;
+        if (
+          file.mimetype && !['image/jpeg', 'image/png'].includes(file.mimetype)
+        ) {
+          return res.status(400).json({ message: 'Only JPEG/PNG images are allowed' });
+        }
+        if (file.size && file.size > 2 * 1024 * 1024) {
+          return res.status(400).json({ message: 'File size exceeds 2MB' });
+        }
         const dir = path.join(process.cwd(), 'public', 'avatars', String(session.user.id));
         fs.mkdirSync(dir, { recursive: true });
         const name = Date.now() + '-' + file.originalFilename;
         const dest = path.join(dir, name);
         fs.renameSync(file.filepath, dest);
-        update.logo = `/avatars/${session.user.id}/${name}`;
+        update.profileImage = `/avatars/${session.user.id}/${name}`;
       }
       await updateUserProfile(session.user.email, update);
       return res.status(200).json({ message: 'updated' });

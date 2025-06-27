@@ -445,9 +445,9 @@ const Header: FC<HeaderProps> = ({
                 tabIndex={0}
                 className="flex items-center gap-2 cursor-pointer"
               >
-                {user.logo ? (
+                {user.profileImage || user.logo ? (
                   <img
-                    src={user.logo}
+                    src={user.profileImage || user.logo}
                     alt="avatar"
                     className="w-6 h-6 rounded-full object-cover"
                   />
