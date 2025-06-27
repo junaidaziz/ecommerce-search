@@ -1,13 +1,10 @@
 import { getServerSession } from 'next-auth/next';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+import type { Session } from 'next-auth';
 import { authOptions } from '../pages/api/auth/[...nextauth]';
 
 export interface AuthedNextApiRequest extends NextApiRequest {
-  user?: {
-    email?: string | null;
-    role?: string;
-    [key: string]: unknown;
-  };
+  user?: Session['user'];
 }
 
 export function withRole(roles: string[]) {

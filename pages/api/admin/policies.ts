@@ -1,5 +1,5 @@
 import type { NextApiResponse } from 'next';
-import { withRole, type AuthedNextApiRequest } from '../../../lib/withRole';
+import { withRole, AuthedNextApiRequest } from '../../../lib/withRole';
 import { getDb } from '../../../lib/db';
 import { handleApiError } from '../../../lib/utils/handleApiError';
 

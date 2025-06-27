@@ -15,6 +15,7 @@ import {
 } from '../../components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '../../lib/pageTitle';
+import PageContainer from '../../components/Layout/PageContainer';
 
 export const BrandProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
@@ -102,10 +103,11 @@ export const BrandProfile: React.FC = () => {
     );
 
   return (
-    <div className="max-w-sm mx-auto">
+    <div className="min-h-screen flex items-center justify-center overflow-auto px-4 py-6 sm:px-6 lg:px-8">
       <Head>
         <title>{getPageTitle('Brand Profile')}</title>
       </Head>
+      <PageContainer>
       <h1 className="text-2xl font-bold mb-4">Brand Profile</h1>
       {showComplete && (
         <div className="alert alert-info mb-2">
@@ -175,6 +177,7 @@ export const BrandProfile: React.FC = () => {
           Update
         </button>
       </form>
+      </PageContainer>
     </div>
   );
 };

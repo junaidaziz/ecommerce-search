@@ -11,6 +11,7 @@ import { EmailInput, PasswordInput } from '../components/form-fields';
 import GoogleIcon from '../components/icons/GoogleIcon';
 import GithubIcon from '../components/icons/GithubIcon';
 import { User } from '../types';
+import PageContainer from '../components/Layout/PageContainer';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -68,11 +69,11 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center overflow-auto px-4 py-6 sm:px-6 lg:px-8">
       <Head>
         <title>{getPageTitle('Login')}</title>
       </Head>
-      <div className="max-w-md mx-auto mt-10 border border-gray-200 rounded-lg shadow-sm p-6 bg-white w-full space-y-4">
+      <PageContainer className="space-y-4">
         <h1 className="text-2xl font-bold mb-4">Login</h1>
         <button
           type="button"
@@ -118,20 +119,20 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           </div>
           <button
             className="btn btn-primary w-full"
-            type="submit"
-            disabled={loading}
-          >
-            {loading && <span className="loading loading-spinner mr-2"></span>}
-            Login
-          </button>
-        </form>
-        <p className="text-center mt-4">
-          Don’t have an account?{' '}
-          <Link href="/signup" className="link">
-            Signup
-          </Link>
-        </p>
-      </div>
+          type="submit"
+          disabled={loading}
+        >
+          {loading && <span className="loading loading-spinner mr-2"></span>}
+          Login
+        </button>
+      </form>
+      <p className="text-center mt-4">
+        Don’t have an account?{' '}
+        <Link href="/signup" className="link">
+          Signup
+        </Link>
+      </p>
+      </PageContainer>
     </div>
   );
 };
