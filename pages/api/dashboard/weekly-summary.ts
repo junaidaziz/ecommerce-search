@@ -16,8 +16,13 @@ async function handler(
     }
     const db = getDb();
     const user = req.user;
-    const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
-    const vendorId = user?.brandId ?? brandId || undefined;
+    const param = parseInt(getQueryParam(req.query.brandId) || '', 10);
+    const queryBrandId = Number.isNaN(param) ? undefined : param;
+    const vendorId =
+      user?.brandId ?? (user?.role === 'SUPER_ADMIN' ? queryBrandId : undefined);
+    if (!user?.brandId && user?.role !== 'SUPER_ADMIN') {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const start = dayjs().subtract(7, 'day').startOf('day').toDate();
     const where: any = { createdAt: { gte: start }, status: 'completed' };
     if (vendorId) where.product = { vendorId };
