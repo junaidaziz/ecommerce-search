@@ -144,6 +144,7 @@ model Coupon {
   code           String        @unique
   discountType   String
   amount         Float
+  minOrderValue  Float?
   expirationDate DateTime?
   usageLimit     Int?
   usedCount      Int           @default(0)
