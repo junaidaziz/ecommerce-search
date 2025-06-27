@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
 import Link from 'next/link';
 import ProductImageSlider from './ProductImageSlider';
-import { AppContext, AppContextValue } from '../../contexts/AppContext';
+import { AppContext } from '../../contexts/AppContext';
+import type { AppContextValue } from '../../types';
 import type { Product } from '../../types/product';
 import { formatCurrency } from '../../lib/utils/formatCurrency';
 
@@ -27,7 +28,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const inventory =
     product.totalInventory !== undefined
       ? product.totalInventory
-      : (product as any).quantity;
+      : product.quantity;
   const isOut = typeof inventory === 'number' && inventory <= 0;
   const finalPrice =
     product.discountType === 'percentage'

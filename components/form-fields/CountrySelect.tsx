@@ -6,7 +6,7 @@ import {
   Path,
   RegisterOptions,
 } from 'react-hook-form';
-import Select from 'react-select';
+import Select, { type Props as SelectProps } from 'react-select';
 import Flag from 'react-world-flags';
 import countries, { CountryInfo } from '../../data/countries';
 
@@ -45,8 +45,8 @@ const CountrySelect = <T extends FieldValues>(props: CountrySelectProps<T>) => {
   const inputId =
     'name' in props && props.name ? String(props.name) : 'country-select';
 
-  const select = (fieldProps: any) => (
-    <Select
+  const select = (fieldProps: SelectProps<CountryInfo, false>) => (
+    <Select<CountryInfo, false>
       inputId={inputId}
       {...fieldProps}
       options={countries}
