@@ -23,7 +23,7 @@ async function handler(
       return res.status(401).json({ message: 'Unauthorized' });
     }
     const monthOffset = getQueryParam(req.query.monthOffset);
-    const where: any = { status: 'completed' };
+    const where: any = { status: 'delivered' };
     if (
       monthOffset !== null &&
       monthOffset !== undefined &&

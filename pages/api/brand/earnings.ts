@@ -24,7 +24,7 @@ export default async function handler(
     const orders = await getOrdersForVendorId(brandId);
     const totalEarned = orders.reduce((s, o) => s + (o.total || 0), 0);
     const pending = orders
-      .filter((o) => o.status !== 'completed')
+      .filter((o) => o.status !== 'delivered')
       .reduce((s, o) => s + (o.total || 0), 0);
     const data: EarningsData = {
       totalEarned,

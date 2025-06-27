@@ -50,7 +50,7 @@ export async function addOrder({
   userEmail,
   items,
   total,
-  status = 'pending',
+  status = 'processing',
   paymentMethod,
   paymentReference,
   paymentProof,

@@ -114,7 +114,7 @@ model Order {
   productId        Int
   quantity         Int
   total            Float
-  status           String   @default("pending")
+  status           String   @default("processing")
   paymentMethod    String?
   paymentReference String?
   paymentProof     String?

@@ -91,11 +91,13 @@ const Orders: React.FC<OrdersProps> = (_props) => {
                   <td>
                     <span
                       className={`badge ${
-                        o.status === 'pending'
+                        o.status === 'processing'
                           ? 'badge-warning'
                           : o.status === 'shipped'
-                            ? 'badge-info'
-                            : 'badge-success'
+                          ? 'badge-info'
+                          : o.status === 'delivered'
+                          ? 'badge-success'
+                          : 'badge-error'
                       }`}
                     >
                       {o.status}
