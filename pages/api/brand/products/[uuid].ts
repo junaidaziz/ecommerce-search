@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import {
   updateProduct,
   deleteProduct,
@@ -116,13 +116,10 @@ export default async function handler(
         title: String(title ?? existing.title),
         vendor: { email: '', brandName: String(vendor ?? existing.vendor) },
         description: String(description ?? existing.description),
-        productType: String(product_type ?? existing.product_type),
+        productType: String(product_type ?? existing.productType),
         tags: String(tags ?? existing.tags),
         category: {
-          id: parseInt(
-            String(category_id ?? (existing as any).categoryId ?? '0'),
-            10
-          ),
+          id: parseInt(String(category_id ?? existing.categoryId ?? '0'), 10),
         },
         quantity:
           typeof quantity !== 'undefined'
@@ -137,11 +134,11 @@ export default async function handler(
             ? parseFloat(String(max_price))
             : existing.max_price,
         currency: String(currency ?? existing.currency),
-        discountType: parsedDiscountType ?? (existing as any).discount_type ?? null,
+        discountType: parsedDiscountType ?? existing.discountType ?? null,
         discountValue:
           parsedDiscountValue !== null
             ? parsedDiscountValue
-            : (existing as any).discount_value ?? null,
+            : existing.discountValue ?? null,
         status: existing.status,
         images: imagePaths.length > 0
           ? imagePaths.map((p) => ({ url: p }))

@@ -41,8 +41,8 @@ async function init() {
     const existing = await client.collections('products').retrieve();
     const fieldsMatch =
       existing.fields?.length === schema.fields.length &&
-      existing.fields.every((f: any, i: number) => {
-        const s = schema.fields[i] as any;
+      existing.fields.every((f, i) => {
+        const s = schema.fields[i];
         return (
           f.name === s.name && f.type === s.type && !!f.facet === !!s.facet
         );

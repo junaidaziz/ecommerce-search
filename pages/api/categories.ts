@@ -8,11 +8,16 @@ import {
 import { handleApiError } from '../../lib/utils/handleApiError';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
-import type { CategoriesResponse, ApiMessage, Category } from '../../types';
+import type {
+  CategoriesResponse,
+  CategoryResponse,
+  ApiMessage,
+  Category,
+} from '../../types';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<CategoriesResponse | ApiMessage>
+  res: NextApiResponse<CategoriesResponse | CategoryResponse | ApiMessage>
 ): Promise<void> {
   try {
     if (req.method === 'GET') {
@@ -49,7 +54,7 @@ export default async function handler(
           .json({ message: 'category exists', category: exists });
       }
       const category = await createCategory(name, slug);
-      return res.status(201).json({ category } as any);
+      return res.status(201).json({ category });
     }
     return res.status(405).json({ message: 'Method Not Allowed' });
   } catch (error) {

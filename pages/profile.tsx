@@ -85,11 +85,11 @@ const Profile: React.FC = () => {
         </div>
         <div>
           <p className="text-sm text-gray-500">State</p>
-          <p className="font-medium">{display((profile as any)?.state)}</p>
+          <p className="font-medium">{display((profile as Record<string, string> | undefined)?.state)}</p>
         </div>
         <div>
           <p className="text-sm text-gray-500">Postal Code</p>
-          <p className="font-medium">{display((profile as any)?.postalCode)}</p>
+          <p className="font-medium">{display((profile as Record<string, string> | undefined)?.postalCode)}</p>
         </div>
         <div>
           <p className="text-sm text-gray-500">Country</p>
