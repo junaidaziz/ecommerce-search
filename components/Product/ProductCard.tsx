@@ -24,6 +24,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const context = useContext(AppContext) as AppContextValue;
   const addToCart = context?.addToCart;
+  const addToWish = context?.addToWishlist;
+  const removeFromWish = context?.removeFromWishlist;
+  const wishlist = context?.wishlist || [];
+  const inWishlist = wishlist.some((w) => w.product.id === product.id);
 
   const inventory =
     product.totalInventory !== undefined
@@ -47,6 +51,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
     <div
       className={`group relative flex flex-col h-full border border-base-300 rounded-xl overflow-hidden shadow hover:shadow-lg transition-shadow duration-200 w-4/5 mx-auto ${className}`}
     >
+      <button
+        type="button"
+        className="absolute top-2 right-2 z-10 btn btn-ghost btn-xs"
+        onClick={(e) => {
+          e.preventDefault();
+          inWishlist
+            ? removeFromWish && removeFromWish(product.id)
+            : addToWish && addToWish(product);
+        }}
+      >
+        {inWishlist ? '❤' : '♡'}
+      </button>
       <Link href={`/product/${product.slug}`} className="block overflow-hidden">
         <ProductImageSlider
           images={

@@ -61,3 +61,33 @@ export async function sendOrderStatusUpdate(
     console.error('Email error', e);
   }
 }
+
+export async function sendBackInStock(to: string, title: string) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM || 'orders@example.com';
+  if (!apiKey) {
+    console.log('No RESEND_API_KEY configured');
+    return;
+  }
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to,
+        subject: `${title} back in stock`,
+        html: `<p>Your saved item <b>${title}</b> is back in stock.</p>`,
+      }),
+    });
+    if (!res.ok) {
+      console.error('Failed to send email', await res.text());
+    }
+  } catch (e) {
+    console.error('Email error', e);
+  }
+}
+
