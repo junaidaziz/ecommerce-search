@@ -1,10 +1,10 @@
 import { JSDOM } from 'jsdom';
 import { getDb } from './db';
-import type { Product, ProductInput } from '@types/product';
-import type { Variant } from '@types/variant';
+import type { Product, ProductInput } from '@/types/product';
+import type { Variant } from '@/types/variant';
 import { parseImages } from './utils/parseImages';
-import type { Category } from '@types/category';
-import type { Vendor } from '@types/vendor';
+import type { Category } from '@/types/category';
+import type { Vendor } from '@/types/vendor';
 import { Prisma } from '@prisma/client';
 import client from './typesenseClient';
 import { getBestSellingProducts } from './orders';
