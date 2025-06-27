@@ -16,7 +16,7 @@ async function handler(
     const db = getDb();
     const user = req.user;
     const brandId = parseInt(getQueryParam(req.query.brandId) || '', 10);
-    const vendorId = Number(user?.id) || brandId || undefined;
+    const vendorId = user?.brandId ?? brandId || undefined;
     const where = vendorId ? { vendorId } : {};
     const count = await db.product.count({ where });
     return res.status(200).json({ count });
