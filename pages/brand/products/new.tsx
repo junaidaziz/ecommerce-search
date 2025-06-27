@@ -28,6 +28,7 @@ const NewProductPage: React.FC = () => {
     try {
       const res = await fetch('/api/brand/products', {
         method: 'POST',
+        credentials: 'include',
         body: values,
       });
       if (res.ok) {

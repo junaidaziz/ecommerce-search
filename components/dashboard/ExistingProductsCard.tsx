@@ -19,7 +19,9 @@ const ExistingProductsCard: React.FC<Props> = ({ previewCount = 3 }) => {
     setError('');
     async function load() {
       try {
-        const res = await fetch('/api/brand/products');
+        const res = await fetch('/api/brand/products', {
+          credentials: 'include',
+        });
         if (res.ok) {
           const data: { products: Product[]; total: number } = await res.json();
           setProducts(data.products);
