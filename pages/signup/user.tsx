@@ -99,7 +99,7 @@ export default function UserSignup() {
       <Head>
         <title>{getPageTitle('User Signup')}</title>
       </Head>
-      <PageContainer className="max-w-xs -mt-12">
+      <PageContainer className="max-w-sm">
         <h1 className="text-2xl font-bold mb-4 text-center">User Sign Up</h1>
         <div className="flex flex-col gap-4 mb-6">
           <button
