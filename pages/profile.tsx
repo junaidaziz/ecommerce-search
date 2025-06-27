@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useContext } from 'react';
 import useRequireAuth from '@hooks/useRequireAuth';
 import { getPageTitle } from '@lib/pageTitle';
+import { NotificationContext } from '@contexts/NotificationContext';
 import type { User } from '@/types/user';
 import type { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth/next';
@@ -15,6 +16,10 @@ dayjs.extend(relativeTime);
 const Profile: React.FC = () => {
   const user = useRequireAuth();
   const [profile, setProfile] = useState<User | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const { addNotification } = useContext(NotificationContext);
   useEffect(() => {
     if (!user) return;
     fetch('/api/user/profile')
@@ -37,6 +42,41 @@ const Profile: React.FC = () => {
     profile?.lastName || user.lastName || ''
   }`.trim();
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!['image/jpeg', 'image/png'].includes(f.type)) {
+      addNotification('Only JPEG or PNG images allowed', 'error');
+      return;
+    }
+    if (f.size > 2 * 1024 * 1024) {
+      addNotification('File must be under 2MB', 'error');
+      return;
+    }
+    setFile(f);
+    setImagePreview(URL.createObjectURL(f));
+  };
+
+  const uploadImage = async () => {
+    if (!file) return;
+    const form = new FormData();
+    form.append('profileImage', file);
+    const res = await fetch('/api/user/profile', {
+      method: 'PUT',
+      body: form,
+    });
+    if (res.ok) {
+      setFile(null);
+      setImagePreview(null);
+      fetch('/api/user/profile')
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => setProfile(data));
+      addNotification('Profile image updated', 'success');
+    } else {
+      addNotification('Upload failed', 'error');
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       <Head>
@@ -45,15 +85,33 @@ const Profile: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4">My Profile</h1>
 
       <div className="flex items-center gap-4">
-        {profile?.logo ? (
-          <img
-            src={profile.logo}
-            alt="avatar"
-            className="w-16 h-16 rounded-full object-cover"
+        <div className="relative" onClick={() => inputRef.current?.click()}>
+          {imagePreview ? (
+            <img
+              src={imagePreview}
+              alt="preview"
+              className="w-16 h-16 rounded-full object-cover cursor-pointer"
+            />
+          ) : profile?.profileImage ? (
+            <img
+              src={profile.profileImage}
+              alt="avatar"
+              className="w-16 h-16 rounded-full object-cover cursor-pointer"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer text-white font-semibold">
+              {(user.firstName?.[0] || '').toUpperCase()}
+              {(user.lastName?.[0] || '').toUpperCase()}
+            </div>
+          )}
+          <input
+            type="file"
+            ref={inputRef}
+            accept="image/jpeg,image/png"
+            className="hidden"
+            onChange={handleChange}
           />
-        ) : (
-          <div className="w-16 h-16 rounded-full bg-gray-300" />
-        )}
+        </div>
         <div>
           <p className="text-lg font-semibold">{display(fullName)}</p>
           <p className="text-gray-600">
@@ -61,6 +119,12 @@ const Profile: React.FC = () => {
           </p>
         </div>
       </div>
+
+      {imagePreview && (
+        <button onClick={uploadImage} className="btn btn-primary btn-sm">
+          Upload
+        </button>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
         <div>

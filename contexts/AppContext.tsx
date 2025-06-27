@@ -57,7 +57,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
   useEffect(() => {
     if (session?.user) {
-      const { email, name, role, brandName, gender, brandId } = session.user;
+      const { email, name, role, brandName, gender, brandId, profileImage } = session.user;
       const [firstName = '', lastName = ''] = (name || '').split(' ');
       setUser({
         id: brandId,
@@ -66,6 +66,7 @@ export function AppProvider({ children }: AppProviderProps) {
         lastName,
         brandName,
         gender,
+        profileImage,
         role: (role || '').toLowerCase(),
         phoneNumber: '',
         address: '',
