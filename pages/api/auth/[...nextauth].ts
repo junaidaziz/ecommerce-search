@@ -52,7 +52,7 @@ export const authOptions: AuthOptions = {
           !user.disabled &&
           (await bcrypt.compare(credentials.password, user.password))
         ) {
-          const { firstName, lastName, brandName, gender, role } = user;
+          const { id, firstName, lastName, brandName, gender, role } = user;
           return {
             id: user.email,
             email: user.email,
@@ -60,6 +60,7 @@ export const authOptions: AuthOptions = {
             brandName,
             gender,
             role,
+            brandId: id,
           };
         }
         return null;
@@ -100,10 +101,19 @@ export const authOptions: AuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
-      } else if (!token.role) {
-        if (typeof token.email === 'string') {
+        if ('brandId' in user && typeof (user as any).brandId === 'number') {
+          token.brandId = (user as any).brandId;
+        } else if (typeof user.email === 'string') {
+          const dbUser = await findUser(user.email);
+          if (dbUser) token.brandId = dbUser.id;
+        }
+      } else {
+        if (token.brandId === undefined && typeof token.email === 'string') {
           const dbUser = await findUser(token.email);
-          if (dbUser) token.role = dbUser.role;
+          if (dbUser) {
+            token.brandId = dbUser.id;
+            if (!token.role) token.role = dbUser.role;
+          }
         }
       }
       return token;
@@ -111,6 +121,9 @@ export const authOptions: AuthOptions = {
     session({ session, token }) {
       if (token && session.user) {
         session.user.role = token.role;
+        if (typeof token.brandId === 'number') {
+          (session.user as { brandId?: number }).brandId = token.brandId;
+        }
       }
       return session;
     },
