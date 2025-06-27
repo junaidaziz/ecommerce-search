@@ -20,17 +20,22 @@ const TotalSalesCard: React.FC<Props> = ({ brandId }) => {
       const base = '/api/dashboard/total-sales';
       try {
         const curRes = await fetch(`${base}?${params.toString()}`);
-        if (!curRes.ok) throw new Error('err');
-        const cur = await curRes.json();
-        setTotal(cur.total);
-        params.set('monthOffset', '1');
-        const prevRes = await fetch(`${base}?${params.toString()}`);
-        if (prevRes.ok) {
-          const prev = await prevRes.json();
-          const pct = prev.total
-            ? ((cur.total - prev.total) / prev.total) * 100
-            : 100;
-          setTrend(pct);
+        if (curRes.ok) {
+          const cur = await curRes.json();
+          setTotal(cur.total);
+          params.set('monthOffset', '1');
+          const prevRes = await fetch(`${base}?${params.toString()}`);
+          if (prevRes.ok) {
+            const prev = await prevRes.json();
+            const pct = prev.total
+              ? ((cur.total - prev.total) / prev.total) * 100
+              : 100;
+            setTrend(pct);
+          }
+        } else if (curRes.status === 404) {
+          setError('No data available');
+        } else {
+          throw new Error('err');
         }
       } catch {
         setError('Failed to load');

@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getOrdersForVendor } from '../../../lib/orders';
+import { getOrdersForVendorId } from '../../../lib/orders';
 import { handleApiError } from '../../../lib/utils/handleApiError';
-import { getQueryParam } from '../../../lib/utils/getQueryParam';
 import type { AnalyticsData, ApiMessage } from '../../../types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
@@ -15,11 +14,14 @@ export default async function handler(
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
     const session = await getServerSession(req, res, authOptions);
-    const vendor = session?.user?.brandName || getQueryParam(req.query.vendor);
-    if (!session?.user || session.user.role !== 'BRAND' || !vendor) {
+    const brandId =
+      typeof session?.user?.brandId === 'number'
+        ? session.user.brandId
+        : undefined;
+    if (!session?.user || session.user.role !== 'BRAND' || !brandId) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-    const orders = await getOrdersForVendor(vendor);
+    const orders = await getOrdersForVendorId(brandId);
     const summary: AnalyticsData = {
       totalOrders: orders.length,
       totalRevenue: 0,
@@ -28,9 +30,7 @@ export default async function handler(
     const counts: Record<string, number> = {};
     orders.forEach((o) => {
       summary.totalRevenue += o.total || 0;
-      if (o.product.vendor.brandName === vendor) {
-        counts[o.product.id] = (counts[o.product.id] || 0) + o.quantity;
-      }
+      counts[o.product.id] = (counts[o.product.id] || 0) + o.quantity;
     });
     summary.topProducts = Object.entries(counts)
       .sort((a, b) => (b[1] as number) - (a[1] as number))

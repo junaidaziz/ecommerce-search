@@ -27,10 +27,22 @@ const InventoryAlertsCard: React.FC<Props> = ({ brandId, threshold = 10 }) => {
     const url =
       '/api/dashboard/inventory-alerts' +
       (params.toString() ? `?${params.toString()}` : '');
-    fetch(url)
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data) => setProducts(data.products))
-      .catch(() => setError('Failed to load'));
+    async function load() {
+      try {
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data.products);
+        } else if (res.status === 404) {
+          setError('No data available');
+        } else {
+          throw new Error('err');
+        }
+      } catch {
+        setError('Failed to load');
+      }
+    }
+    load();
   }, [brandId, threshold]);
 
   return (
