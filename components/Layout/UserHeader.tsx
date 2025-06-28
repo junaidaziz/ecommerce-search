@@ -60,6 +60,19 @@ const Header: FC<HeaderProps> = ({
   const [hoveredCat, setHoveredCat] = useState<Category | null>(null);
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
 
+  const closeDropdown = () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  };
+
+  useEffect(() => {
+    router.events.on('routeChangeStart', closeDropdown);
+    return () => {
+      router.events.off('routeChangeStart', closeDropdown);
+    };
+  }, []);
+
   const handleMenuEnter = () => {
     if (closeTimeout.current) {
       clearTimeout(closeTimeout.current);
@@ -469,7 +482,7 @@ const Header: FC<HeaderProps> = ({
                       : user.email)}
                 </span>
               </label>
-              <DropdownMenu items={menuItems} />
+              <DropdownMenu items={menuItems} onItemClick={closeDropdown} />
             </div>
           ) : (
             !isAuthRoute && (
