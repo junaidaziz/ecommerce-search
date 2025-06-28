@@ -6,6 +6,7 @@ import {
   deletePaymentMethod,
   getPaymentMethodsForUser,
 } from '@lib/paymentMethods';
+import { findUser } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
 
 export default async function handler(
@@ -14,9 +15,14 @@ export default async function handler(
 ) {
   try {
     const session = await getServerSession(req, res, authOptions);
-    if (!session?.user?.id)
+    if (!session?.user)
       return res.status(401).json({ message: 'Unauthorized' });
-    const userId = Number(session.user.id);
+    let userId = session.user.brandId;
+    if (typeof userId !== 'number') {
+      const user = await findUser(session.user.email);
+      userId = user?.id;
+    }
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     const id = parseInt(String(req.query.id));
     if (isNaN(id)) return res.status(400).json({ message: 'invalid id' });
     if (req.method === 'DELETE') {

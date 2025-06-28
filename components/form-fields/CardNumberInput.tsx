@@ -64,33 +64,54 @@ const CardNumberInput = <T extends FieldValues>(
   const [value, setValue] = useState(valueProp || '');
   const [brand, setBrand] = useState<CardBrand>('unknown');
   const cleaveRef = useRef<any>(null);
+  const [cleaveReady, setCleaveReady] = useState(false);
+
+  const safeSetRawValue = (raw: string) => {
+    const cleave = cleaveRef.current;
+    if (cleaveReady && cleave && typeof cleave.setRawValue === 'function') {
+      try {
+        cleave.setRawValue(raw);
+      } catch (err) {
+        console.error('Cleave setRawValue failed', err);
+      }
+    }
+  };
 
   useEffect(() => {
     const val = valueProp || '';
     setValue(val);
     setBrand(detectCardBrand(val));
     const digits = val.replace(/\D/g, '');
-    cleaveRef.current?.setRawValue?.(digits);
+    safeSetRawValue(digits);
   }, [valueProp]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const digits = e.target.value.replace(/\D/g, '');
-    const b = detectCardBrand(digits);
-    const max = getCardMaxLength(b);
-    const raw = digits.slice(0, max);
-    const cleave = cleaveRef.current;
-    let formatted = raw;
-    if (cleave && typeof cleave.setRawValue === 'function') {
-      cleave.setRawValue(raw);
-      formatted = cleave.getFormattedValue();
-    } else {
-      formatted = raw.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
-    }
-    setValue(formatted);
-    setBrand(b);
-    onCardTypeChange?.(b);
-    if (onChange) {
-      onChange({ ...e, target: { ...e.target, value: formatted } });
+    try {
+      const digits = e.target.value.replace(/\D/g, '');
+      const b = detectCardBrand(digits);
+      const max = getCardMaxLength(b);
+      const raw = digits.slice(0, max);
+      const cleave = cleaveRef.current;
+      let formatted = raw;
+      if (cleave && typeof cleave.setRawValue === 'function') {
+        safeSetRawValue(raw);
+        try {
+          formatted = cleave.getFormattedValue();
+        } catch (err) {
+          console.error('Cleave getFormattedValue failed', err);
+          formatted = raw;
+        }
+      } else {
+        formatted = raw.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+      }
+      setValue(formatted);
+      setBrand(b);
+      onCardTypeChange?.(b);
+      if (onChange) {
+        onChange({ ...e, target: { ...e.target, value: formatted } });
+      }
+    } catch (err) {
+      console.error('CardNumberInput handleChange error', err);
     }
   };
 
@@ -137,6 +158,7 @@ const CardNumberInput = <T extends FieldValues>(
           }}
           onInit={(cleave) => {
             cleaveRef.current = cleave;
+            setCleaveReady(true);
           }}
           {...rest}
         />
