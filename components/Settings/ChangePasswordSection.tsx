@@ -4,6 +4,7 @@ import { PasswordInput } from '@components/form-fields';
 import { NotificationContext } from '@contexts/NotificationContext';
 
 interface PasswordFormValues {
+  current: string;
   password: string;
   confirm: string;
 }
@@ -14,20 +15,37 @@ const ChangePasswordSection: React.FC = () => {
   const passwordForm = useForm<PasswordFormValues>();
   const { addNotification } = useContext(NotificationContext);
 
-  const submitPassword: SubmitHandler<PasswordFormValues> = async ({ password }) => {
-    const res = await fetch('/api/user/profile', {
-      method: 'PUT',
+  const submitPassword: SubmitHandler<PasswordFormValues> = async ({
+    current,
+    password,
+  }) => {
+    const res = await fetch('/api/change-password', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ currentPassword: current, newPassword: password }),
     });
+    let message = 'Change failed';
+    try {
+      const data = await res.json();
+      if (data?.message) message = data.message;
+    } catch {
+      // ignore
+    }
     if (res.ok) addNotification('Password changed', 'success');
-    else addNotification('Change failed', 'error');
+    else addNotification(message, 'error');
     passwordForm.reset();
   };
 
   return (
     <form onSubmit={passwordForm.handleSubmit(submitPassword)} className="space-y-2 max-w-md mx-auto">
       <h2 className="text-xl font-bold mb-2">Change Password</h2>
+      <PasswordInput
+        label="Current Password"
+        register={passwordForm.register}
+        name="current"
+        rules={{ required: 'Required' }}
+        error={passwordForm.formState.errors.current?.message}
+      />
       <PasswordInput
         label="New Password"
         register={passwordForm.register}
