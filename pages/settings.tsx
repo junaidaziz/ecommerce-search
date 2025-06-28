@@ -9,10 +9,12 @@ import {
   EmailInput,
   PasswordInput,
   CountrySelect,
+  CardNumberInput,
 } from '@components/form-fields';
 import PageContainer from '@components/Layout/PageContainer';
 import countries from '../data/countries';
 import type { PaymentMethod } from '../types';
+import { luhnCheck } from '@utils/cardUtils';
 
 interface ProfileFormValues {
   firstName: string;
@@ -56,6 +58,8 @@ const SettingsPage: React.FC = () => {
   const addressForm = useForm<AddressFormValues>();
   const emailForm = useForm<EmailFormValues>();
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardError, setCardError] = useState('');
 
   const tabButtonClass = (tab: typeof active) =>
     `w-full text-left px-2 py-2 rounded transition-colors hover:bg-base-200 ${
@@ -396,8 +400,14 @@ const SettingsPage: React.FC = () => {
               onSubmit={(e) => {
                 e.preventDefault();
                 const form = e.currentTarget as HTMLFormElement;
+                const number = cardNumber.replace(/\s+/g, '');
+                if (!luhnCheck(number)) {
+                  setCardError('Invalid card number');
+                  return;
+                }
+                setCardError('');
                 const data = {
-                  number: (form.number as HTMLInputElement).value,
+                  number,
                   expMonth: (form.expMonth as HTMLInputElement).value,
                   expYear: (form.expYear as HTMLInputElement).value,
                   cvc: (form.cvc as HTMLInputElement).value,
@@ -410,16 +420,18 @@ const SettingsPage: React.FC = () => {
                 })
                   .then(() => {
                     form.reset();
+                    setCardNumber('');
                     loadMethods();
                   })
                   .catch(() => {});
               }}
               className="space-y-2"
             >
-              <input
+              <CardNumberInput
                 name="number"
-                className="input input-bordered w-full"
-                placeholder="Card Number"
+                value={cardNumber}
+                onChange={(e) => setCardNumber(e.target.value)}
+                error={cardError}
               />
               <div className="flex gap-2">
                 <input
