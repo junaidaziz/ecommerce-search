@@ -1,4 +1,5 @@
 import { useEffect, useContext } from 'react';
+import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { TextInput, EmailInput } from '@components/form-fields';
 import { NotificationContext } from '@contexts/NotificationContext';
@@ -40,7 +41,10 @@ const UpdateProfileSection: React.FC = () => {
   };
 
   return (
-    <form onSubmit={profileForm.handleSubmit(submitProfile)} className="space-y-2 max-w-md mx-auto">
+    <form
+      onSubmit={profileForm.handleSubmit(submitProfile)}
+      className="space-y-2 max-w-md mx-auto"
+    >
       <h2 className="text-xl font-bold mb-2">Update Profile</h2>
       <TextInput
         label="First Name"
@@ -57,13 +61,24 @@ const UpdateProfileSection: React.FC = () => {
         rules={{ required: 'Required' }}
         error={profileForm.formState.errors.lastName?.message}
       />
-      <EmailInput
-        label="Email"
-        register={profileForm.register}
-        name="email"
-        rules={{ required: 'Required' }}
-        error={profileForm.formState.errors.email?.message}
-      />
+      <div className="flex gap-2 items-end">
+        <div className="flex-1">
+          <EmailInput
+            label="Email"
+            register={profileForm.register}
+            name="email"
+            readOnly
+            rules={{ required: 'Required' }}
+            error={profileForm.formState.errors.email?.message}
+          />
+        </div>
+        <Link
+          href={{ pathname: '/settings', query: { tab: 'email' } }}
+          className="btn btn-sm"
+        >
+          Change Email
+        </Link>
+      </div>
       <TextInput
         label="Phone Number"
         register={profileForm.register}
