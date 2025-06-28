@@ -31,3 +31,36 @@ export function luhnCheck(value: string): boolean {
   }
   return digits.length > 0 && sum % 10 === 0;
 }
+
+export function getCardMaxLength(brand: CardBrand): number {
+  switch (brand) {
+    case 'amex':
+      return 15;
+    case 'mastercard':
+      return 16;
+    case 'visa':
+    case 'discover':
+      return 19;
+    default:
+      return 19;
+  }
+}
+
+export function isValidCardLength(value: string, brand: CardBrand): boolean {
+  const len = value.replace(/\D/g, '').length;
+  const max = getCardMaxLength(brand);
+  if (brand === 'visa' || brand === 'discover') return len >= 16 && len <= max;
+  return len === max;
+}
+
+export function isExpiryValid(month: string, year: string): boolean {
+  const mm = parseInt(month, 10);
+  const yyyy = parseInt(year, 10);
+  if (isNaN(mm) || isNaN(yyyy) || mm < 1 || mm > 12) return false;
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  if (yyyy < currentYear) return false;
+  if (yyyy === currentYear && mm < currentMonth) return false;
+  return true;
+}
