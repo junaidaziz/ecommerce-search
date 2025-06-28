@@ -448,7 +448,8 @@ const SettingsPage: React.FC = () => {
             </form>
           </div>
         )}
-      </div>
+        </div>
+        </div>
     </PageContainer>
   );
 };
