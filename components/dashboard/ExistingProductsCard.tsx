@@ -37,14 +37,15 @@ const ExistingProductsCard: React.FC<Props> = ({ previewCount = 3 }) => {
     load();
   }, []);
 
-  const preview =
-    products
-      ?.slice()
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
-      .slice(0, previewCount) || [];
+  const preview = Array.isArray(products)
+    ? products
+        .slice()
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+        .slice(0, previewCount)
+    : [];
 
   return (
     <DashboardCard

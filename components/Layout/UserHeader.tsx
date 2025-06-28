@@ -67,9 +67,9 @@ const Header: FC<HeaderProps> = ({
   };
 
   useEffect(() => {
-    router.events.on('routeChangeStart', closeDropdown);
+    router.events?.on('routeChangeStart', closeDropdown);
     return () => {
-      router.events.off('routeChangeStart', closeDropdown);
+      router.events?.off('routeChangeStart', closeDropdown);
     };
   }, []);
 
