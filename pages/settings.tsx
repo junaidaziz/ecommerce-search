@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import useRequireAuth from '@hooks/useRequireAuth';
@@ -12,9 +13,30 @@ import SettingsSidebar from '@components/Settings/SettingsSidebar';
 
 const SettingsPage: React.FC = () => {
   const user = useRequireAuth();
+  const router = useRouter();
   const [active, setActive] = useState<
     'profile' | 'password' | 'address' | 'email' | 'payments'
   >('profile');
+
+  useEffect(() => {
+    const tab = router.query.tab as string | undefined;
+    if (
+      tab === 'profile' ||
+      tab === 'password' ||
+      tab === 'address' ||
+      tab === 'email' ||
+      tab === 'payments'
+    ) {
+      setActive(tab);
+    }
+  }, [router.query.tab]);
+
+  const handleSelect = (tab: typeof active) => {
+    setActive(tab);
+    router.replace({ pathname: '/settings', query: { tab } }, undefined, {
+      shallow: true,
+    });
+  };
 
   if (!user) return null;
 
@@ -24,7 +46,7 @@ const SettingsPage: React.FC = () => {
         <Head>
           <title>{getPageTitle('Settings')}</title>
         </Head>
-        <SettingsSidebar active={active} onSelect={setActive} />
+        <SettingsSidebar active={active} onSelect={handleSelect} />
         <div className="flex-1">
           {active === 'profile' && <UpdateProfileSection />}
           {active === 'password' && <ChangePasswordSection />}

@@ -13,11 +13,17 @@ export default async function handler(
     return res.status(405).json({ message: 'Method Not Allowed' });
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user) return res.status(401).json({ message: 'Unauthorized' });
-  const { email, token } = req.body as { email?: string; token?: string };
-  if (!email || !token)
-    return res.status(400).json({ message: 'email and token required' });
+  const { email, oldToken, newToken } = req.body as {
+    email?: string;
+    oldToken?: string;
+    newToken?: string;
+  };
+  if (!email || !oldToken || !newToken)
+    return res
+      .status(400)
+      .json({ message: 'email, oldToken and newToken required' });
   try {
-    await changeEmail(session.user.email, token, email);
+    await changeEmail(session.user.email, oldToken, newToken, email);
     return res.status(200).json({ message: 'Email updated' });
   } catch (e) {
     return handleApiError(res, e, 'Error updating email');
