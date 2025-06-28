@@ -54,6 +54,12 @@ export interface ResetTokenResponse {
   token: string;
 }
 
+export interface EmailChangeTokensResponse {
+  message: string;
+  oldToken: string;
+  newToken: string;
+}
+
 type CouponResponse = import('./coupon').Coupon;
 
 export interface CategoriesResponse {

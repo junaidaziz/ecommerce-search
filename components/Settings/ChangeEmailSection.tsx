@@ -5,15 +5,16 @@ import { NotificationContext } from '@contexts/NotificationContext';
 
 interface EmailFormValues {
   email: string;
-  token: string;
+  oldToken: string;
+  newToken: string;
 }
 
 const ChangeEmailSection: React.FC = () => {
   const emailForm = useForm<EmailFormValues>();
-  const [codeSent, setCodeSent] = useState(false);
+  const [codesSent, setCodesSent] = useState(false);
   const { addNotification } = useContext(NotificationContext);
 
-  const sendCode = async () => {
+  const sendCodes = async () => {
     const email = emailForm.getValues('email');
     if (!email) return;
     const res = await fetch('/api/request-email-change', {
@@ -22,8 +23,8 @@ const ChangeEmailSection: React.FC = () => {
       body: JSON.stringify({ email }),
     });
     if (res.ok) {
-      setCodeSent(true);
-      addNotification('Verification code sent', 'success');
+      setCodesSent(true);
+      addNotification('Verification codes sent', 'success');
     } else {
       addNotification('Send failed', 'error');
     }
@@ -33,11 +34,15 @@ const ChangeEmailSection: React.FC = () => {
     const res = await fetch('/api/change-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values),
+      body: JSON.stringify({
+        email: values.email,
+        oldToken: values.oldToken,
+        newToken: values.newToken,
+      }),
     });
     if (res.ok) {
       addNotification('Email updated', 'success');
-      setCodeSent(false);
+      setCodesSent(false);
       emailForm.reset();
     } else {
       addNotification('Update failed', 'error');
@@ -45,7 +50,10 @@ const ChangeEmailSection: React.FC = () => {
   };
 
   return (
-    <form onSubmit={emailForm.handleSubmit(submitEmailChange)} className="space-y-2 max-w-md mx-auto">
+    <form
+      onSubmit={emailForm.handleSubmit(submitEmailChange)}
+      className="space-y-2 max-w-md mx-auto"
+    >
       <h2 className="text-xl font-bold mb-2">Change Email</h2>
       <EmailInput
         label="New Email"
@@ -57,18 +65,32 @@ const ChangeEmailSection: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-end gap-2">
         <div className="flex-1">
           <TextInput
-            label="Verification Code"
+            label="Code from Old Email"
             register={emailForm.register}
-            name="token"
-            error={emailForm.formState.errors.token?.message}
+            name="oldToken"
+            error={emailForm.formState.errors.oldToken?.message}
             wrapperClassName="mb-0"
           />
         </div>
-        <button type="button" className="btn w-full sm:w-auto" onClick={sendCode}>
-          Send Code
+        <button
+          type="button"
+          className="btn w-full sm:w-auto"
+          onClick={sendCodes}
+        >
+          Send Codes
         </button>
       </div>
-      <button type="submit" className="btn btn-primary w-full" disabled={!codeSent}>
+      <TextInput
+        label="Code from New Email"
+        register={emailForm.register}
+        name="newToken"
+        error={emailForm.formState.errors.newToken?.message}
+      />
+      <button
+        type="submit"
+        className="btn btn-primary w-full"
+        disabled={!codesSent}
+      >
         Confirm
       </button>
     </form>
