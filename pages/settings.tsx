@@ -309,6 +309,7 @@ const SettingsPage: React.FC = () => {
                 name="address"
                 rules={{ required: 'Required' }}
                 error={addressForm.formState.errors.address?.message}
+                wrapperClassName="md:col-span-2"
               />
               <TextInput
                 label="City"
