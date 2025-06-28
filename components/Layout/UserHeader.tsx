@@ -299,19 +299,19 @@ const Header: FC<HeaderProps> = ({
           <nav className="hidden lg:flex gap-6 ml-4">
             <Link
               href="/products"
-              className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname.startsWith('/products') ? 'text-primary underline font-semibold' : ''}`}
+              className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname.startsWith('/products') ? 'font-semibold text-primary border-primary' : ''}`}
             >
               Shop
             </Link>
             <Link
               href="/about"
-              className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname === '/about' ? 'text-primary underline font-semibold' : ''}`}
+              className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname === '/about' ? 'font-semibold text-primary border-primary' : ''}`}
             >
               About
             </Link>
             <Link
               href="/contact"
-              className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname === '/contact' ? 'text-primary underline font-semibold' : ''}`}
+              className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname === '/contact' ? 'font-semibold text-primary border-primary' : ''}`}
             >
               Contact
             </Link>
