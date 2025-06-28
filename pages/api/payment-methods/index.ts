@@ -6,6 +6,7 @@ import {
   addPaymentMethod,
   getPaymentMethodsForUser,
 } from '@lib/paymentMethods';
+import { findUser } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
 
 export default async function handler(
@@ -14,9 +15,14 @@ export default async function handler(
 ) {
   try {
     const session = await getServerSession(req, res, authOptions);
-    if (!session?.user?.id)
+    if (!session?.user)
       return res.status(401).json({ message: 'Unauthorized' });
-    const userId = Number(session.user.id);
+    let userId = session.user.brandId;
+    if (typeof userId !== 'number') {
+      const user = await findUser(session.user.email);
+      userId = user?.id;
+    }
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     if (req.method === 'GET') {
       const methods = await getPaymentMethodsForUser(userId);
       return res.status(200).json(methods);
