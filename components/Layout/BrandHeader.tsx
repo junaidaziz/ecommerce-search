@@ -61,19 +61,19 @@ const BrandHeader: FC<HeaderProps> = ({
             <>
               <Link
                 href="/brand/dashboard"
-                className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname === '/brand/dashboard' ? 'text-primary underline font-semibold' : ''}`}
+                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname === '/brand/dashboard' ? 'font-semibold text-primary border-primary' : ''}`}
               >
                 Dashboard
               </Link>
               <Link
                 href="/brand/orders"
-                className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname === '/brand/orders' ? 'text-primary underline font-semibold' : ''}`}
+                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname === '/brand/orders' ? 'font-semibold text-primary border-primary' : ''}`}
               >
                 Orders
               </Link>
               <Link
                 href="/brand/analytics"
-                className={`transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 ${pathname === '/brand/analytics' ? 'text-primary underline font-semibold' : ''}`}
+                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname === '/brand/analytics' ? 'font-semibold text-primary border-primary' : ''}`}
               >
                 Analytics
               </Link>

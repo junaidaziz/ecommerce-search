@@ -5,7 +5,11 @@ import { AppContext } from '@contexts/AppContext';
 
 let mockPathname = '/';
 jest.mock('next/router', () => ({
-  useRouter: () => ({ push: jest.fn(), pathname: mockPathname }),
+  useRouter: () => ({
+    push: jest.fn(),
+    pathname: mockPathname,
+    events: { on: jest.fn(), off: jest.fn() },
+  }),
 }));
 
 const mockUseSession = jest.fn();
