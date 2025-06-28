@@ -50,6 +50,7 @@ const SettingsPage: React.FC = () => {
     'profile' | 'password' | 'address' | 'email' | 'payments'
   >('profile');
   const [codeSent, setCodeSent] = useState(false);
+  const [savingAddress, setSavingAddress] = useState(false);
 
   const profileForm = useForm<ProfileFormValues>();
   const passwordForm = useForm<PasswordFormValues>();
@@ -119,6 +120,7 @@ const SettingsPage: React.FC = () => {
   };
 
   const submitAddress: SubmitHandler<AddressFormValues> = async (values) => {
+    setSavingAddress(true);
     const payload = {
       address: values.address,
       city: values.city,
@@ -131,6 +133,7 @@ const SettingsPage: React.FC = () => {
     });
     if (res.ok) addNotification('Address updated', 'success');
     else addNotification('Update failed', 'error');
+    setSavingAddress(false);
   };
 
   const sendCode = async () => {
@@ -291,32 +294,42 @@ const SettingsPage: React.FC = () => {
         {active === 'address' && (
           <form
             onSubmit={addressForm.handleSubmit(submitAddress)}
-            className="space-y-2 max-w-md mx-auto"
+            className="space-y-4 max-w-md mx-auto"
           >
             <h2 className="text-xl font-bold mb-2">Manage Address</h2>
-            <TextInput
-              label="Address"
-              register={addressForm.register}
-              name="address"
-              rules={{ required: 'Required' }}
-              error={addressForm.formState.errors.address?.message}
-            />
-            <TextInput
-              label="City"
-              register={addressForm.register}
-              name="city"
-              rules={{ required: 'Required' }}
-              error={addressForm.formState.errors.city?.message}
-            />
-            <CountrySelect
-              label="Country"
-              name="country"
-              control={addressForm.control}
-              rules={{ required: 'Required' }}
-              error={addressForm.formState.errors.country?.message as string}
-            />
-            <button type="submit" className="btn btn-primary w-full">
-              Save Address
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <TextInput
+                label="Address"
+                placeholder="123 Main St"
+                register={addressForm.register}
+                name="address"
+                rules={{ required: 'Required' }}
+                error={addressForm.formState.errors.address?.message}
+              />
+              <TextInput
+                label="City"
+                placeholder="New York"
+                register={addressForm.register}
+                name="city"
+                rules={{ required: 'Required' }}
+                error={addressForm.formState.errors.city?.message}
+              />
+              <div className="md:col-span-2">
+                <CountrySelect
+                  label="Country"
+                  name="country"
+                  control={addressForm.control}
+                  rules={{ required: 'Required' }}
+                  error={addressForm.formState.errors.country?.message as string}
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={savingAddress}
+            >
+              {savingAddress ? 'Saving...' : 'Save Address'}
             </button>
           </form>
         )}
