@@ -112,13 +112,15 @@ export function resetPassword(token: string, password: string) {
 
 export async function changeEmail(
   currentEmail: string,
-  token: string,
+  oldToken: string,
+  newToken: string,
   newEmail: string
 ) {
   const user = await prisma.user.findFirst({
     where: {
       email: currentEmail,
-      resetToken: token,
+      resetToken: oldToken,
+      verificationToken: newToken,
       resetExpires: { gt: new Date() },
     },
   });
@@ -127,7 +129,12 @@ export async function changeEmail(
   if (exists) throw new Error('Email exists');
   await prisma.user.update({
     where: { email: currentEmail },
-    data: { email: newEmail, resetToken: null, resetExpires: null },
+    data: {
+      email: newEmail,
+      resetToken: null,
+      resetExpires: null,
+      verificationToken: null,
+    },
   });
 }
 
@@ -142,11 +149,7 @@ export function findVendorByName(brandName: string) {
   });
 }
 
-export function getVendors(
-  search = '',
-  limit = 20,
-  offset = 0
-) {
+export function getVendors(search = '', limit = 20, offset = 0) {
   return prisma.user.findMany({
     where: {
       role: 'BRAND',
