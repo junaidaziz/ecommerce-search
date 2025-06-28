@@ -37,11 +37,13 @@ const Footer: FC = () => {
               alt="Logo"
               width={140}
               height={50}
-              className="mb-3 max-h-12 w-auto"
+              className="mb-3 max-h-12 h-auto w-auto"
               priority
             />
           </Link>
-          <p className="text-sm text-gray-600">Everything you need, all in one place.</p>
+          <p className="text-sm text-gray-600">
+            Everything you need, all in one place.
+          </p>
           <div className="mt-4 text-sm space-y-1">
             <p>123 Market Street, London</p>
             <p>
@@ -85,12 +87,17 @@ const Footer: FC = () => {
                 className="input input-bordered rounded-full join-item grow"
                 {...register('email', { required: 'Email is required' })}
               />
-              <button type="submit" className="btn btn-primary rounded-full join-item">
+              <button
+                type="submit"
+                className="btn btn-primary rounded-full join-item"
+              >
                 Subscribe
               </button>
             </div>
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </p>
             )}
           </form>
         </div>

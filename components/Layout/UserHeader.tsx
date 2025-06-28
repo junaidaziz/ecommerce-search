@@ -153,7 +153,7 @@ const Header: FC<HeaderProps> = ({
             alt="Logo"
             width={120}
             height={40}
-            className="max-h-10 w-auto"
+            className="max-h-10 h-auto w-auto"
             priority
           />
         </Link>

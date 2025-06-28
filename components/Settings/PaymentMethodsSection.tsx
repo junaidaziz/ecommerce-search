@@ -24,7 +24,13 @@ const PaymentMethodsSection: React.FC = () => {
 
   const loadMethods = () => {
     fetch('/api/payment-methods')
-      .then((res) => (res.ok ? res.json() : []))
+      .then((res) => {
+        if (res.status === 401) {
+          window.location.href = '/login';
+          return [] as PaymentMethod[];
+        }
+        return res.ok ? res.json() : [];
+      })
       .then((data) => setMethods(data))
       .catch(() => {});
   };
@@ -167,7 +173,11 @@ const PaymentMethodsSection: React.FC = () => {
           <input type="checkbox" name="default" className="checkbox" />
           Set as default
         </label>
-        <button type="submit" className="btn btn-primary w-full" disabled={!isCardValid}>
+        <button
+          type="submit"
+          className="btn btn-primary w-full"
+          disabled={!isCardValid}
+        >
           Add Card
         </button>
       </form>
