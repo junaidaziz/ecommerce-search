@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Cleave from 'cleave.js/react';
 import {
   FieldValues,
   Path,
@@ -10,11 +11,7 @@ import VisaIcon from '../icons/VisaIcon';
 import MastercardIcon from '../icons/MastercardIcon';
 import AmexIcon from '../icons/AmexIcon';
 import DiscoverIcon from '../icons/DiscoverIcon';
-import {
-  CardBrand,
-  detectCardBrand,
-  formatCardNumber,
-} from '@utils/cardUtils';
+import { CardBrand, detectCardBrand, getCardMaxLength } from '@utils/cardUtils';
 
 export interface CardNumberInputProps<T extends FieldValues>
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -32,7 +29,9 @@ export interface CardNumberInputProps<T extends FieldValues>
   onCardTypeChange?: (brand: CardBrand) => void;
 }
 
-type BrandMap = { [key in CardBrand]: React.FC<{ size?: number; className?: string }> };
+type BrandMap = {
+  [key in CardBrand]: React.FC<{ size?: number; className?: string }>;
+};
 
 const icons: BrandMap = {
   visa: VisaIcon,
@@ -42,7 +41,9 @@ const icons: BrandMap = {
   unknown: CreditCardIcon,
 };
 
-const CardNumberInput = <T extends FieldValues>(props: CardNumberInputProps<T>) => {
+const CardNumberInput = <T extends FieldValues>(
+  props: CardNumberInputProps<T>
+) => {
   const {
     label,
     name,
@@ -62,21 +63,29 @@ const CardNumberInput = <T extends FieldValues>(props: CardNumberInputProps<T>) 
   const registration = register ? register(name, rules) : {};
   const [value, setValue] = useState(valueProp || '');
   const [brand, setBrand] = useState<CardBrand>('unknown');
+  const cleaveRef = useRef<Cleave | null>(null);
 
   useEffect(() => {
-    setValue(valueProp || '');
-    setBrand(detectCardBrand(valueProp || ''));
+    const val = valueProp || '';
+    setValue(val);
+    setBrand(detectCardBrand(val));
+    cleaveRef.current?.setRawValue(val.replace(/\D/g, ''));
   }, [valueProp]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const digits = e.target.value.replace(/\D/g, '');
-    const formatted = formatCardNumber(digits);
-    setValue(formatted);
     const b = detectCardBrand(digits);
+    const max = getCardMaxLength(b);
+    let trimmed = digits.slice(0, max);
+    if (cleaveRef.current) {
+      cleaveRef.current.setRawValue(trimmed);
+      trimmed = cleaveRef.current.getFormattedValue();
+    }
+    setValue(trimmed);
     setBrand(b);
     onCardTypeChange?.(b);
     if (onChange) {
-      onChange({ ...e, target: { ...e.target, value: formatted } });
+      onChange({ ...e, target: { ...e.target, value: trimmed } });
     }
   };
 
@@ -93,8 +102,8 @@ const CardNumberInput = <T extends FieldValues>(props: CardNumberInputProps<T>) 
         </label>
       )}
       <div className="relative">
-        <input
-          type="text"
+        <Cleave
+          options={{ creditCard: true, creditCardStrictMode: true }}
           id={inputId}
           name={name}
           autoComplete="cc-number"
@@ -102,14 +111,26 @@ const CardNumberInput = <T extends FieldValues>(props: CardNumberInputProps<T>) 
           aria-label="Card number"
           placeholder="1234 5678 9012 3456"
           value={value}
-          onChange={handleChange}
-          onBlur={onBlur}
+          onChange={(e) => {
+            registration.onChange?.(e);
+            handleChange(e);
+          }}
+          onBlur={(e) => {
+            registration.onBlur?.(e);
+            onBlur?.(e);
+          }}
           disabled={disabled}
-          required={required}
           className={`input input-bordered w-full pr-10 ${
             error ? 'border-red-500' : ''
           } ${className}`}
-          {...registration}
+          htmlRef={(ref: any) => {
+            cleaveRef.current = ref;
+            if (typeof registration.ref === 'function') registration.ref(ref);
+            else if (registration.ref)
+              (
+                registration.ref as React.MutableRefObject<HTMLInputElement | null>
+              ).current = ref;
+          }}
           {...rest}
         />
         <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
