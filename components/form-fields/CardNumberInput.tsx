@@ -63,7 +63,7 @@ const CardNumberInput = <T extends FieldValues>(
   const registration = register ? register(name, rules) : {};
   const [value, setValue] = useState(valueProp || '');
   const [brand, setBrand] = useState<CardBrand>('unknown');
-  const cleaveRef = useRef<Cleave | null>(null);
+  const cleaveRef = useRef<any>(null);
 
   useEffect(() => {
     const val = valueProp || '';
@@ -124,12 +124,14 @@ const CardNumberInput = <T extends FieldValues>(
             error ? 'border-red-500' : ''
           } ${className}`}
           htmlRef={(ref: any) => {
-            cleaveRef.current = ref;
             if (typeof registration.ref === 'function') registration.ref(ref);
             else if (registration.ref)
               (
                 registration.ref as React.MutableRefObject<HTMLInputElement | null>
               ).current = ref;
+          }}
+          onInit={(cleave) => {
+            cleaveRef.current = cleave;
           }}
           {...rest}
         />
