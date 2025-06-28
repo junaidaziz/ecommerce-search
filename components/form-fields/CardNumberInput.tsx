@@ -69,23 +69,28 @@ const CardNumberInput = <T extends FieldValues>(
     const val = valueProp || '';
     setValue(val);
     setBrand(detectCardBrand(val));
-    cleaveRef.current?.setRawValue(val.replace(/\D/g, ''));
+    const digits = val.replace(/\D/g, '');
+    cleaveRef.current?.setRawValue?.(digits);
   }, [valueProp]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const digits = e.target.value.replace(/\D/g, '');
     const b = detectCardBrand(digits);
     const max = getCardMaxLength(b);
-    let trimmed = digits.slice(0, max);
-    if (cleaveRef.current) {
-      cleaveRef.current.setRawValue(trimmed);
-      trimmed = cleaveRef.current.getFormattedValue();
+    const raw = digits.slice(0, max);
+    const cleave = cleaveRef.current;
+    let formatted = raw;
+    if (cleave && typeof cleave.setRawValue === 'function') {
+      cleave.setRawValue(raw);
+      formatted = cleave.getFormattedValue();
+    } else {
+      formatted = raw.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
     }
-    setValue(trimmed);
+    setValue(formatted);
     setBrand(b);
     onCardTypeChange?.(b);
     if (onChange) {
-      onChange({ ...e, target: { ...e.target, value: trimmed } });
+      onChange({ ...e, target: { ...e.target, value: formatted } });
     }
   };
 
