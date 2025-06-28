@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import CardNumberInput from '@components/form-fields/CardNumberInput';
 
+let mockCleaveInstance: any = null;
+
 // Mock cleave.js to avoid relying on the real implementation in tests
 jest.mock('cleave.js/react', () => {
   const React = require('react');
@@ -10,13 +12,14 @@ jest.mock('cleave.js/react', () => {
     React.useEffect(() => {
       if (onInit) {
         const instance = {
-          setRawValue: (val: string) => {
+          setRawValue: jest.fn((val: string) => {
             if (inputRef.current) {
               inputRef.current.value = val.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
             }
-          },
-          getFormattedValue: () => inputRef.current?.value || '',
+          }),
+          getFormattedValue: jest.fn(() => inputRef.current?.value || ''),
         };
+        mockCleaveInstance = instance;
         onInit(instance);
       }
     }, [onInit]);
@@ -72,4 +75,18 @@ test('invokes onCardTypeChange with detected brand', async () => {
   );
   fireEvent.change(input, { target: { value: '4111111111111111' } });
   expect(handleBrand).toHaveBeenCalledWith('visa');
+});
+
+test('exposes cleave instance and setRawValue does not throw', async () => {
+  const input = await setup(<CardNumberInput name="card" />);
+  expect(mockCleaveInstance).toBeTruthy();
+  expect(() => mockCleaveInstance.setRawValue('4111111111111111')).not.toThrow();
+});
+
+test('does not crash if change occurs before cleave init', () => {
+  const { getByLabelText } = render(<CardNumberInput name="card" />);
+  const input = getByLabelText(/card number/i) as HTMLInputElement;
+  expect(() => {
+    fireEvent.change(input, { target: { value: '4111111111111111' } });
+  }).not.toThrow();
 });
