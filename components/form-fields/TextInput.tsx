@@ -22,6 +22,7 @@ export interface TextInputProps<T extends FieldValues>
   rightAddon?: React.ReactNode;
   register?: UseFormRegister<T>;
   rules?: RegisterOptions<T, Path<T>>;
+  wrapperClassName?: string;
 }
 
 const TextInput = <T extends FieldValues>(props: TextInputProps<T>) => {
@@ -40,13 +41,14 @@ const TextInput = <T extends FieldValues>(props: TextInputProps<T>) => {
     rightAddon,
     register,
     rules,
+    wrapperClassName = '',
     ...rest
   } = props;
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
 
   return (
-    <div className="mb-4 w-full">
+    <div className={`mb-4 w-full ${wrapperClassName}`}>
       {label && (
         <label
           htmlFor={inputId}
