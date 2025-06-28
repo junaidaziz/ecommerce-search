@@ -337,14 +337,21 @@ const SettingsPage: React.FC = () => {
               rules={{ required: 'Required' }}
               error={emailForm.formState.errors.email?.message}
             />
-            <div className="flex items-end gap-2">
-              <TextInput
-                label="Verification Code"
-                register={emailForm.register}
-                name="token"
-                error={emailForm.formState.errors.token?.message}
-              />
-              <button type="button" className="btn" onClick={sendCode}>
+            <div className="flex flex-col sm:flex-row sm:items-end gap-2">
+              <div className="flex-1">
+                <TextInput
+                  label="Verification Code"
+                  register={emailForm.register}
+                  name="token"
+                  error={emailForm.formState.errors.token?.message}
+                  wrapperClassName="mb-0"
+                />
+              </div>
+              <button
+                type="button"
+                className="btn w-full sm:w-auto"
+                onClick={sendCode}
+              >
                 Send Code
               </button>
             </div>
