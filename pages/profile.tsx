@@ -29,10 +29,19 @@ const Profile: React.FC = () => {
   }, [user]);
   if (!user) return null;
 
-  const display = (value: unknown): string =>
-    value !== null && value !== undefined && value !== ''
-      ? String(value)
-      : 'Not provided';
+  const renderValue = (value: unknown): JSX.Element | string =>
+    value !== null && value !== undefined && value !== '' ? (
+      <>{String(value)}</>
+    ) : (
+      <span className="text-gray-500">&mdash;</span>
+    );
+
+  const renderRow = (label: string, value: unknown) => (
+    <div>
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="font-medium">{renderValue(value)}</p>
+    </div>
+  );
 
   const lastUpdated = profile?.updatedAt
     ? `Updated ${dayjs(profile.updatedAt).fromNow()}`
@@ -113,9 +122,9 @@ const Profile: React.FC = () => {
           />
         </div>
         <div>
-          <p className="text-lg font-semibold">{display(fullName)}</p>
+          <p className="text-lg font-semibold">{renderValue(fullName)}</p>
           <p className="text-gray-600">
-            {display(profile?.email || user.email)}
+            {renderValue(profile?.email || user.email)}
           </p>
         </div>
       </div>
@@ -126,84 +135,66 @@ const Profile: React.FC = () => {
         </button>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
-        <div>
-          <p className="text-sm text-gray-500">Full Name</p>
-          <p className="font-medium">{display(fullName)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Email</p>
-          <p className="font-medium">{display(profile?.email || user.email)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Phone</p>
-          <p className="font-medium">{display(profile?.phoneNumber)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Address</p>
-          <p className="font-medium">{display(profile?.address)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">City</p>
-          <p className="font-medium">{display(profile?.city)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">State</p>
-          <p className="font-medium">{display((profile as Record<string, string> | undefined)?.state)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Postal Code</p>
-          <p className="font-medium">{display((profile as Record<string, string> | undefined)?.postalCode)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Country</p>
-          <p className="font-medium">{display(profile?.country)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Brand Name</p>
-          <p className="font-medium">{display(profile?.brandName)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Business Address</p>
-          <p className="font-medium">{display(profile?.businessAddress)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Website</p>
-          <p className="font-medium">{display(profile?.website)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Description</p>
-          <p className="font-medium">{display(profile?.businessDescription)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Tax ID</p>
-          <p className="font-medium">{display(profile?.taxId)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Role</p>
-          <p className="font-medium">{display(profile?.role)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Verified</p>
-          <p className="font-medium">
-            {profile ? (profile.verified ? 'Yes' : 'No') : 'Not provided'}
-          </p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Disabled</p>
-          <p className="font-medium">
-            {profile ? (profile.disabled ? 'Yes' : 'No') : 'Not provided'}
-          </p>
-        </div>
-        <div className="md:col-span-2">
-          <p className="text-sm text-gray-500">Last updated</p>
-          <p className="font-medium">{lastUpdated}</p>
-        </div>
-      </div>
-
       <Link href="/settings" className="btn btn-primary mt-4">
         Update Profile
       </Link>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <section className="space-y-2 bg-base-100 p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold border-b pb-2 mb-2">Contact Info</h2>
+          {renderRow('Email', profile?.email || user.email)}
+          {renderRow('Phone', profile?.phoneNumber)}
+        </section>
+        <section className="space-y-2 bg-base-100 p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold border-b pb-2 mb-2">Address Info</h2>
+          {renderRow('City', profile?.city)}
+          {renderRow('State', (profile as Record<string, string> | undefined)?.state)}
+          {renderRow('Country', profile?.country)}
+          {renderRow('Postal Code', (profile as Record<string, string> | undefined)?.postalCode)}
+        </section>
+        <section className="space-y-2 bg-base-100 p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold border-b pb-2 mb-2">Business Info</h2>
+          {renderRow('Brand Name', profile?.brandName)}
+          {renderRow('Website', profile?.website)}
+          {renderRow('Description', profile?.businessDescription)}
+          {renderRow('Business Address', profile?.businessAddress)}
+        </section>
+        <section className="space-y-2 bg-base-100 p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold border-b pb-2 mb-2">Account Info</h2>
+          {renderRow('Role', profile?.role)}
+          {renderRow('Tax ID', profile?.taxId)}
+          <div>
+            <p className="text-sm text-gray-500">Verified</p>
+            <p className="font-medium">
+              {profile ? (
+                profile.verified ? (
+                  <span className="badge badge-success">Verified</span>
+                ) : (
+                  <span className="badge">Not Verified</span>
+                )
+              ) : (
+                renderValue(null)
+              )}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Disabled</p>
+            <p className="font-medium">
+              {profile ? (
+                profile.disabled ? (
+                  <span className="badge badge-error">Disabled</span>
+                ) : (
+                  <span className="badge badge-success">Active</span>
+                )
+              ) : (
+                renderValue(null)
+              )}
+            </p>
+          </div>
+          {renderRow('Last updated', lastUpdated)}
+        </section>
+      </div>
+
     </div>
   );
 };
