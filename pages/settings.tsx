@@ -262,7 +262,8 @@ const SettingsPage: React.FC = () => {
                 register={profileForm.register}
                 name="firstName"
                 rules={{ required: 'Required' }}
-                error={profileForm.formState.errors.firstName?.message}
+                error={addressForm.formState.errors.address?.message}
+                wrapperClassName="md:col-span-2"
               />
               <TextInput
                 label="Last Name"
