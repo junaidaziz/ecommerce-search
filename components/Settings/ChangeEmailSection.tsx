@@ -54,7 +54,7 @@ const ChangeEmailSection: React.FC = () => {
         rules={{ required: 'Required' }}
         error={emailForm.formState.errors.email?.message}
       />
-      <div className="flex flex-col sm:flex-row sm:items-end gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
         <div className="flex-1">
           <TextInput
             label="Verification Code"
