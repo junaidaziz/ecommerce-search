@@ -4,7 +4,7 @@ export interface Vendor {
   /** Display name used for the brand */
   brandName: string | null;
   email: string;
-  phoneNumber?: string;
+  phoneNumber?: string | null;
   address?: string;
   city?: string;
   country?: string;

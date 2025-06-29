@@ -7,7 +7,7 @@ export interface User {
   firstName?: string;
   lastName?: string;
   role?: Role;
-  phoneNumber?: string;
+  phoneNumber?: string | null;
   address?: string;
   city?: string;
   country?: string;
@@ -38,7 +38,7 @@ export interface UserInput {
   lastName?: string;
   brandName?: string;
   gender?: string;
-  phoneNumber?: string;
+  phoneNumber?: string | null;
   address?: string;
   city?: string;
   country?: string;
