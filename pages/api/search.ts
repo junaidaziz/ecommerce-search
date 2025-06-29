@@ -4,7 +4,7 @@ import { getDb } from '@lib/db';
 import type { Product } from '@/types/product';
 import type { SearchApiResponse, ApiMessage } from '../../types';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from './auth/[...nextauth]';
+import { authOptions } from '@pages/api/auth/[...nextauth]';
 import client from '@lib/typesenseClient';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';

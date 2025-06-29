@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getWishlist, setWishlist } from '@lib/db';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from './auth/[...nextauth]';
+import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { handleApiError } from '@utils/handleApiError';
 import type { Product, ApiMessage } from '../../types';
 

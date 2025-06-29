@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { setResetToken, findUser, updateUserProfile } from '@lib/users';
 import crypto from 'crypto';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from './auth/[...nextauth]';
+import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { handleApiError } from '@utils/handleApiError';
 import type { EmailChangeTokensResponse, ApiMessage } from '../../types';
 

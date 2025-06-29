@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/[...nextauth]';
+import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { getNotificationsForUser, markNotificationsRead } from '@lib/notifications';
 import { findUser } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
