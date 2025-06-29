@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import bcrypt from 'bcryptjs';
-import { authOptions } from './auth/[...nextauth]';
+import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { findUser, updateUserProfile } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
 import type { ApiMessage } from '../../types';
