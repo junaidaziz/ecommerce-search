@@ -10,9 +10,31 @@ import client from './typesenseClient';
 import { getBestSellingProducts } from './orders';
 import { slugify } from './slugify';
 
-type ProductWithRelations = Prisma.ProductGetPayload<{
-  include: { category: true; vendor: true; variants: true };
-}>;
+/**
+ * Partial representation of a product record returned from Prisma including
+ * related category, vendor and variant records. Prisma's generated types are
+ * not available in this environment so we define the minimal shape locally.
+ */
+interface ProductWithRelations {
+  id: number | string;
+  uuid?: string | null;
+  slug?: string | null;
+  sku: string;
+  title: string;
+  description?: string | null;
+  productType?: string | null;
+  tags?: string | null;
+  quantity: number;
+  minPrice: number;
+  maxPrice: number;
+  currency: string;
+  discountType?: string | null;
+  discountValue?: number | null;
+  images: string | null;
+  vendor: (Vendor & { brandName: string | null; phoneNumber?: string | null | undefined });
+  category: Category;
+  variants: Variant[];
+}
 
 interface ProductRow {
   id: number | string;
@@ -20,7 +42,9 @@ interface ProductRow {
   slug?: string | null;
   sku: string;
   title: string;
-  vendor?: (Vendor & { brandName: string | null }) | null;
+  vendor?:
+    | (Vendor & { brandName: string | null; phoneNumber?: string | null | undefined })
+    | null;
   description?: string | null;
   productType?: string | null;
   tags?: string | null;
@@ -116,8 +140,8 @@ async function loadProductsData(): Promise<Product[]> {
       include: { category: true, vendor: true, variants: true },
     });
 
-    return rows.map((row) => mapDbRowToProduct(row));
-  } catch (error) {
+    return rows.map((row: ProductWithRelations) => mapDbRowToProduct(row));
+  } catch (error: unknown) {
     throw error;
   }
 }
@@ -160,15 +184,15 @@ export async function indexProductsToTypesense(
   products: Product[]
 ): Promise<void> {
   if (products.length === 0) return;
-  const documents = products.map((p) => ({
+  const documents = products.map((p: Product) => ({
     id: String(p.id),
     title: p.title,
     name: p.title,
-    slug: p.slug,
+    slug: p.slug ?? slugify(p.title),
     description: p.descriptionText || p.description || '',
     price: p.minPrice,
-    category: p.category.name.trim().toLowerCase(),
-    brand: p.vendor.brandName.trim(),
+    category: p.category?.name?.trim().toLowerCase() ?? '',
+    brand: (p.vendor.brandName ?? '').trim(),
     sold_count: p.soldCount,
   }));
 
@@ -181,7 +205,7 @@ export async function indexProductsToTypesense(
       ', '
     );
     console.log(`Indexed ${documents.length} products. Categories: ${cats}`);
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Failed to index products to Typesense', err);
   }
 }
@@ -228,7 +252,7 @@ export async function addProduct(product: ProductInput): Promise<void> {
     throw err;
   }
 
-  const data: Prisma.ProductCreateInput = {
+  const data = {
     uuid: product.uuid,
     slug: (product.slug ?? '').trim() || slugify(product.title || product.uuid),
     sku: product.sku,
@@ -319,7 +343,7 @@ export async function updateProduct(
       discountValue: product.discountValue,
       vendor: { connect: { id: vendor.id } },
       category: { connect: { id: category.id } },
-    } as Prisma.ProductUpdateInput,
+    },
   });
   if (existing && existing.quantity <= 0 && (product.quantity ?? 0) > 0) {
     try {
@@ -338,7 +362,7 @@ export async function getPendingProducts(): Promise<Product[]> {
     where: { status: 'pending' },
     include: { category: true, vendor: true, variants: true },
   });
-  return rows.map((row) => mapDbRowToProduct(row));
+  return rows.map((row: ProductWithRelations) => mapDbRowToProduct(row));
 }
 
 export async function getProductsByCategorySlug(
@@ -349,7 +373,7 @@ export async function getProductsByCategorySlug(
     where: { status: 'approved', category: { slug } },
     include: { category: true, vendor: true, variants: true },
   });
-  return rows.map((row) => mapDbRowToProduct(row));
+  return rows.map((row: ProductWithRelations) => mapDbRowToProduct(row));
 }
 
 export async function getProductsByCategorySlugPaginated(
@@ -365,7 +389,7 @@ export async function getProductsByCategorySlugPaginated(
     skip: offset,
     orderBy: { id: 'asc' },
   });
-  return rows.map((row) => mapDbRowToProduct(row));
+  return rows.map((row: ProductWithRelations) => mapDbRowToProduct(row));
 }
 
 export async function getApprovedProductsPaginated(
@@ -380,7 +404,7 @@ export async function getApprovedProductsPaginated(
     skip: offset,
     orderBy: { id: 'asc' },
   });
-  return rows.map((row) => mapDbRowToProduct(row));
+  return rows.map((row: ProductWithRelations) => mapDbRowToProduct(row));
 }
 
 export async function getProductsByVendorBrandName(
@@ -415,7 +439,7 @@ export async function getProductsPaginated(
   options: PaginatedOptions
 ): Promise<PaginatedResult> {
   const db = getDb();
-  const where: Prisma.ProductWhereInput = { status: 'approved' };
+  const where: Record<string, any> = { status: 'approved' };
   if (options.categorySlugs && options.categorySlugs.length > 0) {
     where.category = { slug: { in: options.categorySlugs } };
   }
@@ -438,7 +462,7 @@ export async function getProductsPaginated(
     const current = typeof where.minPrice === 'object' ? where.minPrice : {};
     where.minPrice = { ...current, lte: options.maxPrice };
   }
-  const orderBy: Prisma.Enumerable<Prisma.ProductOrderByWithRelationInput> =
+  const orderBy =
     (() => {
       switch (options.sort) {
         case 'price_asc':
@@ -472,7 +496,7 @@ export async function getProductsPaginated(
   rows = rows.slice(options.offset, options.offset + options.limit);
   return {
     total,
-    products: rows.map((row) => mapDbRowToProduct(row)),
+    products: rows.map((row: ProductWithRelations) => mapDbRowToProduct(row)),
   };
 }
 
@@ -569,7 +593,7 @@ export async function getDistinctTags(search = ''): Promise<string[]> {
     const tags =
       row.tags
         ?.split(',')
-        .map((t) => t.trim())
+        .map((t: string) => t.trim())
         .filter(Boolean) || [];
     for (const tag of tags) {
       if (!term || tag.toLowerCase().includes(term)) {
