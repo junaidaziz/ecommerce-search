@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import Cleave from 'cleave.js/react';
+import React, { useEffect, useState } from 'react';
+import { IMaskInput } from 'react-imask';
 import {
   FieldValues,
   Path,
@@ -63,62 +63,31 @@ const CardNumberInput = <T extends FieldValues>(
   const registration = register ? register(name, rules) : {};
   const [value, setValue] = useState(valueProp || '');
   const [brand, setBrand] = useState<CardBrand>('unknown');
-  const cleaveRef = useRef<any>(null);
-  const [cleaveReady, setCleaveReady] = useState(false);
-  const lastRawValueRef = useRef('');
-
-  const safeSetRawValue = (raw: string) => {
-    const cleave = cleaveRef.current;
-    if (
-      cleaveReady &&
-      cleave &&
-      typeof cleave.setRawValue === 'function' &&
-      lastRawValueRef.current !== raw
-    ) {
-      try {
-        cleave.setRawValue(raw);
-        lastRawValueRef.current = raw;
-      } catch (err) {
-        console.error('Cleave setRawValue failed', err);
-      }
-    }
-  };
 
   useEffect(() => {
     const val = valueProp || '';
     setValue(val);
     setBrand(detectCardBrand(val));
-    const digits = val.replace(/\D/g, '');
-    safeSetRawValue(digits);
   }, [valueProp]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAccept = (val: string, mask: any) => {
     try {
-      const digits = e.target.value.replace(/\D/g, '');
+      const digits = mask.unmaskedValue;
       const b = detectCardBrand(digits);
       const max = getCardMaxLength(b);
-      const raw = digits.slice(0, max);
-      const cleave = cleaveRef.current;
-      let formatted = raw;
-      if (cleave && typeof cleave.setRawValue === 'function') {
-        safeSetRawValue(raw);
-        try {
-          formatted = cleave.getFormattedValue();
-        } catch (err) {
-          console.error('Cleave getFormattedValue failed', err);
-          formatted = raw;
-        }
-      } else {
-        formatted = raw.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+      const trimmedDigits = digits.slice(0, max);
+      if (trimmedDigits !== digits) {
+        mask.unmaskedValue = trimmedDigits;
+        val = mask.value;
       }
-      setValue(formatted);
+      setValue(val);
       setBrand(b);
       onCardTypeChange?.(b);
-      if (onChange) {
-        onChange({ ...e, target: { ...e.target, value: formatted } });
-      }
+      const event = { target: { value: val, name } } as unknown as React.ChangeEvent<HTMLInputElement>;
+      registration.onChange?.(event);
+      onChange?.(event);
     } catch (err) {
-      console.error('CardNumberInput handleChange error', err);
+      console.error('CardNumberInput handleAccept error', err);
     }
   };
 
@@ -135,8 +104,8 @@ const CardNumberInput = <T extends FieldValues>(
         </label>
       )}
       <div className="relative">
-        <Cleave
-          options={{ creditCard: true, creditCardStrictMode: true }}
+        <IMaskInput
+          mask="0000 0000 0000 0000[ 000]"
           id={inputId}
           name={name}
           autoComplete="cc-number"
@@ -144,10 +113,7 @@ const CardNumberInput = <T extends FieldValues>(
           aria-label="Card number"
           placeholder="1234 5678 9012 3456"
           value={value}
-          onChange={(e) => {
-            registration.onChange?.(e);
-            handleChange(e);
-          }}
+          onAccept={handleAccept}
           onBlur={(e) => {
             registration.onBlur?.(e);
             onBlur?.(e);
@@ -156,16 +122,12 @@ const CardNumberInput = <T extends FieldValues>(
           className={`input input-bordered w-full pr-10 ${
             error ? 'border-red-500' : ''
           } ${className}`}
-          htmlRef={(ref: any) => {
+          inputRef={(ref: any) => {
             if (typeof registration.ref === 'function') registration.ref(ref);
             else if (registration.ref)
               (
                 registration.ref as React.MutableRefObject<HTMLInputElement | null>
               ).current = ref;
-          }}
-          onInit={(cleave) => {
-            cleaveRef.current = cleave;
-            setCleaveReady(true);
           }}
           {...rest}
         />
