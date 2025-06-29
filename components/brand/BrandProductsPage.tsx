@@ -1,18 +1,22 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { AppContext } from '@contexts/AppContext';
 import type { User } from '@/types/user';
 import type { Product } from '@/types/product';
 import { getPageTitle } from '@lib/pageTitle';
-import { StatusLabel } from '@components/UI';
+import ProductTable from './ProductTable';
+import ProductDetailsModal from './ProductDetailsModal';
 
 const BrandProductsPage: React.FC = () => {
+  const router = useRouter();
   const { user } = useContext(AppContext) as { user: User | null };
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [viewProduct, setViewProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -24,6 +28,25 @@ const BrandProductsPage: React.FC = () => {
       .catch(() => setError('Failed to load products'))
       .finally(() => setLoading(false));
   }, [user]);
+
+  const slug = router.query.slug as string | undefined;
+  useEffect(() => {
+    if (!slug) {
+      setViewProduct(null);
+      return;
+    }
+    const existing = products.find(
+      (p) => p.slug === slug || String(p.id) === slug || p.uuid === slug
+    );
+    if (existing) {
+      setViewProduct(existing);
+    } else {
+      fetch(`/api/products/${encodeURIComponent(slug)}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => setViewProduct(data as Product | null))
+        .catch(() => setViewProduct(null));
+    }
+  }, [slug, products]);
 
   if (!user) {
     return <div className="p-4">Please log in to manage products.</div>;
@@ -48,8 +71,17 @@ const BrandProductsPage: React.FC = () => {
     }
   };
 
-  const getCategory = (p: Product): string =>
-    typeof p.category === 'string' ? p.category : p.category?.name || p.productType;
+  const handleView = (p: Product) => {
+    setViewProduct(p);
+    router.push(`/brand/products/${p.slug ?? p.uuid ?? p.id}`, undefined, {
+      shallow: true,
+    });
+  };
+
+  const handleClose = () => {
+    setViewProduct(null);
+    router.push('/brand/products', undefined, { shallow: true });
+  };
 
   return (
     <div className="min-h-screen px-4 py-6 space-y-4">
@@ -76,67 +108,9 @@ const BrandProductsPage: React.FC = () => {
       ) : error ? (
         <div className="text-error py-4">{error}</div>
       ) : (
-        <div className="overflow-x-auto">
-          <div className="max-h-[80vh] overflow-y-auto">
-            <table className="table w-full">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th className="hidden sm:table-cell">Category</th>
-                  <th>Status</th>
-                  <th>Qty</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((p) => (
-                  <tr key={p.id}>
-                    <td className="whitespace-nowrap">{p.title}</td>
-                    <td className="hidden sm:table-cell">{getCategory(p)}</td>
-                    <td>
-                      <StatusLabel
-                        color={
-                          p.status === 'approved'
-                            ? 'success'
-                            : p.status === 'pending'
-                            ? 'warning'
-                            : 'error'
-                        }
-                        size="sm"
-                      >
-                        {p.status}
-                      </StatusLabel>
-                    </td>
-                    <td>{p.quantity ?? p.totalInventory ?? 0}</td>
-                    <td className="space-x-2 whitespace-nowrap">
-                      <Link href={`/products/${p.uuid || p.id}`} className="btn btn-xs sm:btn-sm">
-                        View
-                      </Link>
-                      <Link href={`/brand/products/new?edit=${p.uuid || p.id}`} className="btn btn-xs sm:btn-sm">
-                        Edit
-                      </Link>
-                      <button
-                        type="button"
-                        className="btn btn-xs sm:btn-sm btn-error"
-                        onClick={() => handleDelete(String(p.uuid || p.id))}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="text-center py-4">
-                      No products found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <ProductTable products={filtered} onView={handleView} onDelete={handleDelete} />
       )}
+      <ProductDetailsModal product={viewProduct} isOpen={!!viewProduct} onClose={handleClose} />
     </div>
   );
 };
