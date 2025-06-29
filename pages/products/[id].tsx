@@ -4,7 +4,9 @@ import { AppContext } from '@contexts/AppContext';
 import Link from 'next/link';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
-import ProductImageSlider from '@components/Product/ProductImageSlider';
+import ImageGallery from '@components/Product/ImageGallery';
+import { StatusLabel } from '@components/UI';
+import { formatCurrency } from '@utils/formatCurrency';
 import type { Product } from '../../types';
 import type {
   Review,
@@ -31,6 +33,11 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
 
   const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } =
     appContext ?? {};
+
+  const inventory =
+    product?.totalInventory !== undefined
+      ? product.totalInventory
+      : product?.quantity ?? 0;
 
   useEffect(() => {
     if (!id) return;
@@ -66,7 +73,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
   if (!product) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md">
+    <div className="p-4 max-w-screen-lg mx-auto bg-base-100 rounded-box shadow-md">
       <Head>
         <title>{getPageTitle(product?.title || 'Product')}</title>
         <meta
@@ -95,69 +102,80 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
           }}
         />
       </Head>
-      <h1 className="text-2xl font-bold mb-4">{product.title || 'Product'}</h1>
-      <div className="mb-4 w-full flex flex-col items-center">
-        <ProductImageSlider
-          className="w-full"
-          images={
-            product.images && product.images.length > 0
-              ? product.images
-              : product.featuredImage
-                ? [product.featuredImage]
-                : []
-          }
-          imgClass="hover:scale-110 transition"
-          aspectRatioClass="aspect-square md:aspect-[4/3]"
-        />
-      </div>
-      <p className="mb-2">Vendor: {product.vendor?.brandName ?? 'Unknown'}</p>
-      <p className="mb-2">Type: {product.productType || 'N/A'}</p>
-      <p className="mb-4">
-        {product.descriptionText ||
-          product.bodyHtmlText ||
-          'No description available.'}
-      </p>
-      <p className="text-lg font-bold mb-4">
-        {product.currency || ''}{' '}
-        {product.minPrice ? product.minPrice.toFixed(2) : 'N/A'}
-      </p>
-      <p className="mb-2 font-medium">
-        Stock:{' '}
-        {product.totalInventory && product.totalInventory > 10
-          ? 'In Stock'
-          : product.totalInventory && product.totalInventory > 0
-          ? 'Low Stock'
-          : 'Out of Stock'}
-      </p>
-      <p className="mb-2">
-        Rating: {averageRating.toFixed(1)} ({reviewCount})
-      </p>
-      <div className="flex gap-2">
-        <button
-          className="btn btn-primary"
-          onClick={() => addToCart?.(product)}
-          disabled={!addToCart}
-        >
-          Add to Cart
-        </button>
-        {(wishlist ?? []).some((w) => w.product.id === product.id) ? (
-          <button
-            className="btn"
-            onClick={() => removeFromWishlist?.(product.id)}
+      <div className="flex flex-col md:flex-row gap-8">
+        <div className="md:w-1/2">
+          <ImageGallery
+            className="w-full"
+            images={
+              product.images && product.images.length > 0
+                ? product.images
+                : product.featuredImage
+                  ? [product.featuredImage]
+                  : []
+            }
+          />
+        </div>
+        <div className="md:w-1/2 space-y-2">
+          <h1 className="text-2xl font-bold">{product.title || 'Product'}</h1>
+          <p>Vendor: {product.vendor?.brandName ?? 'Unknown'}</p>
+          <p>
+            {product.productType || 'N/A'}
+            {product.category
+              ? ` - ${
+                  typeof product.category === 'string'
+                    ? product.category
+                    : product.category.name
+                }`
+              : ''}
+          </p>
+          <p>
+            {product.descriptionText ||
+              product.bodyHtmlText ||
+              'No description available'}
+          </p>
+          <p className="text-lg font-bold">
+            {formatCurrency(product.minPrice ?? 0, product.currency)}
+          </p>
+          <StatusLabel
+            color={
+              inventory > 10 ? 'success' : inventory > 0 ? 'warning' : 'error'
+            }
           >
-            Remove Wishlist
-          </button>
-        ) : (
-          <button
-            className="btn"
-            onClick={() => addToWishlist?.(product)}
-            disabled={!addToWishlist}
-          >
-            Add Wishlist
-          </button>
-        )}
+            {inventory > 10
+              ? 'In Stock'
+              : inventory > 0
+                ? 'Low Stock'
+                : 'Out of Stock'}
+          </StatusLabel>
+          <p>Rating: {averageRating.toFixed(1)} ({reviewCount})</p>
+          <div className="flex gap-2">
+            <button
+              className="btn btn-primary"
+              onClick={() => addToCart?.(product)}
+              disabled={!addToCart}
+            >
+              Add to Cart
+            </button>
+            {(wishlist ?? []).some((w) => w.product.id === product.id) ? (
+              <button
+                className="btn"
+                onClick={() => removeFromWishlist?.(product.id)}
+              >
+                Remove Wishlist
+              </button>
+            ) : (
+              <button
+                className="btn"
+                onClick={() => addToWishlist?.(product)}
+                disabled={!addToWishlist}
+              >
+                Add Wishlist
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="mt-6 w-full">
+      <div className="mt-6 w-full bg-base-200 rounded-box p-4">
         <h3 className="font-semibold mb-2">Reviews</h3>
         {reviews.map((r, i) => (
           <div key={i} className="border-b py-2 text-sm">
