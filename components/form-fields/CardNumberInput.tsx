@@ -65,12 +65,19 @@ const CardNumberInput = <T extends FieldValues>(
   const [brand, setBrand] = useState<CardBrand>('unknown');
   const cleaveRef = useRef<any>(null);
   const [cleaveReady, setCleaveReady] = useState(false);
+  const lastRawValueRef = useRef('');
 
   const safeSetRawValue = (raw: string) => {
     const cleave = cleaveRef.current;
-    if (cleaveReady && cleave && typeof cleave.setRawValue === 'function') {
+    if (
+      cleaveReady &&
+      cleave &&
+      typeof cleave.setRawValue === 'function' &&
+      lastRawValueRef.current !== raw
+    ) {
       try {
         cleave.setRawValue(raw);
+        lastRawValueRef.current = raw;
       } catch (err) {
         console.error('Cleave setRawValue failed', err);
       }
