@@ -90,3 +90,12 @@ test('does not crash if change occurs before cleave init', () => {
     fireEvent.change(input, { target: { value: '4111111111111111' } });
   }).not.toThrow();
 });
+
+test('does not call setRawValue when value is unchanged', async () => {
+  const input = await setup(<CardNumberInput name="card" />);
+  mockCleaveInstance.setRawValue.mockClear();
+  fireEvent.change(input, { target: { value: '4111111111111111' } });
+  expect(mockCleaveInstance.setRawValue).toHaveBeenCalledTimes(1);
+  fireEvent.change(input, { target: { value: '4111 1111 1111 1111' } });
+  expect(mockCleaveInstance.setRawValue).toHaveBeenCalledTimes(1);
+});
