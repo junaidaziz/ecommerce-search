@@ -140,7 +140,7 @@ async function loadProductsData(): Promise<Product[]> {
       include: { category: true, vendor: true, variants: true },
     });
 
-    return rows.map((row: ProductWithRelations) => mapDbRowToProduct(row));
+    return rows.map(mapDbRowToProduct);
   } catch (error: unknown) {
     throw error;
   }
@@ -362,7 +362,7 @@ export async function getPendingProducts(): Promise<Product[]> {
     where: { status: 'pending' },
     include: { category: true, vendor: true, variants: true },
   });
-  return rows.map((row: ProductWithRelations) => mapDbRowToProduct(row));
+  return rows.map(mapDbRowToProduct);
 }
 
 export async function getProductsByCategorySlug(
@@ -373,7 +373,7 @@ export async function getProductsByCategorySlug(
     where: { status: 'approved', category: { slug } },
     include: { category: true, vendor: true, variants: true },
   });
-  return rows.map((row: ProductWithRelations) => mapDbRowToProduct(row));
+  return rows.map(mapDbRowToProduct);
 }
 
 export async function getProductsByCategorySlugPaginated(
@@ -389,7 +389,7 @@ export async function getProductsByCategorySlugPaginated(
     skip: offset,
     orderBy: { id: 'asc' },
   });
-  return rows.map((row: ProductWithRelations) => mapDbRowToProduct(row));
+  return rows.map(mapDbRowToProduct);
 }
 
 export async function getApprovedProductsPaginated(
@@ -404,7 +404,7 @@ export async function getApprovedProductsPaginated(
     skip: offset,
     orderBy: { id: 'asc' },
   });
-  return rows.map((row: ProductWithRelations) => mapDbRowToProduct(row));
+  return rows.map(mapDbRowToProduct);
 }
 
 export async function getProductsByVendorBrandName(
@@ -416,7 +416,7 @@ export async function getProductsByVendorBrandName(
     include: { category: true, vendor: true, variants: true },
     orderBy: { id: 'asc' },
   });
-  return rows.map((row) => mapDbRowToProduct(row));
+  return rows.map(mapDbRowToProduct);
 }
 
 export interface PaginatedOptions {
@@ -496,7 +496,7 @@ export async function getProductsPaginated(
   rows = rows.slice(options.offset, options.offset + options.limit);
   return {
     total,
-    products: rows.map((row: ProductWithRelations) => mapDbRowToProduct(row)),
+    products: rows.map(mapDbRowToProduct),
   };
 }
 
