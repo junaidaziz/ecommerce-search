@@ -31,7 +31,11 @@ interface ProductWithRelations {
   discountType?: string | null;
   discountValue?: number | null;
   images: string | null;
-  vendor: (Vendor & { brandName: string | null; phoneNumber?: string | null | undefined });
+  vendor: Vendor & {
+    brandName: string | null;
+    phoneNumber?: string | null | undefined;
+    address?: string | null;
+  };
   category: Category;
   variants: Variant[];
 }
@@ -43,7 +47,11 @@ interface ProductRow {
   sku: string;
   title: string;
   vendor?:
-    | (Vendor & { brandName: string | null; phoneNumber?: string | null | undefined })
+    | (Vendor & {
+        brandName: string | null;
+        phoneNumber?: string | null | undefined;
+        address?: string | null;
+      })
     | null;
   description?: string | null;
   productType?: string | null;
@@ -165,6 +173,7 @@ export function mapDbRowToProduct(row: ProductRow): Product {
           ...row.vendor,
           brandName: row.vendor.brandName ?? '',
           phoneNumber: row.vendor.phoneNumber ?? undefined,
+          address: row.vendor.address ?? null,
         }
       : null,
     category: row.category ?? null,
@@ -462,19 +471,18 @@ export async function getProductsPaginated(
     const current = typeof where.minPrice === 'object' ? where.minPrice : {};
     where.minPrice = { ...current, lte: options.maxPrice };
   }
-  const orderBy =
-    (() => {
-      switch (options.sort) {
-        case 'price_asc':
-          return { minPrice: 'asc' };
-        case 'price_desc':
-          return { minPrice: 'desc' };
-        case 'newest':
-          return { createdAt: 'desc' };
-        default:
-          return { id: 'asc' };
-      }
-    })();
+  const orderBy = (() => {
+    switch (options.sort) {
+      case 'price_asc':
+        return { minPrice: 'asc' };
+      case 'price_desc':
+        return { minPrice: 'desc' };
+      case 'newest':
+        return { createdAt: 'desc' };
+      default:
+        return { id: 'asc' };
+    }
+  })();
 
   if (options.sort === 'popularity') {
     const popular = await getBestSellingProducts(
