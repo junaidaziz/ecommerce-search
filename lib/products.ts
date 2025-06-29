@@ -137,7 +137,11 @@ export function mapDbRowToProduct(row: ProductRow): Product {
   return processProductRow({
     ...rest,
     vendor: row.vendor
-      ? { ...row.vendor, brandName: row.vendor.brandName ?? '' }
+      ? {
+          ...row.vendor,
+          brandName: row.vendor.brandName ?? '',
+          phoneNumber: row.vendor.phoneNumber ?? undefined,
+        }
       : null,
     category: row.category ?? null,
     images: parseImages(images),
