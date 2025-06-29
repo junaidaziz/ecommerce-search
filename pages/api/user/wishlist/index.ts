@@ -7,7 +7,7 @@ import {
 } from '@lib/wishlist';
 import { handleApiError } from '@utils/handleApiError';
 import type { WishlistItem, ApiMessage } from '../../../../types';
-import { authOptions } from '../../auth/[...nextauth]';
+import { authOptions } from '@pages/api/auth/[...nextauth]';
 
 export default async function handler(
   req: NextApiRequest,

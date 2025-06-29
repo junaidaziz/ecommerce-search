@@ -12,7 +12,7 @@ import { uploadFileToS3 } from '@lib/s3';
 import path from 'path';
 import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]';
+import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { getDb } from '@lib/db';
 
 export const config = {

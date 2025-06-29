@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]';
+import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { getOrderByUuid } from '@lib/orders';
 import { getProductByUuid, getCart, setCart } from '@lib/db';
 import { handleApiError } from '@utils/handleApiError';
