@@ -8,12 +8,14 @@ import type { Product } from '@/types/product';
 import { getPageTitle } from '@lib/pageTitle';
 import ProductTable from './ProductTable';
 import ProductDetailsModal from './ProductDetailsModal';
+import BrandProductSort, { BrandProductSortValue } from './BrandProductSort';
 
 const BrandProductsPage: React.FC = () => {
   const router = useRouter();
   const { user } = useContext(AppContext) as { user: User | null };
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<BrandProductSortValue>('title_asc');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [viewProduct, setViewProduct] = useState<Product | null>(null);
@@ -22,12 +24,12 @@ const BrandProductsPage: React.FC = () => {
     if (!user) return;
     setLoading(true);
     setError('');
-    fetch('/api/brand/products', { credentials: 'include' })
+    fetch(`/api/brand/products?sort=${sort}`, { credentials: 'include' })
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
       .then((data: { products: Product[]; total: number }) => setProducts(data.products))
       .catch(() => setError('Failed to load products'))
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [user, sort]);
 
   const slug = router.query.slug as string | undefined;
   useEffect(() => {
@@ -94,13 +96,16 @@ const BrandProductsPage: React.FC = () => {
           Add New Product
         </Link>
       </div>
-      <input
-        type="text"
-        className="input input-bordered w-full sm:w-80"
-        placeholder="Search products"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+        <input
+          type="text"
+          className="input input-bordered w-full sm:w-80"
+          placeholder="Search products"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <BrandProductSort value={sort} onChange={setSort} />
+      </div>
       {loading ? (
         <div className="flex justify-center my-4">
           <span className="loading loading-spinner"></span>
