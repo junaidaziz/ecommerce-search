@@ -9,6 +9,7 @@ import {
   Checkbox,
   TagInput,
 } from '../form-fields';
+import { VendorsResponse } from '../../types'
 
 import { AppContext } from '@contexts/AppContext';
 import type { ProductFormValues } from '../../types';
@@ -63,9 +64,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
       productType: initial?.productType || '',
       tags: initial?.tags
         ? initial.tags
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean)
         : [],
       categoryId: initial?.categoryId ? String(initial.categoryId) : '',
       quantity: initial?.quantity ?? 0,
@@ -116,10 +114,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const params = new URLSearchParams({ search: inputValue, limit: '20' });
     const res = await fetch(`/api/vendors?${params.toString()}`);
     if (!res.ok) return [];
-    const data: import('../../types').VendorsResponse = await res.json();
+    const data: VendorsResponse = await res.json();
     return (data.vendors || []).map((v) => ({
-      label: v.brandName,
-      value: v.brandName,
+      label: v.brandName ?? '',
+      value: v.brandName ?? '',
     }));
   };
 
@@ -365,10 +363,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
             register={register}
             rules={{
               required: 'Required',
-              validate: (v) =>
-                watch('discountType') === 'percentage'
-                  ? v > 0 && v < 100 || '1-99'
-                  : v < watch('minPrice') || 'Must be < price',
+              validate: (v) => {
+                const num = typeof v === 'number' ? v : Number(v);
+                if (watch('discountType') === 'percentage') {
+                  if (isNaN(num) || num <= 0 || num >= 100) return '1-99';
+                  return true;
+                } else {
+                  if (isNaN(num) || num >= watch('minPrice')) return 'Must be < price';
+                  return true;
+                }
+              },
             }}
             error={errors.discountValue?.message}
           />
@@ -384,7 +388,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       <div>
         <FileUpload<ProductFormValues>
           label="Images"
-          name="images"
+          name="title"
           multiple
           accept="image/*"
           onChange={handleImagesChange}
