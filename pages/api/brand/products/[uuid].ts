@@ -157,7 +157,7 @@ export default async function handler(
       if (!existing) return res.status(404).json({ message: 'Not found' });
       if (existing.quantity > 0 || (await hasOrdersForProduct(String(uuid)))) {
         return res
-          .status(400)
+          .status(409)
           .json({ message: 'cannot delete product with stock or orders' });
       }
       await deleteProduct(String(uuid));
