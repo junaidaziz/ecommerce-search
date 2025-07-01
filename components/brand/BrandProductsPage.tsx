@@ -105,6 +105,8 @@ const BrandProductsPage: React.FC = () => {
         prev.filter((p) => String(p.uuid || p.id) !== deleteId)
       );
       addNotification('Product deleted', 'success');
+    } else if (res.status === 409) {
+      addNotification('Cannot delete product with stock or orders', 'error');
     } else {
       addNotification('Failed to delete product', 'error');
     }
