@@ -8,17 +8,22 @@ import type { Product } from '@/types/product';
 import { getPageTitle } from '@lib/pageTitle';
 import ProductTable from './ProductTable';
 import ProductDetailsModal from './ProductDetailsModal';
+import { NotificationContext } from '@contexts/NotificationContext';
+import { ConfirmModal } from '@components/UI';
 import BrandProductSort, { BrandProductSortValue } from './BrandProductSort';
 
 const BrandProductsPage: React.FC = () => {
   const router = useRouter();
   const { user } = useContext(AppContext) as { user: User | null };
+  const { addNotification } = useContext(NotificationContext);
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<BrandProductSortValue>('title_asc');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [viewProduct, setViewProduct] = useState<Product | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -26,7 +31,9 @@ const BrandProductsPage: React.FC = () => {
     setError('');
     fetch(`/api/brand/products?sort=${sort}`, { credentials: 'include' })
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((data: { products: Product[]; total: number }) => setProducts(data.products))
+      .then((data: { products: Product[]; total: number }) =>
+        setProducts(data.products)
+      )
       .catch(() => setError('Failed to load products'))
       .finally(() => setLoading(false));
   }, [user, sort]);
@@ -59,18 +66,36 @@ const BrandProductsPage: React.FC = () => {
 
   const filtered = products.filter((p) => {
     const term = search.toLowerCase();
-    return p.title?.toLowerCase().includes(term) || p.sku?.toLowerCase().includes(term);
+    return (
+      p.title?.toLowerCase().includes(term) ||
+      p.sku?.toLowerCase().includes(term)
+    );
   });
 
-  const handleDelete = async (id: string): Promise<void> => {
-    if (!confirm('Delete this product?')) return;
-    const res = await fetch(`/api/brand/products/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
+  const handleDelete = (id: string): void => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async (): Promise<void> => {
+    if (!deleteId) return;
+    setDeleting(true);
+    const res = await fetch(
+      `/api/brand/products/${encodeURIComponent(deleteId)}`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+      }
+    );
     if (res.ok) {
-      setProducts((prev) => prev.filter((p) => String(p.uuid || p.id) !== id));
+      setProducts((prev) =>
+        prev.filter((p) => String(p.uuid || p.id) !== deleteId)
+      );
+      addNotification('Product deleted', 'success');
+    } else {
+      addNotification('Failed to delete product', 'error');
     }
+    setDeleting(false);
+    setDeleteId(null);
   };
 
   const handleView = (p: Product) => {
@@ -113,9 +138,27 @@ const BrandProductsPage: React.FC = () => {
       ) : error ? (
         <div className="text-error py-4">{error}</div>
       ) : (
-        <ProductTable products={filtered} onView={handleView} onDelete={handleDelete} />
+        <ProductTable
+          products={filtered}
+          onView={handleView}
+          onDelete={handleDelete}
+        />
       )}
-      <ProductDetailsModal product={viewProduct} isOpen={!!viewProduct} onClose={handleClose} />
+      <ProductDetailsModal
+        product={viewProduct}
+        isOpen={!!viewProduct}
+        onClose={handleClose}
+      />
+      <ConfirmModal
+        isOpen={!!deleteId}
+        title="Delete Product?"
+        description="Are you sure you want to delete this product? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteId(null)}
+      />
     </div>
   );
 };
