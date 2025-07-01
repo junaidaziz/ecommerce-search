@@ -80,15 +80,37 @@ async function handler(
         return res.status(400).json({ message: 'Invalid session data' });
       }
 
+      const search = String((req.query.search as string) || '');
+      const category = String((req.query.category as string) || '');
+      const minQty = String((req.query.minQty as string) || '');
+      const maxQty = String((req.query.maxQty as string) || '');
+
+      const where: any = { vendorId };
+      if (search) {
+        where.OR = [
+          { title: { contains: search, mode: 'insensitive' } },
+          { sku: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+      if (category) {
+        where.category = { slug: category };
+      }
+      const qtyFilter: any = {};
+      if (minQty) qtyFilter.gte = parseInt(minQty, 10);
+      if (maxQty) qtyFilter.lte = parseInt(maxQty, 10);
+      if (Object.keys(qtyFilter).length) {
+        where.quantity = qtyFilter;
+      }
+
       const [rows, total] = await Promise.all([
         db.product.findMany({
-          where: { vendorId },
+          where,
           include: { category: true, vendor: true },
           orderBy,
           take: limit,
           skip,
         }),
-        db.product.count({ where: { vendorId } }),
+        db.product.count({ where }),
       ]);
 
       const products = rows.map((row: any) => mapDbRowToProduct(row));
