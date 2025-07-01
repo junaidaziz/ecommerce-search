@@ -5,13 +5,33 @@ import type { Product } from '@/types/product';
 
 interface ProductTableProps {
   products: Product[];
+  categories: { name: string; slug: string }[];
+  category: string;
+  onCategoryChange: (value: string) => void;
+  minQty: string;
+  maxQty: string;
+  onMinQtyChange: (value: string) => void;
+  onMaxQtyChange: (value: string) => void;
   onView: (product: Product) => void;
   onDelete: (id: string) => void;
 }
 
-const ProductTable: React.FC<ProductTableProps> = ({ products, onView, onDelete }) => {
+const ProductTable: React.FC<ProductTableProps> = ({
+  products,
+  categories,
+  category,
+  onCategoryChange,
+  minQty,
+  maxQty,
+  onMinQtyChange,
+  onMaxQtyChange,
+  onView,
+  onDelete,
+}) => {
   const getCategory = (p: Product): string =>
-    typeof p.category === 'string' ? p.category : p.category?.name || p.productType;
+    typeof p.category === 'string'
+      ? p.category
+      : p.category?.name || p.productType;
 
   return (
     <div className="overflow-x-auto">
@@ -25,10 +45,51 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onView, onDelete 
               <th>Qty</th>
               <th></th>
             </tr>
+            <tr>
+              <th></th>
+              <th className="hidden sm:table-cell">
+                <select
+                  className="select select-xs select-bordered w-full"
+                  value={category}
+                  onChange={(e) => onCategoryChange(e.target.value)}
+                >
+                  <option value="">All</option>
+                  {categories.map((c) => (
+                    <option key={c.slug} value={c.slug}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </th>
+              <th></th>
+              <th>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    className="input input-xs w-20"
+                    value={minQty}
+                    onChange={(e) => onMinQtyChange(e.target.value)}
+                  />
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    className="input input-xs w-20"
+                    value={maxQty}
+                    onChange={(e) => onMaxQtyChange(e.target.value)}
+                  />
+                </div>
+              </th>
+              <th></th>
+            </tr>
           </thead>
           <tbody>
             {products.map((p) => (
-              <tr key={p.id} className="cursor-pointer" onClick={() => onView(p)}>
+              <tr
+                key={p.id}
+                className="cursor-pointer"
+                onClick={() => onView(p)}
+              >
                 <td className="whitespace-nowrap">{p.title}</td>
                 <td className="hidden sm:table-cell">{getCategory(p)}</td>
                 <td>
@@ -37,8 +98,8 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onView, onDelete 
                       p.status === 'approved'
                         ? 'success'
                         : p.status === 'pending'
-                        ? 'warning'
-                        : 'error'
+                          ? 'warning'
+                          : 'error'
                     }
                     size="sm"
                   >
@@ -46,7 +107,10 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onView, onDelete 
                   </StatusLabel>
                 </td>
                 <td>{p.quantity ?? p.totalInventory ?? 0}</td>
-                <td className="space-x-2 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                <td
+                  className="space-x-2 whitespace-nowrap"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <button
                     type="button"
                     className="btn btn-xs sm:btn-sm"
@@ -54,7 +118,10 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onView, onDelete 
                   >
                     View
                   </button>
-                  <Link href={`/brand/products/new?edit=${p.uuid || p.id}`} className="btn btn-xs sm:btn-sm">
+                  <Link
+                    href={`/brand/products/new?edit=${p.uuid || p.id}`}
+                    className="btn btn-xs sm:btn-sm"
+                  >
                     Edit
                   </Link>
                   <button
