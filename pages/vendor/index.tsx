@@ -7,6 +7,8 @@ import {
   FormEvent,
 } from 'react';
 import { AppContext } from '@contexts/AppContext';
+import { NotificationContext } from '@contexts/NotificationContext';
+import { ConfirmModal } from '@components/UI';
 import type { Product } from '../../types';
 import { TextInput } from '@components/form-fields';
 import Head from 'next/head';
@@ -14,6 +16,7 @@ import { getPageTitle } from '@lib/pageTitle';
 
 export default function VendorDashboard() {
   const { user } = useContext(AppContext)!;
+  const { addNotification } = useContext(NotificationContext);
   interface FormState {
     id: string;
     title: string;
@@ -53,6 +56,8 @@ export default function VendorDashboard() {
     id?: number;
   }
   const [variants, setVariants] = useState<VariantForm[]>([]);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchProducts = useCallback(async (): Promise<void> => {
     if (!user) return;
@@ -88,7 +93,10 @@ export default function VendorDashboard() {
     setVariants((prev) => {
       const next = [...prev];
       // @ts-ignore
-      next[index][field] = field === 'quantity' || field === 'priceModifier' ? Number(value) : value;
+      next[index][field] =
+        field === 'quantity' || field === 'priceModifier'
+          ? Number(value)
+          : value;
       return next;
     });
   };
@@ -163,15 +171,25 @@ export default function VendorDashboard() {
     setVariants([]);
   };
 
-  const handleDelete = async (id: string): Promise<void> => {
-    if (!confirm('Delete this product?')) return;
+  const handleDelete = (id: string): void => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async (): Promise<void> => {
+    if (!deleteId) return;
+    setDeleting(true);
     const res = await fetch(
-      `/api/admin/products?id=${encodeURIComponent(id)}`,
+      `/api/admin/products?id=${encodeURIComponent(deleteId)}`,
       { method: 'DELETE' }
     );
     if (res.ok) {
       fetchProducts();
+      addNotification('Product deleted', 'success');
+    } else {
+      addNotification('Failed to delete product', 'error');
     }
+    setDeleting(false);
+    setDeleteId(null);
   };
 
   if (!user) {
@@ -244,7 +262,9 @@ export default function VendorDashboard() {
                 className="input input-sm input-bordered w-24"
                 placeholder="Price +"
                 value={v.priceModifier}
-                onChange={(e) => updateVariant(idx, 'priceModifier', e.target.value)}
+                onChange={(e) =>
+                  updateVariant(idx, 'priceModifier', e.target.value)
+                }
               />
               <button
                 type="button"
@@ -296,6 +316,16 @@ export default function VendorDashboard() {
           </li>
         ))}
       </ul>
+      <ConfirmModal
+        isOpen={!!deleteId}
+        title="Delete Product?"
+        description="Are you sure you want to delete this product? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteId(null)}
+      />
     </div>
   );
 }
