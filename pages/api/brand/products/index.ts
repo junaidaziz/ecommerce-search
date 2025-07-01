@@ -56,6 +56,24 @@ async function handler(
       const limit = parseInt(String((req.query.limit as string) || '20'), 10);
       const skip = (page - 1) * limit;
 
+      const sortParam = String((req.query.sort as string) || 'title_asc');
+      const orderBy = (() => {
+        switch (sortParam) {
+          case 'title_desc':
+            return { title: 'desc' } as const;
+          case 'category_asc':
+            return { category: { name: 'asc' } } as const;
+          case 'category_desc':
+            return { category: { name: 'desc' } } as const;
+          case 'quantity_desc':
+            return { quantity: 'desc' } as const;
+          case 'quantity_asc':
+            return { quantity: 'asc' } as const;
+          default:
+            return { title: 'asc' } as const;
+        }
+      })();
+
       const vendorId = (session.user as { brandId?: number }).brandId;
       if (!vendorId) {
         console.warn('Missing brandId for brand user', session.user);
@@ -66,7 +84,7 @@ async function handler(
         db.product.findMany({
           where: { vendorId },
           include: { category: true, vendor: true },
-          orderBy: { id: 'asc' },
+          orderBy,
           take: limit,
           skip,
         }),
