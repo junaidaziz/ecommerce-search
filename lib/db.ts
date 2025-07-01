@@ -9,7 +9,10 @@ const reviewsStore = new Map<string, Review[]>();
 export const getDb = () => prisma;
 
 export async function getProductByUuid(uuid: string) {
-  return prisma.product.findUnique({ where: { uuid }, include: { variants: true } });
+  return prisma.product.findUnique({
+    where: { uuid },
+    include: { variants: true, vendor: true, category: true },
+  });
 }
 
 export async function getProductBySlug(slug: string) {
