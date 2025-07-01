@@ -7,7 +7,6 @@ import {
   RegisterOptions,
 } from 'react-hook-form';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import type { MultiValueGenericProps } from 'react-select';
 
 export interface TagInputProps<T extends FieldValues> {
   name: Path<T>;
@@ -38,37 +37,6 @@ const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
     return (data.tags || []).map((t: string) => ({ label: t, value: t }));
   };
 
-  const customComponents = {
-    MultiValueContainer: (
-      props: MultiValueGenericProps<{ label: string; value: string }, true>
-    ) => {
-      if (!props.removeProps) {
-        // eslint-disable-next-line no-console
-        console.error('TagInput: removeProps not provided');
-      }
-      const handleClick = props.removeProps?.onClick;
-      const handleMouseDown = props.removeProps?.onMouseDown;
-      return (
-        <span className="badge badge-outline gap-1 mr-1">
-          {props.data.label}
-          <button
-            type="button"
-            className="ml-1"
-            onClick={handleClick}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleMouseDown?.(e);
-            }}
-            aria-label="Remove tag"
-          >
-            ✕
-          </button>
-        </span>
-      );
-    },
-    MultiValueLabel: () => null,
-    MultiValueRemove: () => null,
-  };
 
   return (
     <Controller
@@ -77,12 +45,36 @@ const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
       rules={rules}
       render={({ field }) => {
         const tags: string[] = field.value || [];
+        const removeTag = (tag: string) => {
+          field.onChange(tags.filter((t) => t !== tag));
+        };
         return (
           <div className="mb-4 w-full">
             {label && (
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {label}
               </label>
+            )}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2 max-h-24 overflow-y-auto">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="flex items-center gap-1 bg-gray-100 rounded-full px-3 py-1 text-sm"
+                    title={tag}
+                  >
+                    <span className="truncate max-w-[10rem]">{tag}</span>
+                    <button
+                      type="button"
+                      className="ml-1"
+                      onClick={() => removeTag(tag)}
+                      aria-label="Remove tag"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+              </div>
             )}
             <AsyncCreatableSelect
               isMulti
@@ -105,7 +97,7 @@ const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
               isDisabled={disabled}
               className="w-full"
               classNamePrefix="react-select"
-              components={customComponents}
+              components={{ MultiValue: () => null }}
             />
             {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
           </div>
