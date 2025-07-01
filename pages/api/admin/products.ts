@@ -198,7 +198,7 @@ async function handler(
       }
       if (existing.quantity > 0 || (await hasOrdersForProduct(String(uuid)))) {
         res
-          .status(400)
+          .status(409)
           .json({ message: 'cannot delete product with stock or orders' });
         return;
       }
