@@ -9,6 +9,7 @@ import { Prisma } from '@prisma/client';
 import client from './typesenseClient';
 import { getBestSellingProducts } from './orders';
 import { slugify } from './slugify';
+import { ensureTypesenseProductCollection } from './initTypesense';
 
 /**
  * Partial representation of a product record returned from Prisma including
@@ -193,6 +194,7 @@ export async function indexProductsToTypesense(
   products: Product[]
 ): Promise<void> {
   if (products.length === 0) return;
+  await ensureTypesenseProductCollection();
   const documents = products.map((p: Product) => ({
     id: String(p.id),
     title: p.title,
