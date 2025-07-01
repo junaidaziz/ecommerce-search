@@ -27,7 +27,6 @@ const Header: FC<HeaderProps> = ({
       <BrandHeader
         theme={theme}
         setTheme={setTheme}
-        maxWidthClass={maxWidthClass}
       />
     );
   }

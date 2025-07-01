@@ -5,6 +5,8 @@ interface GenericModalProps {
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
+  /** Optional actions to render in a footer */
+  actions?: React.ReactNode;
 }
 
 const GenericModal: React.FC<GenericModalProps> = ({
@@ -12,6 +14,7 @@ const GenericModal: React.FC<GenericModalProps> = ({
   onClose,
   title,
   children,
+  actions,
 }) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   if (!isOpen) return null;
@@ -24,7 +27,7 @@ const GenericModal: React.FC<GenericModalProps> = ({
         if (e.target === dialogRef.current) onClose();
       }}
     >
-      <div className="modal-box">
+      <div className="modal-box max-h-[90vh] flex flex-col">
         <div className="flex justify-between items-center mb-2">
           {title && <h2 className="font-semibold text-lg">{title}</h2>}
           <button
@@ -35,7 +38,8 @@ const GenericModal: React.FC<GenericModalProps> = ({
             ✕
           </button>
         </div>
-        {children}
+        <div className="overflow-y-auto flex-1">{children}</div>
+        {actions && <div className="mt-4">{actions}</div>}
       </div>
     </dialog>
   );
