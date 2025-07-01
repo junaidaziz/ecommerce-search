@@ -14,13 +14,11 @@ import type { User } from '@/types/user';
 interface HeaderProps {
   theme?: string;
   setTheme?: React.Dispatch<React.SetStateAction<string>>;
-  maxWidthClass?: string;
 }
 
 const BrandHeader: FC<HeaderProps> = ({
   theme = 'light',
   setTheme,
-  maxWidthClass,
 }) => {
   const router = useRouter();
   const { data: session } = useSession();
@@ -37,11 +35,9 @@ const BrandHeader: FC<HeaderProps> = ({
   const logout = () => signOut({ callbackUrl: '/', redirect: true });
 
   return (
-    <header className="relative bg-base-300 mb-6 py-4">
+    <header className="relative bg-base-300 mb-6 py-4 shadow-md border-b border-base-200">
       <div
-        className={`w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2 mx-auto ${
-          maxWidthClass ?? 'max-w-[95%] 2xl:max-w-[1440px]'
-        }`}
+        className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2"
       >
         <Link
           href="/"
