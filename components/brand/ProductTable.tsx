@@ -15,7 +15,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onView, onDelete 
 
   return (
     <div className="overflow-x-auto">
-      <div className="max-h-[80vh] overflow-y-auto">
+      <div className="max-h-[70vh] overflow-y-auto">
         <table className="table w-full">
           <thead>
             <tr>
