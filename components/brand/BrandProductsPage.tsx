@@ -5,13 +5,12 @@ import { useRouter } from 'next/router';
 import { AppContext } from '@contexts/AppContext';
 import type { User } from '@/types/user';
 import type { Product } from '@/types/product';
-import type { Category } from '@/types/category';
 import { getPageTitle } from '@lib/pageTitle';
 import ProductTable from './ProductTable';
 import ProductDetailsModal from './ProductDetailsModal';
 import { NotificationContext } from '@contexts/NotificationContext';
 import { ConfirmModal } from '@components/UI';
-import BrandProductSort, { BrandProductSortValue } from './BrandProductSort';
+import type { BrandProductSortValue } from './BrandProductSort';
 
 const BrandProductsPage: React.FC = () => {
   const router = useRouter();
@@ -19,10 +18,6 @@ const BrandProductsPage: React.FC = () => {
   const { addNotification } = useContext(NotificationContext);
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [minQty, setMinQty] = useState('');
-  const [maxQty, setMaxQty] = useState('');
   const [sort, setSort] = useState<BrandProductSortValue>('title_asc');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -37,9 +32,6 @@ const BrandProductsPage: React.FC = () => {
     const params = new URLSearchParams();
     params.set('sort', sort);
     if (search) params.set('search', search);
-    if (categoryFilter) params.set('category', categoryFilter);
-    if (minQty) params.set('minQty', minQty);
-    if (maxQty) params.set('maxQty', maxQty);
     fetch(`/api/brand/products?${params.toString()}`, {
       credentials: 'include',
     })
@@ -49,16 +41,7 @@ const BrandProductsPage: React.FC = () => {
       )
       .catch(() => setError('Failed to load products'))
       .finally(() => setLoading(false));
-  }, [user, sort, search, categoryFilter, minQty, maxQty]);
-
-  useEffect(() => {
-    fetch('/api/categories?limit=250')
-      .then((res) => (res.ok ? res.json() : { categories: [] }))
-      .then((data: { categories: Category[] }) =>
-        setCategories(data.categories)
-      )
-      .catch(() => setCategories([]));
-  }, []);
+  }, [user, sort, search]);
 
   const slug = router.query.slug as string | undefined;
   useEffect(() => {
@@ -145,9 +128,6 @@ const BrandProductsPage: React.FC = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <div className="sm:ml-auto">
-          <BrandProductSort value={sort} onChange={setSort} />
-        </div>
       </div>
       {loading ? (
         <div className="flex justify-center my-4">
@@ -158,13 +138,15 @@ const BrandProductsPage: React.FC = () => {
       ) : (
         <ProductTable
           products={products}
-          categories={categories}
-          category={categoryFilter}
-          onCategoryChange={setCategoryFilter}
-          minQty={minQty}
-          maxQty={maxQty}
-          onMinQtyChange={setMinQty}
-          onMaxQtyChange={setMaxQty}
+          sort={sort}
+          onSort={(field) =>
+            setSort((cur) => {
+              const [f, dir] = cur.split('_') as [string, 'asc' | 'desc'];
+              return f === field
+                ? `${field}_${dir === 'asc' ? 'desc' : 'asc'}`
+                : `${field}_asc`;
+            })
+          }
           onView={handleView}
           onDelete={handleDelete}
         />
