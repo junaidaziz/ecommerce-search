@@ -14,10 +14,12 @@ export default async function handler(
 ): Promise<void> {
   try {
     const session = await getServerSession(req, res, authOptions);
-    if (!session?.user) return res.status(401).json({ message: 'Unauthorized' });
+    if (!session?.user)
+      return res.status(401).json({ message: 'Unauthorized' });
 
     const orderUuid = getQueryParam(req.query.orderId);
-    if (!orderUuid) return res.status(400).json({ message: 'orderId required' });
+    if (!orderUuid)
+      return res.status(400).json({ message: 'orderId required' });
     const order = await getOrderByUuid(String(orderUuid));
     if (!order) return res.status(404).json({ message: 'Order not found' });
 
@@ -36,14 +38,24 @@ export default async function handler(
     }
 
     if (req.method === 'POST') {
-      const { content } = req.body as { content?: string };
-      if (!content) return res.status(400).json({ message: 'content required' });
+      const { content, messageType, fileUrl, fileName } = req.body as {
+        content?: string;
+        messageType?: 'text' | 'image' | 'file';
+        fileUrl?: string;
+        fileName?: string;
+      };
+      if (messageType === 'text' && !content) {
+        return res.status(400).json({ message: 'content required' });
+      }
       const receiverId = isBuyer ? order.product.vendor.id : order.userId;
       const msg = await createMessage({
         senderId: user.id,
         receiverId,
         orderId: order.id,
+        messageType,
         content,
+        fileUrl,
+        fileName,
       });
       return res.status(201).json(msg);
     }
