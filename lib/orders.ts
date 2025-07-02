@@ -218,6 +218,20 @@ export async function updateOrderStatus(
   status: string
 ): Promise<void> {
   const db = getDb();
+  const existing = await db.order.findUnique({
+    where: { uuid },
+    include: { product: true },
+  });
+  if (!existing) return;
+  if (
+    status === 'shipped' &&
+    !['shipped', 'delivered', 'completed'].includes(existing.status)
+  ) {
+    await db.product.update({
+      where: { id: existing.productId },
+      data: { quantity: { decrement: existing.quantity } },
+    });
+  }
   await db.order.update({ where: { uuid }, data: { status } });
 }
 

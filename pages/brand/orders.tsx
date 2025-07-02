@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+} from 'react';
 import { AppContext } from '@contexts/AppContext';
 import { useSession } from 'next-auth/react';
 import { Order } from '../../types';
@@ -12,12 +18,29 @@ const BrandOrders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewGroup, setViewGroup] = useState<{ order: Order; items: Order[] } | null>(null);
+  const [viewGroup, setViewGroup] = useState<{
+    order: Order;
+    items: Order[];
+  } | null>(null);
+
+  const loadOrders = useCallback(() => {
+    if (!user) return;
+    setLoading(true);
+    fetch('/api/brand/orders')
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data: Order[]) => {
+        setOrders(data);
+        setError(null);
+      })
+      .catch(() => setError('Failed to load orders'))
+      .finally(() => setLoading(false));
+  }, [user]);
 
   const groupedOrders = useMemo(() => {
     const map = new Map<string, { order: Order; items: Order[] }>();
     for (const o of orders) {
-      const key = o.paymentReference || new Date(o.createdAt).toISOString().split('.')[0];
+      const key =
+        o.paymentReference || new Date(o.createdAt).toISOString().split('.')[0];
       const existing = map.get(key);
       if (existing) {
         existing.items.push(o);
@@ -30,16 +53,8 @@ const BrandOrders: React.FC = () => {
 
   useEffect(() => {
     if (!user || status === 'loading') return;
-    setLoading(true);
-    fetch('/api/brand/orders')
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data: Order[]) => {
-        setOrders(data);
-        setError(null);
-      })
-      .catch(() => setError('Failed to load orders'))
-      .finally(() => setLoading(false));
-  }, [user, session, status]);
+    loadOrders();
+  }, [user, session, status, loadOrders]);
 
   if (!user) {
     return <div className="p-4">Please log in to view orders.</div>;
@@ -93,14 +108,15 @@ const BrandOrders: React.FC = () => {
                           g.order.status === 'pending'
                             ? 'badge-ghost'
                             : g.order.status === 'confirmed'
-                            ? 'badge-secondary'
-                            : g.order.status === 'processing'
-                            ? 'badge-warning'
-                            : g.order.status === 'shipped'
-                            ? 'badge-info'
-                            : g.order.status === 'delivered' || g.order.status === 'completed'
-                            ? 'badge-success'
-                            : 'badge-error'
+                              ? 'badge-secondary'
+                              : g.order.status === 'processing'
+                                ? 'badge-warning'
+                                : g.order.status === 'shipped'
+                                  ? 'badge-info'
+                                  : g.order.status === 'delivered' ||
+                                      g.order.status === 'completed'
+                                    ? 'badge-success'
+                                    : 'badge-error'
                         }`}
                       >
                         {g.order.status}
@@ -116,7 +132,9 @@ const BrandOrders: React.FC = () => {
                       >
                         View
                       </button>
-                      <a className="link" href={`/messages/${g.order.uuid}`}>Chat</a>
+                      <a className="link" href={`/messages/${g.order.uuid}`}>
+                        Chat
+                      </a>
                     </td>
                   </tr>
                 ))}
@@ -131,6 +149,7 @@ const BrandOrders: React.FC = () => {
         group={viewGroup}
         isOpen={!!viewGroup}
         onClose={() => setViewGroup(null)}
+        onUpdated={loadOrders}
       />
     </div>
   );
