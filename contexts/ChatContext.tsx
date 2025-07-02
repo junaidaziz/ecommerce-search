@@ -9,11 +9,21 @@ export interface ChatMessage {
 
 interface ChatContextValue {
   messages: ChatMessage[];
+  isOpen: boolean;
+  openChat: (context?: { orderId?: string; customerName?: string }) => void;
+  closeChat: () => void;
   sendMessage: (content: string) => void;
+  context?: {
+    orderId?: string;
+    customerName?: string;
+  };
 }
 
 export const ChatContext = createContext<ChatContextValue>({
   messages: [],
+  isOpen: false,
+  openChat: () => {},
+  closeChat: () => {},
   sendMessage: () => {},
 });
 
@@ -23,6 +33,11 @@ interface ProviderProps {
 
 export function ChatProvider({ children }: ProviderProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [chatCtx, setChatCtx] = useState<{
+    orderId?: string;
+    customerName?: string;
+  } | undefined>();
   const sendMessage = (content: string) => {
     const msg: ChatMessage = {
       id: Date.now(),
@@ -44,8 +59,18 @@ export function ChatProvider({ children }: ProviderProps) {
       ]);
     }, 1000);
   };
+
+  const openChat = (context?: { orderId?: string; customerName?: string }) => {
+    if (context) setChatCtx(context);
+    setIsOpen(true);
+  };
+
+  const closeChat = () => setIsOpen(false);
+
   return (
-    <ChatContext.Provider value={{ messages, sendMessage }}>
+    <ChatContext.Provider
+      value={{ messages, sendMessage, isOpen, openChat, closeChat, context: chatCtx }}
+    >
       {children}
     </ChatContext.Provider>
   );
