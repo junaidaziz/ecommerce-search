@@ -1,4 +1,10 @@
-import { useContext, useState, useEffect, FormEvent, ChangeEvent } from 'react';
+import {
+  useContext,
+  useState,
+  useEffect,
+  FormEvent,
+  ChangeEvent,
+} from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -35,12 +41,10 @@ const Checkout: React.FC = () => {
   const context = useContext<AppContextValue | undefined>(AppContext);
   const cart = context?.cart ?? [];
   const user = context?.user ?? null;
-  const [name, setName] = useState(
-    user ? `${user.firstName} ${user.lastName}` : ''
-  );
-  const [email, setEmail] = useState(user?.email || '');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
-  const [country, setCountry] = useState(user?.country || '');
+  const [country, setCountry] = useState('');
   const [error, setError] = useState('');
   const [coupon, setCoupon] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -50,6 +54,49 @@ const Checkout: React.FC = () => {
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [step, setStep] = useState(1);
   const [deliveryDate, setDeliveryDate] = useState('');
+
+  // Load persisted form fields on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (user) {
+      setName(`${user.firstName} ${user.lastName}`.trim());
+      setEmail(user.email);
+      setCountry(user.country || '');
+      const stored = localStorage.getItem('checkout-form');
+      if (stored) {
+        try {
+          const data = JSON.parse(stored) as Record<string, string>;
+          if (data.address) setAddress(data.address);
+        } catch {
+          // ignore parse errors
+        }
+      }
+    } else {
+      const stored = localStorage.getItem('checkout-form');
+      if (stored) {
+        try {
+          const data = JSON.parse(stored) as Record<string, string>;
+          if (data.name) setName(data.name);
+          if (data.email) setEmail(data.email);
+          if (data.address) setAddress(data.address);
+          if (data.country) setCountry(data.country);
+        } catch {
+          // ignore parse errors
+        }
+      }
+    }
+  }, [user]);
+
+  // Persist form fields to localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const data = { name, email, address, country };
+    try {
+      localStorage.setItem('checkout-form', JSON.stringify(data));
+    } catch {
+      // ignore write errors
+    }
+  }, [name, email, address, country]);
 
   const itemCount = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce(
