@@ -1,3 +1,4 @@
+import OrderChatWindow from '@components/Chat/OrderChatWindow';
 import { useEffect, useState, useMemo, Fragment, useContext } from 'react';
 import useRequireAuth from '@hooks/useRequireAuth';
 import type { Order } from '../types';
@@ -14,6 +15,11 @@ const Orders: React.FC<OrdersProps> = (_props) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [chatOrder, setChatOrder] = useState<{
+    id: string;
+    brandName: string;
+    brandLogo?: string | null;
+  } | null>(null);
 
   const groupedOrders = useMemo(() => {
     const map = new Map<string, { order: Order; items: Order[] }>();
@@ -130,6 +136,20 @@ const Orders: React.FC<OrdersProps> = (_props) => {
                       {new Date(group.order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="space-x-2">
+                    <button
+                      type="button"
+                      className="link"
+                      onClick={() =>
+                        setChatOrder({
+                          id: group.order.uuid,
+                          brandName:
+                            group.order.product.vendor.brandName || 'Brand',
+                          brandLogo: group.order.product.vendor.logo,
+                        })
+                      }
+                    >
+                      Chat
+                    </button>
                       <a
                         className="btn btn-sm"
                         href={`/orders/${group.order.uuid}`}
@@ -189,6 +209,13 @@ const Orders: React.FC<OrdersProps> = (_props) => {
       ) : (
         !loading && <p>No orders found.</p>
       )}
+      <OrderChatWindow
+        isOpen={!!chatOrder}
+        orderId={chatOrder?.id || ''}
+        brandName={chatOrder?.brandName || ''}
+        brandLogo={chatOrder?.brandLogo}
+        onClose={() => setChatOrder(null)}
+      />
     </div>
   );
 };
