@@ -11,10 +11,12 @@ import { Order } from '../../types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import OrderDetailsModal from '@components/brand/OrderDetailsModal';
-import ChatWidget from '@components/ChatWidget';
+import ChatWindow from '@components/Chat/ChatWindow';
+import { ChatContext } from '@contexts/ChatContext';
 
 const BrandOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;
+  const { openChat } = useContext(ChatContext);
   const { data: session, status } = useSession();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -133,9 +135,23 @@ const BrandOrders: React.FC = () => {
                       >
                         View
                       </button>
-                      <a className="link" href={`/messages/${g.order.uuid}`}>
+                      <button
+                        type="button"
+                        className="link"
+                        onClick={() =>
+                          openChat({
+                            orderId: g.order.uuid,
+                            customerName:
+                              g.order.user
+                                ? `${g.order.user.firstName || ''} ${
+                                    g.order.user.lastName || ''
+                                  }`.trim() || g.order.user.email
+                                : undefined,
+                          })
+                        }
+                      >
                         Chat
-                      </a>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -152,7 +168,7 @@ const BrandOrders: React.FC = () => {
         onClose={() => setViewGroup(null)}
         onUpdated={loadOrders}
       />
-      <ChatWidget />
+      <ChatWindow />
     </div>
   );
 };

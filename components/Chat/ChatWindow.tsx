@@ -1,14 +1,20 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ChatContext } from '@contexts/ChatContext';
-import ChatIcon from './icons/ChatIcon';
+import ChatIcon from '../icons/ChatIcon';
 
-const ChatWidget: React.FC = () => {
-  const { messages, sendMessage } = useContext(ChatContext);
-  const [open, setOpen] = useState(false);
+const ChatWindow: React.FC = () => {
+  const { messages, sendMessage, isOpen, openChat, closeChat } =
+    useContext(ChatContext);
   const [text, setText] = useState('');
   const endRef = useRef<HTMLDivElement | null>(null);
 
-  const toggle = () => setOpen((o) => !o);
+  const toggle = () => {
+    if (isOpen) {
+      closeChat();
+    } else {
+      openChat();
+    }
+  };
 
   const submit = () => {
     if (!text.trim()) return;
@@ -17,14 +23,14 @@ const ChatWidget: React.FC = () => {
   };
 
   useEffect(() => {
-    if (open) {
+    if (isOpen) {
       endRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, open]);
+  }, [messages, isOpen]);
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      {open ? (
+      {isOpen ? (
         <div className="bg-base-100 rounded-lg shadow-lg w-72 h-96 flex flex-col fade-in">
           <div className="flex justify-between items-center p-2 border-b">
             <span className="font-semibold">Support Chat</span>
@@ -69,4 +75,4 @@ const ChatWidget: React.FC = () => {
   );
 };
 
-export default ChatWidget;
+export default ChatWindow;
