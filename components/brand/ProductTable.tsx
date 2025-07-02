@@ -24,47 +24,62 @@ const ProductTable: React.FC<ProductTableProps> = ({
       ? p.category
       : p.category?.name || p.productType;
 
+  const arrow = (active: boolean, dir: 'asc' | 'desc') => (
+    <span className={`${active ? '' : 'invisible'}`}>{dir === 'asc' ? '▲' : '▼'}</span>
+  );
+
+  const headerClass = (field: string) =>
+    sort.startsWith(`${field}_`) ? 'bg-base-200 text-primary font-semibold' : '';
+
+  const headerAria = (field: string) => {
+    if (!sort.startsWith(`${field}_`)) return 'none';
+    return sort.endsWith('asc') ? 'ascending' : 'descending';
+  };
+
   return (
     <div className="overflow-x-auto">
       <div className="max-h-[70vh] overflow-y-auto">
         <table className="table w-full">
           <thead>
             <tr>
-              <th
-                className="cursor-pointer select-none"
-                onClick={() => onSort('title')}
-              >
-                Product{' '}
-                {sort.startsWith('title_') && (
-                  <span>{sort.endsWith('asc') ? '▲' : '▼'}</span>
-                )}
+              <th className={headerClass('title')} aria-sort={headerAria('title')}>
+                <button
+                  type="button"
+                  className="w-full text-left flex items-center gap-1 cursor-pointer select-none"
+                  onClick={() => onSort('title')}
+                >
+                  Product {arrow(sort.startsWith('title_'), sort.endsWith('asc') ? 'asc' : 'desc')}
+                </button>
               </th>
               <th
-                className="hidden sm:table-cell cursor-pointer select-none"
-                onClick={() => onSort('category')}
+                className={`hidden sm:table-cell ${headerClass('category')}`}
+                aria-sort={headerAria('category')}
               >
-                Category{' '}
-                {sort.startsWith('category_') && (
-                  <span>{sort.endsWith('asc') ? '▲' : '▼'}</span>
-                )}
+                <button
+                  type="button"
+                  className="w-full text-left flex items-center gap-1 cursor-pointer select-none"
+                  onClick={() => onSort('category')}
+                >
+                  Category {arrow(sort.startsWith('category_'), sort.endsWith('asc') ? 'asc' : 'desc')}
+                </button>
               </th>
-              <th
-                className="cursor-pointer select-none"
-                onClick={() => onSort('status')}
-              >
-                Status{' '}
-                {sort.startsWith('status_') && (
-                  <span>{sort.endsWith('asc') ? '▲' : '▼'}</span>
-                )}
+              <th className={headerClass('status')} aria-sort={headerAria('status')}>
+                <button
+                  type="button"
+                  className="w-full text-left flex items-center gap-1 cursor-pointer select-none"
+                  onClick={() => onSort('status')}
+                >
+                  Status {arrow(sort.startsWith('status_'), sort.endsWith('asc') ? 'asc' : 'desc')}
+                </button>
               </th>
-              <th
-                className="cursor-pointer select-none"
-                onClick={() => onSort('quantity')}
-              >
-                Qty{' '}
-                {sort.startsWith('quantity_') && (
-                  <span>{sort.endsWith('asc') ? '▲' : '▼'}</span>
-                )}
+              <th className={headerClass('quantity')} aria-sort={headerAria('quantity')}>
+                <button
+                  type="button"
+                  className="w-full text-left flex items-center gap-1 cursor-pointer select-none"
+                  onClick={() => onSort('quantity')}
+                >
+                  Qty {arrow(sort.startsWith('quantity_'), sort.endsWith('asc') ? 'asc' : 'desc')}
+                </button>
               </th>
               <th></th>
             </tr>
