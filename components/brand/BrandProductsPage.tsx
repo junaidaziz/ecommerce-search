@@ -10,6 +10,8 @@ import ProductTable from './ProductTable';
 import ProductDetailsModal from './ProductDetailsModal';
 import { NotificationContext } from '@contexts/NotificationContext';
 import { ConfirmModal } from '@components/UI';
+import BrandProductSort, { BrandProductSortValue } from './BrandProductSort';
+import Pagination from '@components/Pagination';
 import type { BrandProductSortValue } from './BrandProductSort';
 
 const BrandProductsPage: React.FC = () => {
@@ -24,6 +26,13 @@ const BrandProductsPage: React.FC = () => {
   const [viewProduct, setViewProduct] = useState<Product | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 20;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sort, search, categoryFilter, minQty, maxQty]);
 
   useEffect(() => {
     if (!user) return;
@@ -31,17 +40,41 @@ const BrandProductsPage: React.FC = () => {
     setError('');
     const params = new URLSearchParams();
     params.set('sort', sort);
+    params.set('page', String(currentPage));
+    params.set('limit', String(pageSize));
     if (search) params.set('search', search);
     fetch(`/api/brand/products?${params.toString()}`, {
       credentials: 'include',
     })
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((data: { products: Product[]; total: number }) =>
-        setProducts(data.products)
-      )
+      .then((data: { products: Product[]; total: number }) => {
+        setProducts(data.products);
+        setTotalPages(Math.max(1, Math.ceil(data.total / pageSize)));
+      })
       .catch(() => setError('Failed to load products'))
       .finally(() => setLoading(false));
+  }, [user, sort, search, categoryFilter, minQty, maxQty, currentPage]);
+
+  useEffect(() => {
+    fetch('/api/categories?limit=250')
+      .then((res) => (res.ok ? res.json() : { categories: [] }))
+      .then((data: { categories: Category[] }) =>
+        setCategories(data.categories)
+      )
+      .catch(() => setCategories([]));
   }, [user, sort, search]);
+
+  useEffect(() => {
+    const pageParam = router.query.page;
+    if (pageParam) {
+      const p = Array.isArray(pageParam)
+        ? parseInt(pageParam[0], 10)
+        : parseInt(pageParam as string, 10);
+      setCurrentPage(isNaN(p) ? 1 : p);
+    } else {
+      setCurrentPage(1);
+    }
+  }, [router.query.page]);
 
   const slug = router.query.slug as string | undefined;
   useEffect(() => {
@@ -97,16 +130,37 @@ const BrandProductsPage: React.FC = () => {
     setDeleteId(null);
   };
 
+  const handlePageChange = (p: number) => {
+    if (p > 0 && p <= totalPages) {
+      setCurrentPage(p);
+      const query = { ...router.query, page: String(p) } as Record<string, string>;
+      router.push({ pathname: '/brand/products', query }, undefined, {
+        shallow: true,
+      });
+    }
+  };
+
   const handleView = (p: Product) => {
     setViewProduct(p);
-    router.push(`/brand/products/${p.slug ?? p.uuid ?? p.id}`, undefined, {
-      shallow: true,
-    });
+    router.push(
+      {
+        pathname: `/brand/products/${p.slug ?? p.uuid ?? p.id}`,
+        query: { page: String(currentPage) },
+      },
+      undefined,
+      {
+        shallow: true,
+      }
+    );
   };
 
   const handleClose = () => {
     setViewProduct(null);
-    router.push('/brand/products', undefined, { shallow: true });
+    router.push(
+      { pathname: '/brand/products', query: { page: String(currentPage) } },
+      undefined,
+      { shallow: true }
+    );
   };
 
   return (
@@ -151,6 +205,11 @@ const BrandProductsPage: React.FC = () => {
           onDelete={handleDelete}
         />
       )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
       <ProductDetailsModal
         product={viewProduct}
         isOpen={!!viewProduct}
