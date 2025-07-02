@@ -30,6 +30,7 @@ export default async function handler(
       items: JSON.parse(metadata.items || '[]'),
       total: (session.amount_total ?? 0) / 100,
       status: 'processing',
+      paymentMethod: 'stripe',
     });
     const orderId =
       Array.isArray(orders) && orders.length > 0 ? orders[0].id : '';

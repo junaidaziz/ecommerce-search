@@ -5,7 +5,7 @@ import {
   getAllOrders,
   getOrdersForVendor,
 } from '@lib/orders';
-import { findUser } from '@lib/users';
+import { findUser, findUserById } from '@lib/users';
 import {
   getProductByUuid,
   decreaseProductQuantity,
@@ -71,6 +71,22 @@ async function handler(
       }
       if (!email || !items) {
         return res.status(400).json({ message: 'email and items required' });
+      }
+
+      let allowed = true;
+      let vendorMethods: any[] = [];
+      if (items.length > 0) {
+        const product = await getProductByUuid(String(items[0].uuid || items[0].id));
+        if (product) {
+          const vendor = await findUserById(product.vendorId);
+          vendorMethods = (vendor?.paymentMethods as any[]) || [];
+          if (paymentMethod && !vendorMethods.some((m) => m.type === paymentMethod)) {
+            allowed = false;
+          }
+        }
+      }
+      if (!allowed) {
+        return res.status(400).json({ message: 'payment method not supported' });
       }
 
       for (const item of items) {

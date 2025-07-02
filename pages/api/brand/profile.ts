@@ -30,6 +30,7 @@ export default async function handler(
         website: userData.website ?? undefined,
         description: userData.businessDescription ?? undefined,
         taxId: userData.taxId ?? undefined,
+        paymentMethods: (userData.paymentMethods as any) ?? undefined,
         status: userData.disabled ? 'disabled' : 'active',
         createdAt: userData.createdAt ?? undefined,
         updatedAt: userData.updatedAt ?? undefined,
@@ -47,6 +48,7 @@ export default async function handler(
         businessDescription,
         logo,
         taxId,
+        paymentMethods,
       } = req.body;
       await updateUserProfile(session.user.email, {
         brandName,
@@ -58,6 +60,7 @@ export default async function handler(
         businessDescription,
         logo,
         taxId,
+        paymentMethods,
       });
       return res.status(200).json({ message: 'updated' });
     }
