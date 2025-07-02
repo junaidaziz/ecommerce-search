@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
-import BarChart from '@components/BarChart';
 import ChartContainer from '@components/ChartContainer';
+import TopProductsChart from '@components/analytics/TopProductsChart';
 import DashboardCard from '@components/dashboard/DashboardCard';
 import TotalProductsCard from '@components/dashboard/TotalProductsCard';
 import TotalSalesCard from '@components/dashboard/TotalSalesCard';
@@ -188,11 +188,7 @@ const BrandAnalytics: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              <div className="mt-4">
-                <BarChart
-                  data={data.topProducts.map((p) => ({ label: p.id, value: p.qty }))}
-                />
-              </div>
+              <TopProductsChart data={data.topProducts} />
             </>
           ) : (
             <div className="flex flex-col items-center justify-center h-32 text-gray-500">
