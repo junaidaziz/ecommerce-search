@@ -13,10 +13,12 @@ import { getPageTitle } from '@lib/pageTitle';
 import OrderDetailsModal from '@components/brand/OrderDetailsModal';
 import ChatWindow from '@components/Chat/ChatWindow';
 import { ChatContext } from '@contexts/ChatContext';
+import { NotificationContext } from '@contexts/NotificationContext';
 
 const BrandOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;
   const { openChat } = useContext(ChatContext);
+  const { addNotification } = useContext(NotificationContext);
   const { data: session, status } = useSession();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -38,6 +40,18 @@ const BrandOrders: React.FC = () => {
       .catch(() => setError('Failed to load orders'))
       .finally(() => setLoading(false));
   }, [user]);
+
+  const cancelOrder = async (uuid: string) => {
+    if (!confirm('Cancel this order?')) return;
+    const res = await fetch(`/api/orders/${uuid}/cancel`, { method: 'POST' });
+    const data = await res.json().catch(() => null);
+    if (res.ok) {
+      addNotification('Order cancelled', 'success');
+      loadOrders();
+    } else {
+      addNotification(data?.message || 'Cancellation failed', 'error');
+    }
+  };
 
   const groupedOrders = useMemo(() => {
     const map = new Map<string, { order: Order; items: Order[] }>();
@@ -152,6 +166,15 @@ const BrandOrders: React.FC = () => {
                       >
                         Chat
                       </button>
+                      {!['delivered', 'completed'].includes(g.order.status) && (
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-error"
+                          onClick={() => cancelOrder(g.order.uuid)}
+                        >
+                          Cancel
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
