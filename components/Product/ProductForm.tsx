@@ -4,10 +4,10 @@ import AsyncCreatableSelect from 'react-select/async-creatable';
 import type { SelectOption } from '../form-fields/SelectDropdown';
 import {
   TextInput,
-  Textarea,
   FileUpload,
   Checkbox,
   TagInput,
+  RichTextEditor,
 } from '../form-fields';
 import { VendorsResponse } from '../../types';
 
@@ -244,10 +244,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
         error={errors.title?.message}
       />
       <div>
-        <Textarea<ProductFormValues>
+        <RichTextEditor<ProductFormValues>
           label="Description"
           name="description"
-          register={register}
+          control={control}
           rules={{ required: 'Required' }}
           error={errors.description?.message}
         />
