@@ -186,7 +186,7 @@ export default function VendorDashboard() {
       fetchProducts();
       addNotification('Product deleted', 'success');
     } else if (res.status === 409) {
-      addNotification('Cannot delete product with stock or orders', 'error');
+      addNotification('Cannot delete product with orders', 'error');
     } else {
       addNotification('Failed to delete product', 'error');
     }
