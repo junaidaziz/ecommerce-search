@@ -3,7 +3,10 @@ import React, { createContext, useState, ReactNode } from 'react';
 export interface ChatMessage {
   id: number;
   sender: 'user' | 'support';
-  content: string;
+  messageType: 'text' | 'image' | 'file';
+  content?: string;
+  fileUrl?: string;
+  fileName?: string;
   timestamp: Date;
 }
 
@@ -12,7 +15,12 @@ interface ChatContextValue {
   isOpen: boolean;
   openChat: (context?: { orderId?: string; customerName?: string }) => void;
   closeChat: () => void;
-  sendMessage: (content: string) => void;
+  sendMessage: (data: {
+    content?: string;
+    messageType: 'text' | 'image' | 'file';
+    fileUrl?: string;
+    fileName?: string;
+  }) => void;
   context?: {
     orderId?: string;
     customerName?: string;
@@ -34,15 +42,26 @@ interface ProviderProps {
 export function ChatProvider({ children }: ProviderProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [chatCtx, setChatCtx] = useState<{
-    orderId?: string;
-    customerName?: string;
-  } | undefined>();
-  const sendMessage = (content: string) => {
+  const [chatCtx, setChatCtx] = useState<
+    | {
+        orderId?: string;
+        customerName?: string;
+      }
+    | undefined
+  >();
+  const sendMessage = (data: {
+    content?: string;
+    messageType: 'text' | 'image' | 'file';
+    fileUrl?: string;
+    fileName?: string;
+  }) => {
     const msg: ChatMessage = {
       id: Date.now(),
       sender: 'user',
-      content,
+      messageType: data.messageType,
+      content: data.content,
+      fileUrl: data.fileUrl,
+      fileName: data.fileName,
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, msg]);
@@ -53,7 +72,8 @@ export function ChatProvider({ children }: ProviderProps) {
         {
           id: Date.now() + 1,
           sender: 'support',
-          content: 'Thanks for your message! We\'ll get back to you shortly.',
+          messageType: 'text',
+          content: "Thanks for your message! We'll get back to you shortly.",
           timestamp: new Date(),
         },
       ]);
@@ -69,7 +89,14 @@ export function ChatProvider({ children }: ProviderProps) {
 
   return (
     <ChatContext.Provider
-      value={{ messages, sendMessage, isOpen, openChat, closeChat, context: chatCtx }}
+      value={{
+        messages,
+        sendMessage,
+        isOpen,
+        openChat,
+        closeChat,
+        context: chatCtx,
+      }}
     >
       {children}
     </ChatContext.Provider>
