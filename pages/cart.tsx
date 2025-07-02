@@ -23,7 +23,7 @@ const Cart: React.FC = () => {
     );
   }
 
-  const { cart, changeQty, removeFromCart } = context;
+  const { cart, changeQty, removeFromCart, clearCart } = context;
 
   const itemCount = cart.reduce((sum, item) => sum + item.qty, 0);
   const totalPrice = cart.reduce(
@@ -112,7 +112,10 @@ const Cart: React.FC = () => {
               Total: £{(totalPrice + shippingCost).toFixed(2)}
             </p>
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-between">
+            <button className="btn btn-outline" onClick={clearCart}>
+              Empty Cart
+            </button>
             <button
               className="btn btn-primary"
               onClick={() => router.push('/checkout')}
