@@ -13,6 +13,17 @@ import { ConfirmModal } from '@components/UI';
 import BrandProductSort, { BrandProductSortValue } from './BrandProductSort';
 import Pagination from '@components/Pagination';
 
+const SORT_VALUES: BrandProductSortValue[] = [
+  'title_asc',
+  'title_desc',
+  'category_asc',
+  'category_desc',
+  'status_asc',
+  'status_desc',
+  'quantity_asc',
+  'quantity_desc',
+];
+
 const BrandProductsPage: React.FC = () => {
   const router = useRouter();
   const { user } = useContext(AppContext) as { user: User | null };
@@ -75,6 +86,15 @@ const BrandProductsPage: React.FC = () => {
     }
   }, [router.query.page]);
 
+  useEffect(() => {
+    const sortParam = router.query.sort;
+    if (!sortParam) return;
+    const value = Array.isArray(sortParam) ? sortParam[0] : sortParam;
+    if (SORT_VALUES.includes(value as BrandProductSortValue) && value !== sort) {
+      setSort(value as BrandProductSortValue);
+    }
+  }, [router.query.sort]);
+
   const slug = router.query.slug as string | undefined;
   useEffect(() => {
     if (!slug) {
@@ -127,6 +147,25 @@ const BrandProductsPage: React.FC = () => {
     }
     setDeleting(false);
     setDeleteId(null);
+  };
+
+  const handleSortChange = (
+    field: 'title' | 'category' | 'status' | 'quantity'
+  ) => {
+    setSort((cur) => {
+      const [f, dir] = cur.split('_') as [string, 'asc' | 'desc'];
+      const next =
+        f === field ? `${field}_${dir === 'asc' ? 'desc' : 'asc'}` : `${field}_asc`;
+      const query = {
+        ...router.query,
+        sort: next,
+        page: '1',
+      } as Record<string, string>;
+      router.push({ pathname: '/brand/products', query }, undefined, {
+        shallow: true,
+      });
+      return next as BrandProductSortValue;
+    });
   };
 
   const handlePageChange = (p: number) => {
@@ -182,27 +221,22 @@ const BrandProductsPage: React.FC = () => {
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
-      {loading ? (
-        <div className="flex justify-center my-4">
-          <span className="loading loading-spinner"></span>
+      {error && <div className="text-error py-4">{error}</div>}
+      {!error && (
+        <div className="relative">
+          <ProductTable
+            products={products}
+            sort={sort}
+            onSort={handleSortChange}
+            onView={handleView}
+            onDelete={handleDelete}
+          />
+          {loading && (
+            <div className="absolute inset-0 bg-base-100/50 flex items-center justify-center">
+              <span className="loading loading-spinner" />
+            </div>
+          )}
         </div>
-      ) : error ? (
-        <div className="text-error py-4">{error}</div>
-      ) : (
-        <ProductTable
-          products={products}
-          sort={sort}
-          onSort={(field) =>
-            setSort((cur) => {
-              const [f, dir] = cur.split('_') as [string, 'asc' | 'desc'];
-              return f === field
-                ? `${field}_${dir === 'asc' ? 'desc' : 'asc'}`
-                : `${field}_asc`;
-            })
-          }
-          onView={handleView}
-          onDelete={handleDelete}
-        />
       )}
       <Pagination
         currentPage={currentPage}
