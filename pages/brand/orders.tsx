@@ -90,11 +90,15 @@ const BrandOrders: React.FC = () => {
                     <td>
                       <span
                         className={`badge ${
-                          g.order.status === 'processing'
+                          g.order.status === 'pending'
+                            ? 'badge-ghost'
+                            : g.order.status === 'confirmed'
+                            ? 'badge-secondary'
+                            : g.order.status === 'processing'
                             ? 'badge-warning'
                             : g.order.status === 'shipped'
                             ? 'badge-info'
-                            : g.order.status === 'delivered'
+                            : g.order.status === 'delivered' || g.order.status === 'completed'
                             ? 'badge-success'
                             : 'badge-error'
                         }`}

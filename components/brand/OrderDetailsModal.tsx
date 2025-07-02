@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { GenericModal, StatusLabel } from '@components/UI';
 import type { Order } from '@/types';
@@ -18,6 +18,27 @@ const OrderDetailsModal: React.FC<Props> = ({ group, isOpen, onClose }) => {
   if (!group) return null;
   const { order, items } = group;
 
+  const [status, setStatus] = useState(order.status);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const updateStatus = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/orders/${order.uuid}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error('Failed');
+    } catch (e) {
+      setError('Failed to update');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const customer = order.user
     ? `${order.user.firstName || ''} ${order.user.lastName || ''}`.trim() ||
       order.user.email
@@ -33,11 +54,15 @@ const OrderDetailsModal: React.FC<Props> = ({ group, isOpen, onClose }) => {
         <div className="flex items-center justify-between">
           <StatusLabel
             color={
-              order.status === 'processing'
+              order.status === 'pending'
+                ? 'info'
+                : order.status === 'confirmed'
+                ? 'info'
+                : order.status === 'processing'
                 ? 'warning'
                 : order.status === 'shipped'
                 ? 'info'
-                : order.status === 'delivered'
+                : order.status === 'delivered' || order.status === 'completed'
                 ? 'success'
                 : 'error'
             }
@@ -68,7 +93,48 @@ const OrderDetailsModal: React.FC<Props> = ({ group, isOpen, onClose }) => {
             </li>
           ))}
         </ul>
+        {error && <div className="alert alert-error">{error}</div>}
+        <div>
+          <label className="label" htmlFor="status-select">
+            <span className="label-text">Status</span>
+          </label>
+          <select
+            id="status-select"
+            className="select select-bordered w-full"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as any)}
+          >
+            {[
+              'pending',
+              'confirmed',
+              'processing',
+              'shipped',
+              'delivered',
+              'completed',
+              'cancelled',
+              'returned',
+            ].map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="flex justify-end">
+          <a
+            href={`/api/orders/${order.uuid}/invoice`}
+            className="btn btn-outline mr-auto"
+          >
+            Invoice
+          </a>
+          <button
+            type="button"
+            className="btn btn-primary mr-2"
+            disabled={saving}
+            onClick={updateStatus}
+          >
+            {saving ? 'Saving...' : 'Update'}
+          </button>
           <button type="button" className="btn" onClick={onClose}>
             Close
           </button>
