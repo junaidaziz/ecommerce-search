@@ -21,7 +21,17 @@ import {
 import FileUpload from '@components/form-fields/FileUpload';
 import Loader from '@components/Loader';
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || '';
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
+
+async function parseJsonSafe<T>(res: Response): Promise<T> {
+  try {
+    return await res.json();
+  } catch (err) {
+    const text = await res.text();
+    console.error('Failed to parse JSON:', text);
+    throw err;
+  }
+}
 
 // Types for cart item and user
 type CartItem = {
@@ -156,6 +166,7 @@ const Checkout: React.FC = () => {
     try {
       if (user) {
         if (paymentMethod === 'stripe') {
+          if (!STRAPI_URL) throw new Error('STRAPI_URL not configured');
           const createRes = await fetch(`${STRAPI_URL}/orders/create`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -166,7 +177,7 @@ const Checkout: React.FC = () => {
               shippingAddress: { name, address, country },
             }),
           });
-          const createData = await createRes.json();
+          const createData = await parseJsonSafe(createRes);
           if (!createRes.ok)
             throw new Error(createData.message || 'Order failed');
           const res = await fetch('/api/checkout/create-session', {
@@ -179,7 +190,7 @@ const Checkout: React.FC = () => {
               shipping: { name, address },
             }),
           });
-          const data = await res.json();
+          const data = await parseJsonSafe(res);
           if (!res.ok) throw new Error(data.message || 'Checkout failed');
           window.location.href = data.url;
         } else {
@@ -191,7 +202,7 @@ const Checkout: React.FC = () => {
           if (paymentReference) fd.append('paymentReference', paymentReference);
           if (paymentProof) fd.append('paymentProof', paymentProof);
           const res = await fetch('/api/orders', { method: 'POST', body: fd });
-          const data = await res.json();
+          const data = await parseJsonSafe(res);
           if (!res.ok) throw new Error(data.message || 'Checkout failed');
           router.push('/orders');
         }
@@ -208,7 +219,7 @@ const Checkout: React.FC = () => {
             total: finalTotal,
           }),
         });
-        const data = await res.json();
+        const data = await parseJsonSafe(res);
         if (!res.ok) throw new Error(data.message || 'Checkout failed');
         router.push(`/confirm?guest=${data.id}`);
       }
@@ -275,7 +286,7 @@ const Checkout: React.FC = () => {
                 if (!coupon) return;
                 const res = await fetch(`/api/coupons/${encodeURIComponent(coupon)}`);
                 if (res.ok) {
-                  const data: Coupon = await res.json();
+                  const data: Coupon = await parseJsonSafe(res);
                   if (data.discountType === 'percent') {
                     setDiscount(data.amount);
                   } else if (data.discountType === 'bogo') {
