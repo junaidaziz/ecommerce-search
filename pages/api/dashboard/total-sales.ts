@@ -1,5 +1,5 @@
 import type { NextApiResponse } from 'next';
-import { getDb } from '@lib/db';
+import { getSalesMetrics } from '@lib/analytics';
 import { withRole, AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
@@ -13,7 +13,6 @@ async function handler(
     if (req.method !== 'GET') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
-    const db = getDb();
     const user = req.user;
     const param = parseInt(getQueryParam(req.query.brandId) || '', 10);
     const queryBrandId = Number.isNaN(param) ? undefined : param;
@@ -23,23 +22,22 @@ async function handler(
       return res.status(401).json({ message: 'Unauthorized' });
     }
     const monthOffset = getQueryParam(req.query.monthOffset);
-    const where: any = { status: 'delivered' };
+    let start: Date | undefined;
+    let end: Date | undefined;
     if (
       monthOffset !== null &&
       monthOffset !== undefined &&
       monthOffset !== ''
     ) {
       const m = parseInt(monthOffset, 10);
-      const start = require('dayjs')()
+      start = require('dayjs')()
         .startOf('month')
         .subtract(m, 'month')
         .toDate();
-      const end = require('dayjs')(start).endOf('month').toDate();
-      where.createdAt = { gte: start, lte: end };
+      end = require('dayjs')(start).endOf('month').toDate();
     }
-    if (vendorId) where.product = { vendorId };
-    const result = await db.order.aggregate({ where, _sum: { total: true } });
-    return res.status(200).json({ total: result._sum.total ?? 0 });
+    const { revenue } = await getSalesMetrics({ start, end, vendorId });
+    return res.status(200).json({ total: revenue });
   } catch (error) {
     return handleApiError(res, error, 'Failed to load total sales');
   }

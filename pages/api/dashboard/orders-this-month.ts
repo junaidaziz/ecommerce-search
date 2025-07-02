@@ -1,6 +1,6 @@
 import type { NextApiResponse } from 'next';
 import dayjs from 'dayjs';
-import { getDb } from '@lib/db';
+import { getSalesMetrics } from '@lib/analytics';
 import { withRole, AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
@@ -14,7 +14,6 @@ async function handler(
     if (req.method !== 'GET') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
-    const db = getDb();
     const user = req.user;
     const param = parseInt(getQueryParam(req.query.brandId) || '', 10);
     const queryBrandId = Number.isNaN(param) ? undefined : param;
@@ -32,14 +31,8 @@ async function handler(
       .subtract(monthOffset, 'month')
       .toDate();
     const end = dayjs(start).endOf('month').toDate();
-    const where: any = {
-      createdAt: { gte: start, lte: end },
-      status: 'delivered',
-    };
-    if (vendorId) where.product = { vendorId };
-    const count = await db.order.count({ where });
-    const result = await db.order.aggregate({ where, _sum: { total: true } });
-    return res.status(200).json({ count, revenue: result._sum.total ?? 0 });
+    const { count, revenue } = await getSalesMetrics({ start, end, vendorId });
+    return res.status(200).json({ count, revenue });
   } catch (error) {
     return handleApiError(res, error, 'Failed to load orders');
   }
