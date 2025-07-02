@@ -71,6 +71,8 @@ export function AppProvider({ children }: AppProviderProps) {
         phoneNumber: '',
         address: '',
         city: '',
+        state: '',
+        postalCode: '',
         country: '',
       });
     } else {
