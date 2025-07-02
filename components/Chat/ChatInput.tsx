@@ -12,7 +12,16 @@ const allowedTypes = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
 
-const ChatInput: React.FC = () => {
+interface Props {
+  onSend?: (data: {
+    content?: string;
+    messageType: 'text' | 'image' | 'file';
+    fileUrl?: string;
+    fileName?: string;
+  }) => void;
+}
+
+const ChatInput: React.FC<Props> = ({ onSend }) => {
   const { sendMessage } = useContext(ChatContext);
   const [text, setText] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -56,7 +65,8 @@ const ChatInput: React.FC = () => {
         fileName = file.name;
       }
     }
-    sendMessage({ content: text.trim(), messageType, fileUrl, fileName });
+    const fn = onSend || sendMessage;
+    fn({ content: text.trim(), messageType, fileUrl, fileName });
     setText('');
     setFile(null);
     setPreview(null);
