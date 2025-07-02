@@ -181,9 +181,12 @@ export async function hasOrdersForProduct(
   productUuid: string
 ): Promise<boolean> {
   const db = getDb();
-  const count = await db.order.count({
-    where: { product: { uuid: productUuid } },
+  const product = await db.product.findUnique({
+    where: { uuid: productUuid },
+    select: { id: true },
   });
+  if (!product) return false;
+  const count = await db.order.count({ where: { productId: product.id } });
   return count > 0;
 }
 
