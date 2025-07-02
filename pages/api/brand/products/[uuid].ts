@@ -155,10 +155,10 @@ export default async function handler(
     if (req.method === 'DELETE') {
       const existing = await getProductByUuid(String(uuid));
       if (!existing) return res.status(404).json({ message: 'Not found' });
-      if (existing.quantity > 0 || (await hasOrdersForProduct(String(uuid)))) {
+      if (await hasOrdersForProduct(String(uuid))) {
         return res
           .status(409)
-          .json({ message: 'cannot delete product with stock or orders' });
+          .json({ message: 'cannot delete product with orders' });
       }
       await deleteProduct(String(uuid));
       await loadAndIndexProducts();
