@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Image from 'next/image';
 import { GenericModal, StatusLabel } from '@components/UI';
 import type { Order } from '@/types';
+import { NotificationContext } from '@contexts/NotificationContext';
 
 interface OrderGroup {
   order: Order;
@@ -12,15 +13,22 @@ interface Props {
   group: OrderGroup | null;
   isOpen: boolean;
   onClose: () => void;
+  onUpdated?: () => void;
 }
 
-const OrderDetailsModal: React.FC<Props> = ({ group, isOpen, onClose }) => {
+const OrderDetailsModal: React.FC<Props> = ({
+  group,
+  isOpen,
+  onClose,
+  onUpdated,
+}) => {
   if (!group) return null;
   const { order, items } = group;
 
   const [status, setStatus] = useState(order.status);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { addNotification } = useContext(NotificationContext);
 
   const updateStatus = async () => {
     setSaving(true);
@@ -32,6 +40,8 @@ const OrderDetailsModal: React.FC<Props> = ({ group, isOpen, onClose }) => {
         body: JSON.stringify({ status }),
       });
       if (!res.ok) throw new Error('Failed');
+      addNotification('Order updated', 'success');
+      if (onUpdated) onUpdated();
     } catch (e) {
       setError('Failed to update');
     } finally {
@@ -57,14 +67,15 @@ const OrderDetailsModal: React.FC<Props> = ({ group, isOpen, onClose }) => {
               order.status === 'pending'
                 ? 'info'
                 : order.status === 'confirmed'
-                ? 'info'
-                : order.status === 'processing'
-                ? 'warning'
-                : order.status === 'shipped'
-                ? 'info'
-                : order.status === 'delivered' || order.status === 'completed'
-                ? 'success'
-                : 'error'
+                  ? 'info'
+                  : order.status === 'processing'
+                    ? 'warning'
+                    : order.status === 'shipped'
+                      ? 'info'
+                      : order.status === 'delivered' ||
+                          order.status === 'completed'
+                        ? 'success'
+                        : 'error'
             }
           >
             {order.status}
