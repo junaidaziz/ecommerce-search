@@ -1,4 +1,4 @@
-import { useEffect, useContext } from 'react';
+import { useEffect, useContext, useState } from 'react';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { TextInput, EmailInput } from '@components/form-fields';
@@ -14,6 +14,8 @@ interface ProfileFormValues {
 const UpdateProfileSection: React.FC = () => {
   const profileForm = useForm<ProfileFormValues>();
   const { addNotification } = useContext(NotificationContext);
+  const [role, setRole] = useState('');
+  const [updatedAt, setUpdatedAt] = useState('');
 
   useEffect(() => {
     fetch('/api/user/profile')
@@ -26,6 +28,10 @@ const UpdateProfileSection: React.FC = () => {
           email: data.email || '',
           phoneNumber: data.phoneNumber || '',
         });
+        setRole(data.role || '');
+        setUpdatedAt(
+          data.updatedAt ? new Date(data.updatedAt).toLocaleString() : ''
+        );
       })
       .catch(() => {});
   }, [profileForm]);
@@ -84,6 +90,18 @@ const UpdateProfileSection: React.FC = () => {
         register={profileForm.register}
         name="phoneNumber"
         error={profileForm.formState.errors.phoneNumber?.message}
+      />
+      <TextInput
+        label="Role"
+        name="role"
+        value={role}
+        readOnly
+      />
+      <TextInput
+        label="Last Updated"
+        name="updatedAt"
+        value={updatedAt}
+        readOnly
       />
       <button type="submit" className="btn btn-primary w-full">
         Save

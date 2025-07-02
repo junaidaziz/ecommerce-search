@@ -180,9 +180,9 @@ const ProfilePage: React.FC = () => {
               Address Info
             </h2>
             {renderRow('City', profile?.city)}
-            {renderRow('State', (profile as Record<string, string> | undefined)?.state)}
+            {renderRow('State', profile?.state)}
             {renderRow('Country', profile?.country)}
-            {renderRow('Postal Code', (profile as Record<string, string> | undefined)?.postalCode)}
+            {renderRow('Postal Code', profile?.postalCode)}
           </div>
         </section>
         {profile?.role === 'brand' && (

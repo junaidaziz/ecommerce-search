@@ -13,6 +13,8 @@ erDiagram
       STRING phoneNumber
       STRING address
       STRING city
+      STRING state
+      STRING postalCode
       STRING country
       STRING businessAddress
       STRING website
