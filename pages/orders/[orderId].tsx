@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
+import OrderChatWindow from '@components/Chat/OrderChatWindow';
 import { useRouter } from 'next/router';
 import type { Order } from '../../types';
 import Head from 'next/head';
@@ -13,6 +14,7 @@ export default function OrderDetail() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     if (!orderId) return;
@@ -66,6 +68,20 @@ export default function OrderDetail() {
       >
         Download Invoice
       </a>
+      <button
+        type="button"
+        className="btn btn-secondary mt-4 ml-2"
+        onClick={() => setChatOpen(true)}
+      >
+        Chat with Brand
+      </button>
+      <OrderChatWindow
+        isOpen={chatOpen}
+        orderId={order.uuid}
+        brandName={order.product.vendor.brandName || 'Brand'}
+        brandLogo={order.product.vendor.logo}
+        onClose={() => setChatOpen(false)}
+      />
     </div>
   );
 }
