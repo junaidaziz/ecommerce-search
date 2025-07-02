@@ -62,8 +62,8 @@ const OrderChatWindow: React.FC<Props> = ({
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      <div className="bg-base-100 rounded-lg shadow-lg w-72 h-96 flex flex-col fade-in">
-        <div className="flex justify-between items-center p-2 border-b">
+      <div className="bg-base-100 rounded-lg shadow-lg border border-base-300 w-72 sm:w-80 md:w-96 h-96 flex flex-col fade-in">
+        <div className="flex justify-between items-center p-3 border-b">
           <div className="flex items-center gap-2">
             {brandLogo && (
               <img src={brandLogo} alt={brandName} className="w-6 h-6 rounded" />
@@ -77,7 +77,7 @@ const OrderChatWindow: React.FC<Props> = ({
         <div className="p-1 text-xs text-center text-gray-500">
           You are chatting with {brandName}
         </div>
-        <div className="flex-1 overflow-y-auto p-2 space-y-1 text-sm">
+        <div className="flex-1 overflow-y-auto p-3 space-y-1 text-sm">
           {messages.map((m) => (
             <div key={m.id}>
               <span className="text-gray-500 mr-2">
