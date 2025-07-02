@@ -25,8 +25,8 @@ const ChatWindow: React.FC = () => {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {isOpen ? (
-        <div className="bg-base-100 rounded-lg shadow-lg w-72 h-96 flex flex-col fade-in">
-          <div className="flex justify-between items-center p-2 border-b">
+        <div className="bg-base-100 rounded-lg shadow-lg border border-base-300 w-72 sm:w-80 md:w-96 h-96 flex flex-col fade-in">
+          <div className="flex justify-between items-center p-3 border-b">
             <span className="font-semibold">Support Chat</span>
             <button
               type="button"
@@ -36,7 +36,7 @@ const ChatWindow: React.FC = () => {
               ✕
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-2 space-y-1 text-sm">
+          <div className="flex-1 overflow-y-auto p-3 space-y-1 text-sm">
             {messages.map((m) => (
               <ChatMessage key={m.id} message={m} />
             ))}
