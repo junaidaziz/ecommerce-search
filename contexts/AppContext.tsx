@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import {
   useSession,
   signIn as nextSignIn,
@@ -15,6 +15,26 @@ import type { WishlistItem } from '@/types/wishlist';
 
 export const AppContext = createContext<AppContextValue | undefined>(undefined);
 
+function mergeCarts(
+  localItems: (Product & { qty: number; variant?: Variant })[],
+  serverItems: (Product & { qty: number; variant?: Variant })[]
+) {
+  const merged = [...localItems];
+  for (const item of serverItems) {
+    const idx = merged.findIndex(
+      (p) =>
+        p.id === item.id &&
+        (item.variant?.id ? p.variant?.id === item.variant.id : !p.variant?.id)
+    );
+    if (idx >= 0) {
+      merged[idx] = { ...merged[idx], qty: merged[idx].qty + item.qty };
+    } else {
+      merged.push(item);
+    }
+  }
+  return merged;
+}
+
 interface AppProviderProps {
   children: React.ReactNode;
 }
@@ -26,6 +46,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [cart, setCart] = useState<
     (Product & { qty: number; variant?: Variant })[]
   >([]);
+  const hasMergedCart = useRef(false);
   const { addNotification } = useContext(NotificationContext);
 
   useEffect(() => {
@@ -40,19 +61,27 @@ export function AppProvider({ children }: AppProviderProps) {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
-    fetch('/api/cart')
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => {
-        if (Array.isArray(data)) setCart(data);
-      })
-      .catch(() => {});
-    fetch('/api/user/wishlist')
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => {
-        if (Array.isArray(data)) setWishlist(data);
-      })
-      .catch(() => {});
+    if (!user) {
+      hasMergedCart.current = false;
+      return;
+    }
+    if (!hasMergedCart.current) {
+      hasMergedCart.current = true;
+      fetch('/api/cart')
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setCart((prev) => mergeCarts(prev, data));
+          }
+        })
+        .catch(() => {});
+      fetch('/api/user/wishlist')
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data) => {
+          if (Array.isArray(data)) setWishlist(data);
+        })
+        .catch(() => {});
+    }
   }, [user]);
 
   useEffect(() => {
@@ -195,6 +224,11 @@ export function AppProvider({ children }: AppProviderProps) {
     addNotification('❌ Product removed from cart', 'error');
   };
 
+  const clearCart = () => {
+    setCart([]);
+    addNotification('Cart cleared', 'info');
+  };
+
   const addToWishlist = (product: Product, notifyOnStock = false) => {
     setWishlist((prev) => {
       if (prev.find((p) => p.product.id === product.id)) return prev;
@@ -251,6 +285,7 @@ export function AppProvider({ children }: AppProviderProps) {
         addToCart,
         changeQty,
         removeFromCart,
+        clearCart,
         addToWishlist,
         removeFromWishlist,
         placeOrder,
