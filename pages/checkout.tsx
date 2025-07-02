@@ -1,4 +1,10 @@
-import { useContext, useState, useEffect, FormEvent, ChangeEvent } from 'react';
+import {
+  useContext,
+  useState,
+  useEffect,
+  FormEvent,
+  ChangeEvent,
+} from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -9,11 +15,11 @@ import type { User } from '@/types/user';
 import type { Coupon } from '../types';
 import {
   TextInput,
-  Textarea,
   CountrySelect,
   AddressAutocomplete,
 } from '@components/form-fields';
 import FileUpload from '@components/form-fields/FileUpload';
+import Loader from '@components/Loader';
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || '';
 
@@ -50,6 +56,7 @@ const Checkout: React.FC = () => {
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [step, setStep] = useState(1);
   const [deliveryDate, setDeliveryDate] = useState('');
+  const [loadingUser, setLoadingUser] = useState(false);
 
   const itemCount = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce(
@@ -76,6 +83,22 @@ const Checkout: React.FC = () => {
   }, [cart]);
 
   useEffect(() => {
+    if (!user) return;
+    setLoadingUser(true);
+    fetch('/api/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        if (data.name) setName(data.name);
+        if (data.address) setAddress(data.address);
+        if (data.country) setCountry(data.country);
+        if (data.email) setEmail(data.email);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingUser(false));
+  }, [user]);
+
+  useEffect(() => {
     if (!country) return;
     fetch(`/api/delivery-estimate?country=${country}`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
@@ -84,6 +107,7 @@ const Checkout: React.FC = () => {
   }, [country]);
 
   if (cart.length === 0) return <div className="p-4">Your cart is empty.</div>;
+  if (loadingUser) return <Loader className="py-8" />;
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
