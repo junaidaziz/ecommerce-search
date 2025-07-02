@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, Fragment } from 'react';
+import OrderChatWindow from '@components/Chat/OrderChatWindow';
 import useRequireAuth from '@hooks/useRequireAuth';
 import type { Order } from '../types';
 import Head from 'next/head';
@@ -12,6 +13,11 @@ const Orders: React.FC<OrdersProps> = (_props) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [chatOrder, setChatOrder] = useState<{
+    id: string;
+    brandName: string;
+    brandLogo?: string | null;
+  } | null>(null);
 
   const groupedOrders = useMemo(() => {
     const map = new Map<string, { order: Order; items: Order[] }>();
@@ -115,19 +121,33 @@ const Orders: React.FC<OrdersProps> = (_props) => {
                       {new Date(group.order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="space-x-2">
-                      <a
-                        className="btn btn-sm"
-                        href={`/orders/${group.order.uuid}`}
-                      >
-                        View
-                      </a>
-                      <a
-                        className="link"
-                        href={`/api/orders/${group.order.uuid}/invoice`}
-                      >
-                        PDF
-                      </a>
-                    </td>
+                    <a
+                      className="btn btn-sm"
+                      href={`/orders/${group.order.uuid}`}
+                    >
+                      View
+                    </a>
+                    <a
+                      className="link"
+                      href={`/api/orders/${group.order.uuid}/invoice`}
+                    >
+                      PDF
+                    </a>
+                    <button
+                      type="button"
+                      className="link"
+                      onClick={() =>
+                        setChatOrder({
+                          id: group.order.uuid,
+                          brandName:
+                            group.order.product.vendor.brandName || 'Brand',
+                          brandLogo: group.order.product.vendor.logo,
+                        })
+                      }
+                    >
+                      Chat
+                    </button>
+                  </td>
                   </tr>
                   {expanded === idx && (
                     <tr className="bg-base-200">
@@ -163,6 +183,13 @@ const Orders: React.FC<OrdersProps> = (_props) => {
       ) : (
         !loading && <p>No orders found.</p>
       )}
+      <OrderChatWindow
+        isOpen={!!chatOrder}
+        orderId={chatOrder?.id || ''}
+        brandName={chatOrder?.brandName || ''}
+        brandLogo={chatOrder?.brandLogo}
+        onClose={() => setChatOrder(null)}
+      />
     </div>
   );
 };

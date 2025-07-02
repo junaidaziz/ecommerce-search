@@ -8,4 +8,5 @@ export interface Message {
   fileUrl?: string | null;
   fileName?: string | null;
   createdAt: Date;
+  seen: boolean;
 }
