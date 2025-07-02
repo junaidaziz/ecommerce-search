@@ -139,6 +139,15 @@ const ProfilePage: React.FC = () => {
                   {profile.disabled ? 'Disabled' : 'Active'}
                 </StatusLabel>
               )}
+              {profile && (
+                <StatusLabel color="info" size="sm">
+                  {profile.role === 'brand'
+                    ? 'Brand Admin'
+                    : profile.role === 'super-admin'
+                    ? 'Admin'
+                    : 'Customer'}
+                </StatusLabel>
+              )}
             </div>
           </div>
         </div>
@@ -176,18 +185,20 @@ const ProfilePage: React.FC = () => {
             {renderRow('Postal Code', (profile as Record<string, string> | undefined)?.postalCode)}
           </div>
         </section>
-        <section className="card bg-base-100 shadow">
-          <div className="card-body space-y-3">
-            <h2 className="card-title text-base font-semibold flex items-center gap-2">
-              <MoneyIcon className="w-5 h-5" />
-              Business Info
-            </h2>
-            {renderRow('Brand Name', profile?.brandName)}
-            {renderRow('Website', profile?.website)}
-            {renderRow('Description', profile?.businessDescription)}
-            {renderRow('Business Address', profile?.businessAddress)}
-          </div>
-        </section>
+        {profile?.role === 'brand' && (
+          <section className="card bg-base-100 shadow">
+            <div className="card-body space-y-3">
+              <h2 className="card-title text-base font-semibold flex items-center gap-2">
+                <MoneyIcon className="w-5 h-5" />
+                Business Info
+              </h2>
+              {renderRow('Brand Name', profile?.brandName)}
+              {renderRow('Website', profile?.website)}
+              {renderRow('Description', profile?.businessDescription)}
+              {renderRow('Business Address', profile?.businessAddress)}
+            </div>
+          </section>
+        )}
         <section className="card bg-base-100 shadow">
           <div className="card-body space-y-3">
             <h2 className="card-title text-base font-semibold flex items-center gap-2">
@@ -195,7 +206,7 @@ const ProfilePage: React.FC = () => {
               Account Info
             </h2>
             {renderRow('Role', profile?.role)}
-            {renderRow('Tax ID', profile?.taxId)}
+            {profile?.role === 'brand' && renderRow('Tax ID', profile?.taxId)}
             {renderRow('Last updated', lastUpdated)}
           </div>
         </section>
