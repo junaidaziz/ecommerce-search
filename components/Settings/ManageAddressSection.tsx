@@ -5,6 +5,8 @@ import { NotificationContext } from '@contexts/NotificationContext';
 interface AddressFormValues {
   address: string;
   city: string;
+  state: string;
+  postalCode: string;
   country: string;
 }
 
@@ -21,6 +23,8 @@ const ManageAddressSection: React.FC = () => {
         addressForm.reset({
           address: data.address || '',
           city: data.city || '',
+          state: data.state || '',
+          postalCode: data.postalCode || '',
           country: data.country || '',
         });
       })
@@ -32,6 +36,8 @@ const ManageAddressSection: React.FC = () => {
     const payload = {
       address: values.address,
       city: values.city,
+      state: values.state,
+      postalCode: values.postalCode,
       country: values.country,
     };
     const res = await fetch('/api/user/profile', {
@@ -63,6 +69,20 @@ const ManageAddressSection: React.FC = () => {
           name="city"
           rules={{ required: 'Required' }}
           error={addressForm.formState.errors.city?.message}
+        />
+        <TextInput
+          label="State"
+          placeholder="CA"
+          register={addressForm.register}
+          name="state"
+          error={addressForm.formState.errors.state?.message}
+        />
+        <TextInput
+          label="Postal Code"
+          placeholder="90210"
+          register={addressForm.register}
+          name="postalCode"
+          error={addressForm.formState.errors.postalCode?.message}
         />
         <div className="md:col-span-2">
           <CountrySelect

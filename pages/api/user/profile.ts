@@ -57,6 +57,8 @@ export default async function handler(
         phoneNumber,
         address,
         city,
+        state,
+        postalCode,
         country,
       } = fields as Partial<User> & { password?: string };
       const update: any = {
@@ -66,6 +68,8 @@ export default async function handler(
         phoneNumber,
         address,
         city,
+        state,
+        postalCode,
         country,
       };
       if (email) update.email = email;

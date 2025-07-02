@@ -11,6 +11,8 @@ export type UserInfo = Pick<
   | 'phoneNumber'
   | 'address'
   | 'city'
+  | 'state'
+  | 'postalCode'
   | 'country'
   | 'profileImage'
 > & { role: string };
