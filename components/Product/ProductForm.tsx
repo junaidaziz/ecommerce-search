@@ -9,7 +9,7 @@ import {
   Checkbox,
   TagInput,
 } from '../form-fields';
-import { VendorsResponse } from '../../types'
+import { VendorsResponse } from '../../types';
 
 import { AppContext } from '@contexts/AppContext';
 import type { ProductFormValues } from '../../types';
@@ -62,17 +62,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
       title: initial?.title || '',
       description: initial?.description || '',
       productType: initial?.productType || '',
-      tags: initial?.tags
-        ? initial.tags
-        : [],
+      tags: initial?.tags ? initial.tags : [],
       categoryId: initial?.categoryId ? String(initial.categoryId) : '',
       quantity: initial?.quantity ?? 0,
       minPrice: initial?.minPrice ?? 0,
       maxPrice: initial?.maxPrice ?? 0,
       currency: initial?.currency || 'USD',
       discountType:
-        (initial?.discountType as ProductFormValues['discountType'] | undefined) ??
-        'none',
+        (initial?.discountType as
+          | ProductFormValues['discountType']
+          | undefined) ?? 'none',
       discountValue:
         typeof initial?.discountValue === 'number'
           ? initial.discountValue
@@ -172,7 +171,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
       await onSubmit(fd);
     },
     (invalid) => {
-      const first = Object.keys(invalid)[0] as keyof ProductFormValues | undefined;
+      const first = Object.keys(invalid)[0] as
+        | keyof ProductFormValues
+        | undefined;
       if (first) setFocus(first);
     }
   );
@@ -192,41 +193,49 @@ const ProductForm: React.FC<ProductFormProps> = ({
         rules={{ required: 'Required' }}
         error={errors.sku?.message}
       />
-      <Controller
-        name="vendor"
-        control={control}
-        rules={{ required: 'Required' }}
-        render={({ field }) => (
-          <AsyncCreatableSelect
-            inputId="vendor-select"
-            ref={field.ref}
-            value={vendorOption}
-            defaultOptions
-            loadOptions={loadVendorOptions}
-            onBlur={field.onBlur}
-            onChange={(val) => {
-              if (!val) {
-                setVendorOption(null);
-                field.onChange('');
-              } else if (!Array.isArray(val)) {
-                setVendorOption(val as SelectOption);
-                field.onChange(val.value);
+      <div className="mb-4">
+        <label
+          htmlFor="vendor-select"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Vendor
+        </label>
+        <Controller
+          name="vendor"
+          control={control}
+          rules={{ required: 'Required' }}
+          render={({ field }) => (
+            <AsyncCreatableSelect
+              inputId="vendor-select"
+              ref={field.ref}
+              value={vendorOption}
+              defaultOptions
+              loadOptions={loadVendorOptions}
+              onBlur={field.onBlur}
+              onChange={(val) => {
+                if (!val) {
+                  setVendorOption(null);
+                  field.onChange('');
+                } else if (!Array.isArray(val)) {
+                  setVendorOption(val as SelectOption);
+                  field.onChange(val.value);
+                }
+              }}
+              onCreateOption={openCreateVendor}
+              formatCreateLabel={() => 'Create New Vendor'}
+              isValidNewOption={(input, _value, options) =>
+                input.trim().length > 0 && options.length === 0
               }
-            }}
-            onCreateOption={openCreateVendor}
-            formatCreateLabel={() => 'Create New Vendor'}
-            isValidNewOption={(input, _value, options) =>
-              input.trim().length > 0 && options.length === 0
-            }
-            placeholder="Vendor"
-            classNamePrefix="react-select"
-            isDisabled={!!user?.brandName}
-          />
+              placeholder="Vendor"
+              classNamePrefix="react-select"
+              isDisabled={!!user?.brandName}
+            />
+          )}
+        />
+        {errors.vendor && (
+          <p className="text-sm text-red-600">{errors.vendor.message}</p>
         )}
-      />
-      {errors.vendor && (
-        <p className="text-sm text-red-600">{errors.vendor.message}</p>
-      )}
+      </div>
       <TextInput<ProductFormValues>
         label="Title"
         name="title"
@@ -259,7 +268,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
           error={errors.tags?.message as string}
         />
       </div>
-      <div>
+      <div className="mb-4">
+        <label
+          htmlFor="category-select"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Category
+        </label>
         <Controller
           name="categoryId"
           control={control}
@@ -291,10 +306,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
             />
           )}
         />
+        {errors.categoryId && (
+          <p className="text-sm text-red-600">{errors.categoryId.message}</p>
+        )}
       </div>
-      {errors.categoryId && (
-        <p className="text-sm text-red-600">{errors.categoryId.message}</p>
-      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <TextInput<ProductFormValues>
           label="Quantity"
@@ -327,23 +342,28 @@ const ProductForm: React.FC<ProductFormProps> = ({
           }}
           error={errors.minPrice?.message}
         />
-      <TextInput<ProductFormValues>
-        label="Max Price"
-        name="maxPrice"
-        type="number"
-        min={0}
-        step="0.01"
-        register={register}
-        rules={{
-          required: 'Required',
-          min: { value: 0, message: 'Must be >= 0' },
-        }}
-        error={errors.maxPrice?.message}
-      />
+        <TextInput<ProductFormValues>
+          label="Max Price"
+          name="maxPrice"
+          type="number"
+          min={0}
+          step="0.01"
+          register={register}
+          rules={{
+            required: 'Required',
+            min: { value: 0, message: 'Must be >= 0' },
+          }}
+          error={errors.maxPrice?.message}
+        />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="discountType">Discount Type</label>
+          <label
+            className="block text-sm font-medium mb-1"
+            htmlFor="discountType"
+          >
+            Discount Type
+          </label>
           <select
             id="discountType"
             className="select select-bordered w-full"
@@ -369,7 +389,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   if (isNaN(num) || num <= 0 || num >= 100) return '1-99';
                   return true;
                 } else {
-                  if (isNaN(num) || num >= watch('minPrice')) return 'Must be < price';
+                  if (isNaN(num) || num >= watch('minPrice'))
+                    return 'Must be < price';
                   return true;
                 }
               },

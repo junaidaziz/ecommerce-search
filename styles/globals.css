@@ -54,6 +54,9 @@ body {
 .react-select__control {
   @apply input input-bordered w-full rounded-lg shadow-none;
 }
+.react-select__control--is-focused {
+  @apply ring-2 ring-blue-500 border-blue-500;
+}
 .react-select__menu {
   @apply bg-white text-base-content rounded-lg shadow-lg mt-1;
 }
