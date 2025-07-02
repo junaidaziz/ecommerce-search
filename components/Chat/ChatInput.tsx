@@ -73,9 +73,13 @@ const ChatInput: React.FC<Props> = ({ onSend }) => {
   };
 
   return (
-    <div className="p-2 border-t flex gap-2 items-center">
+    <div className="p-3 border-t flex gap-2 items-center">
       <input id="chat-file" type="file" hidden onChange={onFileChange} />
-      <label htmlFor="chat-file" className="btn btn-square btn-sm">
+      <label
+        htmlFor="chat-file"
+        className="btn btn-square btn-sm"
+        title="Attach a file or image"
+      >
         <PaperClipIcon size={16} />
       </label>
       {preview && (
@@ -86,11 +90,11 @@ const ChatInput: React.FC<Props> = ({ onSend }) => {
         />
       )}
       <input
-        className="input input-bordered flex-1"
+        className="input input-bordered flex-1 focus:outline-none focus:ring-2 focus:ring-primary"
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && submit()}
-        placeholder="Type a message"
+        placeholder="Type a message…"
       />
       <button type="button" className="btn btn-primary" onClick={submit}>
         Send
