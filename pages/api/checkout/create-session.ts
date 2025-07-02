@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
-import { getProductByUuid } from '@lib/db';
-import { findUserById } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
 import type { CheckoutSessionResponse, ApiMessage } from '../../../types';
 
@@ -16,52 +14,35 @@ export default async function handler(
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
-  const { items, email, shipping } = req.body || {};
-  if (!items || !email) {
-    return res.status(400).json({ message: 'items and email required' });
+  const { items, lineItems, orderId, email, shipping } = req.body || {};
+  if ((!items && !lineItems) || !email || !orderId) {
+    return res
+      .status(400)
+      .json({ message: 'orderId, email and items required' });
   }
   try {
-    let stripeAccountId: string | undefined;
-    let allowedStripe = false;
-    if (items.length > 0) {
-      const product = await getProductByUuid(
-        String(items[0].uuid || items[0].id)
-      );
-      if (product) {
-        const vendor = await findUserById(product.vendorId);
-        if (vendor) {
-          const methods = (vendor.paymentMethods as any[]) || [];
-          allowedStripe = methods.some((m) => m.type === 'stripe');
-          if (vendor.stripeAccountId) {
-            stripeAccountId = vendor.stripeAccountId;
-          }
-        }
-      }
-    }
-    if (!allowedStripe) {
-      return res.status(400).json({ message: 'payment method not supported' });
-    }
+    const stripeLineItems = lineItems
+      ? lineItems
+      : items.map((it: any) => ({
+          price_data: {
+            currency: 'usd',
+            product_data: { name: it.title },
+            unit_amount: Math.round(parseFloat(it.minPrice || 0) * 100),
+          },
+          quantity: it.qty,
+        }));
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: items.map((it: any) => ({
-        price_data: {
-          currency: 'usd',
-          product_data: { name: it.title },
-          unit_amount: Math.round(parseFloat(it.minPrice || 0) * 100),
-        },
-        quantity: it.qty,
-      })),
+      line_items: stripeLineItems,
       mode: 'payment',
       success_url: `${req.headers.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.origin}/checkout/cancel`,
-      payment_intent_data: stripeAccountId
-        ? { transfer_data: { destination: stripeAccountId } }
-        : undefined,
       metadata: {
         email,
+        orderId,
         shippingName: shipping?.name || '',
         shippingAddress: shipping?.address || '',
-        items: JSON.stringify(items),
+        items: JSON.stringify(items || lineItems),
       },
     });
     return res.status(200).json({ url: session.url ?? '', id: session.id });
