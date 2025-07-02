@@ -10,7 +10,7 @@ import ProductTable from './ProductTable';
 import ProductDetailsModal from './ProductDetailsModal';
 import { NotificationContext } from '@contexts/NotificationContext';
 import { ConfirmModal } from '@components/UI';
-import type { BrandProductSortValue } from './BrandProductSort';
+import BrandProductSort, { BrandProductSortValue } from './BrandProductSort';
 import Pagination from '@components/Pagination';
 
 const SORT_VALUES: BrandProductSortValue[] = [
@@ -42,7 +42,7 @@ const BrandProductsPage: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [sort, search, categoryFilter, minQty, maxQty]);
+  }, [sort, search]);
 
   useEffect(() => {
     if (!user) return;
@@ -63,16 +63,16 @@ const BrandProductsPage: React.FC = () => {
       })
       .catch(() => setError('Failed to load products'))
       .finally(() => setLoading(false));
-  }, [user, sort, search, categoryFilter, minQty, maxQty, currentPage]);
+  }, [user, sort, search, currentPage]);
 
-  useEffect(() => {
-    fetch('/api/categories?limit=250')
-      .then((res) => (res.ok ? res.json() : { categories: [] }))
-      .then((data: { categories: Category[] }) =>
-        setCategories(data.categories)
-      )
-      .catch(() => setCategories([]));
-  }, [user, sort, search]);
+  // useEffect(() => {
+  //   fetch('/api/categories?limit=250')
+  //     .then((res) => (res.ok ? res.json() : { categories: [] }))
+  //     .then((data: { categories: Category[] }) =>
+  //       setCategories(data.categories)
+  //     )
+  //     .catch(() => setCategories([]));
+  // }, [user, sort, search]);
 
   useEffect(() => {
     const pageParam = router.query.page;
@@ -141,7 +141,7 @@ const BrandProductsPage: React.FC = () => {
       );
       addNotification('Product deleted', 'success');
     } else if (res.status === 409) {
-      addNotification('Cannot delete product with stock or orders', 'error');
+      addNotification('Cannot delete product with orders', 'error');
     } else {
       addNotification('Failed to delete product', 'error');
     }
