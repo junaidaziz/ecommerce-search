@@ -65,6 +65,10 @@ async function handler(
             return { category: { name: 'asc' } } as const;
           case 'category_desc':
             return { category: { name: 'desc' } } as const;
+          case 'status_asc':
+            return { status: 'asc' } as const;
+          case 'status_desc':
+            return { status: 'desc' } as const;
           case 'quantity_desc':
             return { quantity: 'desc' } as const;
           case 'quantity_asc':
