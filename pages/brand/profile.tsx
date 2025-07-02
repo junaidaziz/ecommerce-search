@@ -45,6 +45,11 @@ export const BrandProfile: React.FC = () => {
 
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
+  const [stripeEnabled, setStripeEnabled] = useState(false);
+  const [jazzcashEnabled, setJazzcashEnabled] = useState(false);
+  const [jazzcashDetails, setJazzcashDetails] = useState('');
+  const [bankEnabled, setBankEnabled] = useState(false);
+  const [bankDetails, setBankDetails] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -58,6 +63,14 @@ export const BrandProfile: React.FC = () => {
         businessDescription: user.businessDescription || '',
         taxId: user.taxId || '',
       });
+      const methods = Array.isArray(user.paymentMethods) ? user.paymentMethods : [];
+      setStripeEnabled(methods.some((m) => m.type === 'stripe'));
+      const jazz = methods.find((m) => m.type === 'jazzcash');
+      setJazzcashEnabled(!!jazz);
+      setJazzcashDetails(jazz?.details || '');
+      const bank = methods.find((m) => m.type === 'bank_transfer');
+      setBankEnabled(!!bank);
+      setBankDetails(bank?.details || '');
     }
   }, [user, reset]);
 
@@ -78,6 +91,14 @@ export const BrandProfile: React.FC = () => {
           businessDescription: data.description || '',
           taxId: data.taxId || '',
         });
+        const methods = Array.isArray(data.paymentMethods) ? data.paymentMethods : [];
+        setStripeEnabled(methods.some((m) => m.type === 'stripe'));
+        const jazz = methods.find((m) => m.type === 'jazzcash');
+        setJazzcashEnabled(!!jazz);
+        setJazzcashDetails(jazz?.details || '');
+        const bank = methods.find((m) => m.type === 'bank_transfer');
+        setBankEnabled(!!bank);
+        setBankDetails(bank?.details || '');
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -85,10 +106,16 @@ export const BrandProfile: React.FC = () => {
 
   const submit: SubmitHandler<FormValues> = async (values) => {
     setMessage('');
+    const methods = [] as { type: string; details?: string }[];
+    if (stripeEnabled) methods.push({ type: 'stripe' });
+    if (jazzcashEnabled)
+      methods.push({ type: 'jazzcash', details: jazzcashDetails });
+    if (bankEnabled)
+      methods.push({ type: 'bank_transfer', details: bankDetails });
     const res = await fetch('/api/brand/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values),
+      body: JSON.stringify({ ...values, paymentMethods: methods }),
     });
     if (res.ok) setMessage('Profile updated');
     else setMessage('Update failed');
@@ -166,6 +193,52 @@ export const BrandProfile: React.FC = () => {
           placeholder="Tax ID"
           error={errors.taxId?.message}
         />
+        <div className="border p-3 rounded space-y-2">
+          <label className="font-semibold">Payment Methods</label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={stripeEnabled}
+              onChange={(e) => setStripeEnabled(e.target.checked)}
+            />
+            Stripe
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={jazzcashEnabled}
+              onChange={(e) => setJazzcashEnabled(e.target.checked)}
+            />
+            JazzCash
+          </label>
+          {jazzcashEnabled && (
+            <TextInput
+              name="jazzcashDetails"
+              placeholder="JazzCash account"
+              value={jazzcashDetails}
+              onChange={(e) => setJazzcashDetails(e.target.value)}
+            />
+          )}
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={bankEnabled}
+              onChange={(e) => setBankEnabled(e.target.checked)}
+            />
+            Bank Transfer
+          </label>
+          {bankEnabled && (
+            <Textarea
+              name="bankDetails"
+              placeholder="Bank details"
+              value={bankDetails}
+              onChange={(e) => setBankDetails(e.target.value)}
+            />
+          )}
+        </div>
         <button className="btn btn-primary w-full" type="submit">
           Update
         </button>
