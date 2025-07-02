@@ -36,6 +36,7 @@ interface ProductWithRelations {
     brandName: string | null;
     phoneNumber?: string | null | undefined;
     address?: string | null;
+    paymentMethods?: import('@/types/vendor').BrandPaymentMethod[] | null;
   };
   category: Category;
   variants: Variant[];
@@ -52,6 +53,7 @@ interface ProductRow {
         brandName: string | null;
         phoneNumber?: string | null | undefined;
         address?: string | null;
+        paymentMethods?: import('@/types/vendor').BrandPaymentMethod[] | null;
       })
     | null;
   description?: string | null;
@@ -175,6 +177,7 @@ export function mapDbRowToProduct(row: ProductRow): Product {
           brandName: row.vendor.brandName ?? '',
           phoneNumber: row.vendor.phoneNumber ?? undefined,
           address: row.vendor.address ?? null,
+          paymentMethods: (row.vendor.paymentMethods as any) ?? null,
         }
       : null,
     category: row.category ?? null,

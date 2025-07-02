@@ -42,7 +42,8 @@ const Checkout: React.FC = () => {
   const [error, setError] = useState('');
   const [coupon, setCoupon] = useState('');
   const [discount, setDiscount] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [availableMethods, setAvailableMethods] = useState<{ type: string; details?: string }[]>([]);
+  const [paymentMethod, setPaymentMethod] = useState('stripe');
   const [paymentReference, setPaymentReference] = useState('');
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [step, setStep] = useState(1);
@@ -65,6 +66,14 @@ const Checkout: React.FC = () => {
   const finalTotal = discountedTotal + shippingCost;
 
   useEffect(() => {
+    if (cart.length > 0 && (cart[0] as any).vendor) {
+      const methods = (cart[0] as any).vendor.paymentMethods || [];
+      setAvailableMethods(methods);
+      if (methods.length > 0) setPaymentMethod(methods[0].type);
+    }
+  }, [cart]);
+
+  useEffect(() => {
     if (!country) return;
     fetch(`/api/delivery-estimate?country=${country}`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
@@ -79,7 +88,7 @@ const Checkout: React.FC = () => {
     setError('');
     try {
       if (user) {
-        if (paymentMethod === 'card') {
+        if (paymentMethod === 'stripe') {
           const res = await fetch('/api/checkout/create-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -269,7 +278,7 @@ const Checkout: React.FC = () => {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (paymentMethod !== 'card' && !paymentReference) {
+          if (paymentMethod !== 'stripe' && !paymentReference) {
             setError('Payment reference required');
             return;
           }
@@ -278,6 +287,9 @@ const Checkout: React.FC = () => {
         }}
         className="space-y-3"
       >
+        {availableMethods.length === 0 && (
+          <p>No payment methods available.</p>
+        )}
         <div>
           <label className="label" htmlFor="paymentMethod">Payment Method</label>
           <select
@@ -286,21 +298,25 @@ const Checkout: React.FC = () => {
             value={paymentMethod}
             onChange={(e) => setPaymentMethod(e.target.value)}
           >
-            <option value="card">Credit/Debit Card</option>
-            <option value="easypaisa">EasyPaisa</option>
-            <option value="jazzcash">JazzCash</option>
-            <option value="bank">Bank Transfer</option>
+            {availableMethods.map((m) => (
+              <option key={m.type} value={m.type}>
+                {m.type === 'card' || m.type === 'stripe'
+                  ? 'Credit/Debit Card'
+                  : m.type === 'jazzcash'
+                  ? 'JazzCash'
+                  : m.type === 'bank_transfer'
+                  ? 'Bank Transfer'
+                  : m.type}
+              </option>
+            ))}
           </select>
         </div>
-        {paymentMethod !== 'card' && (
+        {paymentMethod !== 'stripe' && paymentMethod !== 'card' && (
           <div className="border p-3 rounded space-y-2">
-            {paymentMethod === 'easypaisa' && (
-              <p>Send payment to EasyPaisa account <b>0300-1234567</b> and enter the transaction ID below.</p>
-            )}
             {paymentMethod === 'jazzcash' && (
               <p>Send payment to JazzCash account <b>0300-7654321</b> and enter the transaction ID below.</p>
             )}
-            {paymentMethod === 'bank' && (
+            {paymentMethod === 'bank_transfer' && (
               <p>Transfer to Bank Account <b>PK00 TEST 1234 5678 9012 3456</b> and provide reference.</p>
             )}
             <TextInput
