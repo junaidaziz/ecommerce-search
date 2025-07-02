@@ -2,29 +2,20 @@ import React from 'react';
 import Link from 'next/link';
 import { StatusLabel } from '@components/UI';
 import type { Product } from '@/types/product';
+import type { BrandProductSortValue } from './BrandProductSort';
 
 interface ProductTableProps {
   products: Product[];
-  categories: { name: string; slug: string }[];
-  category: string;
-  onCategoryChange: (value: string) => void;
-  minQty: string;
-  maxQty: string;
-  onMinQtyChange: (value: string) => void;
-  onMaxQtyChange: (value: string) => void;
+  sort: BrandProductSortValue;
+  onSort: (field: 'title' | 'category' | 'status' | 'quantity') => void;
   onView: (product: Product) => void;
   onDelete: (id: string) => void;
 }
 
 const ProductTable: React.FC<ProductTableProps> = ({
   products,
-  categories,
-  category,
-  onCategoryChange,
-  minQty,
-  maxQty,
-  onMinQtyChange,
-  onMaxQtyChange,
+  sort,
+  onSort,
   onView,
   onDelete,
 }) => {
@@ -39,46 +30,41 @@ const ProductTable: React.FC<ProductTableProps> = ({
         <table className="table w-full">
           <thead>
             <tr>
-              <th>Product</th>
-              <th className="hidden sm:table-cell">Category</th>
-              <th>Status</th>
-              <th>Qty</th>
-              <th></th>
-            </tr>
-            <tr>
-              <th></th>
-              <th className="hidden sm:table-cell">
-                <select
-                  className="select select-xs select-bordered w-full"
-                  value={category}
-                  onChange={(e) => onCategoryChange(e.target.value)}
-                >
-                  <option value="">All</option>
-                  {categories.map((c) => (
-                    <option key={c.slug} value={c.slug}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+              <th
+                className="cursor-pointer select-none"
+                onClick={() => onSort('title')}
+              >
+                Product{' '}
+                {sort.startsWith('title_') && (
+                  <span>{sort.endsWith('asc') ? '▲' : '▼'}</span>
+                )}
               </th>
-              <th></th>
-              <th>
-                <div className="flex items-center gap-1">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    className="input input-xs w-20"
-                    value={minQty}
-                    onChange={(e) => onMinQtyChange(e.target.value)}
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    className="input input-xs w-20"
-                    value={maxQty}
-                    onChange={(e) => onMaxQtyChange(e.target.value)}
-                  />
-                </div>
+              <th
+                className="hidden sm:table-cell cursor-pointer select-none"
+                onClick={() => onSort('category')}
+              >
+                Category{' '}
+                {sort.startsWith('category_') && (
+                  <span>{sort.endsWith('asc') ? '▲' : '▼'}</span>
+                )}
+              </th>
+              <th
+                className="cursor-pointer select-none"
+                onClick={() => onSort('status')}
+              >
+                Status{' '}
+                {sort.startsWith('status_') && (
+                  <span>{sort.endsWith('asc') ? '▲' : '▼'}</span>
+                )}
+              </th>
+              <th
+                className="cursor-pointer select-none"
+                onClick={() => onSort('quantity')}
+              >
+                Qty{' '}
+                {sort.startsWith('quantity_') && (
+                  <span>{sort.endsWith('asc') ? '▲' : '▼'}</span>
+                )}
               </th>
               <th></th>
             </tr>
