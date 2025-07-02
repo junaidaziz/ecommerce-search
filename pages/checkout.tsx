@@ -15,6 +15,8 @@ import {
 } from '@components/form-fields';
 import FileUpload from '@components/form-fields/FileUpload';
 
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || '';
+
 // Types for cart item and user
 type CartItem = {
   id: string | number;
@@ -89,14 +91,27 @@ const Checkout: React.FC = () => {
     try {
       if (user) {
         if (paymentMethod === 'stripe') {
+          const createRes = await fetch(`${STRAPI_URL}/orders/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              products: cart.map((c) => ({ id: c.id, quantity: c.qty })),
+              userId: user.id,
+              paymentMethod: 'stripe',
+              shippingAddress: { name, address, country },
+            }),
+          });
+          const createData = await createRes.json();
+          if (!createRes.ok)
+            throw new Error(createData.message || 'Order failed');
           const res = await fetch('/api/checkout/create-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              items: cart,
+              lineItems: createData.lineItems,
+              orderId: createData.orderId,
               email: user.email,
               shipping: { name, address },
-              discount,
             }),
           });
           const data = await res.json();

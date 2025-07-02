@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { stripe } from '@lib/stripe';
+import { strapiMarkOrderPaid } from '@lib/strapi';
 
 export const config = {
   api: {
@@ -33,6 +34,16 @@ export default async function handler(
     res.status(400).end(`Webhook Error: ${(err as Error).message}`);
     return;
   }
-  // Handle events here if needed
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as any;
+    const orderId = session.metadata?.orderId;
+    try {
+      if (orderId) {
+        await strapiMarkOrderPaid({ orderId, stripeSessionId: session.id });
+      }
+    } catch (err) {
+      console.error('Failed to mark order paid', err);
+    }
+  }
   res.json({ received: true });
 }
