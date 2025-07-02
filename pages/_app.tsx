@@ -1,4 +1,5 @@
 import '../styles/globals.css';
+import 'react-quill/dist/quill.snow.css';
 import { AppProvider } from '@contexts/AppContext';
 import Layout from '@components/Layout/Layout';
 import { SessionProvider } from 'next-auth/react';

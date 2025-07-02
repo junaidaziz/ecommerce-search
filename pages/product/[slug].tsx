@@ -121,11 +121,16 @@ export default function ProductDetail({
           </p>
           <p className="mb-2">SKU: {product.sku || 'N/A'}</p>
           <p className="mb-2">Type: {product.productType || 'N/A'}</p>
-          <p className="mb-4">
-            {product.descriptionText ||
-              product.bodyHtmlText ||
-              'No description available.'}
-          </p>
+          <p
+            className="mb-4"
+            dangerouslySetInnerHTML={{
+              __html:
+                product.description ||
+                product.bodyHtmlText ||
+                product.descriptionText ||
+                'No description available.',
+            }}
+          />
           <p className="text-lg font-bold mb-4">
             {product.currency}{' '}
             {parseFloat(
