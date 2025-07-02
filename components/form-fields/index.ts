@@ -11,3 +11,4 @@ export { default as CountrySelect } from './CountrySelect';
 export { default as TagInput } from './TagInput';
 export { default as AddressAutocomplete } from './AddressAutocomplete';
 export { default as CardNumberInput } from './CardNumberInput';
+export { default as RichTextEditor } from './RichTextEditor';

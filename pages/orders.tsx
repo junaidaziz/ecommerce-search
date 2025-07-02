@@ -1,14 +1,16 @@
-import { useEffect, useState, useMemo, Fragment } from 'react';
 import OrderChatWindow from '@components/Chat/OrderChatWindow';
+import { useEffect, useState, useMemo, Fragment, useContext } from 'react';
 import useRequireAuth from '@hooks/useRequireAuth';
 import type { Order } from '../types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import { NotificationContext } from '@contexts/NotificationContext';
 
 type OrdersProps = {};
 
 const Orders: React.FC<OrdersProps> = (_props) => {
   const user = useRequireAuth();
+  const { addNotification } = useContext(NotificationContext);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +56,18 @@ const Orders: React.FC<OrdersProps> = (_props) => {
       )
       .finally(() => setLoading(false));
   }, [user]);
+
+  const cancelOrder = async (uuid: string) => {
+    if (!confirm('Cancel this order?')) return;
+    const res = await fetch(`/api/user/orders/${uuid}/cancel`, { method: 'POST' });
+    const data = await res.json().catch(() => null);
+    if (res.ok) {
+      addNotification('Order cancelled', 'success');
+      setOrders((prev) => prev.map((o) => (o.uuid === uuid ? { ...o, status: 'cancelled' } : o)));
+    } else {
+      addNotification(data?.message || 'Cancellation failed', 'error');
+    }
+  };
 
   if (!user) {
     return null;
@@ -108,7 +122,8 @@ const Orders: React.FC<OrdersProps> = (_props) => {
                             ? 'badge-warning'
                             : group.order.status === 'shipped'
                               ? 'badge-info'
-                              : group.order.status === 'delivered'
+                              : group.order.status === 'delivered' ||
+                                  group.order.status === 'completed'
                                 ? 'badge-success'
                                 : 'badge-error'
                         }`}
@@ -121,18 +136,6 @@ const Orders: React.FC<OrdersProps> = (_props) => {
                       {new Date(group.order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="space-x-2">
-                    <a
-                      className="btn btn-sm"
-                      href={`/orders/${group.order.uuid}`}
-                    >
-                      View
-                    </a>
-                    <a
-                      className="link"
-                      href={`/api/orders/${group.order.uuid}/invoice`}
-                    >
-                      PDF
-                    </a>
                     <button
                       type="button"
                       className="link"
@@ -147,7 +150,30 @@ const Orders: React.FC<OrdersProps> = (_props) => {
                     >
                       Chat
                     </button>
-                  </td>
+                      <a
+                        className="btn btn-sm"
+                        href={`/orders/${group.order.uuid}`}
+                      >
+                        View
+                      </a>
+                      <a
+                        className="link"
+                        href={`/api/orders/${group.order.uuid}/invoice`}
+                      >
+                        PDF
+                      </a>
+                      {['pending', 'confirmed', 'processing'].includes(
+                        group.order.status
+                      ) && (
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-error"
+                          onClick={() => cancelOrder(group.order.uuid)}
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </td>
                   </tr>
                   {expanded === idx && (
                     <tr className="bg-base-200">
