@@ -5,6 +5,8 @@ export type BrandProductSortValue =
   | 'title_desc'
   | 'category_asc'
   | 'category_desc'
+  | 'status_asc'
+  | 'status_desc'
   | 'quantity_asc'
   | 'quantity_desc';
 
@@ -13,7 +15,10 @@ interface BrandProductSortProps {
   onChange: (v: BrandProductSortValue) => void;
 }
 
-const BrandProductSort: React.FC<BrandProductSortProps> = ({ value, onChange }) => (
+const BrandProductSort: React.FC<BrandProductSortProps> = ({
+  value,
+  onChange,
+}) => (
   <div className="flex items-center gap-2">
     <label htmlFor="brand-sort" className="font-medium">
       Sort by:
@@ -28,6 +33,8 @@ const BrandProductSort: React.FC<BrandProductSortProps> = ({ value, onChange }) 
       <option value="title_desc">Name (Z-A)</option>
       <option value="category_asc">Category (A-Z)</option>
       <option value="category_desc">Category (Z-A)</option>
+      <option value="status_asc">Status (A-Z)</option>
+      <option value="status_desc">Status (Z-A)</option>
       <option value="quantity_asc">Quantity (Low-High)</option>
       <option value="quantity_desc">Quantity (High-Low)</option>
     </select>
