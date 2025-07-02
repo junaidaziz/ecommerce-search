@@ -2,6 +2,7 @@ import { Order, Product } from '../types';
 import { getDb } from './db';
 import { mapDbRowToProduct } from './products';
 import { createNotification } from './notifications';
+import { sendBrandNewOrder } from './email';
 import type { Prisma } from '@prisma/client';
 
 type OrderWithRelations = Prisma.OrderGetPayload<{
@@ -87,6 +88,12 @@ export async function addOrder({
         orderId: o.id,
         message: `New order for ${o.product.title}`,
       })
+    )
+  );
+
+  await Promise.all(
+    createdOrders.map((o) =>
+      sendBrandNewOrder(o.product.vendor.email, { id: o.id })
     )
   );
 

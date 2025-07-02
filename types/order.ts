@@ -3,10 +3,14 @@ import type { User } from './user';
 import type { Product } from './product';
 
 export enum OrderStatus {
+  PENDING = 'pending',
+  CONFIRMED = 'confirmed',
   PROCESSING = 'processing',
   SHIPPED = 'shipped',
   DELIVERED = 'delivered',
+  COMPLETED = 'completed',
   CANCELLED = 'cancelled',
+  RETURNED = 'returned',
 }
 
 export interface Order extends PrismaOrder {
