@@ -5,6 +5,7 @@ import { Order } from '../../types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import OrderDetailsModal from '@components/brand/OrderDetailsModal';
+import ChatWidget from '@components/ChatWidget';
 
 const BrandOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;
@@ -132,6 +133,7 @@ const BrandOrders: React.FC = () => {
         isOpen={!!viewGroup}
         onClose={() => setViewGroup(null)}
       />
+      <ChatWidget />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import Layout from '@components/Layout/Layout';
 import { SessionProvider } from 'next-auth/react';
 import { NotificationProvider } from '@contexts/NotificationContext';
 import { Toaster } from 'sonner';
+import { ChatProvider } from '@contexts/ChatContext';
 
 import type { AppProps } from 'next/app';
 
@@ -17,13 +18,15 @@ export default function App({
     <SessionProvider session={session}>
       <NotificationProvider>
         <AppProvider>
-          <Toaster position="top-right" richColors />
-          <Layout
-            heroSecond={HeroSecond ? <HeroSecond /> : null}
-            maxWidthClass={maxWidthClass}
-          >
-            <Component {...pageProps} />
-          </Layout>
+          <ChatProvider>
+            <Toaster position="top-right" richColors />
+            <Layout
+              heroSecond={HeroSecond ? <HeroSecond /> : null}
+              maxWidthClass={maxWidthClass}
+            >
+              <Component {...pageProps} />
+            </Layout>
+          </ChatProvider>
         </AppProvider>
       </NotificationProvider>
     </SessionProvider>
