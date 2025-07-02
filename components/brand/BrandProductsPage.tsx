@@ -12,7 +12,6 @@ import { NotificationContext } from '@contexts/NotificationContext';
 import { ConfirmModal } from '@components/UI';
 import BrandProductSort, { BrandProductSortValue } from './BrandProductSort';
 import Pagination from '@components/Pagination';
-import type { BrandProductSortValue } from './BrandProductSort';
 
 const BrandProductsPage: React.FC = () => {
   const router = useRouter();
@@ -32,7 +31,7 @@ const BrandProductsPage: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [sort, search, categoryFilter, minQty, maxQty]);
+  }, [sort, search]);
 
   useEffect(() => {
     if (!user) return;
@@ -53,16 +52,16 @@ const BrandProductsPage: React.FC = () => {
       })
       .catch(() => setError('Failed to load products'))
       .finally(() => setLoading(false));
-  }, [user, sort, search, categoryFilter, minQty, maxQty, currentPage]);
+  }, [user, sort, search, currentPage]);
 
-  useEffect(() => {
-    fetch('/api/categories?limit=250')
-      .then((res) => (res.ok ? res.json() : { categories: [] }))
-      .then((data: { categories: Category[] }) =>
-        setCategories(data.categories)
-      )
-      .catch(() => setCategories([]));
-  }, [user, sort, search]);
+  // useEffect(() => {
+  //   fetch('/api/categories?limit=250')
+  //     .then((res) => (res.ok ? res.json() : { categories: [] }))
+  //     .then((data: { categories: Category[] }) =>
+  //       setCategories(data.categories)
+  //     )
+  //     .catch(() => setCategories([]));
+  // }, [user, sort, search]);
 
   useEffect(() => {
     const pageParam = router.query.page;
