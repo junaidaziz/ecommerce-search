@@ -2,16 +2,10 @@ import { useState, useEffect, useContext } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { TextInput, CountrySelect } from '@components/form-fields';
 import { NotificationContext } from '@contexts/NotificationContext';
-import countries from '../../data/countries';
-
 interface AddressFormValues {
   address: string;
   city: string;
-  country: {
-    label: string;
-    value: string;
-    callingCode: string;
-  } | null;
+  country: string;
 }
 
 const ManageAddressSection: React.FC = () => {
@@ -27,7 +21,7 @@ const ManageAddressSection: React.FC = () => {
         addressForm.reset({
           address: data.address || '',
           city: data.city || '',
-          country: countries.find((c) => c.value === data.country) || null,
+          country: data.country || '',
         });
       })
       .catch(() => {});
@@ -38,7 +32,7 @@ const ManageAddressSection: React.FC = () => {
     const payload = {
       address: values.address,
       city: values.city,
-      country: values.country?.value || '',
+      country: values.country,
     };
     const res = await fetch('/api/user/profile', {
       method: 'PUT',
