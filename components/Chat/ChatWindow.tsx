@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { ChatContext } from '@contexts/ChatContext';
 import ChatIcon from '../icons/ChatIcon';
+import ChatInput from './ChatInput';
+import ChatMessage from './ChatMessage';
 
 const ChatWindow: React.FC = () => {
-  const { messages, sendMessage, isOpen, openChat, closeChat } =
-    useContext(ChatContext);
-  const [text, setText] = useState('');
+  const { messages, isOpen, openChat, closeChat } = useContext(ChatContext);
   const endRef = useRef<HTMLDivElement | null>(null);
 
   const toggle = () => {
@@ -14,12 +14,6 @@ const ChatWindow: React.FC = () => {
     } else {
       openChat();
     }
-  };
-
-  const submit = () => {
-    if (!text.trim()) return;
-    sendMessage(text.trim());
-    setText('');
   };
 
   useEffect(() => {
@@ -34,33 +28,21 @@ const ChatWindow: React.FC = () => {
         <div className="bg-base-100 rounded-lg shadow-lg w-72 h-96 flex flex-col fade-in">
           <div className="flex justify-between items-center p-2 border-b">
             <span className="font-semibold">Support Chat</span>
-            <button type="button" className="btn btn-xs btn-circle" onClick={toggle}>
+            <button
+              type="button"
+              className="btn btn-xs btn-circle"
+              onClick={toggle}
+            >
               ✕
             </button>
           </div>
           <div className="flex-1 overflow-y-auto p-2 space-y-1 text-sm">
             {messages.map((m) => (
-              <div key={m.id}>
-                <span className="text-gray-500 mr-2">
-                  {m.sender === 'user' ? 'You' : 'Support'}:
-                </span>
-                <span>{m.content}</span>
-              </div>
+              <ChatMessage key={m.id} message={m} />
             ))}
             <div ref={endRef} />
           </div>
-          <div className="p-2 border-t flex gap-2">
-            <input
-              className="input input-bordered flex-1"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && submit()}
-              placeholder="Type a message"
-            />
-            <button type="button" className="btn btn-primary" onClick={submit}>
-              Send
-            </button>
-          </div>
+          <ChatInput />
         </div>
       ) : (
         <button
