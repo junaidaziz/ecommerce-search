@@ -22,16 +22,24 @@ export default async function handler(
   }
   try {
     let stripeAccountId: string | undefined;
+    let allowedStripe = false;
     if (items.length > 0) {
       const product = await getProductByUuid(
         String(items[0].uuid || items[0].id)
       );
       if (product) {
         const vendor = await findUserById(product.vendorId);
-        if (vendor && vendor.stripeAccountId) {
-          stripeAccountId = vendor.stripeAccountId;
+        if (vendor) {
+          const methods = (vendor.paymentMethods as any[]) || [];
+          allowedStripe = methods.some((m) => m.type === 'stripe');
+          if (vendor.stripeAccountId) {
+            stripeAccountId = vendor.stripeAccountId;
+          }
         }
       }
+    }
+    if (!allowedStripe) {
+      return res.status(400).json({ message: 'payment method not supported' });
     }
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],

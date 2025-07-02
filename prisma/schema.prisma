@@ -35,6 +35,7 @@ model User {
   profileImage        String?
   taxId               String?
   stripeAccountId     String?
+  paymentMethods      Json?
   role                Role      @default(USER)
   verified            Boolean   @default(false)
   disabled            Boolean   @default(false)

@@ -22,6 +22,7 @@ export interface User {
   profileImage?: string;
   taxId?: string;
   stripeAccountId?: string;
+  paymentMethods?: import('./vendor').BrandPaymentMethod[];
   verificationToken?: string;
   resetToken?: string;
   resetExpires?: Date;
@@ -53,6 +54,7 @@ export interface UserInput {
   profileImage?: string;
   taxId?: string;
   stripeAccountId?: string;
+  paymentMethods?: import('./vendor').BrandPaymentMethod[];
   role?: Role;
   verificationToken?: string;
 }

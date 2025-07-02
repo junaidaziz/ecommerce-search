@@ -13,7 +13,13 @@ export interface Vendor {
   description?: string;
   logo?: string;
   taxId?: string;
+  paymentMethods?: BrandPaymentMethod[];
   status?: string;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface BrandPaymentMethod {
+  type: 'stripe' | 'jazzcash' | 'bank_transfer';
+  details?: string | null;
 }

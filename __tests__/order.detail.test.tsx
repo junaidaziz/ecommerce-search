@@ -33,7 +33,7 @@ describe('OrderDetail page', () => {
           id: 1,
           uuid: 'abc',
           status: 'processing',
-          product: { title: 'Test' },
+          product: { title: 'Test', vendor: { brandName: 'Brand', logo: null } },
           quantity: 2,
           total: 20,
         }),
