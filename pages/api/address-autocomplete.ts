@@ -6,7 +6,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const input = (req.query.input as string) || '';
+    const input = String(req.query.input || '').trim();
     if (!input) return res.status(400).json({ message: 'input required' });
     const key = process.env.GOOGLE_PLACES_API_KEY;
     if (!key) return res.status(500).json({ message: 'api key not set' });
@@ -14,9 +14,11 @@ export default async function handler(
       input
     )}&key=${key}`;
     const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`status ${resp.status}`);
     const data = await resp.json();
     return res.status(200).json(data);
   } catch (e) {
-    return handleApiError(res, e, 'autocomplete error');
+    console.error('Address autocomplete error:', e);
+    return res.status(200).json({ predictions: [] });
   }
 }

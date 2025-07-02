@@ -367,29 +367,30 @@ const Checkout: React.FC = () => {
         }}
         className="space-y-3"
       >
-        {availableMethods.length === 0 && (
-          <p>No payment methods available.</p>
-        )}
         <div>
           <label className="label" htmlFor="paymentMethod">Payment Method</label>
-          <select
-            id="paymentMethod"
-            className="select select-bordered w-full"
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-          >
-            {availableMethods.map((m) => (
-              <option key={m.type} value={m.type}>
-                {m.type === 'card' || m.type === 'stripe'
-                  ? 'Credit/Debit Card'
-                  : m.type === 'jazzcash'
-                  ? 'JazzCash'
-                  : m.type === 'bank_transfer'
-                  ? 'Bank Transfer'
-                  : m.type}
-              </option>
-            ))}
-          </select>
+          {availableMethods.length > 0 ? (
+            <select
+              id="paymentMethod"
+              className="select select-bordered w-full"
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+              {availableMethods.map((m) => (
+                <option key={m.type} value={m.type}>
+                  {m.type === 'card' || m.type === 'stripe'
+                    ? 'Credit/Debit Card'
+                    : m.type === 'jazzcash'
+                    ? 'JazzCash'
+                    : m.type === 'bank_transfer'
+                    ? 'Bank Transfer'
+                    : m.type}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p className="text-sm">No payment methods available.</p>
+          )}
         </div>
         {paymentMethod !== 'stripe' && paymentMethod !== 'card' && (
           <div className="border p-3 rounded space-y-2">
