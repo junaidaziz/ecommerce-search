@@ -128,11 +128,15 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
                 }`
               : ''}
           </p>
-          <p>
-            {product.descriptionText ||
-              product.bodyHtmlText ||
-              'No description available'}
-          </p>
+          <p
+            dangerouslySetInnerHTML={{
+              __html:
+                product.description ||
+                product.bodyHtmlText ||
+                product.descriptionText ||
+                'No description available',
+            }}
+          />
           <p className="text-lg font-bold">
             {formatCurrency(product.minPrice ?? 0, product.currency)}
           </p>

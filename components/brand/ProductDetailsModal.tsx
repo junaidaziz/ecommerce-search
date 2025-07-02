@@ -35,10 +35,10 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
       : product.featuredImage
         ? [product.featuredImage]
         : [];
-  const description =
-    product.descriptionText ||
-    product.bodyHtmlText ||
+  const descriptionHtml =
     product.description ||
+    product.bodyHtmlText ||
+    product.descriptionText ||
     'No description.';
   const category =
     typeof product.category === 'string'
@@ -84,8 +84,11 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
         </div>
         <div>
           <h3 className="font-semibold mb-1">Description</h3>
-          <p className={showAll ? undefined : 'line-clamp-5'}>{description}</p>
-          {!showAll && description.length > 200 && (
+          <p
+            className={showAll ? undefined : 'line-clamp-5'}
+            dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+          />
+          {!showAll && descriptionHtml.length > 200 && (
             <button
               type="button"
               className="btn btn-link btn-xs px-0"
