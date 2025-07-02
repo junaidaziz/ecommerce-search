@@ -25,6 +25,8 @@ model User {
   phoneNumber         String?
   address             String?
   city                String?
+  state               String?
+  postalCode          String?
   country             String?
   businessAddress     String?
   website             String?

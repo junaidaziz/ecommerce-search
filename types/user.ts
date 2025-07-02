@@ -10,6 +10,8 @@ export interface User {
   phoneNumber?: string | null;
   address?: string;
   city?: string;
+  state?: string;
+  postalCode?: string;
   country?: string;
   brandName?: string;
   gender?: string;
@@ -41,6 +43,8 @@ export interface UserInput {
   phoneNumber?: string | null;
   address?: string;
   city?: string;
+  state?: string;
+  postalCode?: string;
   country?: string;
   businessAddress?: string;
   website?: string;
