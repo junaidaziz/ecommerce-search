@@ -1,4 +1,10 @@
-import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+} from 'react';
 import {
   useSession,
   signIn as nextSignIn,
@@ -50,9 +56,9 @@ export function AppProvider({ children }: AppProviderProps) {
   const { addNotification } = useContext(NotificationContext);
 
   useEffect(() => {
-    const stored = localStorage.getItem('app-cart');
-    if (stored) {
-      setCart(JSON.parse(stored));
+    const storedCart = localStorage.getItem('app-cart');
+    if (storedCart) {
+      setCart(JSON.parse(storedCart));
     }
     const storedWish = localStorage.getItem('app-wishlist');
     if (storedWish) {
@@ -86,7 +92,8 @@ export function AppProvider({ children }: AppProviderProps) {
 
   useEffect(() => {
     if (session?.user) {
-      const { email, name, role, brandName, gender, brandId, profileImage } = session.user;
+      const { email, name, role, brandName, gender, brandId, profileImage } =
+        session.user;
       const [firstName = '', lastName = ''] = (name || '').split(' ');
       setUser({
         id: brandId,
@@ -111,7 +118,13 @@ export function AppProvider({ children }: AppProviderProps) {
 
   useEffect(() => {
     localStorage.setItem('app-cart', JSON.stringify(cart));
+  }, [cart]);
+
+  useEffect(() => {
     localStorage.setItem('app-wishlist', JSON.stringify(wishlist));
+  }, [wishlist]);
+
+  useEffect(() => {
     if (user) {
       fetch('/api/cart', {
         method: 'POST',
@@ -119,7 +132,7 @@ export function AppProvider({ children }: AppProviderProps) {
         body: JSON.stringify({ items: cart }),
       }).catch(() => {});
     }
-  }, [cart, wishlist, user]);
+  }, [cart, user]);
 
   const login = async (email: string, password: string): Promise<void> => {
     const res = await nextSignIn('credentials', {
