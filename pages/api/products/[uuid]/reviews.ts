@@ -1,10 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/react';
-import {
-  addReview,
-  getReviewsForProduct,
-  getAverageRating,
-} from '@lib/db';
+import { addReview, getReviewsForProduct, getAverageRating } from '@lib/db';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import type {
@@ -13,6 +9,7 @@ import type {
   ReviewAddedResponse,
 } from '@/types/review';
 import type { ApiMessage } from '../../../../types';
+import { METHOD_NOT_ALLOWED, UUID_REQUIRED } from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,7 +18,7 @@ export default async function handler(
   const { method } = req;
   const uuid = getQueryParam(req.query.uuid);
   try {
-    if (!uuid) return res.status(400).json({ message: 'uuid required' });
+    if (!uuid) return res.status(400).json({ message: UUID_REQUIRED });
 
     if (method === 'GET') {
       const reviews = getReviewsForProduct(String(uuid)) as Review[];
@@ -60,7 +57,7 @@ export default async function handler(
       });
     }
 
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     return handleApiError(res, error, 'Failed to handle review');
   }

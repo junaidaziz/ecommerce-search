@@ -10,6 +10,12 @@ import { logAudit } from '@lib/audit';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { Category, CategoryInput, ApiMessage } from '../../../types';
+import {
+  METHOD_NOT_ALLOWED,
+  UUID_REQUIRED,
+  NAME_REQUIRED,
+  CATEGORY_EXISTS,
+} from '@/constants/messages';
 
 async function handler(
   req: NextApiRequest,
@@ -23,14 +29,14 @@ async function handler(
     }
     if (req.method === 'POST') {
       const { name, slug } = req.body as CategoryInput;
-      if (!name) return res.status(400).json({ message: 'name required' });
+      if (!name) return res.status(400).json({ message: NAME_REQUIRED });
       const exists = (await getCategoriesFlat()).find(
         (c: Category) =>
           c.name.toLowerCase() === name.toLowerCase() ||
           (slug && c.slug?.toLowerCase() === slug.toLowerCase())
       );
       if (exists) {
-        return res.status(409).json({ message: 'category exists' });
+        return res.status(409).json({ message: CATEGORY_EXISTS });
       }
       await createCategory(name, slug);
       logAudit('create_category', { name, slug });
@@ -48,7 +54,7 @@ async function handler(
     }
     if (req.method === 'DELETE') {
       const uuid = getQueryParam(req.query.uuid);
-      if (!uuid) return res.status(400).json({ message: 'uuid required' });
+      if (!uuid) return res.status(400).json({ message: UUID_REQUIRED });
       try {
         await removeCategory(String(uuid));
         logAudit('delete_category', { uuid });
@@ -63,7 +69,7 @@ async function handler(
         throw e;
       }
     }
-    res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: METHOD_NOT_ALLOWED });
     return;
   } catch (error) {
     handleApiError(res, error, 'Failed to manage categories');

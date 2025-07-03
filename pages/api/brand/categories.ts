@@ -4,6 +4,11 @@ import { handleApiError } from '@utils/handleApiError';
 import type { ApiMessage, Category } from '../../../types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
+import {
+  METHOD_NOT_ALLOWED,
+  UNAUTHORIZED,
+  NAME_REQUIRED,
+} from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,14 +16,14 @@ export default async function handler(
 ): Promise<void> {
   try {
     if (req.method !== 'POST') {
-      return res.status(405).json({ message: 'Method Not Allowed' });
+      return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     }
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user || session.user.role !== 'BRAND') {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: UNAUTHORIZED });
     }
     const { name, slug } = req.body || {};
-    if (!name) return res.status(400).json({ message: 'name required' });
+    if (!name) return res.status(400).json({ message: NAME_REQUIRED });
     const exists = (await getCategoriesFlat()).find(
       (c) =>
         c.name.toLowerCase() === name.toLowerCase() ||

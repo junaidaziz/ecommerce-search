@@ -5,6 +5,7 @@ import { Product } from '@/types/product';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import type { ApiMessage } from '../../../types';
+import { NOT_FOUND, UUID_REQUIRED } from '@/constants/messages';
 
 export interface ProductParams {
   uuid?: string | string[];
@@ -21,12 +22,12 @@ export default async function handler(
 ): Promise<void> {
   const uuid = getQueryParam(req.query.uuid);
   if (!uuid) {
-    return res.status(400).json({ message: 'uuid required' });
+    return res.status(400).json({ message: UUID_REQUIRED });
   }
   try {
     const row = await getProductByUuid(String(uuid));
     if (!row) {
-      return res.status(404).json({ message: 'Not found' });
+      return res.status(404).json({ message: NOT_FOUND });
     }
     const product = mapDbRowToProduct(row) as Product;
     const stats = getAverageRating(String(uuid));

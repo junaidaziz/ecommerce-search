@@ -7,6 +7,11 @@ import { handleApiError } from '@utils/handleApiError';
 import type { User, ApiMessage } from '../../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import { uploadFileToS3 } from '@lib/s3';
+import {
+  METHOD_NOT_ALLOWED,
+  UNAUTHORIZED,
+  UPDATED,
+} from '@/constants/messages';
 
 export const config = {
   api: {
@@ -40,7 +45,7 @@ export default async function handler(
   try {
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: UNAUTHORIZED });
     }
     if (req.method === 'GET') {
       const userData = await findUser(session.user.email);
@@ -103,9 +108,9 @@ export default async function handler(
         update.profileImage = url;
       }
       await updateUserProfile(session.user.email, update);
-      return res.status(200).json({ message: 'updated' });
+      return res.status(200).json({ message: UPDATED });
     }
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     return handleApiError(res, error, 'Failed to update profile');
   }

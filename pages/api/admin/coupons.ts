@@ -3,6 +3,7 @@ import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { createCoupon, listCoupons, updateCoupon } from '@lib/coupons';
 import type { Coupon, ApiMessage } from '../../../types';
+import { METHOD_NOT_ALLOWED, ID_REQUIRED } from '@/constants/messages';
 
 async function handler(
   req: NextApiRequest,
@@ -16,8 +17,14 @@ async function handler(
     }
 
     if (req.method === 'POST') {
-      const { code, discountType, amount, minOrderValue, expirationDate, usageLimit } =
-        req.body as Partial<Coupon>;
+      const {
+        code,
+        discountType,
+        amount,
+        minOrderValue,
+        expirationDate,
+        usageLimit,
+      } = req.body as Partial<Coupon>;
       if (!code || !discountType || amount === undefined) {
         res
           .status(400)
@@ -39,7 +46,7 @@ async function handler(
     if (req.method === 'PUT') {
       const { id, ...rest } = req.body as Coupon;
       if (!id) {
-        res.status(400).json({ message: 'id required' });
+        res.status(400).json({ message: ID_REQUIRED });
         return;
       }
       await updateCoupon(Number(id), {
@@ -54,7 +61,7 @@ async function handler(
       return;
     }
 
-    res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     handleApiError(res, error, 'Failed to manage coupons');
   }
