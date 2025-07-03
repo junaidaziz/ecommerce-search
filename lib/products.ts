@@ -5,7 +5,7 @@ import type { Variant } from '@/types/variant';
 import { parseImages } from './utils/parseImages';
 import type { Category } from '@/types/category';
 import type { Vendor } from '@/types/vendor';
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import client from './typesenseClient';
 import { getBestSellingProducts } from './orders';
 import { slugify } from './slugify';
@@ -177,7 +177,9 @@ export function mapDbRowToProduct(row: ProductRow): Product {
           brandName: row.vendor.brandName ?? '',
           phoneNumber: row.vendor.phoneNumber ?? undefined,
           address: row.vendor.address ?? null,
-          paymentMethods: (row.vendor.paymentMethods as any) ?? null,
+          paymentMethods:
+            (row.vendor.paymentMethods as import('@/types/vendor').BrandPaymentMethod[] | null) ??
+            null,
         }
       : null,
     category: row.category ?? null,
@@ -453,9 +455,11 @@ export async function getProductsPaginated(
   options: PaginatedOptions
 ): Promise<PaginatedResult> {
   const db = getDb();
-  const where: Record<string, any> = { status: 'approved' };
+  const where: Prisma.ProductWhereInput = { status: 'approved' };
   if (options.categorySlugs && options.categorySlugs.length > 0) {
-    where.category = { slug: { in: options.categorySlugs } };
+    where.category = {
+      slug: { in: options.categorySlugs },
+    } as Prisma.CategoryRelationFilter;
   }
   if (options.inStock) {
     where.quantity = { gt: 0 };
