@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getCategoriesFlat } from '@lib/products';
 import { handleApiError } from '@utils/handleApiError';
 import type { ApiMessage, Category } from '../../../types';
+import { METHOD_NOT_ALLOWED, NAME_REQUIRED } from '@/constants/messages';
 
 interface CheckResponse {
   exists: boolean;
@@ -14,10 +15,10 @@ export default async function handler(
 ): Promise<void> {
   try {
     if (req.method !== 'GET') {
-      return res.status(405).json({ message: 'Method Not Allowed' });
+      return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     }
     const name = String(req.query.name || '').trim();
-    if (!name) return res.status(400).json({ message: 'name required' });
+    if (!name) return res.status(400).json({ message: NAME_REQUIRED });
     const categories = await getCategoriesFlat();
     const match = categories.find(
       (c) => c.name.toLowerCase() === name.toLowerCase()

@@ -6,11 +6,7 @@ import {
   getOrdersForVendor,
 } from '@lib/orders';
 import { findUser, findUserById } from '@lib/users';
-import {
-  getProductByUuid,
-  decreaseProductQuantity,
-  clearCart,
-} from '@lib/db';
+import { getProductByUuid, decreaseProductQuantity, clearCart } from '@lib/db';
 import { withRole } from '@lib/withRole';
 import { sendOrderConfirmation } from '@lib/email';
 import { handleApiError } from '@utils/handleApiError';
@@ -20,6 +16,11 @@ import type { Order, OrderPlacedResponse, ApiMessage } from '../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
+import {
+  METHOD_NOT_ALLOWED,
+  UNAUTHORIZED,
+  PRODUCT_NOT_FOUND,
+} from '@/constants/messages';
 
 export const config = {
   api: {
@@ -76,23 +77,30 @@ async function handler(
       let allowed = true;
       let vendorMethods: any[] = [];
       if (items.length > 0) {
-        const product = await getProductByUuid(String(items[0].uuid || items[0].id));
+        const product = await getProductByUuid(
+          String(items[0].uuid || items[0].id)
+        );
         if (product) {
           const vendor = await findUserById(product.vendorId);
           vendorMethods = (vendor?.paymentMethods as any[]) || [];
-          if (paymentMethod && !vendorMethods.some((m) => m.type === paymentMethod)) {
+          if (
+            paymentMethod &&
+            !vendorMethods.some((m) => m.type === paymentMethod)
+          ) {
             allowed = false;
           }
         }
       }
       if (!allowed) {
-        return res.status(400).json({ message: 'payment method not supported' });
+        return res
+          .status(400)
+          .json({ message: 'payment method not supported' });
       }
 
       for (const item of items) {
         const product = await getProductByUuid(String(item.uuid || item.id));
         if (!product) {
-          return res.status(404).json({ message: 'Product not found' });
+          return res.status(404).json({ message: PRODUCT_NOT_FOUND });
         }
         if ((product.quantity || 0) < item.qty) {
           return res
@@ -123,7 +131,7 @@ async function handler(
     if (req.method === 'GET') {
       const session = await getServerSession(req, res, authOptions);
       const email = session?.user?.email;
-      if (!email) return res.status(401).json({ message: 'Unauthorized' });
+      if (!email) return res.status(401).json({ message: UNAUTHORIZED });
       const user = await findUser(email);
       if (!user) return res.status(404).json({ message: 'user not found' });
       if (user.role === 'SUPER_ADMIN') {
@@ -135,7 +143,7 @@ async function handler(
       return res.status(200).json(await getOrdersForUser(email));
     }
 
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     return handleApiError(res, error, 'Failed to process orders');
   }

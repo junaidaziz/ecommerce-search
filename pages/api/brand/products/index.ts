@@ -14,6 +14,11 @@ import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { getDb } from '@lib/db';
+import {
+  METHOD_NOT_ALLOWED,
+  UNAUTHORIZED,
+  PERCENTAGE_DISCOUNT_BETWEEN_1_AND_99,
+} from '@/constants/messages';
 
 export const config = {
   api: {
@@ -48,7 +53,7 @@ async function handler(
     if (req.method === 'GET') {
       const session = await getServerSession(req, res, authOptions);
       if (!session?.user || session.user.role !== 'BRAND') {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(401).json({ message: UNAUTHORIZED });
       }
 
       const db = getDb();
@@ -166,7 +171,7 @@ async function handler(
         ) {
           return res
             .status(400)
-            .json({ message: 'Percentage discount must be between 1 and 99' });
+            .json({ message: PERCENTAGE_DISCOUNT_BETWEEN_1_AND_99 });
         }
       }
       if (parsedDiscountType === 'fixed') {
@@ -213,7 +218,7 @@ async function handler(
       return res.status(201).json({ message: 'product created' });
     }
 
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     return handleApiError(res, error, 'Failed to manage products');
   }

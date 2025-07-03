@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getVendors } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
 import type { Vendor, ApiMessage } from '../../types';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export interface VendorsResponse {
   vendors: Vendor[];
@@ -13,7 +14,7 @@ export default async function handler(
 ): Promise<void> {
   try {
     if (req.method !== 'GET') {
-      return res.status(405).json({ message: 'Method Not Allowed' });
+      return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     }
     const { search = '', page, limit } = req.query;
     const pageNum = parseInt(String(page || '1'), 10);

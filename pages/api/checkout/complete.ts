@@ -4,6 +4,7 @@ import { addOrder } from '@lib/orders';
 import { sendOrderConfirmation } from '@lib/email';
 import { handleApiError } from '@utils/handleApiError';
 import type { OrderIdResponse, ApiMessage } from '../../../types';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2022-11-15',
@@ -14,7 +15,7 @@ export default async function handler(
   res: NextApiResponse<OrderIdResponse | ApiMessage>
 ): Promise<void> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   }
   const { sessionId } = req.body || {};
   if (!sessionId)

@@ -4,6 +4,7 @@ import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import type { Order, ApiMessage } from '../../../types';
+import { METHOD_NOT_ALLOWED, VENDOR_REQUIRED } from '@/constants/messages';
 
 async function handler(
   req: NextApiRequest,
@@ -11,11 +12,11 @@ async function handler(
 ): Promise<void> {
   try {
     if (req.method !== 'GET') {
-      return res.status(405).json({ message: 'Method Not Allowed' });
+      return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     }
     const vendor = getQueryParam(req.query.vendor);
     if (!vendor) {
-      return res.status(400).json({ message: 'vendor required' });
+      return res.status(400).json({ message: VENDOR_REQUIRED });
     }
     const orders = await getOrdersForVendor(vendor);
     return res.status(200).json(orders);
