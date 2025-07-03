@@ -4,6 +4,11 @@ import { authOptions } from '@pages/api/auth/[...nextauth]';
 import formidable, { File } from 'formidable';
 import { uploadFileToS3 } from '@/lib/s3';
 import type { ApiMessage } from '../../../types';
+import {
+  METHOD_NOT_ALLOWED,
+  UNAUTHORIZED,
+  INVALID_FORM_DATA,
+} from '@/constants/messages';
 
 export const config = {
   api: { bodyParser: false },
@@ -14,16 +19,16 @@ export default async function handler(
   res: NextApiResponse<{ url: string } | ApiMessage>
 ) {
   const session = await getServerSession(req, res, authOptions);
-  if (!session?.user) return res.status(401).json({ message: 'Unauthorized' });
+  if (!session?.user) return res.status(401).json({ message: UNAUTHORIZED });
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   }
 
   const form = formidable({ multiples: false, maxFileSize: 5 * 1024 * 1024 });
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      res.status(400).json({ message: 'Invalid form data' });
+      res.status(400).json({ message: INVALID_FORM_DATA });
       return;
     }
     const file = files.file as File | undefined;

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { stripe } from '@lib/stripe';
 import { strapiMarkOrderPaid } from '@lib/strapi';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export const config = {
   api: {
@@ -13,7 +14,7 @@ export default async function handler(
   res: NextApiResponse
 ): Promise<void> {
   if (req.method !== 'POST') {
-    res.status(405).end('Method Not Allowed');
+    res.status(405).end(METHOD_NOT_ALLOWED);
     return;
   }
   const sig = req.headers['stripe-signature'] as string;

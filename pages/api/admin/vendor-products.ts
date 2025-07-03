@@ -7,6 +7,7 @@ import {
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { PendingProduct, ApiMessage } from '../../../types';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 async function handler(
   req: NextApiRequest,
@@ -38,7 +39,7 @@ async function handler(
       res.status(400).json({ message: 'invalid action' });
       return;
     }
-    res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: METHOD_NOT_ALLOWED });
     return;
   } catch (error) {
     handleApiError(res, error, 'Failed to process vendor products');

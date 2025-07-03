@@ -8,6 +8,7 @@ import { authOptions } from '@pages/api/auth/[...nextauth]';
 import client from '@lib/typesenseClient';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 interface SearchParams {
   q: string;
@@ -53,7 +54,7 @@ export default async function handler(
   res: NextApiResponse<SearchApiResponse | ApiMessage>
 ): Promise<void> {
   if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   }
 
   const db = getDb();

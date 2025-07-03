@@ -4,22 +4,27 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '@utils/handleApiError';
 import type { SignupResponse, ApiMessage } from '../../types';
+import {
+  METHOD_NOT_ALLOWED,
+  MISSING_REQUIRED_FIELDS,
+  USER_EXISTS,
+} from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SignupResponse | ApiMessage>
 ): Promise<void> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   }
   const { email, password, firstName, lastName, brandName, gender, role } =
     req.body;
   if (!email || !password || !firstName || !lastName || !gender) {
-    return res.status(400).json({ message: 'missing required fields' });
+    return res.status(400).json({ message: MISSING_REQUIRED_FIELDS });
   }
   try {
     if (await findUser(email)) {
-      return res.status(409).json({ message: 'User exists' });
+      return res.status(409).json({ message: USER_EXISTS });
     }
     const hashed = await bcrypt.hash(password, 10);
     const token = crypto.randomBytes(20).toString('hex');
