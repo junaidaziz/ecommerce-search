@@ -4,7 +4,7 @@ import { mapDbRowToProduct } from '@lib/products';
 import { Product } from '@/types';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { ApiMessage } from '../@/types';
+import type { ApiMessage } from '@/types';
 import { NOT_FOUND, UUID_REQUIRED } from '@/constants/messages';
 
 export interface ProductParams {

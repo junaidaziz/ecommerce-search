@@ -8,7 +8,7 @@ import type {
   ReviewsResponse,
   ReviewAddedResponse,
 } from '@/types';
-import type { ApiMessage } from '../../@/types';
+import type { ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED, UUID_REQUIRED } from '@/constants/messages';
 
 export default async function handler(

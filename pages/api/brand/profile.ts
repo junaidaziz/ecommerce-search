@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { updateUserProfile, findUser } from '@lib/users';
-import type { Vendor, ApiMessage } from '../@/types';
+import type { Vendor, ApiMessage } from '@/types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { handleApiError } from '@utils/handleApiError';

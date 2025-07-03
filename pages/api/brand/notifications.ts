@@ -7,7 +7,7 @@ import {
 } from '@lib/notifications';
 import { findUser } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
-import type { Notification, ApiMessage } from '../@/types';
+import type { Notification, ApiMessage } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   UNAUTHORIZED,

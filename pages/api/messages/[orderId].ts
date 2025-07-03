@@ -6,7 +6,7 @@ import { getOrderByUuid } from '@lib/orders';
 import { findUser } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { Message, ApiMessage } from '../@/types';
+import type { Message, ApiMessage } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   UNAUTHORIZED,
