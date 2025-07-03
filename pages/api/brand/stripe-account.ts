@@ -3,24 +3,29 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { stripe } from '@lib/stripe';
 import { findUser, updateUserProfile } from '@lib/users';
+import {
+  METHOD_NOT_ALLOWED,
+  UNAUTHORIZED,
+  USER_NOT_FOUND,
+} from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<{ url: string } | { message: string }>
 ): Promise<void> {
   if (req.method !== 'POST') {
-    res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: METHOD_NOT_ALLOWED });
     return;
   }
   const session = await getServerSession(req, res, authOptions);
   const email = session?.user?.email;
   if (!email) {
-    res.status(401).json({ message: 'Unauthorized' });
+    res.status(401).json({ message: UNAUTHORIZED });
     return;
   }
   const user = await findUser(email);
   if (!user) {
-    res.status(404).json({ message: 'User not found' });
+    res.status(404).json({ message: USER_NOT_FOUND });
     return;
   }
   let accountId = user.stripeAccountId || '';

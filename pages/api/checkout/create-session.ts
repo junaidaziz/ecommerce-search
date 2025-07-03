@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 import { handleApiError } from '@utils/handleApiError';
 import type { CheckoutSessionResponse, ApiMessage } from '../../../types';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2022-11-15',
@@ -12,7 +13,7 @@ export default async function handler(
   res: NextApiResponse<CheckoutSessionResponse | ApiMessage>
 ): Promise<void> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   }
   const { items, lineItems, orderId, email, shipping } = req.body || {};
   if ((!items && !lineItems) || !email || !orderId) {

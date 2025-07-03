@@ -8,6 +8,7 @@ import {
 } from '@lib/paymentMethods';
 import { findUser } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
+import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,14 +16,13 @@ export default async function handler(
 ) {
   try {
     const session = await getServerSession(req, res, authOptions);
-    if (!session?.user)
-      return res.status(401).json({ message: 'Unauthorized' });
+    if (!session?.user) return res.status(401).json({ message: UNAUTHORIZED });
     let userId = session.user.brandId;
     if (typeof userId !== 'number') {
       const user = await findUser(session.user.email);
       userId = user?.id;
     }
-    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+    if (!userId) return res.status(401).json({ message: UNAUTHORIZED });
     const id = parseInt(String(req.query.id));
     if (isNaN(id)) return res.status(400).json({ message: 'invalid id' });
     if (req.method === 'DELETE') {
@@ -38,7 +38,7 @@ export default async function handler(
       const methods = await getPaymentMethodsForUser(userId);
       return res.status(200).json(methods);
     }
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     return handleApiError(res, error, 'Failed to manage payment methods');
   }
