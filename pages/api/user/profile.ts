@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { handleApiError } from '@utils/handleApiError';
-import type { User, ApiMessage } from '../@/types';
+import type { User, ApiMessage } from '@/types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import { uploadFileToS3 } from '@lib/s3';
 import {

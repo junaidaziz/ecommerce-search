@@ -8,7 +8,7 @@ import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { slugify } from '@lib/slugify';
-import { Product, ApiMessage, Variant } from '../@/types';
+import { Product, ApiMessage, Variant } from '@/types';
 import { mapDbRowToProduct } from '@lib/products';
 import {
   METHOD_NOT_ALLOWED,

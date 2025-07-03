@@ -4,7 +4,7 @@ import { getPageTitle } from '@lib/pageTitle';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import ProductCard from '@components/Product/ProductCard';
-import type { Product, Category } from '../@/types';
+import type { Product, Category } from '@/types';
 import {
   getCategoryBySlug,
   getProductsByCategorySlug,

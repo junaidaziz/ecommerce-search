@@ -6,7 +6,7 @@ import {
 } from '@lib/products';
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
-import { PendingProduct, ApiMessage } from '../@/types';
+import { PendingProduct, ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 async function handler(
