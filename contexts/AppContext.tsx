@@ -45,6 +45,8 @@ interface AppProviderProps {
   children: React.ReactNode;
 }
 
+const CART_MERGED_KEY = 'app-cart-merged-user';
+
 export function AppProvider({ children }: AppProviderProps) {
   const { data: session } = useSession();
   const [user, setUser] = useState<UserInfo | null>(null);
@@ -69,24 +71,39 @@ export function AppProvider({ children }: AppProviderProps) {
   useEffect(() => {
     if (!user) {
       hasMergedCart.current = false;
+      localStorage.removeItem(CART_MERGED_KEY);
       return;
     }
+
     if (!hasMergedCart.current) {
       hasMergedCart.current = true;
-      fetch('/api/cart')
-        .then((res) => (res.ok ? res.json() : []))
-        .then((data) => {
-          if (Array.isArray(data)) {
-            setCart((prev) => mergeCarts(prev, data));
-          }
-        })
-        .catch(() => {});
-      fetch('/api/user/wishlist')
-        .then((res) => (res.ok ? res.json() : []))
-        .then((data) => {
-          if (Array.isArray(data)) setWishlist(data);
-        })
-        .catch(() => {});
+      const mergedFor = localStorage.getItem(CART_MERGED_KEY);
+      const promises: Promise<any>[] = [];
+
+      if (mergedFor !== user.email) {
+        promises.push(
+          fetch('/api/cart')
+            .then((res) => (res.ok ? res.json() : []))
+            .then((data) => {
+              if (Array.isArray(data)) {
+                setCart((prev) => mergeCarts(prev, data));
+                localStorage.setItem(CART_MERGED_KEY, user.email);
+              }
+            })
+            .catch(() => {})
+        );
+      }
+
+      promises.push(
+        fetch('/api/user/wishlist')
+          .then((res) => (res.ok ? res.json() : []))
+          .then((data) => {
+            if (Array.isArray(data)) setWishlist(data);
+          })
+          .catch(() => {})
+      );
+
+      Promise.all(promises).catch(() => {});
     }
   }, [user]);
 
@@ -170,6 +187,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
   const logout = (): void => {
     nextSignOut({ callbackUrl: '/', redirect: true });
+    localStorage.removeItem(CART_MERGED_KEY);
     addNotification('Logged out', 'info');
   };
 
