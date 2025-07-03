@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import formidable, { File } from 'formidable';
 import { uploadFileToS3 } from '@/lib/s3';
-import type { ApiMessage } from '../../../types';
+import type { ApiMessage } from '../@/types';
 import {
   METHOD_NOT_ALLOWED,
   UNAUTHORIZED,

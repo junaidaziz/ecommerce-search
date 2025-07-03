@@ -4,7 +4,7 @@ import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { getOrderByUuid } from '@lib/orders';
 import { getProductByUuid, getCart, setCart } from '@lib/db';
 import { handleApiError } from '@utils/handleApiError';
-import type { ApiMessage } from '../../../../../types';
+import type { ApiMessage } from '../../../@/types';
 import {
   METHOD_NOT_ALLOWED,
   UNAUTHORIZED,

@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { findUser } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { ApiMessage } from '../../types';
+import type { ApiMessage } from '@/types';
 import { EMAIL_REQUIRED } from '@/constants/messages';
 
 export default async function handler(

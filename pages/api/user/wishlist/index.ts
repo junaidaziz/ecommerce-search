@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { findUser } from '@lib/users';
 import { addWishlistItem, getWishlistForUser } from '@lib/wishlist';
 import { handleApiError } from '@utils/handleApiError';
-import type { WishlistItem, ApiMessage } from '../../../../types';
+import type { WishlistItem, ApiMessage } from '../../@/types';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import {
   METHOD_NOT_ALLOWED,

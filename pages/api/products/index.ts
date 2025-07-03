@@ -2,8 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getProductsPaginated } from '@lib/products';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { Product } from '@/types/product';
-import type { ApiMessage } from '../../../types';
+import type { Product } from '@/types';
+import type { ApiMessage } from '../@/types';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export interface ProductsQuery {

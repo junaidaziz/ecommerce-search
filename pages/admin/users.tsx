@@ -5,7 +5,7 @@ import {
   UserRoleUpdateRequest,
   UserDisabledUpdateRequest,
   ApiMessage,
-} from '../../types';
+} from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';

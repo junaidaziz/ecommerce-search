@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ActiveFilter } from '@/types/shared';
+import type { ActiveFilter } from '@/types';
 
 interface ActiveFiltersProps {
   filters: ActiveFilter[];

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import Link from 'next/link';
-import { AnalyticsData, LowStockProduct } from '../../types';
+import { AnalyticsData, LowStockProduct } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';

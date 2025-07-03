@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getOrdersForVendorId } from '@lib/orders';
 import { handleApiError } from '@utils/handleApiError';
-import type { EarningsData, ApiMessage } from '../../../types';
+import type { EarningsData, ApiMessage } from '../@/types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';

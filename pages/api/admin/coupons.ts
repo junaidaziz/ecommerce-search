@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { createCoupon, listCoupons, updateCoupon } from '@lib/coupons';
-import type { Coupon, ApiMessage } from '../../../types';
+import type { Coupon, ApiMessage } from '../@/types';
 import { METHOD_NOT_ALLOWED, ID_REQUIRED } from '@/constants/messages';
 
 async function handler(

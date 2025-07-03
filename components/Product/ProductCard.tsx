@@ -2,8 +2,8 @@ import React, { useContext } from 'react';
 import Link from 'next/link';
 import ProductImageSlider from './ProductImageSlider';
 import { AppContext } from '@contexts/AppContext';
-import type { AppContextValue } from '../../types';
-import type { Product } from '@/types/product';
+import type { AppContextValue } from '@/types';
+import type { Product } from '@/types';
 import { formatCurrency } from '@utils/formatCurrency';
 
 interface ProductCardProps {

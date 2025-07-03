@@ -1,12 +1,9 @@
 import { JSDOM } from 'jsdom';
 import { getDb } from './db';
-import type { Product, ProductInput } from '@/types/product';
-import type { Variant } from '@/types/variant';
+import type { Product, ProductInput, Variant, Category, Vendor } from '@/types';
 import { parseImages } from './utils/parseImages';
-import type { Category } from '@/types/category';
-import type { Vendor } from '@/types/vendor';
-import type { Prisma } from '@prisma/client';
 import client from './typesenseClient';
+import { Prisma } from '@prisma/client';
 import { getBestSellingProducts } from './orders';
 import { slugify } from './slugify';
 import { ensureTypesenseProductCollection } from './initTypesense';
@@ -36,7 +33,7 @@ interface ProductWithRelations {
     brandName: string | null;
     phoneNumber?: string | null | undefined;
     address?: string | null;
-    paymentMethods?: import('@/types/vendor').BrandPaymentMethod[] | null;
+    paymentMethods?: import('@/types').BrandPaymentMethod[] | null;
   };
   category: Category;
   variants: Variant[];
@@ -53,7 +50,7 @@ interface ProductRow {
         brandName: string | null;
         phoneNumber?: string | null | undefined;
         address?: string | null;
-        paymentMethods?: import('@/types/vendor').BrandPaymentMethod[] | null;
+        paymentMethods?: import('@/types').BrandPaymentMethod[] | null;
       })
     | null;
   description?: string | null;

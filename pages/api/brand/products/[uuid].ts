@@ -8,7 +8,7 @@ import { getProductByUuid } from '@lib/db';
 import { hasOrdersForProduct } from '@lib/orders';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { ApiMessage, ProductInput } from '../../../../types';
+import type { ApiMessage, ProductInput } from '../../@/types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import { uploadFileToS3 } from '@lib/s3';
 import path from 'path';

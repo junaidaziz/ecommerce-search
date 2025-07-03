@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { findUser, updateUserProfile } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
-import type { ApiMessage } from '../../types';
+import type { ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 export default async function handler(

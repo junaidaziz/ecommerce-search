@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { resetPassword } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
-import type { ApiMessage } from '../../types';
+import type { ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export default async function handler(

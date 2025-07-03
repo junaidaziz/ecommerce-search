@@ -9,7 +9,7 @@ import { withRole } from '@lib/withRole';
 import { logAudit } from '@lib/audit';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import { Category, CategoryInput, ApiMessage } from '../../../types';
+import { Category, CategoryInput, ApiMessage } from '../@/types';
 import {
   METHOD_NOT_ALLOWED,
   UUID_REQUIRED,

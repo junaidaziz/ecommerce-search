@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import BellIcon from '../icons/BellIcon';
-import type { Notification } from '../../types';
+import type { Notification } from '@/types';
 
 export interface NotificationBellProps {
   notifications?: Notification[];

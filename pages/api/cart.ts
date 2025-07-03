@@ -3,7 +3,7 @@ import { getCart, setCart } from '@lib/db';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { handleApiError } from '@utils/handleApiError';
-import type { CartItem, ApiMessage } from '../../types';
+import type { CartItem, ApiMessage } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   UNAUTHORIZED,

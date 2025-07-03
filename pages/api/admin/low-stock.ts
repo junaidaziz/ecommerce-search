@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getDb } from '@lib/db';
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
-import type { ApiMessage, LowStockProduct } from '../../../types';
+import type { ApiMessage, LowStockProduct } from '../@/types';
 import { DEFAULT_LOW_STOCK_THRESHOLD } from '@lib/config';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { GenericModal, StatusLabel } from '@components/UI';
 import ImageGallery from '@components/Product/ImageGallery';
-import type { Product } from '@/types/product';
+import type { Product } from '@/types';
 import { formatCurrency } from '@utils/formatCurrency';
 
 interface ProductDetailsModalProps {

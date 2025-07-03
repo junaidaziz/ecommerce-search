@@ -14,7 +14,7 @@ import {
   CountrySelect,
   FileUpload,
 } from '@components/form-fields';
-import type { User } from '@/types/user';
+import type { User } from '@/types';
 
 interface FormValues {
   firstName: string;

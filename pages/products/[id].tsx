@@ -7,12 +7,12 @@ import { getPageTitle } from '@lib/pageTitle';
 import ImageGallery from '@components/Product/ImageGallery';
 import { StatusLabel } from '@components/UI';
 import { formatCurrency } from '@utils/formatCurrency';
-import type { Product } from '../../types';
+import type { Product } from '@/types';
 import type {
   Review,
   ReviewsResponse,
   ReviewAddedResponse,
-} from '@/types/review';
+} from '@/types';
 import { SelectDropdown, Textarea } from '@components/form-fields';
 import type { SelectOption } from '@components/form-fields/SelectDropdown';
 

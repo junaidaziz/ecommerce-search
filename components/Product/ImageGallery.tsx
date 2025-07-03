@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import type { Image as ProductImage } from '@/types/image';
+import type { Image as ProductImage } from '@/types';
 
 interface ImageGalleryProps {
   images?: ProductImage[];

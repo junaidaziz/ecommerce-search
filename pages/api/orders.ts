@@ -12,7 +12,7 @@ import { sendOrderConfirmation } from '@lib/email';
 import { handleApiError } from '@utils/handleApiError';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
-import type { Order, OrderPlacedResponse, ApiMessage } from '../../types';
+import type { Order, OrderPlacedResponse, ApiMessage } from '@/types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';
 import path from 'path';

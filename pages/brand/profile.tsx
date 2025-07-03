@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { AppContext } from '@contexts/AppContext';
-import type { User, Vendor } from '../../types';
+import type { User, Vendor } from '@/types';
 import { TextInput, Textarea, CountrySelect } from '@components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
