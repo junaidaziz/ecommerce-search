@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import formidable, { File } from 'formidable';
-import { uploadFileToS3 } from '@/lib/s3';
+import { uploadFileToS3 } from '../../../lib/s3';
 import type { ApiMessage } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
@@ -49,7 +49,7 @@ export default async function handler(
       res.status(400).json({ message: 'Invalid file type' });
       return;
     }
-    const key = `chat/${session.user.id}/${Date.now()}-${file.originalFilename || 'file'}`;
+    const key = `chat/${session.user!.id}/${Date.now()}-${file.originalFilename || 'file'}`;
     const url = await uploadFileToS3(
       file.filepath,
       key,

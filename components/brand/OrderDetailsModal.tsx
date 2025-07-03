@@ -22,13 +22,16 @@ const OrderDetailsModal: React.FC<Props> = ({
   onClose,
   onUpdated,
 }) => {
-  if (!group) return null;
-  const { order, items } = group;
+  // Provide fallback values to satisfy hooks' rules
+  const order = group?.order as Order;
+  const items = group?.items ?? [];
 
-  const [status, setStatus] = useState(order.status);
+  const [status, setStatus] = useState(order?.status ?? 'pending');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { addNotification } = useContext(NotificationContext);
+
+  if (!group) return null;
 
   const updateStatus = async () => {
     setSaving(true);

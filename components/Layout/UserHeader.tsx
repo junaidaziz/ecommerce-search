@@ -103,12 +103,35 @@ const Header: FC<HeaderProps> = ({
         const cats = catsRaw.map((c) => ({
           ...c,
           subcategories: Array.isArray(c.subcategories)
-            ? c.subcategories.map((s) =>
-                typeof s === 'string' ? { name: s } : s
-              )
+            ? c.subcategories
+                .map((s) => {
+                  if (typeof s === 'string') {
+                    // Provide default slug and required fields for Category
+                    return {
+                      name: s,
+                      slug: s
+                        .toLowerCase()
+                        .replace(/\s+/g, '-')
+                        .replace(/[^a-z0-9\-]/g, ''),
+                    };
+                  }
+                  // Ensure all required fields exist
+                  return {
+                    ...s,
+                    slug:
+                      s.slug ||
+                      (typeof s.name === 'string'
+                        ? s.name
+                            .toLowerCase()
+                            .replace(/\s+/g, '-')
+                            .replace(/[^a-z0-9\-]/g, '')
+                        : ''),
+                  };
+                })
+                .filter((s) => !!s.name && !!s.slug)
             : undefined,
         }));
-        setCategories(filterCats(cats));
+        setCategories(filterCats(cats as Category[]));
       })
       .catch(() => setCategories(filterCats(DEFAULT_CATEGORIES)));
   }, []);

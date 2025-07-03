@@ -30,7 +30,7 @@ export interface CardNumberInputProps<T extends FieldValues>
 }
 
 type BrandMap = {
-  [key in CardBrand]: React.FC<{ size?: number; className?: string }>;
+  [key in CardBrand]: React.FC<{ size?: string | number; className?: string }>;
 };
 
 const icons: BrandMap = {
@@ -60,7 +60,13 @@ const CardNumberInput = <T extends FieldValues>(
     ...rest
   } = props;
   const inputId = rest.id || name;
-  const registration = register ? register(name, rules) : {};
+  const registration: {
+    onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    ref?: ((instance: HTMLInputElement | null) => void) | React.MutableRefObject<HTMLInputElement | null> | null;
+  } = register
+    ? register(name, rules)
+    : { onBlur: undefined, onChange: undefined, ref: undefined };
   const [value, setValue] = useState(valueProp || '');
   const [brand, setBrand] = useState<CardBrand>('unknown');
 
@@ -84,7 +90,9 @@ const CardNumberInput = <T extends FieldValues>(
       setBrand(b);
       onCardTypeChange?.(b);
       const event = { target: { value: val, name } } as unknown as React.ChangeEvent<HTMLInputElement>;
-      registration.onChange?.(event);
+      if (register && (registration as any).onChange) {
+        (registration as any).onChange(event);
+      }
       onChange?.(event);
     } catch (err) {
       console.error('CardNumberInput handleAccept error', err);
@@ -115,7 +123,9 @@ const CardNumberInput = <T extends FieldValues>(
           value={value}
           onAccept={handleAccept}
           onBlur={(e) => {
-            registration.onBlur?.(e);
+            if (typeof registration.onBlur === 'function') {
+              registration.onBlur(e);
+            }
             onBlur?.(e);
           }}
           disabled={disabled}

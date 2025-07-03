@@ -6,7 +6,8 @@ import {
   FieldValues,
   Path,
 } from 'react-hook-form';
-import Select, { type Props as SelectProps, type Components } from 'react-select';
+import Select, { type Props as SelectProps } from 'react-select';
+import type { components, StylesConfig, GroupBase } from 'react-select';
 
 export interface SelectOption {
   label: string;
@@ -26,7 +27,8 @@ export interface SelectDropdownProps<T extends FieldValues> {
   error?: string;
   className?: string;
   icon?: React.ReactNode;
-  components?: Components<SelectOption, boolean>;
+  components?: Partial<typeof components>;
+  styles?: StylesConfig<SelectOption, boolean, GroupBase<SelectOption>>;
   control?: Control<T>;
   rules?: RegisterOptions<T, Path<T>>;
   [key: string]: unknown;

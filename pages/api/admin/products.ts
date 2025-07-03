@@ -219,7 +219,7 @@ async function handler(
         where,
         include: { category: true, vendor: true, variants: true },
       });
-      const data: Product[] = rows.map((p) => mapDbRowToProduct(p));
+      const data: Product[] = rows.map((p: any) => mapDbRowToProduct(p));
       res.status(200).json(data);
       return;
     }
