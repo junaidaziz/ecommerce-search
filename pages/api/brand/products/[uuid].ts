@@ -1,4 +1,4 @@
-import type { NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   updateProduct,
   deleteProduct,
@@ -129,6 +129,8 @@ export default async function handler(
         tags: String(tags ?? existing.tags),
         category: {
           id: parseInt(String(category_id ?? existing.categoryId ?? '0'), 10),
+          name: '',
+          slug: '',
         },
         quantity:
           typeof quantity !== 'undefined'

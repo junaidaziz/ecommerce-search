@@ -7,6 +7,7 @@ import OrderChatWindow from '@components/Chat/OrderChatWindow';
 import { StatusLabel } from '@components/UI';
 import { getPageTitle } from '@lib/pageTitle';
 import type { Order } from '../../../types';
+import { OrderStatus } from '../../../types';
 
 export default function UserOrderDetail() {
   const router = useRouter();
@@ -47,7 +48,7 @@ export default function UserOrderDetail() {
       method: 'POST',
     });
     if (res.ok) {
-      setOrder({ ...order, status: 'cancelled' });
+      setOrder({ ...order, status: OrderStatus.CANCELLED });
     } else {
       const d = await res.json().catch(() => null);
       alert(d?.message || 'Failed to cancel');

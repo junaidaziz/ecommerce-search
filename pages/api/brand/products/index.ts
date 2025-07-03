@@ -203,7 +203,11 @@ async function handler(
         description: String(description || ''),
         productType: String(product_type || ''),
         tags: String(tags || ''),
-        category: { id: parseInt(String(category_id || '0'), 10), name: '' },
+        category: {
+          id: parseInt(String(category_id || '0'), 10),
+          name: '',
+          slug: ''
+        },
         quantity: quantity ? parseInt(String(quantity), 10) : 0,
         minPrice: parseFloat(String(min_price || '0')),
         maxPrice: parseFloat(String(max_price || '0')),
