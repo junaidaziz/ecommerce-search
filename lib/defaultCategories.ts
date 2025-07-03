@@ -5,41 +5,45 @@ export const DEFAULT_CATEGORIES: Category[] = [
     name: 'Electronics',
     slug: 'electronics',
     subcategories: [
-      { name: 'Phones' },
-      { name: 'Computers' },
-      { name: 'Cameras' },
+      { name: 'Phones', slug: 'phones' },
+      { name: 'Computers', slug: 'computers' },
+      { name: 'Cameras', slug: 'cameras' },
     ],
   },
   {
     name: 'Fashion',
     slug: 'fashion',
-    subcategories: [{ name: 'Men' }, { name: 'Women' }, { name: 'Kids' }],
+    subcategories: [
+      { name: 'Men', slug: 'men' },
+      { name: 'Women', slug: 'women' },
+      { name: 'Kids', slug: 'kids' },
+    ],
   },
   {
     name: 'Home',
     slug: 'home',
     subcategories: [
-      { name: 'Furniture' },
-      { name: 'Kitchen' },
-      { name: 'Decor' },
+      { name: 'Furniture', slug: 'furniture' },
+      { name: 'Kitchen', slug: 'kitchen' },
+      { name: 'Decor', slug: 'decor' },
     ],
   },
   {
     name: 'Toys',
     slug: 'toys',
     subcategories: [
-      { name: 'Games' },
-      { name: 'Stuffed Animals' },
-      { name: 'Educational' },
+      { name: 'Games', slug: 'games' },
+      { name: 'Stuffed Animals', slug: 'stuffed-animals' },
+      { name: 'Educational', slug: 'educational' },
     ],
   },
   {
     name: 'Sports',
     slug: 'sports',
     subcategories: [
-      { name: 'Fitness' },
-      { name: 'Outdoor' },
-      { name: 'Team Sports' },
+      { name: 'Fitness', slug: 'fitness' },
+      { name: 'Outdoor', slug: 'outdoor' },
+      { name: 'Team Sports', slug: 'team-sports' },
     ],
   },
 ];
