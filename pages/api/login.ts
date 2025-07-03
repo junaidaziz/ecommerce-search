@@ -3,6 +3,7 @@ import { findUser } from '@lib/users';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '@utils/handleApiError';
 import type { LoginResponse } from '../../types';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,7 +11,7 @@ export default async function handler(
 ): Promise<void> {
   try {
     if (req.method !== 'POST') {
-      return res.status(405).json({ message: 'Method Not Allowed' });
+      return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     }
     const { email, password } = req.body as {
       email?: string;

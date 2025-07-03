@@ -4,6 +4,7 @@ import { withRole, AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import type { ApiMessage } from '../../../types';
+import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 async function handler(
   req: AuthedNextApiRequest,
@@ -11,15 +12,16 @@ async function handler(
 ) {
   try {
     if (req.method !== 'GET') {
-      return res.status(405).json({ message: 'Method Not Allowed' });
+      return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     }
     const user = req.user;
     const param = parseInt(getQueryParam(req.query.brandId) || '', 10);
     const queryBrandId = Number.isNaN(param) ? undefined : param;
     const vendorId =
-      user?.brandId ?? (user?.role === 'SUPER_ADMIN' ? queryBrandId : undefined);
+      user?.brandId ??
+      (user?.role === 'SUPER_ADMIN' ? queryBrandId : undefined);
     if (!user?.brandId && user?.role !== 'SUPER_ADMIN') {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: UNAUTHORIZED });
     }
     const monthOffset = getQueryParam(req.query.monthOffset);
     let start: Date | undefined;
@@ -30,10 +32,7 @@ async function handler(
       monthOffset !== ''
     ) {
       const m = parseInt(monthOffset, 10);
-      start = require('dayjs')()
-        .startOf('month')
-        .subtract(m, 'month')
-        .toDate();
+      start = require('dayjs')().startOf('month').subtract(m, 'month').toDate();
       end = require('dayjs')(start).endOf('month').toDate();
     }
     const { revenue } = await getSalesMetrics({ start, end, vendorId });

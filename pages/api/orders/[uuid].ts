@@ -5,6 +5,12 @@ import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import type { Order, ApiMessage } from '../../../types';
+import {
+  METHOD_NOT_ALLOWED,
+  NOT_FOUND,
+  UUID_REQUIRED,
+  CANCELLED,
+} from '@/constants/messages';
 
 async function handler(
   req: NextApiRequest,
@@ -13,12 +19,12 @@ async function handler(
   try {
     const uuid = getQueryParam(req.query.uuid);
     if (!uuid) {
-      return res.status(400).json({ message: 'uuid required' });
+      return res.status(400).json({ message: UUID_REQUIRED });
     }
 
     if (req.method === 'GET') {
       const result = await getOrderByUuid(String(uuid));
-      if (!result) return res.status(404).json({ message: 'Not found' });
+      if (!result) return res.status(404).json({ message: NOT_FOUND });
       const { userEmail, ...order } = result;
       return res.status(200).json(order);
     }
@@ -32,7 +38,7 @@ async function handler(
         'shipped',
         'delivered',
         'completed',
-        'cancelled',
+        CANCELLED,
         'returned',
       ];
       if (!status || !allowed.includes(status)) {
@@ -40,7 +46,7 @@ async function handler(
       }
       await updateOrderStatus(String(uuid), status);
       const result = await getOrderByUuid(String(uuid));
-      if (!result) return res.status(404).json({ message: 'Not found' });
+      if (!result) return res.status(404).json({ message: NOT_FOUND });
       const { userEmail, ...order } = result;
       await sendOrderStatusUpdate(userEmail, {
         id: order.id,
@@ -49,7 +55,7 @@ async function handler(
       return res.status(200).json(order);
     }
 
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     return handleApiError(res, error, 'Failed to manage order');
   }

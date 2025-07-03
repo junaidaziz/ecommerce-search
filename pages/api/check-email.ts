@@ -3,6 +3,7 @@ import { findUser } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import type { ApiMessage } from '../../types';
+import { EMAIL_REQUIRED } from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,7 +12,7 @@ export default async function handler(
   try {
     const email = getQueryParam(req.query.email);
     if (!email) {
-      return res.status(400).json({ message: 'email required' });
+      return res.status(400).json({ message: EMAIL_REQUIRED });
     }
     const user = await findUser(email);
     return res.status(200).json({ exists: !!user });

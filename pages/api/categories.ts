@@ -14,6 +14,12 @@ import type {
   ApiMessage,
   Category,
 } from '../../types';
+import {
+  METHOD_NOT_ALLOWED,
+  UNAUTHORIZED,
+  NAME_REQUIRED,
+  CATEGORY_EXISTS,
+} from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
@@ -39,10 +45,10 @@ export default async function handler(
     if (req.method === 'POST') {
       const session = await getServerSession(req, res, authOptions);
       if (!session?.user) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(401).json({ message: UNAUTHORIZED });
       }
       const { name, slug } = req.body as Partial<Category>;
-      if (!name) return res.status(400).json({ message: 'name required' });
+      if (!name) return res.status(400).json({ message: NAME_REQUIRED });
       const exists = (await getCategoriesFlat()).find(
         (c) =>
           c.name.toLowerCase() === name.toLowerCase() ||
@@ -51,12 +57,12 @@ export default async function handler(
       if (exists) {
         return res
           .status(409)
-          .json({ message: 'category exists', category: exists });
+          .json({ message: CATEGORY_EXISTS, category: exists });
       }
       const category = await createCategory(name, slug);
       return res.status(201).json({ category });
     }
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     return handleApiError(res, error, 'Failed to load categories');
   }

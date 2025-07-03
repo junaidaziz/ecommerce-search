@@ -4,6 +4,12 @@ import type { Vendor, ApiMessage } from '../../../types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { handleApiError } from '@utils/handleApiError';
+import {
+  METHOD_NOT_ALLOWED,
+  UNAUTHORIZED,
+  NOT_FOUND,
+  UPDATED,
+} from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,12 +18,12 @@ export default async function handler(
   try {
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: UNAUTHORIZED });
     }
     if (req.method === 'GET') {
       const userData = await findUser(session.user.email);
       if (!userData) {
-        return res.status(404).json({ message: 'Not found' });
+        return res.status(404).json({ message: NOT_FOUND });
       }
       const vendor: Vendor = {
         id: Number(userData.id),
@@ -62,9 +68,9 @@ export default async function handler(
         taxId,
         paymentMethods,
       });
-      return res.status(200).json({ message: 'updated' });
+      return res.status(200).json({ message: UPDATED });
     }
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     return handleApiError(res, error, 'Failed to manage profile');
   }

@@ -5,6 +5,7 @@ import { paymentProvider } from '@lib/paymentProvider';
 import { recordPayment } from '@lib/payments';
 import { getDb } from '@lib/db';
 import { handleApiError } from '@utils/handleApiError';
+import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,9 +14,9 @@ export default async function handler(
   try {
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user?.id)
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: UNAUTHORIZED });
     if (req.method !== 'POST')
-      return res.status(405).json({ message: 'Method Not Allowed' });
+      return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     const { orderId, paymentMethodId, amount } = req.body || {};
     if (!orderId || !paymentMethodId || !amount)
       return res.status(400).json({ message: 'missing fields' });

@@ -4,13 +4,14 @@ import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import type { ApiMessage, LowStockProduct } from '../../../types';
 import { DEFAULT_LOW_STOCK_THRESHOLD } from '@lib/config';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<{ products: LowStockProduct[] } | ApiMessage>
 ): Promise<void> {
   if (req.method !== 'GET') {
-    res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: METHOD_NOT_ALLOWED });
     return;
   }
   try {
@@ -18,7 +19,12 @@ async function handler(
     const param = parseInt(String(req.query.threshold || ''), 10);
     const threshold = Number.isNaN(param) ? DEFAULT_LOW_STOCK_THRESHOLD : param;
     const rows = await db.product.findMany({
-      select: { id: true, title: true, quantity: true, lowStockThreshold: true },
+      select: {
+        id: true,
+        title: true,
+        quantity: true,
+        lowStockThreshold: true,
+      },
     });
     const products = rows
       .filter((p) => p.quantity < (p.lowStockThreshold ?? threshold))

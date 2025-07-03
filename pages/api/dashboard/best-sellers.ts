@@ -4,6 +4,7 @@ import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import type { ApiMessage } from '../../../types';
+import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 async function handler(
   req: AuthedNextApiRequest,
@@ -13,16 +14,17 @@ async function handler(
 ) {
   try {
     if (req.method !== 'GET') {
-      return res.status(405).json({ message: 'Method Not Allowed' });
+      return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     }
     const db = getDb();
     const user = req.user;
     const param = parseInt(getQueryParam(req.query.brandId) || '', 10);
     const queryBrandId = Number.isNaN(param) ? undefined : param;
     const vendorId =
-      user?.brandId ?? (user?.role === 'SUPER_ADMIN' ? queryBrandId : undefined);
+      user?.brandId ??
+      (user?.role === 'SUPER_ADMIN' ? queryBrandId : undefined);
     if (!user?.brandId && user?.role !== 'SUPER_ADMIN') {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: UNAUTHORIZED });
     }
     const where: any = {};
     if (vendorId) where.product = { vendorId };
