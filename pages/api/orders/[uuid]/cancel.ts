@@ -14,8 +14,10 @@ import {
   CANNOT_CANCEL_THIS_ORDER,
 } from '@/constants/messages';
 
+type NextApiRequestWithUser = NextApiRequest & { user?: { email?: string } };
+
 async function handler(
-  req: NextApiRequest,
+  req: NextApiRequestWithUser,
   res: NextApiResponse<ApiMessage>
 ): Promise<void> {
   if (req.method !== 'POST') {

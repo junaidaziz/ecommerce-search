@@ -35,13 +35,13 @@ async function handler(
       orderBy: { _sum: { quantity: 'desc' } },
       take: 5,
     });
-    const ids = grouped.map((g) => g.productId);
+    const ids = grouped.map((g: { productId: string }) => g.productId);
     const products = await db.product.findMany({
       where: { id: { in: ids } },
       select: { id: true, title: true },
     });
-    const map = new Map(products.map((p) => [p.id, p.title]));
-    const result = grouped.map((g) => ({
+    const map = new Map(products.map((p: { id: string; title: string }) => [p.id, p.title]));
+    const result = grouped.map((g: { productId: string; _sum: { quantity: number | null } }) => ({
       id: String(g.productId),
       title: map.get(g.productId) || '',
       quantity: g._sum.quantity || 0,
