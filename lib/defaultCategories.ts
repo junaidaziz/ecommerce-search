@@ -1,4 +1,6 @@
-export const DEFAULT_CATEGORIES = [
+import type { Category } from '@/types/category';
+
+export const DEFAULT_CATEGORIES: Category[] = [
   {
     name: 'Electronics',
     slug: 'electronics',
@@ -41,4 +43,5 @@ export const DEFAULT_CATEGORIES = [
     ],
   },
 ];
+
 export default DEFAULT_CATEGORIES;
