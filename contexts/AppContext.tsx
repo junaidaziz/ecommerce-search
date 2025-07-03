@@ -60,7 +60,10 @@ export function AppProvider({ children }: AppProviderProps) {
   useEffect(() => {
     const storedCart = localStorage.getItem('app-cart');
     if (storedCart) {
-      setCart(JSON.parse(storedCart));
+      const parsed = JSON.parse(storedCart);
+      if (Array.isArray(parsed) && parsed.length) {
+        setCart((prev) => (prev.length ? prev : parsed));
+      }
     }
     const storedWish = localStorage.getItem('app-wishlist');
     if (storedWish) {
@@ -71,7 +74,6 @@ export function AppProvider({ children }: AppProviderProps) {
   useEffect(() => {
     if (!user) {
       hasMergedCart.current = false;
-      localStorage.removeItem(CART_MERGED_KEY);
       return;
     }
 
@@ -86,7 +88,12 @@ export function AppProvider({ children }: AppProviderProps) {
             .then((res) => (res.ok ? res.json() : []))
             .then((data) => {
               if (Array.isArray(data)) {
-                setCart((prev) => mergeCarts(prev, data));
+                setCart((prev) => {
+                  const next = prev.length ? mergeCarts(prev, data) : data;
+                  return JSON.stringify(prev) === JSON.stringify(next)
+                    ? prev
+                    : next;
+                });
                 localStorage.setItem(CART_MERGED_KEY, user.email);
               }
             })
