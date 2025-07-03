@@ -2,6 +2,7 @@ import OrderChatWindow from '@components/Chat/OrderChatWindow';
 import { useEffect, useState, useMemo, Fragment, useContext } from 'react';
 import useRequireAuth from '@hooks/useRequireAuth';
 import type { Order } from '../types';
+import { OrderStatus } from '../types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import { NotificationContext } from '@contexts/NotificationContext';
@@ -63,7 +64,11 @@ const Orders: React.FC<OrdersProps> = (_props) => {
     const data = await res.json().catch(() => null);
     if (res.ok) {
       addNotification('Order cancelled', 'success');
-      setOrders((prev) => prev.map((o) => (o.uuid === uuid ? { ...o, status: 'cancelled' } : o)));
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.uuid === uuid ? { ...o, status: OrderStatus.CANCELLED } : o
+        )
+      );
     } else {
       addNotification(data?.message || 'Cancellation failed', 'error');
     }

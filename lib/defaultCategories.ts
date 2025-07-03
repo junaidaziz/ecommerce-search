@@ -1,6 +1,7 @@
 export const DEFAULT_CATEGORIES = [
   {
     name: 'Electronics',
+    slug: 'electronics',
     subcategories: [
       { name: 'Phones' },
       { name: 'Computers' },
@@ -9,10 +10,12 @@ export const DEFAULT_CATEGORIES = [
   },
   {
     name: 'Fashion',
+    slug: 'fashion',
     subcategories: [{ name: 'Men' }, { name: 'Women' }, { name: 'Kids' }],
   },
   {
     name: 'Home',
+    slug: 'home',
     subcategories: [
       { name: 'Furniture' },
       { name: 'Kitchen' },
@@ -21,6 +24,7 @@ export const DEFAULT_CATEGORIES = [
   },
   {
     name: 'Toys',
+    slug: 'toys',
     subcategories: [
       { name: 'Games' },
       { name: 'Stuffed Animals' },
@@ -29,6 +33,7 @@ export const DEFAULT_CATEGORIES = [
   },
   {
     name: 'Sports',
+    slug: 'sports',
     subcategories: [
       { name: 'Fitness' },
       { name: 'Outdoor' },

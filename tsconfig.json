@@ -112,6 +112,7 @@
       "@styles/*": ["styles/*"],
       "@contexts/*": ["contexts/*"],
       "@/types/*": ["types/*"],
+      "@/types": ["types/index.ts"],
       "@test-utils/*": ["test-utils/*"],
       "@lib/prisma": ["lib/prisma"]
     }
