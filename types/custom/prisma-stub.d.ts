@@ -16,10 +16,18 @@ declare module '@prisma/client' {
     export interface Product {
       [key: string]: any;
     }
+    export interface ProductWhereInput {
+      [key: string]: any;
+    }
   }
   export type Role = any;
   export interface Product extends Record<string, any> {}
   export interface User extends Record<string, any> {}
   export interface Order extends Record<string, any> {}
   export interface Category extends Record<string, any> {}
+  export interface Payment extends Record<string, any> {}
+  export interface PaymentMethod extends Record<string, any> {}
+  export interface PolicyDocument extends Record<string, any> {}
+  export interface SupportTicket extends Record<string, any> {}
+  export interface WishlistItem extends Record<string, any> {}
 }

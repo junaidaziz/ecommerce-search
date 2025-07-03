@@ -3,7 +3,7 @@ import { getAllOrdersFiltered, updateOrderStatus } from '@lib/orders';
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { Order, ApiMessage } from '../@/types';
+import type { Order, ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED, UPDATED } from '@/constants/messages';
 
 async function handler(

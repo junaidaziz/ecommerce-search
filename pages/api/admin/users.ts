@@ -16,7 +16,7 @@ import {
   UserDisabledUpdateRequest,
   CreateUserRequest,
   ApiMessage,
-} from '../@/types';
+} from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   MISSING_REQUIRED_FIELDS,

@@ -30,6 +30,8 @@ type ProductBase = Pick<
 export interface Product extends ProductBase {
   vendor: Vendor;
   category: Category;
+  /** Associated category id */
+  categoryId?: number;
   brand?: Brand;
   images?: Image[];
   variants?: Variant[];

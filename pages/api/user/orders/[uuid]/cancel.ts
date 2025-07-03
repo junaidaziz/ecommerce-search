@@ -6,7 +6,7 @@ import { stripe } from '@lib/stripe';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { logAudit } from '@lib/audit';
-import type { ApiMessage } from '../../../../@/types';
+import type { ApiMessage } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   UNAUTHORIZED,
