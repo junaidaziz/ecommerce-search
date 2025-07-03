@@ -3,6 +3,7 @@ import { SearchAnalyticsResponse, ApiMessage } from '../../../types';
 import { getDb } from '@lib/db';
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 interface SearchLog {
   query: string;
@@ -15,7 +16,7 @@ async function handler(
 ): Promise<void> {
   try {
     if (req.method !== 'GET') {
-      res.status(405).json({ message: 'Method Not Allowed' });
+      res.status(405).json({ message: METHOD_NOT_ALLOWED });
       return;
     }
 

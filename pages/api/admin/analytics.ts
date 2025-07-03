@@ -4,13 +4,14 @@ import { handleApiError } from '@utils/handleApiError';
 import { AnalyticsData, ApiMessage } from '../../../types';
 import { getDb } from '@lib/db';
 import { getQueryParam } from '@utils/getQueryParam';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AnalyticsData | ApiMessage>
 ): Promise<void> {
   if (req.method !== 'GET') {
-    res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: METHOD_NOT_ALLOWED });
     return;
   }
   try {
@@ -27,7 +28,8 @@ async function handler(
     }
     if (brandIdParam) {
       const id = parseInt(brandIdParam, 10);
-      if (!isNaN(id)) where.product = { ...(where.product || {}), vendorId: id };
+      if (!isNaN(id))
+        where.product = { ...(where.product || {}), vendorId: id };
     }
     if (categoryParam) {
       const cid = parseInt(categoryParam, 10);
@@ -36,7 +38,10 @@ async function handler(
     }
 
     const totalOrders = await db.order.count({ where });
-    const revenueAgg = await db.order.aggregate({ where, _sum: { total: true } });
+    const revenueAgg = await db.order.aggregate({
+      where,
+      _sum: { total: true },
+    });
     const grouped = await db.order.groupBy({
       by: ['productId'],
       where,

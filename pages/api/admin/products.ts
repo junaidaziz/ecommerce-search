@@ -10,6 +10,12 @@ import { getQueryParam } from '@utils/getQueryParam';
 import { slugify } from '@lib/slugify';
 import { Product, ApiMessage, Variant } from '../../../types';
 import { mapDbRowToProduct } from '@lib/products';
+import {
+  METHOD_NOT_ALLOWED,
+  NOT_FOUND,
+  UUID_REQUIRED,
+  CANNOT_DELETE_PRODUCT_WITH_ORDERS,
+} from '@/constants/messages';
 
 export const config = {
   api: {
@@ -105,7 +111,7 @@ async function handler(
       if (req.method === 'PUT') {
         existing = await db.product.findUnique({ where: { id: Number(id) } });
         if (!existing) {
-          res.status(404).json({ message: 'Not found' });
+          res.status(404).json({ message: NOT_FOUND });
           return;
         }
         const existingImages = existing.images
@@ -188,18 +194,16 @@ async function handler(
     if (req.method === 'DELETE') {
       const uuid = getQueryParam(req.query.uuid);
       if (!uuid) {
-        res.status(400).json({ message: 'uuid required' });
+        res.status(400).json({ message: UUID_REQUIRED });
         return;
       }
       const existing = await db.product.findUnique({ where: { uuid } });
       if (!existing) {
-        res.status(404).json({ message: 'Not found' });
+        res.status(404).json({ message: NOT_FOUND });
         return;
       }
       if (await hasOrdersForProduct(String(uuid))) {
-        res
-          .status(409)
-          .json({ message: 'cannot delete product with orders' });
+        res.status(409).json({ message: CANNOT_DELETE_PRODUCT_WITH_ORDERS });
         return;
       }
       await db.product.delete({ where: { uuid } });
@@ -220,7 +224,7 @@ async function handler(
       return;
     }
 
-    res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: METHOD_NOT_ALLOWED });
     return;
   } catch (error) {
     handleApiError(res, error, 'Failed to process product');

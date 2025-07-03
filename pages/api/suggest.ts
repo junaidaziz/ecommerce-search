@@ -3,13 +3,14 @@ import client from '@lib/typesenseClient';
 import { handleApiError } from '@utils/handleApiError';
 import { ObjectNotFound } from 'typesense/lib/Typesense/Errors';
 import type { SuggestionsResponse, ApiMessage } from '../../types';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuggestionsResponse | ApiMessage>
 ): Promise<void> {
   if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   }
 
   const { q = '' } = req.query as { q?: string };

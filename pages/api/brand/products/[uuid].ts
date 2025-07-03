@@ -12,6 +12,13 @@ import type { ApiMessage, ProductInput } from '../../../../types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import { uploadFileToS3 } from '@lib/s3';
 import path from 'path';
+import {
+  METHOD_NOT_ALLOWED,
+  NOT_FOUND,
+  UUID_REQUIRED,
+  CANNOT_DELETE_PRODUCT_WITH_ORDERS,
+  PERCENTAGE_DISCOUNT_BETWEEN_1_AND_99,
+} from '@/constants/messages';
 
 export const config = {
   api: {
@@ -44,11 +51,11 @@ export default async function handler(
 ): Promise<void> {
   try {
     const uuid = getQueryParam(req.query.uuid);
-    if (!uuid) return res.status(400).json({ message: 'uuid required' });
+    if (!uuid) return res.status(400).json({ message: UUID_REQUIRED });
 
     if (req.method === 'PUT') {
       const existing = await getProductByUuid(String(uuid));
-      if (!existing) return res.status(404).json({ message: 'Not found' });
+      if (!existing) return res.status(404).json({ message: NOT_FOUND });
       const { fields, files } = await parseBody(req);
       const {
         title,
@@ -82,7 +89,7 @@ export default async function handler(
         ) {
           return res
             .status(400)
-            .json({ message: 'Percentage discount must be between 1 and 99' });
+            .json({ message: PERCENTAGE_DISCOUNT_BETWEEN_1_AND_99 });
         }
       }
       if (parsedDiscountType === 'fixed') {
@@ -156,18 +163,18 @@ export default async function handler(
 
     if (req.method === 'DELETE') {
       const existing = await getProductByUuid(String(uuid));
-      if (!existing) return res.status(404).json({ message: 'Not found' });
+      if (!existing) return res.status(404).json({ message: NOT_FOUND });
       if (await hasOrdersForProduct(String(uuid))) {
         return res
           .status(409)
-          .json({ message: 'cannot delete product with orders' });
+          .json({ message: CANNOT_DELETE_PRODUCT_WITH_ORDERS });
       }
       await deleteProduct(String(uuid));
       await loadAndIndexProducts();
       return res.status(200).json({ message: 'product deleted' });
     }
 
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     return handleApiError(res, error, 'Failed to process product');
   }

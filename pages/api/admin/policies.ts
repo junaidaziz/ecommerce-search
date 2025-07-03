@@ -2,12 +2,15 @@ import type { NextApiResponse } from 'next';
 import { withRole, AuthedNextApiRequest } from '@lib/withRole';
 import { getDb } from '@lib/db';
 import { handleApiError } from '@utils/handleApiError';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 async function handler(req: AuthedNextApiRequest, res: NextApiResponse) {
   try {
     const db = getDb();
     if (req.method === 'GET') {
-      const type = Array.isArray(req.query.type) ? req.query.type[0] : req.query.type;
+      const type = Array.isArray(req.query.type)
+        ? req.query.type[0]
+        : req.query.type;
       if (type) {
         const doc = await db.policyDocument.findFirst({
           where: { type: String(type) },
@@ -48,7 +51,7 @@ async function handler(req: AuthedNextApiRequest, res: NextApiResponse) {
       res.status(201).json(doc);
       return;
     }
-    res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     handleApiError(res, error, 'Failed to manage policies');
   }

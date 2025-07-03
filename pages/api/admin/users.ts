@@ -17,6 +17,11 @@ import {
   CreateUserRequest,
   ApiMessage,
 } from '../../../types';
+import {
+  METHOD_NOT_ALLOWED,
+  MISSING_REQUIRED_FIELDS,
+  EMAIL_REQUIRED,
+} from '@/constants/messages';
 
 async function handler(
   req: NextApiRequest,
@@ -46,7 +51,7 @@ async function handler(
     }
     if (req.method === 'DELETE') {
       const email = getQueryParam(req.query.email);
-      if (!email) return res.status(400).json({ message: 'email required' });
+      if (!email) return res.status(400).json({ message: EMAIL_REQUIRED });
       await deleteUser(email);
       res.status(200).json({ message: 'user deleted' });
       return;
@@ -55,7 +60,7 @@ async function handler(
       const { email, password, firstName, lastName, brandName, gender, role } =
         req.body as CreateUserRequest;
       if (!email || !password || !firstName || !lastName || !gender) {
-        return res.status(400).json({ message: 'missing required fields' });
+        return res.status(400).json({ message: MISSING_REQUIRED_FIELDS });
       }
       await addUser({
         email,
@@ -69,7 +74,7 @@ async function handler(
       res.status(201).json({ message: 'user created' });
       return;
     }
-    res.status(405).json({ message: 'Method Not Allowed' });
+    res.status(405).json({ message: METHOD_NOT_ALLOWED });
     return;
   } catch (error) {
     handleApiError(res, error, 'Failed to manage users');

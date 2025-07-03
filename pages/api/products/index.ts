@@ -4,6 +4,7 @@ import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import type { Product } from '@/types/product';
 import type { ApiMessage } from '../../../types';
+import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export interface ProductsQuery {
   category?: string | string[];
@@ -28,7 +29,7 @@ export default async function handler(
   res: NextApiResponse<ProductsResponse | ApiMessage>
 ): Promise<void> {
   if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   }
   const catParam =
     getQueryParam(req.query.category) || getQueryParam(req.query.categorySlug);

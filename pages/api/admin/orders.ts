@@ -4,6 +4,7 @@ import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import type { Order, ApiMessage } from '../../../types';
+import { METHOD_NOT_ALLOWED, UPDATED } from '@/constants/messages';
 
 async function handler(
   req: NextApiRequest,
@@ -13,7 +14,10 @@ async function handler(
     if (req.method === 'GET') {
       const status = getQueryParam(req.query.status);
       const search = getQueryParam(req.query.search);
-      const orders = await getAllOrdersFiltered({ status: status || undefined, search: search || undefined });
+      const orders = await getAllOrdersFiltered({
+        status: status || undefined,
+        search: search || undefined,
+      });
       return res.status(200).json(orders);
     }
     if (req.method === 'PATCH') {
@@ -23,9 +27,9 @@ async function handler(
         return res.status(400).json({ message: 'uuid and status required' });
       }
       await updateOrderStatus(uuid, status);
-      return res.status(200).json({ message: 'updated' });
+      return res.status(200).json({ message: UPDATED });
     }
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (e) {
     return handleApiError(res, e, 'Failed to manage orders');
   }

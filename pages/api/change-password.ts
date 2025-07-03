@@ -5,6 +5,7 @@ import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { findUser, updateUserProfile } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
 import type { ApiMessage } from '../../types';
+import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,10 +13,9 @@ export default async function handler(
 ): Promise<void> {
   try {
     if (req.method !== 'POST')
-      return res.status(405).json({ message: 'Method Not Allowed' });
+      return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     const session = await getServerSession(req, res, authOptions);
-    if (!session?.user)
-      return res.status(401).json({ message: 'Unauthorized' });
+    if (!session?.user) return res.status(401).json({ message: UNAUTHORIZED });
 
     const { currentPassword, newPassword } = req.body as {
       currentPassword?: string;
