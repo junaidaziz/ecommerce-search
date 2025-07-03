@@ -13,7 +13,7 @@ import {
   getAverageRating,
 } from '@lib/db';
 import { mapDbRowToProduct } from '@lib/products';
-import { Product, Review } from '../../types';
+import { Product, Review } from '@/types';
 import { SelectDropdown, Textarea } from '@components/form-fields';
 import { serializeDates } from '@utils/serializeDates';
 

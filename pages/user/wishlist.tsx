@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import Link from 'next/link';
 import { AppContext } from '@contexts/AppContext';
-import type { AppContextValue, WishlistItem } from '../../types';
+import type { AppContextValue, WishlistItem } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 

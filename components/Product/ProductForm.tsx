@@ -9,10 +9,10 @@ import {
   TagInput,
   RichTextEditor,
 } from '../form-fields';
-import { VendorsResponse } from '../../types';
+import { VendorsResponse } from '@/types';
 
 import { AppContext } from '@contexts/AppContext';
-import type { ProductFormValues } from '../../types';
+import type { ProductFormValues } from '@/types';
 
 interface ProductFormProps {
   initial?: Partial<ProductFormValues>;
@@ -100,7 +100,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const params = new URLSearchParams({ search: inputValue, limit: '20' });
     const res = await fetch(`/api/categories?${params.toString()}`);
     if (!res.ok) return [];
-    const data: import('../../types').CategoriesResponse = await res.json();
+    const data: import('@/types').CategoriesResponse = await res.json();
     return (data.categories || []).map((c) => ({
       label: c.name,
       value: String(c.id),

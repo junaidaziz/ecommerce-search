@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { getOrderByUuid } from '@lib/orders';
 import { handleApiError } from '@utils/handleApiError';
-import type { Order, ApiMessage } from '../../../../types';
+import type { Order, ApiMessage } from '../../@/types';
 import { UNAUTHORIZED, NOT_FOUND, UUID_REQUIRED } from '@/constants/messages';
 
 export default async function handler(

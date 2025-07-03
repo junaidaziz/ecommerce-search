@@ -4,7 +4,7 @@ import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { findUser } from '@lib/users';
 import { removeWishlistItem } from '@lib/wishlist';
 import { handleApiError } from '@utils/handleApiError';
-import type { ApiMessage } from '../../../../types';
+import type { ApiMessage } from '../../@/types';
 import {
   METHOD_NOT_ALLOWED,
   UNAUTHORIZED,

@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import { useSession } from 'next-auth/react';
-import { Order } from '../../types';
+import { Order } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import OrderDetailsModal from '@components/brand/OrderDetailsModal';

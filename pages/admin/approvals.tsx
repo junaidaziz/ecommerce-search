@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import { PendingProduct, ApiMessage } from '../../types';
+import { PendingProduct, ApiMessage } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';

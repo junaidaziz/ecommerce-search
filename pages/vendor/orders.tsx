@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import { NotificationContext } from '@contexts/NotificationContext';
-import type { Order } from '../../types';
+import type { Order } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 

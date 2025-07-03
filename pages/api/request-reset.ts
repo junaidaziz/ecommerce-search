@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { findUser, setResetToken } from '@lib/users';
 import crypto from 'crypto';
 import { handleApiError } from '@utils/handleApiError';
-import type { ResetTokenResponse, ApiMessage } from '../../types';
+import type { ResetTokenResponse, ApiMessage } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   USER_NOT_FOUND,

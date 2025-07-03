@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { handleApiError } from '@utils/handleApiError';
-import type { EmailChangeTokensResponse, ApiMessage } from '../../types';
+import type { EmailChangeTokensResponse, ApiMessage } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   UNAUTHORIZED,

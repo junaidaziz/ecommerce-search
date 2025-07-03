@@ -13,7 +13,7 @@ import type {
   CategoryResponse,
   ApiMessage,
   Category,
-} from '../../types';
+} from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   UNAUTHORIZED,

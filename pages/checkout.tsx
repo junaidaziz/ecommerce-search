@@ -11,8 +11,7 @@ import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import { AppContext } from '@contexts/AppContext';
 import type { AppContextValue } from '../types';
-import type { User } from '@/types/user';
-import type { Coupon } from '../types';
+import type { User, Coupon } from '@/types';
 import {
   TextInput,
   CountrySelect,

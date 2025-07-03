@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import type { Order } from '../../types';
+import type { Order } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 const UserOrders: React.FC = () => {

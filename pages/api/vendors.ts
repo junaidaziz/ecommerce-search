@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getVendors } from '@lib/users';
 import { handleApiError } from '@utils/handleApiError';
-import type { Vendor, ApiMessage } from '../../types';
+import type { Vendor, ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export interface VendorsResponse {

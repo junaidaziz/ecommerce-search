@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { CardNumberInput } from '@components/form-fields';
-import type { PaymentMethod } from '../../types';
+import type { PaymentMethod } from '@/types';
 import {
   luhnCheck,
   detectCardBrand,

@@ -9,7 +9,7 @@ import {
 import { AppContext } from '@contexts/AppContext';
 import { NotificationContext } from '@contexts/NotificationContext';
 import { ConfirmModal } from '@components/UI';
-import type { Product } from '../../types';
+import type { Product } from '@/types';
 import { TextInput } from '@components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';

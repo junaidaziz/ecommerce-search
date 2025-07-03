@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import { Category, CategoryInput, ApiMessage } from '../../types';
+import { Category, CategoryInput, ApiMessage } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import { TextInput } from '@components/form-fields';
 import { slugify } from '@lib/slugify';

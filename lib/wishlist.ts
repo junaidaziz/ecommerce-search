@@ -1,5 +1,5 @@
 import { prisma } from './prisma';
-import type { WishlistItem } from '@/types/wishlist';
+import type { WishlistItem } from '@/types';
 
 export async function addWishlistItem(params: {
   userId: number;

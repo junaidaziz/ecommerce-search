@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { StatusLabel } from '@components/UI';
-import type { Product } from '@/types/product';
+import type { Product } from '@/types';
 import type { BrandProductSortValue } from './BrandProductSort';
 
 interface ProductTableProps {

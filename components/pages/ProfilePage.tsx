@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useContext } from 'react';
 import useRequireAuth from '@hooks/useRequireAuth';
 import { getPageTitle } from '@lib/pageTitle';
 import { NotificationContext } from '@contexts/NotificationContext';
-import type { User } from '@/types/user';
+import type { User } from '@/types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import PageContainer from '@components/Layout/PageContainer';

@@ -6,7 +6,7 @@ import {
 } from '@lib/products';
 import { handleApiError } from '@utils/handleApiError';
 import { slugify } from '@lib/slugify';
-import type { Product, ProductInput, ApiMessage } from '../../../../types';
+import type { Product, ProductInput, ApiMessage } from '../../@/types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import { uploadFileToS3 } from '@lib/s3';
 import path from 'path';

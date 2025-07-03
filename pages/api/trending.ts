@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { handleApiError } from '@utils/handleApiError';
-import type { TrendingResponse } from '../../types';
+import type { TrendingResponse } from '@/types';
 
 const trendingKeywords = [
   'iPhone 14',

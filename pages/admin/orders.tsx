@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import type { Order } from '../../types';
+import type { Order } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 

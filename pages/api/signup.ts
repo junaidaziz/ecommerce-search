@@ -3,7 +3,7 @@ import { addUser, findUser } from '@lib/users';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '@utils/handleApiError';
-import type { SignupResponse, ApiMessage } from '../../types';
+import type { SignupResponse, ApiMessage } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   MISSING_REQUIRED_FIELDS,

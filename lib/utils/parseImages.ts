@@ -1,4 +1,4 @@
-import type { Image } from '../../types';
+import type { Image } from '@/types';
 
 export function parseImages(raw: string | null): Image[] {
   if (!raw) return [];
