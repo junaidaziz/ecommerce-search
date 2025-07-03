@@ -2,8 +2,20 @@ import { useEffect, useState } from 'react';
 import BellIcon from '../icons/BellIcon';
 import type { Notification } from '../../types';
 
-export default function NotificationBell() {
-  const [items, setItems] = useState<Notification[]>([]);
+export interface NotificationBellProps {
+  notifications?: Notification[];
+  onClick?: () => void;
+}
+
+export default function NotificationBell({
+  notifications = [],
+  onClick,
+}: NotificationBellProps) {
+  const [items, setItems] = useState<Notification[]>(notifications);
+
+  useEffect(() => {
+    setItems(notifications);
+  }, [notifications]);
 
   const fetchNotifications = () => {
     fetch('/api/brand/notifications')
@@ -28,7 +40,12 @@ export default function NotificationBell() {
 
   return (
     <div className="dropdown dropdown-end">
-      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+      <div
+        tabIndex={0}
+        role="button"
+        className="btn btn-ghost btn-circle"
+        onClick={onClick}
+      >
         <div className="indicator">
           <BellIcon className="w-5 h-5" />
           {unread > 0 && (
