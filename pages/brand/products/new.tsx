@@ -52,7 +52,7 @@ const NewProductPage: React.FC = () => {
           description: data.description || '',
           productType: data.productType || '',
           tags:
-            data.tags?.split(',').map((t) => t.trim()).filter(Boolean) || [],
+            data.tags?.split(',').map((t: string) => t.trim()).filter(Boolean) || [],
           categoryId: data.category?.id
             ? String(data.category.id)
             : data.categoryId

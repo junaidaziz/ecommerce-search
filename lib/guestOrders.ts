@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { sendOrderConfirmation } from './email';
-import type { CartItem } from '@/types/cart';
+import type { CartItem } from '@/types';
 
 export interface GuestOrder {
   id: string;

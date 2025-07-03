@@ -1,5 +1,5 @@
+import { ObjectNotFound } from 'typesense/lib/Typesense/Errors';
 import typesense from './typesenseClient';
-import { ObjectNotFound } from 'typesense';
 
 export async function ensureTypesenseProductCollection(): Promise<void> {
   try {

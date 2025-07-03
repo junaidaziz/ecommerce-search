@@ -1,4 +1,4 @@
-import { Order, Product } from '../types';
+import { Order, OrderStatus, Product } from '../types';
 import { getDb } from './db';
 import { mapDbRowToProduct } from './products';
 import { createNotification } from './notifications';
@@ -51,7 +51,7 @@ export async function addOrder({
   userEmail,
   items,
   total,
-  status = 'processing',
+  status = OrderStatus.PROCESSING,
   paymentMethod,
   paymentReference,
   paymentProof,

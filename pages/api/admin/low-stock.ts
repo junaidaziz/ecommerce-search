@@ -18,7 +18,12 @@ async function handler(
     const db = getDb();
     const param = parseInt(String(req.query.threshold || ''), 10);
     const threshold = Number.isNaN(param) ? DEFAULT_LOW_STOCK_THRESHOLD : param;
-    const rows = await db.product.findMany({
+    const rows: Array<{
+      id: string | number;
+      title: string;
+      quantity: number;
+      lowStockThreshold?: number | null;
+    }> = await db.product.findMany({
       select: {
         id: true,
         title: true,

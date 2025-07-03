@@ -176,9 +176,15 @@ const Checkout: React.FC = () => {
               shippingAddress: { name, address, country },
             }),
           });
-          const createData = await parseJsonSafe(createRes);
+          const createData = await parseJsonSafe(createRes) as { lineItems: any; orderId: any; [key: string]: any };
           if (!createRes.ok)
-            throw new Error(createData.message || 'Order failed');
+            throw new Error(
+              typeof createData === 'object' &&
+              createData !== null &&
+              'message' in createData
+                ? (createData as { message?: string }).message
+                : 'Order failed'
+            );
           const res = await fetch('/api/checkout/create-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -190,8 +196,18 @@ const Checkout: React.FC = () => {
             }),
           });
           const data = await parseJsonSafe(res);
-          if (!res.ok) throw new Error(data.message || 'Checkout failed');
-          window.location.href = data.url;
+          if (!res.ok) {
+            const errorMsg =
+              typeof data === 'object' && data !== null && 'message' in data
+                ? (data as { message?: string }).message
+                : undefined;
+            throw new Error(errorMsg || 'Checkout failed');
+          }
+          if (typeof data === 'object' && data !== null && 'url' in data && typeof (data as any).url === 'string') {
+            window.location.href = (data as { url: string }).url;
+          } else {
+            throw new Error('Invalid response from checkout session');
+          }
         } else {
           const fd = new FormData();
           fd.append('email', user.email);
@@ -202,7 +218,13 @@ const Checkout: React.FC = () => {
           if (paymentProof) fd.append('paymentProof', paymentProof);
           const res = await fetch('/api/orders', { method: 'POST', body: fd });
           const data = await parseJsonSafe(res);
-          if (!res.ok) throw new Error(data.message || 'Checkout failed');
+          if (!res.ok) {
+            const errorMsg =
+              typeof data === 'object' && data !== null && 'message' in data
+                ? (data as { message?: string }).message
+                : undefined;
+            throw new Error(errorMsg || 'Checkout failed');
+          }
           router.push('/orders');
         }
       } else {
@@ -219,8 +241,14 @@ const Checkout: React.FC = () => {
           }),
         });
         const data = await parseJsonSafe(res);
-        if (!res.ok) throw new Error(data.message || 'Checkout failed');
-        router.push(`/confirm?guest=${data.id}`);
+        if (!res.ok) {
+          const errorMsg =
+            typeof data === 'object' && data !== null && 'message' in data
+              ? (data as { message?: string }).message
+              : undefined;
+          throw new Error(errorMsg || 'Checkout failed');
+        }
+        router.push(`/confirm?guest=${(data as { id: string }).id}`);
       }
     } catch (e: any) {
       setError(e.message || 'Order failed');
@@ -465,7 +493,11 @@ const Checkout: React.FC = () => {
           <button type="button" className="btn" onClick={() => setStep(2)}>
             Back
           </button>
-          <button type="button" className="btn btn-primary" onClick={submit}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => submit(new Event('submit') as any)}
+          >
             Confirm Order
           </button>
         </div>
