@@ -175,7 +175,7 @@ export function mapDbRowToProduct(row: ProductRow): Product {
           phoneNumber: row.vendor.phoneNumber ?? undefined,
           address: row.vendor.address ?? null,
           paymentMethods:
-            (row.vendor.paymentMethods as import('@/types/vendor').BrandPaymentMethod[] | null) ??
+            (row.vendor.paymentMethods as import('@/types').BrandPaymentMethod[] | null) ??
             null,
         }
       : null,
