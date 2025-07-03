@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { addOrder } from '@lib/orders';
 import { sendOrderConfirmation } from '@lib/email';
 import { handleApiError } from '@utils/handleApiError';
-import type { OrderIdResponse, ApiMessage } from '../@/types';
+import type { OrderIdResponse, ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {

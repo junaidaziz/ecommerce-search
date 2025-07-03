@@ -3,7 +3,7 @@ import { getSalesMetrics } from '@lib/analytics';
 import { withRole, AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { ApiMessage } from '../@/types';
+import type { ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 async function handler(

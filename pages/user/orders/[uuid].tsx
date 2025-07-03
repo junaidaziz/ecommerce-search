@@ -6,8 +6,8 @@ import dayjs from 'dayjs';
 import OrderChatWindow from '@components/Chat/OrderChatWindow';
 import { StatusLabel } from '@components/UI';
 import { getPageTitle } from '@lib/pageTitle';
-import type { Order } from '../@/types';
-import { OrderStatus } from '../@/types';
+import type { Order } from '@/types';
+import { OrderStatus } from '@/types';
 
 export default function UserOrderDetail() {
   const router = useRouter();

@@ -4,6 +4,8 @@ export interface User {
   id?: number | string;
   uuid?: string;
   email: string;
+  /** Optional display name from auth providers */
+  name?: string;
   firstName?: string;
   lastName?: string;
   role?: Role;

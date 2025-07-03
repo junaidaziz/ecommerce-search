@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getCategoriesFlat } from '@lib/products';
 import { handleApiError } from '@utils/handleApiError';
-import type { ApiMessage, Category } from '../@/types';
+import type { ApiMessage, Category } from '@/types';
 import { METHOD_NOT_ALLOWED, NAME_REQUIRED } from '@/constants/messages';
 
 interface CheckResponse {
