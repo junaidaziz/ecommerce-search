@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import DashboardCard from './DashboardCard';
 import MoneyIcon from '../icons/MoneyIcon';
@@ -19,12 +20,12 @@ const TotalSalesCard: React.FC<Props> = ({ brandId }) => {
       if (brandId) params.set('brandId', String(brandId));
       const base = '/api/dashboard/total-sales';
       try {
-        const curRes = await fetch(`${base}?${params.toString()}`);
+        const curRes = await apiFetch(`${base}?${params.toString()}`);
         if (curRes.ok) {
           const cur = await curRes.json();
           setTotal(cur.total);
           params.set('monthOffset', '1');
-          const prevRes = await fetch(`${base}?${params.toString()}`);
+          const prevRes = await apiFetch(`${base}?${params.toString()}`);
           if (prevRes.ok) {
             const prev = await prevRes.json();
             const pct = prev.total
@@ -50,7 +51,11 @@ const TotalSalesCard: React.FC<Props> = ({ brandId }) => {
       loading={total === null && !error}
       error={error}
       icon={<MoneyIcon className="w-5 h-5" />}
-      trend={trend !== null ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}%` : undefined}
+      trend={
+        trend !== null
+          ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}%`
+          : undefined
+      }
       className="bg-green-50"
     >
       {total !== null && (

@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import DashboardCard from './DashboardCard';
@@ -21,9 +22,8 @@ const BestSellersCard: React.FC<Props> = ({ brandId }) => {
     setProducts(null);
     setError('');
     const url =
-      '/api/dashboard/best-sellers' +
-      (brandId ? `?brandId=${brandId}` : '');
-    fetch(url)
+      '/api/dashboard/best-sellers' + (brandId ? `?brandId=${brandId}` : '');
+    apiFetch(url)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data) => setProducts(data.products))
       .catch(() => setError('Failed to load'));

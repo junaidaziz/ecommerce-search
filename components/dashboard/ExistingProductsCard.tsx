@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -19,7 +20,7 @@ const ExistingProductsCard: React.FC<Props> = ({ previewCount = 3 }) => {
     setError('');
     async function load() {
       try {
-        const res = await fetch('/api/brand/products', {
+        const res = await apiFetch('/api/brand/products', {
           credentials: 'include',
         });
         if (res.ok) {

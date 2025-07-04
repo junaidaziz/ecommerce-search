@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useEffect, useState, useRef, useContext } from 'react';
 import ChatInput from './ChatInput';
 import { AppContext } from '@contexts/AppContext';
@@ -25,7 +26,7 @@ const OrderChatWindow: React.FC<Props> = ({
 
   const fetchMsgs = () => {
     if (!orderId) return;
-    fetch(`/api/messages/${orderId}`)
+    apiFetch(`/api/messages/${orderId}`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setMessages(data))
       .catch(() => {});
@@ -50,11 +51,13 @@ const OrderChatWindow: React.FC<Props> = ({
     fileUrl?: string;
     fileName?: string;
   }) => {
-    await fetch(`/api/messages/${orderId}`, {
+    await apiFetch(`/api/messages/${orderId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
-    }).then((res) => res.ok && res.json()).catch(() => {});
+    })
+      .then((res) => res.ok && res.json())
+      .catch(() => {});
     fetchMsgs();
   };
 
@@ -66,11 +69,19 @@ const OrderChatWindow: React.FC<Props> = ({
         <div className="flex justify-between items-center p-3 border-b">
           <div className="flex items-center gap-2">
             {brandLogo && (
-              <img src={brandLogo} alt={brandName} className="w-6 h-6 rounded" />
+              <img
+                src={brandLogo}
+                alt={brandName}
+                className="w-6 h-6 rounded"
+              />
             )}
             <span className="font-semibold">{brandName}</span>
           </div>
-          <button type="button" className="btn btn-xs btn-circle" onClick={onClose}>
+          <button
+            type="button"
+            className="btn btn-xs btn-circle"
+            onClick={onClose}
+          >
             ✕
           </button>
         </div>
@@ -90,7 +101,12 @@ const OrderChatWindow: React.FC<Props> = ({
                   className="max-w-[150px] rounded inline"
                 />
               ) : m.messageType === 'file' && m.fileUrl ? (
-                <a href={m.fileUrl} target="_blank" rel="noopener" className="link">
+                <a
+                  href={m.fileUrl}
+                  target="_blank"
+                  rel="noopener"
+                  className="link"
+                >
                   {m.fileName || 'Download file'}
                 </a>
               ) : (

@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -40,7 +41,7 @@ const NewProductPage: React.FC = () => {
     }
     setFetching(true);
     setFetchError('');
-    fetch(`/api/products/${encodeURIComponent(editId)}`)
+    apiFetch(`/api/products/${encodeURIComponent(editId)}`)
       .then(async (res) => {
         if (!res.ok) throw new Error(res.statusText);
         const data: Product = await res.json();
@@ -52,12 +53,15 @@ const NewProductPage: React.FC = () => {
           description: data.description || '',
           productType: data.productType || '',
           tags:
-            data.tags?.split(',').map((t: string) => t.trim()).filter(Boolean) || [],
+            data.tags
+              ?.split(',')
+              .map((t: string) => t.trim())
+              .filter(Boolean) || [],
           categoryId: data.category?.id
             ? String(data.category.id)
             : data.categoryId
-            ? String(data.categoryId)
-            : '',
+              ? String(data.categoryId)
+              : '',
           quantity: data.quantity ?? 0,
           minPrice: data.minPrice ?? 0,
           maxPrice: data.maxPrice ?? 0,
@@ -81,7 +85,7 @@ const NewProductPage: React.FC = () => {
         ? `/api/brand/products/${encodeURIComponent(editId)}`
         : '/api/brand/products';
       const method = editId ? 'PUT' : 'POST';
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         credentials: 'include',
         body: values,
@@ -115,7 +119,7 @@ const NewProductPage: React.FC = () => {
   };
 
   const requestNewVendor = async (name: string) => {
-    const res = await fetch('/api/vendors/check-or-create', {
+    const res = await apiFetch('/api/vendors/check-or-create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),

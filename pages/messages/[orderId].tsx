@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import useRequireAuth from '@hooks/useRequireAuth';
@@ -14,7 +15,7 @@ export default function OrderMessages() {
 
   const fetchMsgs = () => {
     if (!orderId) return;
-    fetch(`/api/messages/${orderId}`)
+    apiFetch(`/api/messages/${orderId}`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setMsgs(data))
       .catch(() => {});
@@ -28,7 +29,7 @@ export default function OrderMessages() {
 
   const send = () => {
     if (!text.trim()) return;
-    fetch(`/api/messages/${orderId}`, {
+    apiFetch(`/api/messages/${orderId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content: text }),

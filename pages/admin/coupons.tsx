@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useEffect, useState, useContext, ChangeEvent } from 'react';
 import Head from 'next/head';
 import { AppContext } from '@contexts/AppContext';
@@ -18,7 +19,7 @@ export default function AdminCoupons() {
   const [message, setMessage] = useState('');
 
   const fetchCoupons = () => {
-    fetch('/api/admin/coupons')
+    apiFetch('/api/admin/coupons')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: Coupon[]) => setCoupons(data))
       .catch(() => setCoupons([]));
@@ -32,14 +33,19 @@ export default function AdminCoupons() {
     e.preventDefault();
     const method = editingId ? 'PUT' : 'POST';
     const body = { ...form, id: editingId ?? undefined };
-    const res = await fetch('/api/admin/coupons', {
+    const res = await apiFetch('/api/admin/coupons', {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
     if (res.ok) {
       setMessage(editingId ? 'Coupon updated' : 'Coupon created');
-      setForm({ code: '', discountType: 'percent', amount: 0, minOrderValue: undefined });
+      setForm({
+        code: '',
+        discountType: 'percent',
+        amount: 0,
+        minOrderValue: undefined,
+      });
       setEditingId(null);
       fetchCoupons();
     } else {
@@ -72,14 +78,14 @@ export default function AdminCoupons() {
           value={form.discountType}
           onChange={(e) =>
             setForm((f) => ({
-                ...f,
-                discountType: e.target.value as 'percent' | 'amount' | 'bogo',
-              }))
+              ...f,
+              discountType: e.target.value as 'percent' | 'amount' | 'bogo',
+            }))
           }
         >
-            <option value="percent">Percent</option>
-            <option value="amount">Amount</option>
-            <option value="bogo">BOGO</option>
+          <option value="percent">Percent</option>
+          <option value="amount">Amount</option>
+          <option value="bogo">BOGO</option>
         </select>
         <TextInput
           name="amount"
@@ -95,7 +101,10 @@ export default function AdminCoupons() {
           type="number"
           value={form.minOrderValue ? String(form.minOrderValue) : ''}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setForm((f) => ({ ...f, minOrderValue: parseFloat(e.target.value) }))
+            setForm((f) => ({
+              ...f,
+              minOrderValue: parseFloat(e.target.value),
+            }))
           }
           placeholder="Min Order Value"
         />
@@ -123,7 +132,12 @@ export default function AdminCoupons() {
               className="btn"
               onClick={() => {
                 setEditingId(null);
-                setForm({ code: '', discountType: 'percent', amount: 0, minOrderValue: undefined });
+                setForm({
+                  code: '',
+                  discountType: 'percent',
+                  amount: 0,
+                  minOrderValue: undefined,
+                });
               }}
             >
               Cancel

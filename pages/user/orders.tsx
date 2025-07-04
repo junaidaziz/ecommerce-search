@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import type { Order } from '@/types';
@@ -12,7 +13,7 @@ const UserOrders: React.FC = () => {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    fetch('/api/user/orders')
+    apiFetch('/api/user/orders')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: Order[]) => {
         setOrders(data);
@@ -48,10 +49,10 @@ const UserOrders: React.FC = () => {
                   o.status === 'processing'
                     ? 'badge-warning'
                     : o.status === 'shipped'
-                    ? 'badge-info'
-                    : o.status === 'delivered'
-                    ? 'badge-success'
-                    : 'badge-error'
+                      ? 'badge-info'
+                      : o.status === 'delivered'
+                        ? 'badge-success'
+                        : 'badge-error'
                 }`}
               >
                 {o.status}
@@ -64,14 +65,16 @@ const UserOrders: React.FC = () => {
             </ul>
             <p>Total: £{o.total}</p>
             <p className="space-x-2">
-              <a className="btn btn-sm" href={`/user/orders/${o.uuid}`}>View</a>
+              <a className="btn btn-sm" href={`/user/orders/${o.uuid}`}>
+                View
+              </a>
               <a className="link" href={`/api/orders/${o.uuid}/invoice`}>
                 Invoice
               </a>
               <button
                 className="btn btn-sm"
                 onClick={() =>
-                  fetch(`/api/user/orders/${o.uuid}/reorder`, {
+                  apiFetch(`/api/user/orders/${o.uuid}/reorder`, {
                     method: 'POST',
                   }).then(() => window.location.assign('/cart'))
                 }

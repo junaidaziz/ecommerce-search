@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useState, useEffect, useContext } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { TextInput, CountrySelect } from '@components/form-fields';
@@ -16,7 +17,7 @@ const ManageAddressSection: React.FC = () => {
   const [savingAddress, setSavingAddress] = useState(false);
 
   useEffect(() => {
-    fetch('/api/user/profile')
+    apiFetch('/api/user/profile')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!data) return;
@@ -40,7 +41,7 @@ const ManageAddressSection: React.FC = () => {
       postalCode: values.postalCode,
       country: values.country,
     };
-    const res = await fetch('/api/user/profile', {
+    const res = await apiFetch('/api/user/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -51,7 +52,10 @@ const ManageAddressSection: React.FC = () => {
   };
 
   return (
-    <form onSubmit={addressForm.handleSubmit(submitAddress)} className="space-y-4 max-w-md mx-auto">
+    <form
+      onSubmit={addressForm.handleSubmit(submitAddress)}
+      className="space-y-4 max-w-md mx-auto"
+    >
       <h2 className="text-xl font-bold mb-2">Manage Address</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
@@ -94,7 +98,11 @@ const ManageAddressSection: React.FC = () => {
           />
         </div>
       </div>
-      <button type="submit" className="btn btn-primary w-full" disabled={savingAddress}>
+      <button
+        type="submit"
+        className="btn btn-primary w-full"
+        disabled={savingAddress}
+      >
         {savingAddress ? 'Saving...' : 'Save Address'}
       </button>
     </form>

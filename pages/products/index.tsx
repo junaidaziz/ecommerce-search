@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -144,7 +145,9 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       else setLoading(true);
 
       try {
-        const res = await fetch(`/api/products?${buildParams(p).toString()}`);
+        const res = await apiFetch(
+          `/api/products?${buildParams(p).toString()}`
+        );
         if (!res.ok) throw new Error('Failed to fetch');
         const data = (await res.json()) as {
           products: Product[];

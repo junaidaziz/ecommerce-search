@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import ProductCard from '@components/Product/ProductCard';
@@ -21,7 +22,7 @@ const CategoryPage: React.FC = () => {
           ? `&filterByType=${encodeURIComponent(type)}`
           : ''
       }`;
-      const res = await fetch(url);
+      const res = await apiFetch(url);
       if (res.ok) {
         const data = await res.json();
         setProducts(data.results || []);

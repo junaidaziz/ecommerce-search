@@ -1,10 +1,5 @@
-import {
-  useContext,
-  useState,
-  useEffect,
-  FormEvent,
-  ChangeEvent,
-} from 'react';
+import { apiFetch } from '@lib/api';
+import { useContext, useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -57,7 +52,9 @@ const Checkout: React.FC = () => {
   const [error, setError] = useState('');
   const [coupon, setCoupon] = useState('');
   const [discount, setDiscount] = useState(0);
-  const [availableMethods, setAvailableMethods] = useState<{ type: string; details?: string }[]>([]);
+  const [availableMethods, setAvailableMethods] = useState<
+    { type: string; details?: string }[]
+  >([]);
   const [paymentMethod, setPaymentMethod] = useState('stripe');
   const [paymentReference, setPaymentReference] = useState('');
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
@@ -135,7 +132,7 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     if (!user) return;
     setLoadingUser(true);
-    fetch('/api/me')
+    apiFetch('/api/me')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!data) return;
@@ -150,7 +147,7 @@ const Checkout: React.FC = () => {
 
   useEffect(() => {
     if (!country) return;
-    fetch(`/api/delivery-estimate?country=${country}`)
+    apiFetch(`/api/delivery-estimate?country=${country}`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((d) => setDeliveryDate(d.date))
       .catch(() => setDeliveryDate(''));
@@ -166,7 +163,7 @@ const Checkout: React.FC = () => {
       if (user) {
         if (paymentMethod === 'stripe') {
           if (!STRAPI_URL) throw new Error('STRAPI_URL not configured');
-          const createRes = await fetch(`${STRAPI_URL}/orders/create`, {
+          const createRes = await apiFetch(`${STRAPI_URL}/orders/create`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -176,7 +173,11 @@ const Checkout: React.FC = () => {
               shippingAddress: { name, address, country },
             }),
           });
-          const createData = await parseJsonSafe(createRes) as { lineItems: any; orderId: any; [key: string]: any };
+          const createData = (await parseJsonSafe(createRes)) as {
+            lineItems: any;
+            orderId: any;
+            [key: string]: any;
+          };
           if (!createRes.ok)
             throw new Error(
               typeof createData === 'object' &&
@@ -185,7 +186,7 @@ const Checkout: React.FC = () => {
                 ? (createData as { message?: string }).message
                 : 'Order failed'
             );
-          const res = await fetch('/api/checkout/create-session', {
+          const res = await apiFetch('/api/checkout/create-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -203,7 +204,12 @@ const Checkout: React.FC = () => {
                 : undefined;
             throw new Error(errorMsg || 'Checkout failed');
           }
-          if (typeof data === 'object' && data !== null && 'url' in data && typeof (data as any).url === 'string') {
+          if (
+            typeof data === 'object' &&
+            data !== null &&
+            'url' in data &&
+            typeof (data as any).url === 'string'
+          ) {
             window.location.href = (data as { url: string }).url;
           } else {
             throw new Error('Invalid response from checkout session');
@@ -216,7 +222,10 @@ const Checkout: React.FC = () => {
           fd.append('paymentMethod', paymentMethod);
           if (paymentReference) fd.append('paymentReference', paymentReference);
           if (paymentProof) fd.append('paymentProof', paymentProof);
-          const res = await fetch('/api/orders', { method: 'POST', body: fd });
+          const res = await apiFetch('/api/orders', {
+            method: 'POST',
+            body: fd,
+          });
           const data = await parseJsonSafe(res);
           if (!res.ok) {
             const errorMsg =
@@ -228,7 +237,7 @@ const Checkout: React.FC = () => {
           router.push('/orders');
         }
       } else {
-        const res = await fetch('/api/guest-orders', {
+        const res = await apiFetch('/api/guest-orders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -257,253 +266,305 @@ const Checkout: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto">
-    <Head>
-      <title>{getPageTitle('Checkout')}</title>
-    </Head>
-    <h1 className="text-3xl font-bold mb-4">Checkout</h1>
+      <Head>
+        <title>{getPageTitle('Checkout')}</title>
+      </Head>
+      <h1 className="text-3xl font-bold mb-4">Checkout</h1>
 
-    {step === 1 && (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!name || !address || (!user && !email) || !country) {
-            setError('Shipping information required');
-            return;
-          }
-          setError('');
-          setStep(2);
-        }}
-        className="space-y-3"
-      >
-        <div className="mb-4 max-h-64 overflow-y-auto">
-          <ul className="space-y-2">
-            {cart.map((item) => {
-              const price = parseFloat(typeof item.minPrice === 'number' ? item.minPrice.toString() : item.minPrice || '0');
-              const subtotal = price * item.qty;
-              return (
-                <li key={item.id} className="border p-2 flex justify-between">
-                  <div>
-                    <p className="font-medium">{item.title}</p>
-                    <p className="text-sm">£{price.toFixed(2)} x {item.qty}</p>
-                  </div>
-                  <span>£{subtotal.toFixed(2)}</span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-        <div className="border-t pt-4">
-          <p className="font-semibold">Items: {itemCount}</p>
-          <p className="font-semibold">Subtotal: £{totalPrice.toFixed(2)}</p>
-        </div>
-        <div>
-          <label className="label" htmlFor="coupon">Coupon Code</label>
-          <div className="flex gap-2">
-            <TextInput
-              name="coupon"
-              id="coupon"
-              className="flex-1"
-              value={coupon}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setCoupon(e.target.value)}
-            />
-            <button
-              type="button"
-              className="btn"
-              onClick={async () => {
-                if (!coupon) return;
-                const res = await fetch(`/api/coupons/${encodeURIComponent(coupon)}`);
-                if (res.ok) {
-                  const data: Coupon = await parseJsonSafe(res);
-                  if (data.discountType === 'percent') {
-                    setDiscount(data.amount);
-                  } else if (data.discountType === 'bogo') {
-                    if (cart.length >= 2) {
-                      const cheapest = Math.min(
-                        ...cart.map((item) =>
-                          parseFloat(
-                            typeof item.minPrice === 'number'
-                              ? item.minPrice.toString()
-                              : item.minPrice || '0'
+      {step === 1 && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!name || !address || (!user && !email) || !country) {
+              setError('Shipping information required');
+              return;
+            }
+            setError('');
+            setStep(2);
+          }}
+          className="space-y-3"
+        >
+          <div className="mb-4 max-h-64 overflow-y-auto">
+            <ul className="space-y-2">
+              {cart.map((item) => {
+                const price = parseFloat(
+                  typeof item.minPrice === 'number'
+                    ? item.minPrice.toString()
+                    : item.minPrice || '0'
+                );
+                const subtotal = price * item.qty;
+                return (
+                  <li key={item.id} className="border p-2 flex justify-between">
+                    <div>
+                      <p className="font-medium">{item.title}</p>
+                      <p className="text-sm">
+                        £{price.toFixed(2)} x {item.qty}
+                      </p>
+                    </div>
+                    <span>£{subtotal.toFixed(2)}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          <div className="border-t pt-4">
+            <p className="font-semibold">Items: {itemCount}</p>
+            <p className="font-semibold">Subtotal: £{totalPrice.toFixed(2)}</p>
+          </div>
+          <div>
+            <label className="label" htmlFor="coupon">
+              Coupon Code
+            </label>
+            <div className="flex gap-2">
+              <TextInput
+                name="coupon"
+                id="coupon"
+                className="flex-1"
+                value={coupon}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setCoupon(e.target.value)
+                }
+              />
+              <button
+                type="button"
+                className="btn"
+                onClick={async () => {
+                  if (!coupon) return;
+                  const res = await apiFetch(
+                    `/api/coupons/${encodeURIComponent(coupon)}`
+                  );
+                  if (res.ok) {
+                    const data: Coupon = await parseJsonSafe(res);
+                    if (data.discountType === 'percent') {
+                      setDiscount(data.amount);
+                    } else if (data.discountType === 'bogo') {
+                      if (cart.length >= 2) {
+                        const cheapest = Math.min(
+                          ...cart.map((item) =>
+                            parseFloat(
+                              typeof item.minPrice === 'number'
+                                ? item.minPrice.toString()
+                                : item.minPrice || '0'
+                            )
                           )
-                        )
-                      );
-                      setDiscount((cheapest / totalPrice) * 100);
+                        );
+                        setDiscount((cheapest / totalPrice) * 100);
+                      } else {
+                        setDiscount(0);
+                      }
                     } else {
-                      setDiscount(0);
+                      setDiscount(
+                        totalPrice > 0 ? (data.amount / totalPrice) * 100 : 0
+                      );
                     }
                   } else {
-                    setDiscount(totalPrice > 0 ? (data.amount / totalPrice) * 100 : 0);
+                    setDiscount(0);
                   }
-                } else {
-                  setDiscount(0);
+                }}
+              >
+                Apply
+              </button>
+            </div>
+            {discount > 0 && (
+              <p className="text-sm text-green-600">
+                Discount {discount}% applied
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="label" htmlFor="name">
+              Name
+            </label>
+            <TextInput
+              name="name"
+              id="name"
+              className="w-full"
+              value={name}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setName(e.target.value)
+              }
+              required
+            />
+          </div>
+          {!user && (
+            <div>
+              <label className="label" htmlFor="email">
+                Email
+              </label>
+              <TextInput
+                name="email"
+                id="email"
+                className="w-full"
+                value={email}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setEmail(e.target.value)
                 }
-              }}
-            >
-              Apply
+                required
+                type="email"
+              />
+            </div>
+          )}
+          <div>
+            <label className="label" htmlFor="address">
+              Address
+            </label>
+            <AddressAutocomplete
+              value={address}
+              onChange={setAddress}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <CountrySelect
+              value={country}
+              onChange={setCountry}
+              label="Country"
+            />
+          </div>
+          {deliveryDate && (
+            <p className="text-sm">Estimated Delivery: {deliveryDate}</p>
+          )}
+          {error && <p className="text-red-500">{error}</p>}
+          <div className="flex justify-end">
+            <button className="btn btn-primary" type="submit">
+              Next
             </button>
           </div>
-          {discount > 0 && (
-            <p className="text-sm text-green-600">Discount {discount}% applied</p>
-          )}
-        </div>
-        <div>
-          <label className="label" htmlFor="name">Name</label>
-          <TextInput
-            name="name"
-            id="name"
-            className="w-full"
-            value={name}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-            required
-          />
-        </div>
-        {!user && (
+        </form>
+      )}
+
+      {step === 2 && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (paymentMethod !== 'stripe' && !paymentReference) {
+              setError('Payment reference required');
+              return;
+            }
+            setError('');
+            setStep(3);
+          }}
+          className="space-y-3"
+        >
           <div>
-            <label className="label" htmlFor="email">Email</label>
-            <TextInput
-              name="email"
-              id="email"
-              className="w-full"
-              value={email}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-              required
-              type="email"
-            />
+            <label className="label" htmlFor="paymentMethod">
+              Payment Method
+            </label>
+            {availableMethods.length > 0 ? (
+              <select
+                id="paymentMethod"
+                className="select select-bordered w-full"
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              >
+                {availableMethods.map((m) => (
+                  <option key={m.type} value={m.type}>
+                    {m.type === 'card' || m.type === 'stripe'
+                      ? 'Credit/Debit Card'
+                      : m.type === 'jazzcash'
+                        ? 'JazzCash'
+                        : m.type === 'bank_transfer'
+                          ? 'Bank Transfer'
+                          : m.type}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p className="text-sm">No payment methods available.</p>
+            )}
           </div>
-        )}
-        <div>
-          <label className="label" htmlFor="address">Address</label>
-          <AddressAutocomplete
-            value={address}
-            onChange={setAddress}
-            className="w-full"
-          />
-        </div>
-        <div>
-          <CountrySelect value={country} onChange={setCountry} label="Country" />
-        </div>
-        {deliveryDate && (
-          <p className="text-sm">Estimated Delivery: {deliveryDate}</p>
-        )}
-        {error && <p className="text-red-500">{error}</p>}
-        <div className="flex justify-end">
-          <button className="btn btn-primary" type="submit">Next</button>
-        </div>
-      </form>
-    )}
-
-    {step === 2 && (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (paymentMethod !== 'stripe' && !paymentReference) {
-            setError('Payment reference required');
-            return;
-          }
-          setError('');
-          setStep(3);
-        }}
-        className="space-y-3"
-      >
-        <div>
-          <label className="label" htmlFor="paymentMethod">Payment Method</label>
-          {availableMethods.length > 0 ? (
-            <select
-              id="paymentMethod"
-              className="select select-bordered w-full"
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            >
-              {availableMethods.map((m) => (
-                <option key={m.type} value={m.type}>
-                  {m.type === 'card' || m.type === 'stripe'
-                    ? 'Credit/Debit Card'
-                    : m.type === 'jazzcash'
-                    ? 'JazzCash'
-                    : m.type === 'bank_transfer'
-                    ? 'Bank Transfer'
-                    : m.type}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <p className="text-sm">No payment methods available.</p>
+          {paymentMethod !== 'stripe' && paymentMethod !== 'card' && (
+            <div className="border p-3 rounded space-y-2">
+              {paymentMethod === 'jazzcash' && (
+                <p>
+                  Send payment to JazzCash account <b>0300-7654321</b> and enter
+                  the transaction ID below.
+                </p>
+              )}
+              {paymentMethod === 'bank_transfer' && (
+                <p>
+                  Transfer to Bank Account <b>PK00 TEST 1234 5678 9012 3456</b>{' '}
+                  and provide reference.
+                </p>
+              )}
+              <TextInput
+                name="reference"
+                id="reference"
+                placeholder="Transaction / Reference ID"
+                className="w-full"
+                value={paymentReference}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setPaymentReference(e.target.value)
+                }
+              />
+              <FileUpload
+                name="proof"
+                label="Upload Payment Proof (optional)"
+                onChange={(e) => setPaymentProof(e.target.files?.[0] || null)}
+              />
+            </div>
           )}
-        </div>
-        {paymentMethod !== 'stripe' && paymentMethod !== 'card' && (
-          <div className="border p-3 rounded space-y-2">
-            {paymentMethod === 'jazzcash' && (
-              <p>Send payment to JazzCash account <b>0300-7654321</b> and enter the transaction ID below.</p>
-            )}
-            {paymentMethod === 'bank_transfer' && (
-              <p>Transfer to Bank Account <b>PK00 TEST 1234 5678 9012 3456</b> and provide reference.</p>
-            )}
-            <TextInput
-              name="reference"
-              id="reference"
-              placeholder="Transaction / Reference ID"
-              className="w-full"
-              value={paymentReference}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setPaymentReference(e.target.value)}
-            />
-            <FileUpload
-              name="proof"
-              label="Upload Payment Proof (optional)"
-              onChange={(e) => setPaymentProof(e.target.files?.[0] || null)}
-            />
+          {error && <p className="text-red-500">{error}</p>}
+          <div className="flex justify-between">
+            <button type="button" className="btn" onClick={() => setStep(1)}>
+              Back
+            </button>
+            <button className="btn btn-primary" type="submit">
+              Next
+            </button>
           </div>
-        )}
-        {error && <p className="text-red-500">{error}</p>}
-        <div className="flex justify-between">
-          <button type="button" className="btn" onClick={() => setStep(1)}>
-            Back
-          </button>
-          <button className="btn btn-primary" type="submit">Next</button>
-        </div>
-      </form>
-    )}
+        </form>
+      )}
 
-    {step === 3 && (
-      <div className="space-y-4">
-        <div className="mb-4 max-h-64 overflow-y-auto">
-          <ul className="space-y-2">
-            {cart.map((item) => {
-              const price = parseFloat(typeof item.minPrice === 'number' ? item.minPrice.toString() : item.minPrice || '0');
-              const subtotal = price * item.qty;
-              return (
-                <li key={item.id} className="border p-2 flex justify-between">
-                  <div>
-                    <p className="font-medium">{item.title}</p>
-                    <p className="text-sm">£{price.toFixed(2)} x {item.qty}</p>
-                  </div>
-                  <span>£{subtotal.toFixed(2)}</span>
-                </li>
-              );
-            })}
-          </ul>
+      {step === 3 && (
+        <div className="space-y-4">
+          <div className="mb-4 max-h-64 overflow-y-auto">
+            <ul className="space-y-2">
+              {cart.map((item) => {
+                const price = parseFloat(
+                  typeof item.minPrice === 'number'
+                    ? item.minPrice.toString()
+                    : item.minPrice || '0'
+                );
+                const subtotal = price * item.qty;
+                return (
+                  <li key={item.id} className="border p-2 flex justify-between">
+                    <div>
+                      <p className="font-medium">{item.title}</p>
+                      <p className="text-sm">
+                        £{price.toFixed(2)} x {item.qty}
+                      </p>
+                    </div>
+                    <span>£{subtotal.toFixed(2)}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          <div className="border-t pt-4 space-y-1">
+            <p className="font-semibold">Subtotal: £{totalPrice.toFixed(2)}</p>
+            <p className="font-semibold">Discount: {discount}%</p>
+            <p className="font-semibold">
+              Shipping: £{shippingCost.toFixed(2)}
+            </p>
+            <p className="font-semibold">Total: £{finalTotal.toFixed(2)}</p>
+          </div>
+          {error && <p className="text-red-500">{error}</p>}
+          <div className="flex justify-between">
+            <button type="button" className="btn" onClick={() => setStep(2)}>
+              Back
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => submit(new Event('submit') as any)}
+            >
+              Confirm Order
+            </button>
+          </div>
         </div>
-        <div className="border-t pt-4 space-y-1">
-          <p className="font-semibold">Subtotal: £{totalPrice.toFixed(2)}</p>
-          <p className="font-semibold">Discount: {discount}%</p>
-          <p className="font-semibold">Shipping: £{shippingCost.toFixed(2)}</p>
-          <p className="font-semibold">Total: £{finalTotal.toFixed(2)}</p>
-        </div>
-        {error && <p className="text-red-500">{error}</p>}
-        <div className="flex justify-between">
-          <button type="button" className="btn" onClick={() => setStep(2)}>
-            Back
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => submit(new Event('submit') as any)}
-          >
-            Confirm Order
-          </button>
-        </div>
-      </div>
-    )}
-  </div>
+      )}
+    </div>
   );
 };
 
