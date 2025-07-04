@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { AppContext } from '@contexts/AppContext';
@@ -63,7 +64,9 @@ export const BrandProfile: React.FC = () => {
         businessDescription: user.businessDescription || '',
         taxId: user.taxId || '',
       });
-      const methods = Array.isArray(user.paymentMethods) ? user.paymentMethods : [];
+      const methods = Array.isArray(user.paymentMethods)
+        ? user.paymentMethods
+        : [];
       setStripeEnabled(methods.some((m) => m.type === 'stripe'));
       const jazz = methods.find((m) => m.type === 'jazzcash');
       setJazzcashEnabled(!!jazz);
@@ -77,7 +80,7 @@ export const BrandProfile: React.FC = () => {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    fetch('/api/brand/profile')
+    apiFetch('/api/brand/profile')
       .then((res) => (res.ok ? res.json() : null))
       .then((data: Vendor | null) => {
         if (!data) return;
@@ -91,7 +94,9 @@ export const BrandProfile: React.FC = () => {
           businessDescription: data.description || '',
           taxId: data.taxId || '',
         });
-        const methods = Array.isArray(data.paymentMethods) ? data.paymentMethods : [];
+        const methods = Array.isArray(data.paymentMethods)
+          ? data.paymentMethods
+          : [];
         setStripeEnabled(methods.some((m) => m.type === 'stripe'));
         const jazz = methods.find((m) => m.type === 'jazzcash');
         setJazzcashEnabled(!!jazz);
@@ -112,7 +117,7 @@ export const BrandProfile: React.FC = () => {
       methods.push({ type: 'jazzcash', details: jazzcashDetails });
     if (bankEnabled)
       methods.push({ type: 'bank_transfer', details: bankDetails });
-    const res = await fetch('/api/brand/profile', {
+    const res = await apiFetch('/api/brand/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...values, paymentMethods: methods }),
@@ -137,112 +142,112 @@ export const BrandProfile: React.FC = () => {
         <title>{getPageTitle('Brand Profile')}</title>
       </Head>
       <PageContainer>
-      <h1 className="text-2xl font-bold mb-4">Brand Profile</h1>
-      {showComplete && (
-        <div className="alert alert-info mb-2">
-          Please complete your profile.
-        </div>
-      )}
-      {message && <div className="mb-2 text-green-600">{message}</div>}
-      <form onSubmit={handleSubmit(submit)} className="space-y-2">
-        <TextInput
-          name="brandName"
-          register={register}
-          rules={{ required: 'Required' }}
-          error={errors.brandName?.message}
-          placeholder="Brand Name"
-        />
-        <TextInput
-          name="phoneNumber"
-          register={register}
-          placeholder="Phone Number"
-          error={errors.phoneNumber?.message}
-        />
-        <TextInput
-          name="businessAddress"
-          register={register}
-          placeholder="Business Address"
-          error={errors.businessAddress?.message}
-        />
-        <TextInput
-          name="city"
-          register={register}
-          placeholder="City"
-          error={errors.city?.message}
-        />
-        <CountrySelect<FormValues>
-          name="country"
-          control={control}
-          error={errors.country?.message as string}
-        />
-        <TextInput
-          name="website"
-          register={register}
-          placeholder="Website"
-          error={errors.website?.message}
-        />
-        <Textarea
-          name="businessDescription"
-          register={register}
-          placeholder="Business Description"
-          error={errors.businessDescription?.message}
-        />
-        <TextInput
-          name="taxId"
-          register={register}
-          placeholder="Tax ID"
-          error={errors.taxId?.message}
-        />
-        <div className="border p-3 rounded space-y-2">
-          <label className="font-semibold">Payment Methods</label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={stripeEnabled}
-              onChange={(e) => setStripeEnabled(e.target.checked)}
-            />
-            Stripe
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={jazzcashEnabled}
-              onChange={(e) => setJazzcashEnabled(e.target.checked)}
-            />
-            JazzCash
-          </label>
-          {jazzcashEnabled && (
-            <TextInput
-              name="jazzcashDetails"
-              placeholder="JazzCash account"
-              value={jazzcashDetails}
-              onChange={(e) => setJazzcashDetails(e.target.value)}
-            />
-          )}
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={bankEnabled}
-              onChange={(e) => setBankEnabled(e.target.checked)}
-            />
-            Bank Transfer
-          </label>
-          {bankEnabled && (
-            <Textarea
-              name="bankDetails"
-              placeholder="Bank details"
-              value={bankDetails}
-              onChange={(e) => setBankDetails(e.target.value)}
-            />
-          )}
-        </div>
-        <button className="btn btn-primary w-full" type="submit">
-          Update
-        </button>
-      </form>
+        <h1 className="text-2xl font-bold mb-4">Brand Profile</h1>
+        {showComplete && (
+          <div className="alert alert-info mb-2">
+            Please complete your profile.
+          </div>
+        )}
+        {message && <div className="mb-2 text-green-600">{message}</div>}
+        <form onSubmit={handleSubmit(submit)} className="space-y-2">
+          <TextInput
+            name="brandName"
+            register={register}
+            rules={{ required: 'Required' }}
+            error={errors.brandName?.message}
+            placeholder="Brand Name"
+          />
+          <TextInput
+            name="phoneNumber"
+            register={register}
+            placeholder="Phone Number"
+            error={errors.phoneNumber?.message}
+          />
+          <TextInput
+            name="businessAddress"
+            register={register}
+            placeholder="Business Address"
+            error={errors.businessAddress?.message}
+          />
+          <TextInput
+            name="city"
+            register={register}
+            placeholder="City"
+            error={errors.city?.message}
+          />
+          <CountrySelect<FormValues>
+            name="country"
+            control={control}
+            error={errors.country?.message as string}
+          />
+          <TextInput
+            name="website"
+            register={register}
+            placeholder="Website"
+            error={errors.website?.message}
+          />
+          <Textarea
+            name="businessDescription"
+            register={register}
+            placeholder="Business Description"
+            error={errors.businessDescription?.message}
+          />
+          <TextInput
+            name="taxId"
+            register={register}
+            placeholder="Tax ID"
+            error={errors.taxId?.message}
+          />
+          <div className="border p-3 rounded space-y-2">
+            <label className="font-semibold">Payment Methods</label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={stripeEnabled}
+                onChange={(e) => setStripeEnabled(e.target.checked)}
+              />
+              Stripe
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={jazzcashEnabled}
+                onChange={(e) => setJazzcashEnabled(e.target.checked)}
+              />
+              JazzCash
+            </label>
+            {jazzcashEnabled && (
+              <TextInput
+                name="jazzcashDetails"
+                placeholder="JazzCash account"
+                value={jazzcashDetails}
+                onChange={(e) => setJazzcashDetails(e.target.value)}
+              />
+            )}
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={bankEnabled}
+                onChange={(e) => setBankEnabled(e.target.checked)}
+              />
+              Bank Transfer
+            </label>
+            {bankEnabled && (
+              <Textarea
+                name="bankDetails"
+                placeholder="Bank details"
+                value={bankDetails}
+                onChange={(e) => setBankDetails(e.target.value)}
+              />
+            )}
+          </div>
+          <button className="btn btn-primary w-full" type="submit">
+            Update
+          </button>
+        </form>
       </PageContainer>
     </div>
   );

@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useContext, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Head from 'next/head';
@@ -88,7 +89,9 @@ export default function ProductDetail({
   const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } =
     appCtx;
   const [variantId, setVariantId] = useState<string>('');
-  const selectedVariant = product.variants?.find((v) => String(v.id) === variantId);
+  const selectedVariant = product.variants?.find(
+    (v) => String(v.id) === variantId
+  );
 
   return (
     <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md min-h-screen">
@@ -137,7 +140,7 @@ export default function ProductDetail({
               typeof product.minPrice === 'number'
                 ? product.minPrice.toString()
                 : product.minPrice || '0'
-          ).toFixed(2)}
+            ).toFixed(2)}
           </p>
           {product.variants && product.variants.length > 0 && (
             <select
@@ -150,7 +153,8 @@ export default function ProductDetail({
                 <option key={v.id} value={v.id}>
                   {Object.entries(v.attributes)
                     .map(([k, val]) => `${k}: ${val}`)
-                    .join(', ')} - Stock {v.quantity}
+                    .join(', ')}{' '}
+                  - Stock {v.quantity}
                 </option>
               ))}
             </select>
@@ -160,8 +164,8 @@ export default function ProductDetail({
             {product.totalInventory && product.totalInventory > 10
               ? 'In Stock'
               : product.totalInventory && product.totalInventory > 0
-              ? 'Low Stock'
-              : 'Out of Stock'}
+                ? 'Low Stock'
+                : 'Out of Stock'}
           </p>
           <p className="mb-2">
             Rating: {averageRating.toFixed(1)} ({reviewCount})
@@ -207,7 +211,7 @@ export default function ProductDetail({
         {user && (
           <form
             onSubmit={handleSubmit(async (data) => {
-              const res = await fetch(`/api/products/${id}/reviews`, {
+              const res = await apiFetch(`/api/products/${id}/reviews`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
@@ -216,7 +220,7 @@ export default function ProductDetail({
                 const response = await res.json();
                 setAverageRating(response.averageRating);
                 setReviewCount(response.reviewCount);
-                const rres = await fetch(`/api/products/${id}/reviews`);
+                const rres = await apiFetch(`/api/products/${id}/reviews`);
                 if (rres.ok) {
                   const rdata = await rres.json();
                   setReviews(rdata.reviews);

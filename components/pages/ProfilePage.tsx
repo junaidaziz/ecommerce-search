@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import Link from 'next/link';
 import Head from 'next/head';
 import { useEffect, useState, useRef, useContext } from 'react';
@@ -26,7 +27,7 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
-    fetch('/api/user/profile')
+    apiFetch('/api/user/profile')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => setProfile(data))
       .catch(() => {});
@@ -75,14 +76,14 @@ const ProfilePage: React.FC = () => {
     if (!file) return;
     const form = new FormData();
     form.append('profileImage', file);
-    const res = await fetch('/api/user/profile', {
+    const res = await apiFetch('/api/user/profile', {
       method: 'PUT',
       body: form,
     });
     if (res.ok) {
       setFile(null);
       setImagePreview(null);
-      fetch('/api/user/profile')
+      apiFetch('/api/user/profile')
         .then((r) => (r.ok ? r.json() : null))
         .then((data) => setProfile(data));
       addNotification('Profile image updated', 'success');

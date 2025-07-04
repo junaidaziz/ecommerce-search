@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
@@ -55,7 +56,7 @@ const EditProfile: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
-    fetch('/api/user/profile')
+    apiFetch('/api/user/profile')
       .then((res) => (res.ok ? res.json() : null))
       .then((data: User | null) => {
         if (data) {
@@ -90,7 +91,7 @@ const EditProfile: React.FC = () => {
     if (data.logo && data.logo[0]) {
       formData.append('logo', data.logo[0]);
     }
-    await fetch('/api/user/profile', {
+    await apiFetch('/api/user/profile', {
       method: 'PUT',
       body: formData,
     });

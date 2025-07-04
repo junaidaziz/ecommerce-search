@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useContext, FormEvent, ChangeEvent } from 'react';
 import { AppContext } from '@contexts/AppContext';
@@ -8,11 +9,7 @@ import ImageGallery from '@components/Product/ImageGallery';
 import { StatusLabel } from '@components/UI';
 import { formatCurrency } from '@utils/formatCurrency';
 import type { Product } from '@/types';
-import type {
-  Review,
-  ReviewsResponse,
-  ReviewAddedResponse,
-} from '@/types';
+import type { Review, ReviewsResponse, ReviewAddedResponse } from '@/types';
 import { SelectDropdown, Textarea } from '@components/form-fields';
 import type { SelectOption } from '@components/form-fields/SelectDropdown';
 
@@ -37,13 +34,13 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
   const inventory =
     product?.totalInventory !== undefined
       ? product.totalInventory
-      : product?.quantity ?? 0;
+      : (product?.quantity ?? 0);
 
   useEffect(() => {
     if (!id) return;
     async function load() {
       try {
-        const res = await fetch(`/api/products/${id}`);
+        const res = await apiFetch(`/api/products/${id}`);
         if (res.status === 404) {
           setError('Product not found');
           return;
@@ -55,7 +52,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
           return;
         }
         setProduct(data);
-        const revRes = await fetch(`/api/products/${id}/reviews`);
+        const revRes = await apiFetch(`/api/products/${id}/reviews`);
         if (revRes.ok) {
           const rdata: ReviewsResponse = await revRes.json();
           setReviews(rdata.reviews);
@@ -151,7 +148,9 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
                 ? 'Low Stock'
                 : 'Out of Stock'}
           </StatusLabel>
-          <p>Rating: {averageRating.toFixed(1)} ({reviewCount})</p>
+          <p>
+            Rating: {averageRating.toFixed(1)} ({reviewCount})
+          </p>
           <div className="flex gap-2">
             <button
               className="btn btn-primary"
@@ -195,7 +194,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
           <form
             onSubmit={async (e: FormEvent<HTMLFormElement>) => {
               e.preventDefault();
-              const res = await fetch(`/api/products/${id}/reviews`, {
+              const res = await apiFetch(`/api/products/${id}/reviews`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ rating: myRating, comment }),
@@ -204,7 +203,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
                 const data: ReviewAddedResponse = await res.json();
                 setAverageRating(data.averageRating);
                 setReviewCount(data.reviewCount);
-                const rres = await fetch(`/api/products/${id}/reviews`);
+                const rres = await apiFetch(`/api/products/${id}/reviews`);
                 if (rres.ok) {
                   const rdata: ReviewsResponse = await rres.json();
                   setReviews(rdata.reviews);
@@ -221,9 +220,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
                 name="rating"
                 value={{ label: String(myRating), value: String(myRating) }}
                 onChange={(opt) =>
-                  setMyRating(
-                    opt ? parseInt((opt as SelectOption).value) : 5
-                  )
+                  setMyRating(opt ? parseInt((opt as SelectOption).value) : 5)
                 }
                 options={[1, 2, 3, 4, 5].map((n) => ({
                   label: String(n),

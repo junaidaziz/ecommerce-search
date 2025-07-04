@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import type { User } from '@/types';
@@ -19,8 +20,8 @@ const BrandDashboard: React.FC = () => {
   useEffect(() => {
     async function load() {
       const [prodRes, alertRes] = await Promise.all([
-        fetch('/api/dashboard/total-products'),
-        fetch('/api/dashboard/inventory-alerts'),
+        apiFetch('/api/dashboard/total-products'),
+        apiFetch('/api/dashboard/inventory-alerts'),
       ]);
       if (prodRes.ok && alertRes.ok) {
         const prod = await prodRes.json();
