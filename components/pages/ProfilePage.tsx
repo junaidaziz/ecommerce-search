@@ -127,15 +127,23 @@ const ProfilePage: React.FC = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold">{renderValue(fullName)}</h1>
-            <p className="text-gray-600">{renderValue(profile?.email || user.email)}</p>
-            <div className="flex gap-2 mt-2">
+            <p className="text-gray-600">
+              {renderValue(profile?.email || user.email)}
+            </p>
+            <div className="flex gap-1 mt-2">
               {profile && (
-                <StatusLabel color={profile.verified ? 'success' : 'default'} size="sm">
+                <StatusLabel
+                  color={profile.verified ? 'success' : 'default'}
+                  size="sm"
+                >
                   {profile.verified ? 'Verified' : 'Not verified'}
                 </StatusLabel>
               )}
               {profile && (
-                <StatusLabel color={profile.disabled ? 'error' : 'success'} size="sm">
+                <StatusLabel
+                  color={profile.disabled ? 'error' : 'success'}
+                  size="sm"
+                >
                   {profile.disabled ? 'Disabled' : 'Active'}
                 </StatusLabel>
               )}
@@ -144,8 +152,8 @@ const ProfilePage: React.FC = () => {
                   {profile.role === UserRole.BRAND
                     ? 'Brand Admin'
                     : profile.role === UserRole.SUPER_ADMIN
-                    ? 'Admin'
-                    : 'Customer'}
+                      ? 'Admin'
+                      : 'Customer'}
                 </StatusLabel>
               )}
             </div>
@@ -157,7 +165,10 @@ const ProfilePage: React.FC = () => {
               Upload
             </button>
           )}
-          <Link href="/settings" className="btn btn-primary btn-sm sm:btn">
+          <Link
+            href="/settings"
+            className="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+          >
             Edit Profile
           </Link>
         </div>
@@ -206,7 +217,8 @@ const ProfilePage: React.FC = () => {
               Account Info
             </h2>
             {renderRow('Role', profile?.role)}
-            {profile?.role === UserRole.BRAND && renderRow('Tax ID', profile?.taxId)}
+            {profile?.role === UserRole.BRAND &&
+              renderRow('Tax ID', profile?.taxId)}
             {renderRow('Last updated', lastUpdated)}
           </div>
         </section>
