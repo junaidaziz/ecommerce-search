@@ -1,4 +1,4 @@
-import { apiFetch } from '@lib/api';
+import { updateUserProfile } from '@lib/api/user';
 import React, { useContext, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { CountrySelect } from '@components/form-fields';
@@ -53,13 +53,12 @@ export const UserProfile: React.FC = () => {
 
   const submit: SubmitHandler<ProfileForm> = async (data) => {
     setMessage('');
-    const res = await apiFetch('/api/user/profile', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    if (res.ok) setMessage('Profile updated');
-    else setMessage('Update failed');
+    try {
+      await updateUserProfile(data);
+      setMessage('Profile updated');
+    } catch {
+      setMessage('Update failed');
+    }
   };
 
   if (!user) return <div className="p-4">Please log in.</div>;

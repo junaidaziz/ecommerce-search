@@ -1,4 +1,4 @@
-import { apiFetch } from '@lib/api';
+import { getTrending, getSuggestions } from '@lib/api/search';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import type { FC } from 'react';
@@ -45,13 +45,8 @@ const SearchBar: FC<SearchBarProps> = ({
 
   useEffect(() => {
     if (showTrending) {
-      apiFetch('/api/trending')
-        .then((res) =>
-          res.ok ? (res.json() as Promise<TrendingResponse>) : null
-        )
-        .then((data) => {
-          if (data && Array.isArray(data.keywords)) setTrending(data.keywords);
-        })
+      getTrending()
+        .then((keywords) => setTrending(keywords))
         .catch(() => {});
     }
   }, [showTrending]);
@@ -64,14 +59,9 @@ const SearchBar: FC<SearchBarProps> = ({
     }
     if (suggestTimeout.current) clearTimeout(suggestTimeout.current);
     suggestTimeout.current = setTimeout(() => {
-      apiFetch(`/api/suggest?q=${encodeURIComponent(query)}`)
-        .then((res) =>
-          res.ok ? (res.json() as Promise<SuggestionsResponse>) : null
-        )
-        .then((data) => {
-          if (data && Array.isArray(data.suggestions))
-            setSuggestions(data.suggestions);
-          else setSuggestions([]);
+      getSuggestions(query)
+        .then((sugs) => {
+          setSuggestions(sugs);
           setSelectedIdx(-1);
         })
         .catch(() => setSuggestions([]));
