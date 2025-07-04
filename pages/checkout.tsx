@@ -336,7 +336,7 @@ const Checkout: React.FC = () => {
                   if (res.ok) {
                     const data: Coupon = await parseJsonSafe(res);
                     if (data.discountType === 'percent') {
-                      setDiscount(data.amount);
+                      setDiscount(data.discountValue);
                     } else if (data.discountType === 'bogo') {
                       if (cart.length >= 2) {
                         const cheapest = Math.min(
@@ -354,7 +354,9 @@ const Checkout: React.FC = () => {
                       }
                     } else {
                       setDiscount(
-                        totalPrice > 0 ? (data.amount / totalPrice) * 100 : 0
+                        totalPrice > 0
+                          ? (data.discountValue / totalPrice) * 100
+                          : 0
                       );
                     }
                   } else {

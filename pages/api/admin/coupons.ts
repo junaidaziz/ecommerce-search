@@ -20,23 +20,23 @@ async function handler(
       const {
         code,
         discountType,
-        amount,
+        discountValue,
         minOrderValue,
-        expirationDate,
+        expiresAt,
         usageLimit,
       } = req.body as Partial<Coupon>;
-      if (!code || !discountType || amount === undefined) {
+      if (!code || !discountType || discountValue === undefined) {
         res
           .status(400)
-          .json({ message: 'code, discountType and amount required' });
+          .json({ message: 'code, discountType and discountValue required' });
         return;
       }
       await createCoupon({
         code: code.toUpperCase(),
         discountType,
-        amount,
+        discountValue,
         minOrderValue: minOrderValue ?? null,
-        expirationDate: expirationDate ? new Date(expirationDate) : undefined,
+        expiresAt: expiresAt ? new Date(expiresAt) : undefined,
         usageLimit: usageLimit ?? null,
       });
       res.status(201).json({ message: 'coupon created' });
@@ -53,9 +53,7 @@ async function handler(
         ...rest,
         code: rest.code?.toUpperCase(),
         minOrderValue: rest.minOrderValue ?? null,
-        expirationDate: rest.expirationDate
-          ? new Date(rest.expirationDate)
-          : undefined,
+        expiresAt: rest.expiresAt ? new Date(rest.expiresAt) : undefined,
       });
       res.status(200).json({ message: 'coupon updated' });
       return;
