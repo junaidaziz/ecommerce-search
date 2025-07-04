@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { TextInput, EmailInput } from '@components/form-fields';
 import { NotificationContext } from '@contexts/NotificationContext';
+import ProfileAvatarUploader from '@components/ProfileAvatarUploader';
 
 interface ProfileFormValues {
   firstName: string;
@@ -49,9 +50,12 @@ const UpdateProfileSection: React.FC = () => {
   return (
     <form
       onSubmit={profileForm.handleSubmit(submitProfile)}
-      className="space-y-2 max-w-md mx-auto"
+      className="space-y-4 max-w-md mx-auto"
     >
       <h2 className="text-xl font-bold mb-2">Update Profile</h2>
+      <div className="flex justify-center">
+        <ProfileAvatarUploader />
+      </div>
       <TextInput
         label="First Name"
         register={profileForm.register}
