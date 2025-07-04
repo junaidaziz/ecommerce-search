@@ -3,7 +3,7 @@ import { getSalesMetrics } from '@lib/analytics';
 import { withRole, AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { ApiMessage } from '@/types';
+import { UserRole, type ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 async function handler(
@@ -19,8 +19,8 @@ async function handler(
     const queryBrandId = Number.isNaN(param) ? undefined : param;
     const vendorId =
       user?.brandId ??
-      (user?.role === 'SUPER_ADMIN' ? queryBrandId : undefined);
-    if (!user?.brandId && user?.role !== 'SUPER_ADMIN') {
+      (user?.role === UserRole.SUPER_ADMIN ? queryBrandId : undefined);
+    if (!user?.brandId && user?.role !== UserRole.SUPER_ADMIN) {
       return res.status(401).json({ message: UNAUTHORIZED });
     }
     const monthOffset = getQueryParam(req.query.monthOffset);
@@ -42,4 +42,4 @@ async function handler(
   }
 }
 
-export default withRole(['BRAND', 'SUPER_ADMIN'])(handler);
+export default withRole([UserRole.BRAND, UserRole.SUPER_ADMIN])(handler);

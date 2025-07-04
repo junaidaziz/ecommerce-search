@@ -1,7 +1,7 @@
 jest.mock('next-auth/next', () => ({ getServerSession: jest.fn() }));
 jest.mock('@pages/api/auth/[...nextauth]', () => ({ authOptions: {} }));
 
-import { getServerSideProps } from '@pages/profile';
+import { getServerSideProps } from '../pages/profile';
 import { getServerSession } from 'next-auth/next';
 
 const mockedGetServerSession = getServerSession as jest.Mock;

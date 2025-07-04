@@ -1,7 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Layout from '@components/Layout/Layout';
-import { AppContext } from '@contexts/AppContext';
+import Layout from '../components/Layout/Layout';
+// Update the import path below if your AppContext is located elsewhere
+import { AppContext } from '../contexts/AppContext';
 
 jest.mock('next/router', () => ({
   useRouter: () => ({
@@ -40,7 +41,12 @@ beforeEach(() => {
   });
   localStorage.clear();
   global.fetch = jest.fn(() =>
-    Promise.resolve({ ok: true, json: () => Promise.resolve([]) })
+    Promise.resolve(
+      new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { 'Content-type': 'application/json' },
+      })
+    )
   );
 });
 

@@ -15,6 +15,7 @@ import {
   TextInput,
 } from '@components/form-fields';
 import useEmailAvailability from '@hooks/useEmailAvailability';
+import { UserRole } from '@/types';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -41,8 +42,8 @@ export default function BrandSignup() {
 
   useEffect(() => {
     if (user) {
-      if (user.role === 'brand') router.push('/brand/profile?complete=1');
-      else if (user.role === 'super-admin') router.push('/admin');
+      if (user.role === UserRole.BRAND) router.push('/brand/profile?complete=1');
+      else if (user.role === UserRole.SUPER_ADMIN) router.push('/admin');
       else router.push('/user/profile?complete=1');
     }
   }, [user, router]);

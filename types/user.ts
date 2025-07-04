@@ -60,3 +60,13 @@ export interface UserInput {
   role?: Role;
   verificationToken?: string;
 }
+
+export enum UserRole {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  BRAND = 'BRAND',
+  USER = 'USER',
+}
+
+export const getUserRoles = (): UserRole[] => {
+  return Object.values(UserRole);
+};

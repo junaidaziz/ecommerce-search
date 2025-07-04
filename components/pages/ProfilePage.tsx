@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useContext } from 'react';
 import useRequireAuth from '@hooks/useRequireAuth';
 import { getPageTitle } from '@lib/pageTitle';
 import { NotificationContext } from '@contexts/NotificationContext';
-import type { User } from '@/types';
+import { UserRole, type User } from '@/types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import PageContainer from '@components/Layout/PageContainer';
@@ -141,9 +141,9 @@ const ProfilePage: React.FC = () => {
               )}
               {profile && (
                 <StatusLabel color="info" size="sm">
-                  {profile.role === 'brand'
+                  {profile.role === UserRole.BRAND
                     ? 'Brand Admin'
-                    : profile.role === 'super-admin'
+                    : profile.role === UserRole.SUPER_ADMIN
                     ? 'Admin'
                     : 'Customer'}
                 </StatusLabel>
@@ -185,7 +185,7 @@ const ProfilePage: React.FC = () => {
             {renderRow('Postal Code', profile?.postalCode)}
           </div>
         </section>
-        {profile?.role === 'brand' && (
+        {profile?.role === UserRole.BRAND && (
           <section className="card bg-base-100 shadow">
             <div className="card-body space-y-3">
               <h2 className="card-title text-base font-semibold flex items-center gap-2">
@@ -206,7 +206,7 @@ const ProfilePage: React.FC = () => {
               Account Info
             </h2>
             {renderRow('Role', profile?.role)}
-            {profile?.role === 'brand' && renderRow('Tax ID', profile?.taxId)}
+            {profile?.role === UserRole.BRAND && renderRow('Tax ID', profile?.taxId)}
             {renderRow('Last updated', lastUpdated)}
           </div>
         </section>

@@ -12,7 +12,7 @@ import { sendOrderConfirmation } from '@lib/email';
 import { handleApiError } from '@utils/handleApiError';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
-import type { Order, OrderPlacedResponse, ApiMessage } from '@/types';
+import { type Order, type OrderPlacedResponse, type ApiMessage, UserRole, getUserRoles } from '@/types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
@@ -134,10 +134,10 @@ async function handler(
       if (!email) return res.status(401).json({ message: UNAUTHORIZED });
       const user = await findUser(email);
       if (!user) return res.status(404).json({ message: 'user not found' });
-      if (user.role === 'SUPER_ADMIN') {
+      if (user.role === UserRole.SUPER_ADMIN) {
         return res.status(200).json(await getAllOrders());
       }
-      if (user.role === 'BRAND') {
+      if (user.role === UserRole.BRAND) {
         return res.status(200).json(await getOrdersForVendor(user.brandName));
       }
       return res.status(200).json(await getOrdersForUser(email));
@@ -149,4 +149,4 @@ async function handler(
   }
 }
 
-export default withRole(['USER', 'BRAND', 'SUPER_ADMIN'])(handler);
+export default withRole(getUserRoles())(handler);
