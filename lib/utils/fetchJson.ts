@@ -9,3 +9,15 @@ export async function fetchJson<T>(
   }
   return res.json() as Promise<T>;
 }
+
+export async function fetchJsonSafe<T>(
+  input: RequestInfo | URL,
+  fallback: T,
+  init?: RequestInit
+): Promise<T> {
+  try {
+    return await fetchJson<T>(input, init);
+  } catch {
+    return fallback;
+  }
+}
