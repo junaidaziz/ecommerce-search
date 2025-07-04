@@ -3,13 +3,13 @@ import { getDb } from '@lib/db';
 import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import { UserRole, type ApiMessage } from '@/types';
+import { UserRole, type ApiMessage, type Product } from '@/types';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 async function handler(
   req: AuthedNextApiRequest,
   res: NextApiResponse<
-    { products: { id: string; title: string; quantity: number }[] } | ApiMessage
+    { products: Pick<Product, 'id' | 'title' | 'quantity'>[] } | ApiMessage
   >
 ) {
   try {
@@ -33,11 +33,13 @@ async function handler(
       where,
       select: { id: true, title: true, quantity: true },
     });
-    const result = products.map((p: { id: string | number; title: string; quantity: number }) => ({
-      id: String(p.id),
-      title: p.title,
-      quantity: p.quantity,
-    }));
+    const result = products.map(
+      (p: Pick<Product, 'id' | 'title' | 'quantity'>) => ({
+        id: String(p.id),
+        title: p.title,
+        quantity: p.quantity,
+      })
+    );
     return res.status(200).json({ products: result });
   } catch (error) {
     return handleApiError(res, error, 'Failed to load inventory alerts');
