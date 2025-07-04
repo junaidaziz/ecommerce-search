@@ -78,3 +78,8 @@ export function getAverageRating(productId: string): {
   const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
   return { average: sum / reviews.length, count: reviews.length };
 }
+
+export function getReviewsByUser(email: string): Review[] {
+  const all = Array.from(reviewsStore.values()).flat();
+  return all.filter((r) => r.userEmail === email);
+}
