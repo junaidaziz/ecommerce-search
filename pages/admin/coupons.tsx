@@ -1,4 +1,5 @@
 import { apiFetch } from '@lib/api';
+import { fetchJsonSafe } from '@utils/fetchJson';
 import { useEffect, useState, useContext, ChangeEvent } from 'react';
 import Head from 'next/head';
 import { AppContext } from '@contexts/AppContext';
@@ -19,10 +20,8 @@ export default function AdminCoupons() {
   const [message, setMessage] = useState('');
 
   const fetchCoupons = () => {
-    apiFetch('/api/admin/coupons')
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data: Coupon[]) => setCoupons(data))
-      .catch(() => setCoupons([]));
+    fetchJsonSafe<Coupon[]>('/api/admin/coupons', [])
+      .then((data) => setCoupons(data));
   };
 
   useEffect(() => {

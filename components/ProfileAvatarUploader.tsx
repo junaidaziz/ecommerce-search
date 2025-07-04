@@ -1,5 +1,6 @@
 import { apiFetch } from '@lib/api';
 import { useState, useRef, useEffect, useContext } from 'react';
+import { fetchJsonSafe } from '@utils/fetchJson';
 import useRequireAuth from '@hooks/useRequireAuth';
 import { NotificationContext } from '@contexts/NotificationContext';
 import type { User } from '@/types';
@@ -15,12 +16,10 @@ const ProfileAvatarUploader: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
-    apiFetch('/api/user/profile')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: User | null) => {
+    fetchJsonSafe<User | null>('/api/user/profile', null)
+      .then((data) => {
         if (data?.profileImage) setCurrent(data.profileImage);
-      })
-      .catch(() => {});
+      });
   }, []);
 
   if (!user) return null;
