@@ -3,13 +3,13 @@ import { getDb } from '@lib/db';
 import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import { UserRole, type ApiMessage } from '@/types';
+import { UserRole, type ApiMessage, type Product } from '@/types';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 async function handler(
   req: AuthedNextApiRequest,
   res: NextApiResponse<
-    { products: { id: string; title: string; quantity: number }[] } | ApiMessage
+    { products: Pick<Product, 'id' | 'title' | 'quantity'>[] } | ApiMessage
   >
 ) {
   try {
@@ -40,12 +40,16 @@ async function handler(
       where: { id: { in: ids } },
       select: { id: true, title: true },
     });
-    const map = new Map(products.map((p: { id: string; title: string }) => [p.id, p.title]));
-    const result = grouped.map((g: { productId: string; _sum: { quantity: number | null } }) => ({
-      id: String(g.productId),
-      title: map.get(g.productId) || '',
-      quantity: g._sum.quantity || 0,
-    }));
+    const map = new Map(
+      products.map((p: Pick<Product, 'id' | 'title'>) => [p.id, p.title])
+    );
+    const result = grouped.map(
+      (g: { productId: string; _sum: { quantity: number | null } }) => ({
+        id: String(g.productId),
+        title: map.get(g.productId) || '',
+        quantity: g._sum.quantity || 0,
+      })
+    );
     return res.status(200).json({ products: result });
   } catch (error) {
     return handleApiError(res, error, 'Failed to load best sellers');
