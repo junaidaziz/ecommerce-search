@@ -1,14 +1,14 @@
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
-import OrderDetail from '../pages/orders/[orderId]';
-// Update the import path below to the correct relative path if needed
-import { AppContext } from '../contexts/AppContext';
+import OrderDetail from '@pages/orders/[orderId]';
+import { AppContext } from '@contexts/AppContext';
+import { UserRole } from '@/types';
 
 jest.mock('next/router', () => ({
   useRouter: () => ({ query: { orderId: 'abc' } }),
 }));
 
-const renderWithUser = (userRole: string) => {
+const renderWithUser = (userRole: UserRole) => {
   const value: any = { user: { role: userRole } };
   return render(
     <AppContext.Provider value={value}>
@@ -39,7 +39,7 @@ describe('OrderDetail page', () => {
           total: 20,
         }),
     });
-    renderWithUser('user');
+    renderWithUser(UserRole.USER);
     expect(global.fetch).toHaveBeenCalledWith('/api/user/orders/abc');
     expect(await screen.findByText('Order #1')).toBeInTheDocument();
   });
@@ -50,14 +50,14 @@ describe('OrderDetail page', () => {
       status: 404,
       json: () => Promise.resolve({ message: 'Not found' }),
     });
-    renderWithUser('brand');
+    renderWithUser(UserRole.BRAND);
     expect(global.fetch).toHaveBeenCalledWith('/api/orders/abc');
     expect(await screen.findByText('Order not found.')).toBeInTheDocument();
   });
 
   it('shows error on network failure', async () => {
     (global.fetch as jest.Mock).mockRejectedValue(new Error('Network'));
-    renderWithUser('brand');
+    renderWithUser(UserRole.BRAND);
     expect(global.fetch).toHaveBeenCalledWith('/api/orders/abc');
     expect(await screen.findByText('Failed to load order')).toBeInTheDocument();
   });
