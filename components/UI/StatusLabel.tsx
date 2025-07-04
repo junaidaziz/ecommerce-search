@@ -15,16 +15,22 @@ const StatusLabel: React.FC<StatusLabelProps> = ({
 }) => {
   const colorClass =
     color === 'success'
-      ? 'badge-success'
+      ? 'bg-green-100 text-green-800'
       : color === 'info'
-      ? 'badge-info'
-      : color === 'warning'
-      ? 'badge-warning'
-      : color === 'error'
-      ? 'badge-error'
-      : '';
-  const sizeClass = size === 'sm' ? 'badge-sm' : '';
-  return <span className={`badge ${sizeClass} ${colorClass} ${className}`}>{children}</span>;
+        ? 'bg-blue-100 text-blue-800'
+        : color === 'warning'
+          ? 'bg-yellow-100 text-yellow-800'
+          : color === 'error'
+            ? 'bg-red-100 text-red-800'
+            : 'bg-gray-100 text-gray-800';
+  const sizeClass = size === 'sm' ? 'text-xs' : 'text-sm';
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-medium ${sizeClass} ${colorClass} ${className}`}
+    >
+      {children}
+    </span>
+  );
 };
 
 export default StatusLabel;
