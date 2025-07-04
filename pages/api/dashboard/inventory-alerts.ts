@@ -3,7 +3,7 @@ import { getDb } from '@lib/db';
 import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { ApiMessage } from '@/types';
+import { UserRole, type ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 async function handler(
@@ -22,8 +22,8 @@ async function handler(
     const queryBrandId = Number.isNaN(param) ? undefined : param;
     const vendorId =
       user?.brandId ??
-      (user?.role === 'SUPER_ADMIN' ? queryBrandId : undefined);
-    if (!user?.brandId && user?.role !== 'SUPER_ADMIN') {
+      (user?.role === UserRole.SUPER_ADMIN ? queryBrandId : undefined);
+    if (!user?.brandId && user?.role !== UserRole.SUPER_ADMIN) {
       return res.status(401).json({ message: UNAUTHORIZED });
     }
     const threshold = parseInt(getQueryParam(req.query.threshold) || '10', 10);
@@ -33,7 +33,7 @@ async function handler(
       where,
       select: { id: true, title: true, quantity: true },
     });
-    const result = products.map((p) => ({
+    const result = products.map((p: { id: string | number; title: string; quantity: number }) => ({
       id: String(p.id),
       title: p.title,
       quantity: p.quantity,
@@ -44,4 +44,4 @@ async function handler(
   }
 }
 
-export default withRole(['BRAND', 'SUPER_ADMIN'])(handler);
+export default withRole([UserRole.BRAND, UserRole.SUPER_ADMIN])(handler);

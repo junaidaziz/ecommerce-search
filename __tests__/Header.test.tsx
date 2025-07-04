@@ -1,7 +1,9 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
-import Header from '@components/Layout/Header';
-import { AppContext } from '@contexts/AppContext';
+// Update the import path below if your Header component is located elsewhere
+import Header from '../components/Layout/Header';
+// Update the path below to the correct relative path where AppContext is defined
+import { AppContext } from '../contexts/AppContext';
 
 let mockPathname = '/';
 jest.mock('next/router', () => ({

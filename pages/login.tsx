@@ -10,7 +10,7 @@ import { getPageTitle } from '@lib/pageTitle';
 import { EmailInput, PasswordInput } from '@components/form-fields';
 import GoogleIcon from '@components/icons/GoogleIcon';
 import GithubIcon from '@components/icons/GithubIcon';
-import { User } from '../types';
+import { User, UserRole } from '../types';
 import PageContainer from '@components/Layout/PageContainer';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,10 +41,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   useEffect(() => {
     if (user) {
       if (onLoginSuccess) onLoginSuccess(user);
-      if (user.role === 'brand') {
+      if (user.role === UserRole.BRAND) {
         if (!user.brandName) router.push('/brand/profile?complete=1');
         else router.push('/brand/dashboard');
-      } else if (user.role === 'super-admin') {
+      } else if (user.role === UserRole.SUPER_ADMIN) {
         router.push('/admin');
       } else {
         if (!user.lastName) router.push('/user/profile?complete=1');

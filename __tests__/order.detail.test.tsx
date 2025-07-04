@@ -1,7 +1,8 @@
-import React from 'react';
+import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
-import OrderDetail from '@pages/orders/[orderId]';
-import { AppContext } from '@contexts/AppContext';
+import OrderDetail from '../pages/orders/[orderId]';
+// Update the import path below to the correct relative path if needed
+import { AppContext } from '../contexts/AppContext';
 
 jest.mock('next/router', () => ({
   useRouter: () => ({ query: { orderId: 'abc' } }),
