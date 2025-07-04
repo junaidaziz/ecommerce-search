@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useEffect, useContext, useState } from 'react';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -19,7 +20,7 @@ const UpdateProfileSection: React.FC = () => {
   const [updatedAt, setUpdatedAt] = useState('');
 
   useEffect(() => {
-    fetch('/api/user/profile')
+    apiFetch('/api/user/profile')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!data) return;
@@ -38,7 +39,7 @@ const UpdateProfileSection: React.FC = () => {
   }, [profileForm]);
 
   const submitProfile: SubmitHandler<ProfileFormValues> = async (values) => {
-    const res = await fetch('/api/user/profile', {
+    const res = await apiFetch('/api/user/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values),
@@ -95,12 +96,7 @@ const UpdateProfileSection: React.FC = () => {
         name="phoneNumber"
         error={profileForm.formState.errors.phoneNumber?.message}
       />
-      <TextInput
-        label="Role"
-        name="role"
-        value={role}
-        readOnly
-      />
+      <TextInput label="Role" name="role" value={role} readOnly />
       <TextInput
         label="Last Updated"
         name="updatedAt"

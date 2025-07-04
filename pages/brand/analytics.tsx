@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import Head from 'next/head';
@@ -79,14 +80,14 @@ const BrandAnalytics: React.FC = () => {
     async function load() {
       try {
         setLoading(true);
-        const analyticsRes = await fetch('/api/brand/analytics');
+        const analyticsRes = await apiFetch('/api/brand/analytics');
         const analyticsData = analyticsRes.ok
           ? await analyticsRes.json()
           : null;
         setData(
           analyticsData || { totalOrders: 0, totalRevenue: 0, topProducts: [] }
         );
-        const earningsRes = await fetch('/api/brand/earnings');
+        const earningsRes = await apiFetch('/api/brand/earnings');
         setEarnings(earningsRes.ok ? await earningsRes.json() : null);
       } catch {
         setData({ totalOrders: 0, totalRevenue: 0, topProducts: [] });
@@ -122,7 +123,13 @@ const BrandAnalytics: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={salesData}>
                 <defs>
-                  <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id="salesGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="0%" stopColor="#4F46E5" />
                     <stop offset="100%" stopColor="#6366F1" />
                   </linearGradient>

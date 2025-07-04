@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import {
   useState,
   useEffect,
@@ -61,7 +62,7 @@ export default function VendorDashboard() {
 
   const fetchProducts = useCallback(async (): Promise<void> => {
     if (!user) return;
-    const res = await fetch(
+    const res = await apiFetch(
       `/api/admin/products?vendor=${encodeURIComponent(user.brandName || '')}`
     );
     if (res.ok) {
@@ -108,7 +109,7 @@ export default function VendorDashboard() {
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const payload = editingId ? { ...form, id: editingId } : form;
-    const res = await fetch('/api/admin/products', {
+    const res = await apiFetch('/api/admin/products', {
       method: editingId ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -178,7 +179,7 @@ export default function VendorDashboard() {
   const confirmDelete = async (): Promise<void> => {
     if (!deleteId) return;
     setDeleting(true);
-    const res = await fetch(
+    const res = await apiFetch(
       `/api/admin/products?id=${encodeURIComponent(deleteId)}`,
       { method: 'DELETE' }
     );

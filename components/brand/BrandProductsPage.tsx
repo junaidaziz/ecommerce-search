@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -53,7 +54,7 @@ const BrandProductsPage: React.FC = () => {
     params.set('page', String(currentPage));
     params.set('limit', String(pageSize));
     if (search) params.set('search', search);
-    fetch(`/api/brand/products?${params.toString()}`, {
+    apiFetch(`/api/brand/products?${params.toString()}`, {
       credentials: 'include',
     })
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
@@ -66,7 +67,7 @@ const BrandProductsPage: React.FC = () => {
   }, [user, sort, search, currentPage]);
 
   // useEffect(() => {
-  //   fetch('/api/categories?limit=250')
+  //   apiFetch('/api/categories?limit=250')
   //     .then((res) => (res.ok ? res.json() : { categories: [] }))
   //     .then((data: { categories: Category[] }) =>
   //       setCategories(data.categories)
@@ -90,7 +91,10 @@ const BrandProductsPage: React.FC = () => {
     const sortParam = router.query.sort;
     if (!sortParam) return;
     const value = Array.isArray(sortParam) ? sortParam[0] : sortParam;
-    if (SORT_VALUES.includes(value as BrandProductSortValue) && value !== sort) {
+    if (
+      SORT_VALUES.includes(value as BrandProductSortValue) &&
+      value !== sort
+    ) {
       setSort(value as BrandProductSortValue);
     }
   }, [router.query.sort]);
@@ -107,7 +111,7 @@ const BrandProductsPage: React.FC = () => {
     if (existing) {
       setViewProduct(existing);
     } else {
-      fetch(`/api/products/${encodeURIComponent(slug)}`)
+      apiFetch(`/api/products/${encodeURIComponent(slug)}`)
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => setViewProduct(data as Product | null))
         .catch(() => setViewProduct(null));
@@ -128,7 +132,7 @@ const BrandProductsPage: React.FC = () => {
   const confirmDelete = async (): Promise<void> => {
     if (!deleteId) return;
     setDeleting(true);
-    const res = await fetch(
+    const res = await apiFetch(
       `/api/brand/products/${encodeURIComponent(deleteId)}`,
       {
         method: 'DELETE',
@@ -155,7 +159,9 @@ const BrandProductsPage: React.FC = () => {
     setSort((cur) => {
       const [f, dir] = cur.split('_') as [string, 'asc' | 'desc'];
       const next =
-        f === field ? `${field}_${dir === 'asc' ? 'desc' : 'asc'}` : `${field}_asc`;
+        f === field
+          ? `${field}_${dir === 'asc' ? 'desc' : 'asc'}`
+          : `${field}_asc`;
       const query = {
         ...router.query,
         sort: next,
@@ -171,7 +177,10 @@ const BrandProductsPage: React.FC = () => {
   const handlePageChange = (p: number) => {
     if (p > 0 && p <= totalPages) {
       setCurrentPage(p);
-      const query = { ...router.query, page: String(p) } as Record<string, string>;
+      const query = { ...router.query, page: String(p) } as Record<
+        string,
+        string
+      >;
       router.push({ pathname: '/brand/products', query }, undefined, {
         shallow: true,
       });

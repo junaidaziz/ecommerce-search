@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useContext, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { CountrySelect } from '@components/form-fields';
@@ -52,7 +53,7 @@ export const UserProfile: React.FC = () => {
 
   const submit: SubmitHandler<ProfileForm> = async (data) => {
     setMessage('');
-    const res = await fetch('/api/user/profile', {
+    const res = await apiFetch('/api/user/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),

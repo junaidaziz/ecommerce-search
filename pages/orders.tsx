@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import OrderChatWindow from '@components/Chat/OrderChatWindow';
 import { useEffect, useState, useMemo, Fragment, useContext } from 'react';
 import useRequireAuth from '@hooks/useRequireAuth';
@@ -40,7 +41,7 @@ const Orders: React.FC<OrdersProps> = (_props) => {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    fetch('/api/orders')
+    apiFetch('/api/orders')
       .then(async (res) => {
         if (!res.ok) {
           const d = await res.json().catch(() => null);
@@ -60,7 +61,9 @@ const Orders: React.FC<OrdersProps> = (_props) => {
 
   const cancelOrder = async (uuid: string) => {
     if (!confirm('Cancel this order?')) return;
-    const res = await fetch(`/api/user/orders/${uuid}/cancel`, { method: 'POST' });
+    const res = await apiFetch(`/api/user/orders/${uuid}/cancel`, {
+      method: 'POST',
+    });
     const data = await res.json().catch(() => null);
     if (res.ok) {
       addNotification('Order cancelled', 'success');
@@ -141,20 +144,20 @@ const Orders: React.FC<OrdersProps> = (_props) => {
                       {new Date(group.order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="space-x-2">
-                    <button
-                      type="button"
-                      className="link"
-                      onClick={() =>
-                        setChatOrder({
-                          id: group.order.uuid,
-                          brandName:
-                            group.order.product.vendor.brandName || 'Brand',
-                          brandLogo: group.order.product.vendor.logo,
-                        })
-                      }
-                    >
-                      Chat
-                    </button>
+                      <button
+                        type="button"
+                        className="link"
+                        onClick={() =>
+                          setChatOrder({
+                            id: group.order.uuid,
+                            brandName:
+                              group.order.product.vendor.brandName || 'Brand',
+                            brandLogo: group.order.product.vendor.logo,
+                          })
+                        }
+                      >
+                        Chat
+                      </button>
                       <a
                         className="btn btn-sm"
                         href={`/orders/${group.order.uuid}`}
