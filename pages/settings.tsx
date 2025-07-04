@@ -10,12 +10,13 @@ import ManageAddressSection from '@components/Settings/ManageAddressSection';
 import ChangeEmailSection from '@components/Settings/ChangeEmailSection';
 import PaymentMethodsSection from '@components/Settings/PaymentMethodsSection';
 import SettingsSidebar from '@components/Settings/SettingsSidebar';
+import CouponsSection from '@components/Settings/CouponsSection';
 
 const SettingsPage: React.FC = () => {
   const user = useRequireAuth();
   const router = useRouter();
   const [active, setActive] = useState<
-    'profile' | 'password' | 'address' | 'email' | 'payments'
+    'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons'
   >('profile');
 
   useEffect(() => {
@@ -25,7 +26,8 @@ const SettingsPage: React.FC = () => {
       tab === 'password' ||
       tab === 'address' ||
       tab === 'email' ||
-      tab === 'payments'
+      tab === 'payments' ||
+      tab === 'coupons'
     ) {
       setActive(tab);
     }
@@ -53,6 +55,7 @@ const SettingsPage: React.FC = () => {
           {active === 'address' && <ManageAddressSection />}
           {active === 'email' && <ChangeEmailSection />}
           {active === 'payments' && <PaymentMethodsSection />}
+          {active === 'coupons' && <CouponsSection />}
         </div>
       </div>
     </PageContainer>

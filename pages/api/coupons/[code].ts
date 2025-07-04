@@ -20,7 +20,7 @@ export default async function handler(
       return;
     }
     const now = new Date();
-    if (coupon.expirationDate && new Date(coupon.expirationDate) < now) {
+    if (coupon.expiresAt && new Date(coupon.expiresAt) < now) {
       res.status(400).json({ message: 'Coupon expired' });
       return;
     }

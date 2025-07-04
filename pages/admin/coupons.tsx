@@ -12,7 +12,7 @@ export default function AdminCoupons() {
   const [form, setForm] = useState<Partial<Coupon>>({
     code: '',
     discountType: 'percent',
-    amount: 0,
+    discountValue: 0,
     minOrderValue: undefined,
   });
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -43,7 +43,7 @@ export default function AdminCoupons() {
       setForm({
         code: '',
         discountType: 'percent',
-        amount: 0,
+        discountValue: 0,
         minOrderValue: undefined,
       });
       setEditingId(null);
@@ -88,13 +88,16 @@ export default function AdminCoupons() {
           <option value="bogo">BOGO</option>
         </select>
         <TextInput
-          name="amount"
+          name="discountValue"
           type="number"
-          value={String(form.amount)}
+          value={String(form.discountValue)}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setForm((f) => ({ ...f, amount: parseFloat(e.target.value) }))
+            setForm((f) => ({
+              ...f,
+              discountValue: parseFloat(e.target.value),
+            }))
           }
-          placeholder="Amount"
+          placeholder="Discount Value"
         />
         <TextInput
           name="minOrderValue"
@@ -109,11 +112,11 @@ export default function AdminCoupons() {
           placeholder="Min Order Value"
         />
         <TextInput
-          name="expirationDate"
+          name="expiresAt"
           type="date"
-          value={form.expirationDate?.slice(0, 10) || ''}
+          value={form.expiresAt?.slice(0, 10) || ''}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setForm((f) => ({ ...f, expirationDate: e.target.value }))
+            setForm((f) => ({ ...f, expiresAt: e.target.value }))
           }
         />
         <TextInput
@@ -135,7 +138,7 @@ export default function AdminCoupons() {
                 setForm({
                   code: '',
                   discountType: 'percent',
-                  amount: 0,
+                  discountValue: 0,
                   minOrderValue: undefined,
                 });
               }}
@@ -154,7 +157,7 @@ export default function AdminCoupons() {
           <tr>
             <th>Code</th>
             <th>Type</th>
-            <th>Amount</th>
+            <th>Discount</th>
             <th>Min Order</th>
             <th>Used</th>
             <th>Actions</th>
@@ -165,7 +168,7 @@ export default function AdminCoupons() {
             <tr key={c.id} className="hover">
               <td>{c.code}</td>
               <td>{c.discountType}</td>
-              <td>{c.amount}</td>
+              <td>{c.discountValue}</td>
               <td>{c.minOrderValue ?? '-'}</td>
               <td>{c.usedCount}</td>
               <td>
@@ -176,9 +179,9 @@ export default function AdminCoupons() {
                     setForm({
                       code: c.code,
                       discountType: c.discountType,
-                      amount: c.amount,
+                      discountValue: c.discountValue,
                       minOrderValue: c.minOrderValue,
-                      expirationDate: c.expirationDate,
+                      expiresAt: c.expiresAt,
                       usageLimit: c.usageLimit,
                     });
                   }}
