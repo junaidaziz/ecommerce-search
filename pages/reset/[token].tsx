@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -14,7 +15,7 @@ const ResetToken: React.FC = () => {
   const [message, setMessage] = useState<string>('');
 
   const submit: SubmitHandler<ResetForm> = async ({ password }) => {
-    const res = await fetch('/api/reset-password', {
+    const res = await apiFetch('/api/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token, password }),

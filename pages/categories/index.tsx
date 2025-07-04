@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import CategoryCard from '@components/Category/CategoryCard';
@@ -8,7 +9,7 @@ const Categories: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    fetch('/api/categories')
+    apiFetch('/api/categories')
       .then((res) => (res.ok ? res.json() : { categories: [] }))
       .then((data: { categories: Category[] }) =>
         setCategories(data.categories)

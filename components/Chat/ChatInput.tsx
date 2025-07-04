@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useState, useContext, ChangeEvent } from 'react';
 import { ChatContext } from '@contexts/ChatContext';
 import PaperClipIcon from '../icons/PaperClipIcon';
@@ -55,7 +56,7 @@ const ChatInput: React.FC<Props> = ({ onSend }) => {
       messageType = file.type.startsWith('image/') ? 'image' : 'file';
       const formData = new FormData();
       formData.append('file', file);
-      const res = await fetch('/api/chat/upload', {
+      const res = await apiFetch('/api/chat/upload', {
         method: 'POST',
         body: formData,
       });

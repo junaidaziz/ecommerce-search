@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, {
   useState,
   useEffect,
@@ -108,7 +109,7 @@ const Home: React.FC & {
   useEffect(() => {
     async function loadCats() {
       try {
-        const res = await fetch('/api/categories');
+        const res = await apiFetch('/api/categories');
         if (res.ok) {
           const data: { name: string }[] = await res.json();
           const names = data.map((c) => c.name);
@@ -132,7 +133,7 @@ const Home: React.FC & {
         localStorage.getItem('browse-history') || '[]'
       );
       if (hist.length > 0) {
-        fetch(`/api/products/${hist[0]}`)
+        apiFetch(`/api/products/${hist[0]}`)
           .then((res) => (res.ok ? res.json() : null))
           .then((data) => {
             if (data && data.CATEGORY) {
@@ -173,7 +174,7 @@ const Home: React.FC & {
       params.append('perPage', String(pageSize));
 
       const queryString = params.toString();
-      const response = await fetch(
+      const response = await apiFetch(
         `/api/search${queryString ? `?${queryString}` : ''}`,
         { signal }
       );

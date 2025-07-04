@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useState, useContext } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { EmailInput, TextInput } from '@components/form-fields';
@@ -17,7 +18,7 @@ const ChangeEmailSection: React.FC = () => {
   const sendCodes = async () => {
     const email = emailForm.getValues('email');
     if (!email) return;
-    const res = await fetch('/api/request-email-change', {
+    const res = await apiFetch('/api/request-email-change', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
@@ -31,7 +32,7 @@ const ChangeEmailSection: React.FC = () => {
   };
 
   const submitEmailChange: SubmitHandler<EmailFormValues> = async (values) => {
-    const res = await fetch('/api/change-email', {
+    const res = await apiFetch('/api/change-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

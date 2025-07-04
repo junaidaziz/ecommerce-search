@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import type { Order } from '@/types';
@@ -17,7 +18,7 @@ export default function AdminOrders() {
     if (status) params.append('status', status);
     if (search) params.append('search', search);
     setLoading(true);
-    fetch(`/api/admin/orders?${params.toString()}`)
+    apiFetch(`/api/admin/orders?${params.toString()}`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data) => {
         setOrders(data);

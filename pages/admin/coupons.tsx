@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useEffect, useState, useContext, ChangeEvent } from 'react';
 import Head from 'next/head';
 import { AppContext } from '@contexts/AppContext';
@@ -18,7 +19,7 @@ export default function AdminCoupons() {
   const [message, setMessage] = useState('');
 
   const fetchCoupons = () => {
-    fetch('/api/admin/coupons')
+    apiFetch('/api/admin/coupons')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: Coupon[]) => setCoupons(data))
       .catch(() => setCoupons([]));
@@ -32,7 +33,7 @@ export default function AdminCoupons() {
     e.preventDefault();
     const method = editingId ? 'PUT' : 'POST';
     const body = { ...form, id: editingId ?? undefined };
-    const res = await fetch('/api/admin/coupons', {
+    const res = await apiFetch('/api/admin/coupons', {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

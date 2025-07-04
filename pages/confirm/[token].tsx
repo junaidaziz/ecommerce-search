@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
@@ -10,7 +11,7 @@ export default function Confirm() {
   useEffect(() => {
     if (!token) return;
     async function verify() {
-      const res = await fetch(`/api/verify-email?token=${token}`);
+      const res = await apiFetch(`/api/verify-email?token=${token}`);
       if (res.ok) {
         setMessage('Email verified');
       } else {

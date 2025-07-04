@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useContext, useState, useEffect, useRef } from 'react';
@@ -95,7 +96,7 @@ const Header: FC<HeaderProps> = ({
           !/^[0-9]+$/.test(c.name)
       );
 
-    fetch('/api/categories')
+    apiFetch('/api/categories')
       .then((res) => res.json())
       .then((data) => {
         const catsRaw: Category[] =

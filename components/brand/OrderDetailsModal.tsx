@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useState, useContext } from 'react';
 import Image from 'next/image';
 import { GenericModal, StatusLabel } from '@components/UI';
@@ -37,7 +38,7 @@ const OrderDetailsModal: React.FC<Props> = ({
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(`/api/orders/${order.uuid}`, {
+      const res = await apiFetch(`/api/orders/${order.uuid}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),

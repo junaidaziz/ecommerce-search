@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useContext, useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -131,7 +132,7 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     if (!user) return;
     setLoadingUser(true);
-    fetch('/api/me')
+    apiFetch('/api/me')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!data) return;
@@ -146,7 +147,7 @@ const Checkout: React.FC = () => {
 
   useEffect(() => {
     if (!country) return;
-    fetch(`/api/delivery-estimate?country=${country}`)
+    apiFetch(`/api/delivery-estimate?country=${country}`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((d) => setDeliveryDate(d.date))
       .catch(() => setDeliveryDate(''));
@@ -162,7 +163,7 @@ const Checkout: React.FC = () => {
       if (user) {
         if (paymentMethod === 'stripe') {
           if (!STRAPI_URL) throw new Error('STRAPI_URL not configured');
-          const createRes = await fetch(`${STRAPI_URL}/orders/create`, {
+          const createRes = await apiFetch(`${STRAPI_URL}/orders/create`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -185,7 +186,7 @@ const Checkout: React.FC = () => {
                 ? (createData as { message?: string }).message
                 : 'Order failed'
             );
-          const res = await fetch('/api/checkout/create-session', {
+          const res = await apiFetch('/api/checkout/create-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -221,7 +222,10 @@ const Checkout: React.FC = () => {
           fd.append('paymentMethod', paymentMethod);
           if (paymentReference) fd.append('paymentReference', paymentReference);
           if (paymentProof) fd.append('paymentProof', paymentProof);
-          const res = await fetch('/api/orders', { method: 'POST', body: fd });
+          const res = await apiFetch('/api/orders', {
+            method: 'POST',
+            body: fd,
+          });
           const data = await parseJsonSafe(res);
           if (!res.ok) {
             const errorMsg =
@@ -233,7 +237,7 @@ const Checkout: React.FC = () => {
           router.push('/orders');
         }
       } else {
-        const res = await fetch('/api/guest-orders', {
+        const res = await apiFetch('/api/guest-orders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -326,7 +330,7 @@ const Checkout: React.FC = () => {
                 className="btn"
                 onClick={async () => {
                   if (!coupon) return;
-                  const res = await fetch(
+                  const res = await apiFetch(
                     `/api/coupons/${encodeURIComponent(coupon)}`
                   );
                   if (res.ok) {

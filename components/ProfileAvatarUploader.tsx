@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useState, useRef, useEffect, useContext } from 'react';
 import useRequireAuth from '@hooks/useRequireAuth';
 import { NotificationContext } from '@contexts/NotificationContext';
@@ -14,7 +15,7 @@ const ProfileAvatarUploader: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
-    fetch('/api/user/profile')
+    apiFetch('/api/user/profile')
       .then((res) => (res.ok ? res.json() : null))
       .then((data: User | null) => {
         if (data?.profileImage) setCurrent(data.profileImage);
@@ -43,7 +44,7 @@ const ProfileAvatarUploader: React.FC = () => {
     if (!file) return;
     const form = new FormData();
     form.append('profileImage', file);
-    const res = await fetch('/api/user/profile-picture', {
+    const res = await apiFetch('/api/user/profile-picture', {
       method: 'PATCH',
       body: form,
     });
@@ -59,7 +60,7 @@ const ProfileAvatarUploader: React.FC = () => {
   };
 
   const remove = async () => {
-    const res = await fetch('/api/user/profile-picture', {
+    const res = await apiFetch('/api/user/profile-picture', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ remove: true }),

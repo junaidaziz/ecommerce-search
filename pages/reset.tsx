@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useState, FormEvent, ChangeEvent } from 'react';
 import Link from 'next/link';
 import { TextInput } from '@components/form-fields';
@@ -11,7 +12,7 @@ const RequestReset: React.FC = () => {
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const res = await fetch('/api/request-reset', {
+    const res = await apiFetch('/api/request-reset', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
