@@ -148,6 +148,13 @@ const Header: FC<HeaderProps> = ({
   const menuItems = [
     { label: 'My Orders', href: '/orders' },
     { label: 'Profile', href: '/profile' },
+    { label: 'Reviews', href: '/user/reviews' },
+    { label: 'Coupons', href: '/user/coupons' },
+    { label: 'Credit', href: '/user/credit' },
+    { label: 'Stores', href: '/user/stores' },
+    { label: 'History', href: '/user/history' },
+    { label: 'Notifications', href: '/user/notifications' },
+    { label: 'Permissions', href: '/user/permissions' },
     { label: 'Settings', href: '/settings' },
     { label: 'Logout', onClick: logout, isButton: true },
   ];
