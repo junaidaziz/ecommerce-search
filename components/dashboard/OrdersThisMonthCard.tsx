@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import DashboardCard from './DashboardCard';
 import CartIcon from '../icons/CartIcon';
@@ -25,12 +26,12 @@ const OrdersThisMonthCard: React.FC<Props> = ({ brandId }) => {
       if (brandId) params.set('brandId', String(brandId));
       const base = '/api/dashboard/orders-this-month';
       try {
-        const curRes = await fetch(`${base}?${params.toString()}`);
+        const curRes = await apiFetch(`${base}?${params.toString()}`);
         if (curRes.ok) {
           const cur = await curRes.json();
           setData(cur);
           params.set('monthOffset', '1');
-          const prevRes = await fetch(`${base}?${params.toString()}`);
+          const prevRes = await apiFetch(`${base}?${params.toString()}`);
           if (prevRes.ok) {
             const prev = await prevRes.json();
             const pct = prev.count
@@ -56,7 +57,11 @@ const OrdersThisMonthCard: React.FC<Props> = ({ brandId }) => {
       loading={!data && !error}
       error={error}
       icon={<CartIcon className="w-5 h-5" />}
-      trend={trend !== null ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}%` : undefined}
+      trend={
+        trend !== null
+          ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}%`
+          : undefined
+      }
       className="bg-yellow-50"
     >
       {data && (

@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import DashboardCard from './DashboardCard';
 import CartIcon from '../icons/CartIcon';
@@ -21,7 +22,9 @@ const WeeklySummaryCard: React.FC<Props> = ({ brandId }) => {
       setError('');
       const params = new URLSearchParams();
       if (brandId) params.set('brandId', String(brandId));
-      const res = await fetch(`/api/dashboard/weekly-summary?${params.toString()}`);
+      const res = await apiFetch(
+        `/api/dashboard/weekly-summary?${params.toString()}`
+      );
       if (!res.ok) {
         setError('Failed to load');
         return;

@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
 import { Product, SearchResults } from '@/types';
@@ -19,7 +20,7 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
 
   useEffect(() => {
     if (!category) return;
-    fetch(
+    apiFetch(
       `/api/search?filterByCategory=${encodeURIComponent(category)}&perPage=${limit}`
     )
       .then((res) => (res.ok ? (res.json() as Promise<SearchResults>) : null))

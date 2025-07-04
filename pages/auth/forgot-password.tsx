@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -23,7 +24,7 @@ const ForgotPasswordPage: React.FC = () => {
     setLoading(true);
     setMessage('');
     try {
-      const res = await fetch('/api/request-reset', {
+      const res = await apiFetch('/api/request-reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

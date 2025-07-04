@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import DashboardCard from './DashboardCard';
@@ -21,7 +22,7 @@ const TotalProductsCard: React.FC<Props> = ({ brandId }) => {
         '/api/dashboard/total-products' +
         (brandId ? `?brandId=${brandId}` : '');
       try {
-        const res = await fetch(url);
+        const res = await apiFetch(url);
         if (res.ok) {
           const data = await res.json();
           setCount(data.count);

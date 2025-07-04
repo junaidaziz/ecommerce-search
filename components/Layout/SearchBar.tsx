@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import type { FC } from 'react';
@@ -44,7 +45,7 @@ const SearchBar: FC<SearchBarProps> = ({
 
   useEffect(() => {
     if (showTrending) {
-      fetch('/api/trending')
+      apiFetch('/api/trending')
         .then((res) =>
           res.ok ? (res.json() as Promise<TrendingResponse>) : null
         )
@@ -63,7 +64,7 @@ const SearchBar: FC<SearchBarProps> = ({
     }
     if (suggestTimeout.current) clearTimeout(suggestTimeout.current);
     suggestTimeout.current = setTimeout(() => {
-      fetch(`/api/suggest?q=${encodeURIComponent(query)}`)
+      apiFetch(`/api/suggest?q=${encodeURIComponent(query)}`)
         .then((res) =>
           res.ok ? (res.json() as Promise<SuggestionsResponse>) : null
         )

@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import DashboardCard from './DashboardCard';
 import WarningIcon from '../icons/WarningIcon';
@@ -29,7 +30,7 @@ const InventoryAlertsCard: React.FC<Props> = ({ brandId, threshold = 10 }) => {
       (params.toString() ? `?${params.toString()}` : '');
     async function load() {
       try {
-        const res = await fetch(url);
+        const res = await apiFetch(url);
         if (res.ok) {
           const data = await res.json();
           setProducts(data.products);

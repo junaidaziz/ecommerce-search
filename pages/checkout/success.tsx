@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
@@ -10,7 +11,7 @@ export default function Success() {
 
   useEffect(() => {
     if (!session_id) return;
-    fetch('/api/checkout/complete', {
+    apiFetch('/api/checkout/complete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionId: session_id }),

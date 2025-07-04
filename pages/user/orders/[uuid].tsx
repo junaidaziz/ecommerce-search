@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -22,7 +23,7 @@ export default function UserOrderDetail() {
   useEffect(() => {
     if (!uuid) return;
     setLoading(true);
-    fetch(`/api/user/orders/${uuid}`)
+    apiFetch(`/api/user/orders/${uuid}`)
       .then(async (res) => {
         if (!res.ok) {
           const d = await res.json().catch(() => null);
@@ -44,7 +45,7 @@ export default function UserOrderDetail() {
     if (!order) return;
     if (!confirm('Cancel this order?')) return;
     setCancelling(true);
-    const res = await fetch(`/api/user/orders/${order.uuid}/cancel`, {
+    const res = await apiFetch(`/api/user/orders/${order.uuid}/cancel`, {
       method: 'POST',
     });
     if (res.ok) {

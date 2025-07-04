@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useEffect, useState, useRef } from 'react';
 import { CardNumberInput } from '@components/form-fields';
 import type { PaymentMethod } from '@/types';
@@ -23,7 +24,7 @@ const PaymentMethodsSection: React.FC = () => {
   const cvcRef = useRef<HTMLInputElement>(null);
 
   const loadMethods = () => {
-    fetch('/api/payment-methods')
+    apiFetch('/api/payment-methods')
       .then((res) => {
         if (res.status === 401) {
           window.location.href = '/login';
@@ -65,7 +66,7 @@ const PaymentMethodsSection: React.FC = () => {
                 <button
                   className="btn btn-xs"
                   onClick={() =>
-                    fetch(`/api/payment-methods/${m.id}`, {
+                    apiFetch(`/api/payment-methods/${m.id}`, {
                       method: 'PATCH',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ makeDefault: true }),
@@ -78,7 +79,7 @@ const PaymentMethodsSection: React.FC = () => {
               <button
                 className="btn btn-xs"
                 onClick={() =>
-                  fetch(`/api/payment-methods/${m.id}`, {
+                  apiFetch(`/api/payment-methods/${m.id}`, {
                     method: 'DELETE',
                   }).then(loadMethods)
                 }
@@ -101,7 +102,7 @@ const PaymentMethodsSection: React.FC = () => {
             cvc: cvc.trim(),
             setDefault: (form.default as HTMLInputElement).checked,
           };
-          fetch('/api/payment-methods', {
+          apiFetch('/api/payment-methods', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
