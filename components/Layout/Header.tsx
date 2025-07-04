@@ -18,11 +18,13 @@ const Header: FC<HeaderProps> = ({
 }) => {
   const app = useContext(AppContext);
   const { data: session } = useSession();
-  const role =
-    app?.user?.role?.toLowerCase() ||
-    (
-      (session?.user as { role?: string } | undefined)?.role || ''
-    ).toLowerCase();
+  const role = (
+    app?.user?.role ||
+    (session?.user as { role?: string } | undefined)?.role ||
+    ''
+  )
+    .toString()
+    .toUpperCase();
   if (role === UserRole.BRAND) {
     return (
       <BrandHeader

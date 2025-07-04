@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Layout from '../components/Layout/Layout';
+import Layout from '@components/Layout/Layout';
 // Update the import path below if your AppContext is located elsewhere
-import { AppContext } from '../contexts/AppContext';
+import { AppContext } from '@contexts/AppContext';
 
 jest.mock('next/router', () => ({
   useRouter: () => ({
