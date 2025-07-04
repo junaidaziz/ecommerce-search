@@ -14,6 +14,7 @@ module.exports = {
     '^@styles/(.*)$': '<rootDir>/styles/$1',
     '^@contexts/(.*)$': '<rootDir>/contexts/$1',
     '^@/constants/(.*)$': '<rootDir>/constants/$1',
+    '^@/types$': '<rootDir>/types/index.ts',
     '^@/types/(.*)$': '<rootDir>/types/$1',
     '^@test-utils/(.*)$': '<rootDir>/test-utils/$1',
   },
