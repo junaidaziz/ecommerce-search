@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useEffect, useState, useContext } from 'react';
 import OrderChatWindow from '@components/Chat/OrderChatWindow';
 import { useRouter } from 'next/router';
@@ -23,7 +24,7 @@ export default function OrderDetail() {
         ? `/api/user/orders/${orderId}`
         : `/api/orders/${orderId}`;
     setLoading(true);
-    fetch(endpoint)
+    apiFetch(endpoint)
       .then(async (res) => {
         if (!res.ok) {
           if (res.status === 404) {
@@ -31,7 +32,9 @@ export default function OrderDetail() {
             return Promise.reject(new Error('Not found'));
           }
           const d = await res.json().catch(() => null);
-          return Promise.reject(new Error(d?.message || 'Failed to load order'));
+          return Promise.reject(
+            new Error(d?.message || 'Failed to load order')
+          );
         }
         return res.json();
       })

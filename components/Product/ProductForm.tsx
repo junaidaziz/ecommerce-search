@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useState, useContext, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import AsyncCreatableSelect from 'react-select/async-creatable';
@@ -98,7 +99,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     inputValue: string
   ): Promise<SelectOption[]> => {
     const params = new URLSearchParams({ search: inputValue, limit: '20' });
-    const res = await fetch(`/api/categories?${params.toString()}`);
+    const res = await apiFetch(`/api/categories?${params.toString()}`);
     if (!res.ok) return [];
     const data: import('@/types').CategoriesResponse = await res.json();
     return (data.categories || []).map((c) => ({
@@ -111,7 +112,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     inputValue: string
   ): Promise<SelectOption[]> => {
     const params = new URLSearchParams({ search: inputValue, limit: '20' });
-    const res = await fetch(`/api/vendors?${params.toString()}`);
+    const res = await apiFetch(`/api/vendors?${params.toString()}`);
     if (!res.ok) return [];
     const data: VendorsResponse = await res.json();
     return (data.vendors || []).map((v) => ({

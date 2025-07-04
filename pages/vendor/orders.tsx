@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import { NotificationContext } from '@contexts/NotificationContext';
@@ -15,7 +16,7 @@ export default function VendorOrders() {
   const fetchOrders = useCallback((): void => {
     if (!user) return;
     setLoading(true);
-    fetch(
+    apiFetch(
       `/api/vendor/orders?vendor=${encodeURIComponent(user.brandName || '')}`
     )
       .then((res) => (res.ok ? res.json() : Promise.reject()))
@@ -32,7 +33,7 @@ export default function VendorOrders() {
   }, [fetchOrders]);
 
   const updateStatus = async (id: number, status: string): Promise<void> => {
-    const res = await fetch(`/api/orders/${id}`, {
+    const res = await apiFetch(`/api/orders/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
@@ -81,7 +82,9 @@ export default function VendorOrders() {
             </select>
             <p>Total: £{o.total}</p>
             <p>
-              <a className="link" href={`/messages/${o.uuid}`}>Chat</a>
+              <a className="link" href={`/messages/${o.uuid}`}>
+                Chat
+              </a>
             </p>
           </li>
         ))}

@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useEffect, useState } from 'react';
 import BellIcon from '../icons/BellIcon';
 import type { Notification } from '@/types';
@@ -18,7 +19,7 @@ export default function NotificationBell({
   }, [notifications]);
 
   const fetchNotifications = () => {
-    fetch('/api/brand/notifications')
+    apiFetch('/api/brand/notifications')
       .then((res) => (res.ok ? res.json() : []))
       .then(setItems)
       .catch(() => {});
@@ -31,7 +32,7 @@ export default function NotificationBell({
   }, []);
 
   const markAll = () => {
-    fetch('/api/brand/notifications', { method: 'PATCH' })
+    apiFetch('/api/brand/notifications', { method: 'PATCH' })
       .then(() => fetchNotifications())
       .catch(() => {});
   };

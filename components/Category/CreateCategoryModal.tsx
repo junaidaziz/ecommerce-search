@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import { GenericInput } from '../UI';
 import GenericModal from '../Modals/GenericModal';
@@ -42,7 +43,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
     }
     setSaving(true);
     try {
-      const checkRes = await fetch(
+      const checkRes = await apiFetch(
         `/api/categories/check?name=${encodeURIComponent(nameTrim)}`
       );
       if (checkRes.ok) {
@@ -53,7 +54,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
           return;
         }
       }
-      const createRes = await fetch('/api/categories', {
+      const createRes = await apiFetch('/api/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: nameTrim, slug: slugTrim }),

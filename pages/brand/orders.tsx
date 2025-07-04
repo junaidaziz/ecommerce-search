@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, {
   useContext,
   useEffect,
@@ -31,7 +32,7 @@ const BrandOrders: React.FC = () => {
   const loadOrders = useCallback(() => {
     if (!user) return;
     setLoading(true);
-    fetch('/api/brand/orders')
+    apiFetch('/api/brand/orders')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: Order[]) => {
         setOrders(data);
@@ -43,7 +44,9 @@ const BrandOrders: React.FC = () => {
 
   const cancelOrder = async (uuid: string) => {
     if (!confirm('Cancel this order?')) return;
-    const res = await fetch(`/api/orders/${uuid}/cancel`, { method: 'POST' });
+    const res = await apiFetch(`/api/orders/${uuid}/cancel`, {
+      method: 'POST',
+    });
     const data = await res.json().catch(() => null);
     if (res.ok) {
       addNotification('Order cancelled', 'success');
@@ -155,12 +158,11 @@ const BrandOrders: React.FC = () => {
                         onClick={() =>
                           openChat({
                             orderId: g.order.uuid,
-                            customerName:
-                              g.order.user
-                                ? `${g.order.user.firstName || ''} ${
-                                    g.order.user.lastName || ''
-                                  }`.trim() || g.order.user.email
-                                : undefined,
+                            customerName: g.order.user
+                              ? `${g.order.user.firstName || ''} ${
+                                  g.order.user.lastName || ''
+                                }`.trim() || g.order.user.email
+                              : undefined,
                           })
                         }
                       >

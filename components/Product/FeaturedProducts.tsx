@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
 import type { Product } from '@/types';
@@ -6,7 +7,7 @@ const FeaturedProducts: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetch('/api/products?limit=8')
+    apiFetch('/api/products?limit=8')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => setProducts(data?.products || []))
       .catch(() => {});

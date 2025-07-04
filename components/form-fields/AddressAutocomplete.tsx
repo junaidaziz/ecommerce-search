@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import React, { useState, useEffect } from 'react';
 
 interface Suggestion {
@@ -10,17 +11,21 @@ interface Props {
   className?: string;
 }
 
-const AddressAutocomplete: React.FC<Props> = ({ value, onChange, className }) => {
+const AddressAutocomplete: React.FC<Props> = ({
+  value,
+  onChange,
+  className,
+}) => {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [show, setShow] = useState(false);
 
   useEffect(() => {
     if (!value) return setSuggestions([]);
     const controller = new AbortController();
-    fetch(`/api/address-autocomplete?input=${encodeURIComponent(value)}`, {
+    apiFetch(`/api/address-autocomplete?input=${encodeURIComponent(value)}`, {
       signal: controller.signal,
     })
-      .then((res) => res.ok ? res.json() : Promise.reject())
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data) => setSuggestions(data.predictions || []))
       .catch(() => {});
     return () => controller.abort();

@@ -1,3 +1,4 @@
+import { searchTags } from '@lib/api/tags';
 import React from 'react';
 import {
   Controller,
@@ -30,13 +31,9 @@ const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
   } = props;
 
   const loadOptions = async (inputValue: string) => {
-    const params = new URLSearchParams({ search: inputValue });
-    const res = await fetch(`/api/tags?${params.toString()}`);
-    if (!res.ok) return [];
-    const data = await res.json();
-    return (data.tags || []).map((t: string) => ({ label: t, value: t }));
+    const tags = await searchTags(inputValue);
+    return tags.map((t) => ({ label: t, value: t }));
   };
-
 
   return (
     <Controller

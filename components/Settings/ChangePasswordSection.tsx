@@ -1,3 +1,4 @@
+import { apiFetch } from '@lib/api';
 import { useContext } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { PasswordInput } from '@components/form-fields';
@@ -19,7 +20,7 @@ const ChangePasswordSection: React.FC = () => {
     current,
     password,
   }) => {
-    const res = await fetch('/api/change-password', {
+    const res = await apiFetch('/api/change-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ currentPassword: current, newPassword: password }),
@@ -37,7 +38,10 @@ const ChangePasswordSection: React.FC = () => {
   };
 
   return (
-    <form onSubmit={passwordForm.handleSubmit(submitPassword)} className="space-y-2 max-w-md mx-auto">
+    <form
+      onSubmit={passwordForm.handleSubmit(submitPassword)}
+      className="space-y-2 max-w-md mx-auto"
+    >
       <h2 className="text-xl font-bold mb-2">Change Password</h2>
       <PasswordInput
         label="Current Password"
@@ -50,7 +54,10 @@ const ChangePasswordSection: React.FC = () => {
         label="New Password"
         register={passwordForm.register}
         name="password"
-        rules={{ required: 'Required', pattern: { value: passwordRegex, message: 'Weak password' } }}
+        rules={{
+          required: 'Required',
+          pattern: { value: passwordRegex, message: 'Weak password' },
+        }}
         error={passwordForm.formState.errors.password?.message}
       />
       <PasswordInput
@@ -59,7 +66,9 @@ const ChangePasswordSection: React.FC = () => {
         name="confirm"
         rules={{
           required: 'Required',
-          validate: (v) => v === passwordForm.getValues('password') || 'Passwords do not match',
+          validate: (v) =>
+            v === passwordForm.getValues('password') ||
+            'Passwords do not match',
         }}
         error={passwordForm.formState.errors.confirm?.message}
       />
