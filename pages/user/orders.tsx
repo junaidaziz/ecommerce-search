@@ -1,4 +1,4 @@
-import { apiFetch } from '@lib/api';
+import { fetchUserOrders, reorderOrder } from '@lib/api/user';
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import type { Order } from '@/types';
@@ -13,9 +13,8 @@ const UserOrders: React.FC = () => {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    apiFetch('/api/user/orders')
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data: Order[]) => {
+    fetchUserOrders()
+      .then((data) => {
         setOrders(data);
         setError(null);
       })
@@ -74,9 +73,9 @@ const UserOrders: React.FC = () => {
               <button
                 className="btn btn-sm"
                 onClick={() =>
-                  apiFetch(`/api/user/orders/${o.uuid}/reorder`, {
-                    method: 'POST',
-                  }).then(() => window.location.assign('/cart'))
+                  reorderOrder(o.uuid).then(() =>
+                    window.location.assign('/cart')
+                  )
                 }
               >
                 Reorder
