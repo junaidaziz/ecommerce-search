@@ -8,7 +8,7 @@ import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import PageContainer from '@components/Layout/PageContainer';
 import GoogleIcon from '@components/icons/GoogleIcon';
-import GithubIcon from '@components/icons/GithubIcon';
+import FacebookIcon from '@components/icons/FacebookIcon';
 import {
   EmailInput,
   PasswordInput,
@@ -116,14 +116,14 @@ export default function UserSignup() {
           </button>
           <button
             type="button"
-            className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-gray-800 hover:text-white"
+            className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-blue-700 hover:text-white"
             onClick={() => {
               document.cookie = 'signupRole=USER; path=/';
-              signIn('github');
+              signIn('facebook');
             }}
           >
-            <GithubIcon className="h-5 w-5" />
-            Continue with GitHub
+            <FacebookIcon className="h-5 w-5" />
+            Continue with Facebook
           </button>
         </div>
         {formError && <div className="text-red-500 mb-2">{formError}</div>}
