@@ -57,6 +57,7 @@ model User {
   updatedPolicies  PolicyDocument[]  @relation("UserToPolicyDocuments")
   supportTickets   SupportTicket[]
   wishlistItems    WishlistItem[]
+  Coupon           Coupon[]
 }
 
 model Category {
@@ -72,27 +73,27 @@ model Category {
 }
 
 model Product {
-  id            Int      @id @default(autoincrement())
-  uuid          String   @unique @default(uuid())
-  slug          String   @unique
-  sku           String   @unique
-  title         String
-  description   String
-  productType   String
-  tags          String?
-  quantity      Int      @default(0)
-  lowStockThreshold Int? @default(5)
-  minPrice      Float    @default(0)
-  maxPrice      Float    @default(0)
-  currency      String   @default("USD")
-  discountType  String?
-  discountValue Float?
-  status        String   @default("approved")
-  images        String?
-  vendorId      Int
-  categoryId    Int
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  uuid              String   @unique @default(uuid())
+  slug              String   @unique
+  sku               String   @unique
+  title             String
+  description       String
+  productType       String
+  tags              String?
+  quantity          Int      @default(0)
+  lowStockThreshold Int?     @default(5)
+  minPrice          Float    @default(0)
+  maxPrice          Float    @default(0)
+  currency          String   @default("USD")
+  discountType      String?
+  discountValue     Float?
+  status            String   @default("approved")
+  images            String?
+  vendorId          Int
+  categoryId        Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   vendor        User           @relation(fields: [vendorId], references: [id])
   category      Category       @relation(fields: [categoryId], references: [id])
@@ -159,21 +160,21 @@ model SearchLog {
 }
 
 model Coupon {
-  id             Int           @id @default(autoincrement())
-  code           String        @unique
-  description    String?
-  discountType   String
-  discountValue  Float
-  minOrderValue  Float?
-  expiresAt      DateTime?
-  usageLimit     Int?
-  usedCount      Int           @default(0)
-  userId         Int?
-  isActive       Boolean       @default(true)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  user           User?         @relation(fields: [userId], references: [id])
-  usages         CouponUsage[]
+  id            Int           @id @default(autoincrement())
+  code          String        @unique
+  description   String?
+  discountType  String
+  discountValue Float
+  minOrderValue Float?
+  expiresAt     DateTime?
+  usageLimit    Int?
+  usedCount     Int           @default(0)
+  userId        Int?
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  user          User?         @relation(fields: [userId], references: [id])
+  usages        CouponUsage[]
 }
 
 model CouponUsage {
@@ -232,16 +233,16 @@ model Notification {
 }
 
 model Message {
-  id         Int      @id @default(autoincrement())
-  senderId   Int
-  receiverId Int
-  orderId    Int
+  id          Int      @id @default(autoincrement())
+  senderId    Int
+  receiverId  Int
+  orderId     Int
   messageType String   @default("text")
   content     String?
   fileUrl     String?
   fileName    String?
-  createdAt  DateTime @default(now())
-  seen       Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  seen        Boolean  @default(false)
 
   sender   User  @relation("SentMessages", fields: [senderId], references: [id])
   receiver User  @relation("ReceivedMessages", fields: [receiverId], references: [id])
