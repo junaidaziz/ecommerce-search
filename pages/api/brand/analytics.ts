@@ -5,6 +5,7 @@ import type { AnalyticsData, ApiMessage } from '@/types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
+import { UserRole } from '@/types';
 
 export default async function handler(
   req: NextApiRequest,
@@ -19,7 +20,11 @@ export default async function handler(
       typeof session?.user?.brandId === 'number'
         ? session.user.brandId
         : undefined;
-    if (!session?.user || session.user.role !== 'BRAND' || !brandId) {
+    if (
+      !session?.user ||
+      (session.user.role !== 'BRAND' && session.user.role !== UserRole.SUPER_ADMIN) ||
+      !brandId
+    ) {
       return res.status(401).json({ message: UNAUTHORIZED });
     }
     const orders = await getOrdersForVendorId(brandId);
