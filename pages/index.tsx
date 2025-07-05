@@ -11,6 +11,9 @@ import CategorySlider, {
 import { getPageTitle } from '@lib/pageTitle';
 import DEFAULT_CATEGORIES from '@lib/defaultCategories';
 import CATEGORY_IMAGES from '@lib/categoryImages';
+import Hero from '@components/Hero';
+import FeaturedCards from '@components/FeaturedCards';
+import CategoryGrid from '@components/Category/CategoryGrid';
 
 const HomePage: React.FC = () => {
   const [categories, setCategories] = useState<CategoryItem[]>([]);
@@ -44,10 +47,9 @@ const HomePage: React.FC = () => {
         <title>{getPageTitle('Home')}</title>
       </Head>
       <main className="flex-1">
-        <HomeHero />
-        <PromoBanner />
-        <FeaturedProducts />
-        <CategoryPromotion categories={categories} />
+        <Hero />
+        <FeaturedCards />
+        <CategoryGrid categories={categories.slice(0, 6)} />
       </main>
     </div>
   );
