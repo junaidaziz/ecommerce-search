@@ -12,6 +12,7 @@ module.exports = {
     '^@hooks/(.*)$': '<rootDir>/hooks/$1',
     '^@pages/(.*)$': '<rootDir>/pages/$1',
     '^@styles/(.*)$': '<rootDir>/styles/$1',
+    '^@/styles/(.*)$': '<rootDir>/styles/$1',
     '^@contexts/(.*)$': '<rootDir>/contexts/$1',
     '^@/constants/(.*)$': '<rootDir>/constants/$1',
     '^@/types$': '<rootDir>/types/index.ts',
