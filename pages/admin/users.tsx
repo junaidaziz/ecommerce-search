@@ -85,7 +85,7 @@ export default function ManageUsers() {
             >
               <option value="user">user</option>
               <option value="brand">brand</option>
-              <option value="super-admin">super-admin</option>
+              <option value={UserRole.SUPER_ADMIN.toLowerCase().replace('_', '-')}>{UserRole.SUPER_ADMIN.toLowerCase().replace('_', '-')}</option>
             </select>
             <label className="label cursor-pointer gap-1">
               <span className="label-text">Disabled</span>
