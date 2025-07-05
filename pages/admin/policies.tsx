@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { AppContext } from '@contexts/AppContext';
 import { fetchJson } from '@utils/fetchJson';
 import { getPageTitle } from '@lib/pageTitle';
+import type { UserRole } from '@/types';
 
 const TYPES = [
   { value: 'terms', label: 'Terms & Conditions' },
@@ -24,7 +25,7 @@ export default function ManagePolicies() {
   }, [type]);
 
   if (!user) return <div className="p-4">Please log in to view policies.</div>;
-  if (user.role !== 'super-admin')
+  if (user.role !== UserRole.SUPER_ADMIN)
     return <div className="p-4">Admin access required.</div>;
 
   const save = async () => {
