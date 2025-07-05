@@ -79,7 +79,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           <button
             type="button"
             className="btn w-full hover:bg-red-600 hover:text-white flex items-center justify-center gap-2"
-            onClick={() => signIn('google')}
+            onClick={() => {
+              document.cookie = 'signupRole=; path=/; Max-Age=0';
+              signIn('google');
+            }}
           >
             <GoogleIcon className="h-5 w-5" />
             Login with Google
@@ -87,7 +90,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           <button
             type="button"
             className="btn w-full hover:bg-gray-800 hover:text-white flex items-center justify-center gap-2"
-            onClick={() => signIn('github')}
+            onClick={() => {
+              document.cookie = 'signupRole=; path=/; Max-Age=0';
+              signIn('github');
+            }}
           >
             <GithubIcon className="h-5 w-5" />
             Login with GitHub

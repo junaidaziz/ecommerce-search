@@ -5,6 +5,8 @@ import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { findUser, addUser } from '@lib/users';
+import { assignUserRoleIfMissing } from '@lib/db/user';
+import type { Role } from '@prisma/client';
 import type { User as AppUser } from '@/types';
 
 // Extend the User type to include 'role'
@@ -26,7 +28,8 @@ if (!process.env.NEXTAUTH_URL) {
   console.error('NEXTAUTH_URL environment variable is not set');
 }
 
-export const authOptions: AuthOptions = {
+export function authOptions(req: NextApiRequest, res: NextApiResponse): AuthOptions {
+  return {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -76,6 +79,7 @@ export const authOptions: AuthOptions = {
         if (!user.email) {
           return false;
         }
+        const roleCookie = req.cookies.signupRole as string | undefined;
         const existing = await findUser(user.email);
         if (existing && existing.disabled) {
           return false;
@@ -89,11 +93,17 @@ export const authOptions: AuthOptions = {
             lastName: nameParts.slice(1).join(' ') || '',
             brandName: '',
             gender: '',
-            role: 'USER',
+            role: (roleCookie || 'USER') as Role,
           });
+          if (!roleCookie) return '/select-role';
+        } else if (roleCookie && existing.role !== roleCookie) {
+          await assignUserRoleIfMissing(user.email, roleCookie as Role);
+        }
+        if (roleCookie) {
+          res.setHeader('Set-Cookie', 'signupRole=; Path=/; Max-Age=0');
         }
       }
-      if (user && user.disabled) {
+      if (user && (user as any).disabled) {
         return false;
       }
       return true;
@@ -134,6 +144,9 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: 'jwt',
   },
-};
+  };
+}
 
-export default NextAuth(authOptions);
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  return NextAuth(req, res, authOptions(req, res));
+}
