@@ -8,24 +8,30 @@ async function main() {
   const password = process.env.SUPER_ADMIN_PASSWORD || 'admin123';
   const hashed = await bcrypt.hash(password, 10);
 
-  await prisma.user.upsert({
+  // Delete existing user (if any)
+  await prisma.user.deleteMany({
     where: { email },
-    update: {},
-    create: {
+  });
+
+  // Re-create Super Admin
+  await prisma.user.create({
+    data: {
       email,
       password: hashed,
-      firstName: 'Super',
-      lastName: 'Admin',
-      gender: 'OTHER',
+      firstName: 'Junaid',
+      lastName: 'Aziz',
+      gender: 'Male',
       role: 'SUPER_ADMIN',
       verified: true,
     },
   });
+
+  console.log(`✅ Super Admin user created with email: ${email}`);
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Failed to create Super Admin:', e);
     process.exit(1);
   })
   .finally(async () => {

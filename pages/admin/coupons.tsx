@@ -3,7 +3,7 @@ import { useEffect, useState, useContext, ChangeEvent } from 'react';
 import Head from 'next/head';
 import { AppContext } from '@contexts/AppContext';
 import { TextInput } from '@components/form-fields';
-import type { Coupon, UserRole } from '@/types';
+import { Coupon, UserRole } from '@/types';
 import { getPageTitle } from '@lib/pageTitle';
 
 export default function AdminCoupons() {
@@ -54,7 +54,7 @@ export default function AdminCoupons() {
   };
 
   if (!user) return <div className="p-4">Please log in.</div>;
-  if (user.role !== UserRole.SUPER_ADMIN)
+  if (user.role.toUpperCase() !== UserRole.SUPER_ADMIN)
     return <div className="p-4">Admin access required.</div>;
 
   return (
