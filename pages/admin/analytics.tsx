@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import Link from 'next/link';
-import { AnalyticsData, LowStockProduct } from '@/types';
+import { AnalyticsData, LowStockProduct, UserRole } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
@@ -39,7 +39,7 @@ export default function AdminAnalytics() {
   }, [user]);
 
   if (!user) return <div className="p-4">Please log in to view analytics.</div>;
-  if (user.role !== 'super-admin')
+  if (user.role !== UserRole.SUPER_ADMIN)
     return <div className="p-4">Admin access required.</div>;
 
   if (loading || data === null) return <div className="p-4">Loading...</div>;

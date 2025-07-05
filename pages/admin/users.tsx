@@ -5,6 +5,7 @@ import {
   UserRoleUpdateRequest,
   UserDisabledUpdateRequest,
   ApiMessage,
+  UserRole,
 } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
@@ -57,7 +58,7 @@ export default function ManageUsers() {
   };
 
   if (!user) return <div className="p-4">Please log in to view users.</div>;
-  if (user.role !== 'super-admin')
+  if (user.role !== UserRole.SUPER_ADMIN)
     return <div className="p-4">Admin access required.</div>;
 
   return (
