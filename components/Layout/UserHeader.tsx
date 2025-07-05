@@ -9,13 +9,15 @@ import { AppContext } from '@contexts/AppContext';
 import MoonIcon from '../icons/MoonIcon';
 import SunIcon from '../icons/SunIcon';
 import DEFAULT_CATEGORIES from '@lib/defaultCategories';
-import SearchBar from './SearchBar';
 import type { Category } from '@/types';
 import type { User } from '@/types';
 import { UserRole } from '@/types';
-import CartDropdown from '../common/CartDropdown';
-import CategoryMenu from './CategoryMenu';
-import UserDropdown from './UserDropdown';
+import { 
+  CartDropdown,
+  CategoryMenu,
+  UserDropdown,
+  SearchBar
+} from '@lib/dynamicImports';
 
 interface HeaderProps {
   theme?: string;
