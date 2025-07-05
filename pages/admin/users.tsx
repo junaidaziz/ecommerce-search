@@ -21,19 +21,22 @@ export default function ManageUsers() {
     email: string;
   } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [search, setSearch] = useState('');
 
   const fetchUsers = useCallback(async () => {
     if (!user) return;
-    const data = await fetchJson<AdminUser[]>('/api/admin/users');
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    const data = await fetchJson<AdminUser[]>(`/api/admin/users?${params.toString()}`);
     setUsers(data);
-  }, [user]);
+  }, [user, search]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
   const changeRole = async (email: string, role: string) => {
-    const payload: UserRoleUpdateRequest = { email, role: role.toUpperCase() };
+    const payload: UserRoleUpdateRequest = { email, role };
     await fetchJson<ApiMessage>('/api/admin/users', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -80,6 +83,13 @@ export default function ManageUsers() {
         <title>{getPageTitle('Manage Users')}</title>
       </Head>
       <h1 className="text-2xl font-bold mb-4">Manage Users</h1>
+      <input
+        type="text"
+        placeholder="Search"
+        className="input input-bordered mb-4"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <ul className="space-y-2">
         {users.map((u) => (

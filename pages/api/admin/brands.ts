@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getVendors } from '@lib/users';
+import { getVendors, setBrandActive } from '@lib/users';
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import type { Vendor, ApiMessage } from '@/types';
@@ -10,12 +10,26 @@ async function handler(
   res: NextApiResponse<Vendor[] | ApiMessage>
 ): Promise<void> {
   try {
-    if (req.method !== 'GET') {
-      res.status(405).json({ message: METHOD_NOT_ALLOWED });
+    if (req.method === 'GET') {
+      const search = String(req.query.search || '');
+      const page = parseInt(String(req.query.page || '1'), 10);
+      const limit = parseInt(String(req.query.limit || '20'), 10);
+      const offset = (page - 1) * limit;
+      const vendors = await getVendors(search, limit, offset, true);
+      res.status(200).json(vendors);
       return;
     }
-    const vendors = await getVendors();
-    res.status(200).json(vendors);
+    if (req.method === 'PATCH') {
+      const { id, active } = req.body as { id?: number; active?: boolean };
+      if (!id || typeof active !== 'boolean') {
+        res.status(400).json({ message: 'id and active required' });
+        return;
+      }
+      await setBrandActive(id, active);
+      res.status(200).json({ message: 'updated' });
+      return;
+    }
+    res.status(405).json({ message: METHOD_NOT_ALLOWED });
   } catch (error) {
     handleApiError(res, error, 'Failed to load brands');
   }
