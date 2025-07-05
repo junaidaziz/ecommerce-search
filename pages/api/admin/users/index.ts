@@ -1,22 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { withRole } from '@lib/withRole';
-import { handleApiError } from '@utils/handleApiError';
 import type { AdminUser, ApiMessage } from '@/types';
 import getUsersHandler from '@lib/api/admin/users/getUsers';
 import createUserHandler from '@lib/api/admin/users/createUser';
-import updateUserRoleHandler from '@lib/api/admin/users/updateUserRole';
-import updateUserDisabledHandler from '@lib/api/admin/users/updateUserDisabled'; 
-import deleteUserHandler from '@lib/api/admin/users/deleteUser';
+import { handleApiError } from '@utils/handleApiError';
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AdminUser[] | ApiMessage>
-): Promise<void> {
+) {
   try {
     if (req.method === 'GET') return getUsersHandler(req, res);
-    if (req.method === 'PUT') return updateUserRoleHandler(req, res);
-    if (req.method === 'PATCH') return updateUserDisabledHandler(req, res);
-    if (req.method === 'DELETE') return deleteUserHandler(req, res);
     if (req.method === 'POST') return createUserHandler(req, res);
     res.status(405).json({ message: 'Method Not Allowed' });
   } catch (error) {
@@ -24,4 +18,4 @@ async function handler(
   }
 }
 
-export default withRole(['SUPER_ADMIN'])(handler);
+export default withRole(['SUPER_ADMIN'])(handler); 

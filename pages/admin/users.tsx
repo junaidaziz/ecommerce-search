@@ -36,22 +36,20 @@ export default function ManageUsers() {
   }, [fetchUsers]);
 
   const changeRole = async (email: string, role: string) => {
-    const payload: UserRoleUpdateRequest = { email, role };
-    await fetchJson<ApiMessage>('/api/admin/users', {
+    await fetchJson<ApiMessage>(`/api/admin/users/${encodeURIComponent(email)}/role`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ role }),
     });
     setMessage('Role updated');
     fetchUsers();
   };
 
   const toggleDisabled = async (email: string, disabled: boolean) => {
-    const payload: UserDisabledUpdateRequest = { email, disabled };
-    await fetchJson<ApiMessage>('/api/admin/users', {
+    await fetchJson<ApiMessage>(`/api/admin/users/${encodeURIComponent(email)}/disable`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ disabled }),
     });
     setMessage('Status updated');
     fetchUsers();
@@ -64,7 +62,7 @@ export default function ManageUsers() {
   const confirmDelete = async () => {
     if (!deleteUser) return;
     setDeleting(true);
-    await fetchJson<ApiMessage>(`/api/admin/users/${deleteUser.id}`, {
+    await fetchJson<ApiMessage>(`/api/admin/users/${encodeURIComponent(deleteUser.email)}`, {
       method: 'DELETE',
     });
     setDeleting(false);
