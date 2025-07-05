@@ -19,7 +19,7 @@ const Layout: FC<LayoutProps> = ({ children, heroSecond, maxWidthClass }) => {
   const containerWidth = maxWidthClass ?? 'max-w-[95%] 2xl:max-w-[1440px]';
 
   return (
-    <div className="flex flex-col min-h-screen overflow-x-hidden">
+    <div className="flex flex-col min-h-screen overflow-x-hidden bg-base-200">
       <Header
         theme={theme}
         setTheme={setTheme}
