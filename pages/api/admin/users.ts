@@ -30,7 +30,8 @@ async function handler(
 ): Promise<void> {
   try {
     if (req.method === 'GET') {
-      const users: AdminUser[] = await getAllUsers();
+      const search = getQueryParam(req.query.search) || '';
+      const users: AdminUser[] = await getAllUsers(search);
       res.status(200).json(users);
       return;
     }
@@ -42,7 +43,7 @@ async function handler(
       if (target?.role === 'SUPER_ADMIN') {
         return res.status(403).json({ message: 'cannot modify super admin' });
       }
-      await updateUserRole(email, role as Role);
+      await updateUserRole(email, role.toUpperCase() as Role);
       res.status(200).json({ message: 'role updated' });
       return;
     }

@@ -22,9 +22,7 @@ const Header: FC<HeaderProps> = ({
     app?.user?.role ||
     (session?.user as { role?: string } | undefined)?.role ||
     ''
-  )
-    .toString()
-    .toUpperCase();
+  ).toString();
   if (role === UserRole.BRAND) {
     return (
       <BrandHeader

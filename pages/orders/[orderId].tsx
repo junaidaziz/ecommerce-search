@@ -20,7 +20,7 @@ export default function OrderDetail() {
   useEffect(() => {
     if (!orderId) return;
     const endpoint =
-      user?.role?.toUpperCase() === UserRole.USER
+      user?.role === UserRole.USER
         ? `/api/user/orders/${orderId}`
         : `/api/orders/${orderId}`;
     setLoading(true);
