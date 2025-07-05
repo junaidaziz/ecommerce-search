@@ -9,7 +9,7 @@ import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import { EmailInput, PasswordInput } from '@components/form-fields';
 import GoogleIcon from '@components/icons/GoogleIcon';
-import GithubIcon from '@components/icons/GithubIcon';
+import FacebookIcon from '@components/icons/FacebookIcon';
 import { User, UserRole } from '../types';
 import PageContainer from '@components/Layout/PageContainer';
 
@@ -89,14 +89,14 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           </button>
           <button
             type="button"
-            className="btn w-full hover:bg-gray-800 hover:text-white flex items-center justify-center gap-2"
+            className="btn w-full hover:bg-blue-700 hover:text-white flex items-center justify-center gap-2"
             onClick={() => {
               document.cookie = 'signupRole=; path=/; Max-Age=0';
-              signIn('github');
+              signIn('facebook');
             }}
           >
-            <GithubIcon className="h-5 w-5" />
-            Login with GitHub
+            <FacebookIcon className="h-5 w-5" />
+            Login with Facebook
           </button>
         </div>
         {formError && <div className="text-red-500 mb-2">{formError}</div>}
