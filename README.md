@@ -44,6 +44,8 @@ Next.js runtime variables go in `.env.local`:
 ```env
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
+FACEBOOK_CLIENT_ID=your-facebook-app-id
+FACEBOOK_CLIENT_SECRET=your-facebook-app-secret
 NEXTAUTH_SECRET=random-secret
 ```
 
