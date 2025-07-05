@@ -1,6 +1,6 @@
 import { useContext, useCallback, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import type { Vendor, UserRole, ApiMessage } from '@/types';
+import { Vendor, UserRole, ApiMessage } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
@@ -32,7 +32,7 @@ export default function ManageBrands() {
   }, [load]);
 
   if (!user) return <div className="p-4">Please log in to view brands.</div>;
-  if (user.role !== UserRole.SUPER_ADMIN)
+  if (user.role.toUpperCase() !== UserRole.SUPER_ADMIN)
     return <div className="p-4">Admin access required.</div>;
 
   return (
