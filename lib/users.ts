@@ -191,6 +191,19 @@ export function getVendors(search = '', limit = 20, offset = 0, includeInactive 
   });
 }
 
+export function getVendorsCount(search = '', includeInactive = false) {
+  return prisma.user.count({
+    where: {
+      role: 'BRAND',
+      OR: [
+        { brandName: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ],
+      ...(includeInactive ? {} : { active: true }),
+    },
+  });
+}
+
 export async function createVendor(name: string) {
   const slug = slugify(name);
   const email = `${slug}-${Date.now()}@example.com`;

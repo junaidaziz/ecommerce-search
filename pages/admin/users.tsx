@@ -22,14 +22,20 @@ export default function ManageUsers() {
   } | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [limit] = useState(20);
+  const [total, setTotal] = useState(0);
 
   const fetchUsers = useCallback(async () => {
     if (!user) return;
     const params = new URLSearchParams();
     if (search) params.set('search', search);
-    const data = await fetchJson<AdminUser[]>(`/api/admin/users?${params.toString()}`);
-    setUsers(data);
-  }, [user, search]);
+    params.set('page', String(page));
+    params.set('limit', String(limit));
+    const data = await fetchJson<{ users: AdminUser[]; total: number; page: number; limit: number }>(`/api/admin/users?${params.toString()}`);
+    setUsers(data.users);
+    setTotal(data.total);
+  }, [user, search, page, limit]);
 
   useEffect(() => {
     fetchUsers();
@@ -71,6 +77,8 @@ export default function ManageUsers() {
     fetchUsers();
   };
 
+  const totalPages = Math.ceil(total / limit);
+
   if (!user) return <div className="p-4">Please log in to view users.</div>;
   if (user.role.toUpperCase() !== UserRole.SUPER_ADMIN)
     return <div className="p-4">Admin access required.</div>;
@@ -86,7 +94,7 @@ export default function ManageUsers() {
         placeholder="Search"
         className="input input-bordered mb-4"
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
       />
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <ul className="space-y-2">
@@ -132,6 +140,25 @@ export default function ManageUsers() {
           </li>
         ))}
       </ul>
+      <div className="flex items-center gap-4 mt-6">
+        <button
+          className="btn btn-sm"
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={page === 1}
+        >
+          Previous
+        </button>
+        <span>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          className="btn btn-sm"
+          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+          disabled={page === totalPages || totalPages === 0}
+        >
+          Next
+        </button>
+      </div>
       <ConfirmModal
         isOpen={!!deleteUser}
         title="Are you sure?"

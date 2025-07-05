@@ -8,21 +8,30 @@ const InfiniteLoader: React.FC<InfiniteLoaderProps> = ({
   itemsLength = 0,
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
+  const triggeredRef = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || !hasMore) return;
+    if (!el || !hasMore) {
+      return;
+    }
+    
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && !loading && !triggeredRef.current) {
+          triggeredRef.current = true;
           onLoadMore();
+          // Reset the trigger after a short delay
+          setTimeout(() => {
+            triggeredRef.current = false;
+          }, 1000);
         }
       },
       { rootMargin: '200px' }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [onLoadMore, hasMore]);
+  }, [onLoadMore, hasMore, loading, itemsLength]);
 
   return (
     <>

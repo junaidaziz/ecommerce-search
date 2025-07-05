@@ -95,7 +95,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const initializingRef = useRef(false);
   const filterChangedRef = useRef(0);
   const lastFilterSnapshot = useRef('');
-  const lastPageRequested = useRef(0);
+  const lastPageRequested = useRef(1);
   const firstFilterRef = useRef(true);
   const loadProductsRef = useRef<
     null | ((p: number, mode: 'reset' | 'append') => void)
@@ -141,18 +141,28 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       requestedRef.current.add(key);
       lastFilterSnapshot.current = snapshot;
       lastPageRequested.current = p;
-      if (mode === 'append') setLoadingMore(true);
-      else setLoading(true);
+      
+      if (mode === 'append') {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
 
       try {
-        const res = await apiFetch(
+        const res = await fetch(
           `/api/products?${buildParams(p).toString()}`
         );
+        
+        if (res.status === 304) {
+          // Data is cached and hasn't changed, skip this request
+          return;
+        }
         if (!res.ok) throw new Error('Failed to fetch');
         const data = (await res.json()) as {
           products: Product[];
           total: number;
         };
+        
         if (mode === 'reset') {
           setItems(data.products);
           setHasMore(data.products.length < data.total);
@@ -160,29 +170,19 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         } else {
           setItems((prev) => {
             const updated = [...prev, ...data.products];
-            setHasMore(updated.length < data.total);
             return updated;
           });
+          setHasMore(data.products.length < data.total);
         }
-        if (mode === 'reset') {
-          const query: Record<string, string> = {};
-          if (keyword) query.q = keyword;
-          if (selectedCategories.length > 0)
-            query.category = selectedCategories.join(',');
-          if (minPrice) query.minPrice = minPrice;
-          if (maxPrice) query.maxPrice = maxPrice;
-          if (inStock) query.inStock = 'true';
-          if (sort) query.sort = sort;
-          router.replace({ pathname: router.pathname, query }, undefined, {
-            shallow: true,
-          });
-        }
-      } catch (err) {
-        console.error('Failed to load products:', err);
+      } catch (error) {
+        console.error('Failed to load products:', error);
       } finally {
-        if (mode === 'append') setLoadingMore(false);
-        else setLoading(false);
         loadingRef.current = false;
+        if (mode === 'append') {
+          setLoadingMore(false);
+        } else {
+          setLoading(false);
+        }
       }
     },
     [
@@ -195,7 +195,6 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       maxPrice,
       inStock,
       sort,
-      router,
     ]
   );
 
