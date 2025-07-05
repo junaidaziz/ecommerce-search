@@ -66,6 +66,7 @@ export function findUserById(id: number | string) {
 export function getAllUsers() {
   return prisma.user.findMany({
     select: {
+      id: true,
       email: true,
       firstName: true,
       lastName: true,
@@ -87,6 +88,10 @@ export function setUserDisabled(email: string, disabled: boolean) {
 
 export function deleteUser(email: string) {
   return prisma.user.delete({ where: { email } });
+}
+
+export function deleteUserById(id: number) {
+  return prisma.user.delete({ where: { id } });
 }
 
 export function verifyUser(token: string) {
