@@ -4,6 +4,7 @@ import { Category, CategoryInput, ApiMessage, UserRole } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import { TextInput } from '@components/form-fields';
 import { slugify } from '@lib/slugify';
+import { ConfirmModal } from '@components/UI';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 
@@ -14,6 +15,8 @@ export default function Categories() {
   const [message, setMessage] = useState<string>('');
   const [editing, setEditing] = useState<string | null>(null);
   const [editName, setEditName] = useState<string>('');
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -57,11 +60,19 @@ export default function Categories() {
     load();
   };
 
-  const remove = async (id: number) => {
-    await fetchJson<ApiMessage>(`/api/admin/categories?id=${id}`, {
+  const handleDelete = (id: number) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteId === null) return;
+    setDeleting(true);
+    await fetchJson<ApiMessage>(`/api/admin/categories?id=${deleteId}`, {
       method: 'DELETE',
     });
+    setDeleting(false);
     setMessage('Category deleted');
+    setDeleteId(null);
     load();
   };
 
@@ -103,6 +114,16 @@ export default function Categories() {
           <CategoryItem key={c.id} cat={c} />
         ))}
       </ul>
+      <ConfirmModal
+        isOpen={deleteId !== null}
+        title="Are you sure?"
+        description="This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteId(null)}
+      />
     </div>
   );
 
@@ -148,7 +169,7 @@ export default function Categories() {
                 Edit
               </button>
               <button
-                onClick={() => remove(Number(cat.id))}
+                onClick={() => handleDelete(Number(cat.id))}
                 className="btn btn-sm"
               >
                 Delete
