@@ -62,7 +62,7 @@ export const UserProfile: React.FC = () => {
   };
 
   if (!user) return <div className="p-4">Please log in.</div>;
-  if (user.role !== UserRole.USER)
+  if (user.role?.toUpperCase() !== UserRole.USER)
     return <div className="p-4">User access required.</div>;
 
   return (
