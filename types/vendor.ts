@@ -15,6 +15,7 @@ export interface Vendor {
   taxId?: string;
   paymentMethods?: BrandPaymentMethod[];
   status?: string;
+  active?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

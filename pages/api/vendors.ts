@@ -20,7 +20,7 @@ export default async function handler(
     const pageNum = parseInt(String(page || '1'), 10);
     const limitNum = parseInt(String(limit || '20'), 10);
     const offset = (pageNum - 1) * limitNum;
-    const vendors = await getVendors(String(search), limitNum, offset);
+    const vendors = await getVendors(String(search), limitNum, offset, false);
     return res.status(200).json({ vendors });
   } catch (error) {
     return handleApiError(res, error, 'Failed to load vendors');
