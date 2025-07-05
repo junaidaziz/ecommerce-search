@@ -2,10 +2,11 @@ import Link from 'next/link';
 import type { FC } from 'react';
 
 type DropdownItem = {
-  label: string;
+  label?: string;
   href?: string;
   onClick?: () => void;
   isButton?: boolean;
+  divider?: boolean;
 };
 
 interface DropdownMenuProps {
@@ -23,8 +24,15 @@ const DropdownMenu: FC<DropdownMenuProps> = ({ items, onItemClick }) => {
       tabIndex={0}
       className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded w-40"
     >
-      {items.map((item, index) =>
-        item.isButton ? (
+      {items.map((item, index) => {
+        if (item.divider) {
+          return (
+            <li key={index} className="py-1" role="separator">
+              <hr className="border-t border-base-300" />
+            </li>
+          );
+        }
+        return item.isButton ? (
           <li key={index}>
             <button
               onClick={handleClick(item.onClick)}
@@ -43,8 +51,8 @@ const DropdownMenu: FC<DropdownMenuProps> = ({ items, onItemClick }) => {
               {item.label}
             </Link>
           </li>
-        )
-      )}
+        );
+      })}
     </ul>
   );
 };
