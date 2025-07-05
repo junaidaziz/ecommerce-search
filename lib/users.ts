@@ -50,6 +50,7 @@ export async function addUser({
       stripeAccountId,
       role: role as Role,
       disabled: false,
+      active: true,
       verificationToken,
     },
   });
@@ -63,8 +64,19 @@ export function findUserById(id: number | string) {
   return prisma.user.findUnique({ where: { id: Number(id) } });
 }
 
-export function getAllUsers() {
+export function getAllUsers(search = '') {
+  const where = search
+    ? {
+        OR: [
+          { firstName: { contains: search, mode: 'insensitive' } },
+          { lastName: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { role: search.toUpperCase() as Role },
+        ],
+      }
+    : undefined;
   return prisma.user.findMany({
+    where,
     select: {
       id: true,
       email: true,
@@ -84,6 +96,10 @@ export function updateUserRole(email: string, role: Role) {
 
 export function setUserDisabled(email: string, disabled: boolean) {
   return prisma.user.update({ where: { email }, data: { disabled } });
+}
+
+export function setBrandActive(id: number, active: boolean) {
+  return prisma.user.update({ where: { id }, data: { active } });
 }
 
 export function deleteUser(email: string) {
@@ -153,18 +169,22 @@ export function updateUserProfile(email: string, data: Prisma.UserUpdateInput) {
 
 export function findVendorByName(brandName: string) {
   return prisma.user.findFirst({
-    where: { role: 'BRAND', brandName },
-    select: { id: true, brandName: true, email: true },
+    where: { role: 'BRAND', brandName, active: true },
+    select: { id: true, brandName: true, email: true, active: true },
   });
 }
 
-export function getVendors(search = '', limit = 20, offset = 0) {
+export function getVendors(search = '', limit = 20, offset = 0, includeInactive = false) {
   return prisma.user.findMany({
     where: {
       role: 'BRAND',
-      brandName: { contains: search, mode: 'insensitive' },
+      OR: [
+        { brandName: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ],
+      ...(includeInactive ? {} : { active: true }),
     },
-    select: { id: true, brandName: true, email: true },
+    select: { id: true, brandName: true, email: true, active: true },
     orderBy: { brandName: 'asc' },
     take: limit,
     skip: offset,

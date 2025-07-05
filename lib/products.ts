@@ -144,7 +144,7 @@ async function loadProductsData(): Promise<Product[]> {
   const db = getDb();
   try {
     const rows: ProductWithRelations[] = await db.product.findMany({
-      where: { status: 'approved' },
+      where: { status: 'approved', vendor: { active: true } },
       include: { category: true, vendor: true, variants: true },
     });
 
@@ -383,7 +383,7 @@ export async function getProductsByCategorySlug(
 ): Promise<Product[]> {
   const db = getDb();
   const rows: ProductWithRelations[] = await db.product.findMany({
-    where: { status: 'approved', category: { slug } },
+    where: { status: 'approved', category: { slug }, vendor: { active: true } },
     include: { category: true, vendor: true, variants: true },
   });
   return rows.map(mapDbRowToProduct);
@@ -396,7 +396,7 @@ export async function getProductsByCategorySlugPaginated(
 ): Promise<Product[]> {
   const db = getDb();
   const rows: ProductWithRelations[] = await db.product.findMany({
-    where: { status: 'approved', category: { slug } },
+    where: { status: 'approved', category: { slug }, vendor: { active: true } },
     include: { category: true, vendor: true, variants: true },
     take: limit,
     skip: offset,
@@ -411,7 +411,7 @@ export async function getApprovedProductsPaginated(
 ): Promise<Product[]> {
   const db = getDb();
   const rows: ProductWithRelations[] = await db.product.findMany({
-    where: { status: 'approved' },
+    where: { status: 'approved', vendor: { active: true } },
     include: { category: true, vendor: true, variants: true },
     take: limit,
     skip: offset,
@@ -425,7 +425,7 @@ export async function getProductsByVendorBrandName(
 ): Promise<Product[]> {
   const db = getDb();
   const rows: ProductWithRelations[] = await db.product.findMany({
-    where: { status: 'approved', vendor: { brandName } },
+    where: { status: 'approved', vendor: { brandName, active: true } },
     include: { category: true, vendor: true, variants: true },
     orderBy: { id: 'asc' },
   });
@@ -452,7 +452,7 @@ export async function getProductsPaginated(
   options: PaginatedOptions
 ): Promise<PaginatedResult> {
   const db = getDb();
-  const where: Prisma.ProductWhereInput = { status: 'approved' };
+  const where: Prisma.ProductWhereInput = { status: 'approved', vendor: { active: true } };
   if (options.categorySlugs && options.categorySlugs.length > 0) {
     where.category = {
       slug: { in: options.categorySlugs },
