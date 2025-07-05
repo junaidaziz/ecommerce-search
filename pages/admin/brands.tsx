@@ -1,7 +1,6 @@
 import { useContext, useCallback, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import type { Vendor } from '@/types';
-import { UserRole } from '@/types';
+import type { Vendor, UserRole } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';

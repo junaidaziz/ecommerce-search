@@ -3,8 +3,7 @@ import { useEffect, useState, useContext, ChangeEvent } from 'react';
 import Head from 'next/head';
 import { AppContext } from '@contexts/AppContext';
 import { TextInput } from '@components/form-fields';
-import type { Coupon } from '@/types';
-import { UserRole } from '@/types';
+import type { Coupon, UserRole } from '@/types';
 import { getPageTitle } from '@lib/pageTitle';
 
 export default function AdminCoupons() {
