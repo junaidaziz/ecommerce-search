@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import { PendingProduct, ApiMessage } from '@/types';
+import { PendingProduct, ApiMessage, UserRole } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
@@ -34,7 +34,7 @@ export default function Approvals() {
 
   if (!user)
     return <div className="p-4">Please log in to view vendor products.</div>;
-  if (user.role !== 'super-admin')
+  if (user.role !== UserRole.SUPER_ADMIN)
     return <div className="p-4">Admin access required.</div>;
 
   return (

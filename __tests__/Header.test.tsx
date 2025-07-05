@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 // Update the import path below if your Header component is located elsewhere
 import Header from '@components/Layout/Header';
+import { UserRole } from '@/types';
 // Update the path below to the correct relative path where AppContext is defined
 import { AppContext } from '@contexts/AppContext';
 
@@ -55,7 +56,7 @@ test('shows login and signup when unauthenticated', () => {
 
 test('shows name and cart count when authenticated', () => {
   const user = {
-    role: 'super-admin',
+    role: UserRole.SUPER_ADMIN,
     firstName: 'Alice',
     lastName: 'Smith',
     email: 'a@a.com',
