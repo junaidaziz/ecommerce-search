@@ -6,8 +6,8 @@ import React from 'react';
 
 interface CartDropdownProps {
   cart: CartItem[];
-  changeQty: (id: string, delta: number) => void;
-  removeFromCart: (id: string) => void;
+  changeQty: (id: string, delta: number, variantId?: number) => void;
+  removeFromCart: (id: string, variantId?: number) => void;
   itemCount: number;
 }
 
@@ -75,7 +75,7 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ cart, changeQty, removeFrom
                         aria-label="Decrease quantity"
                         onFocus={(e) => e.currentTarget.classList.add('ring-2', 'ring-primary')}
                         onBlur={(e) => e.currentTarget.classList.remove('ring-2', 'ring-primary')}
-                        onClick={() => changeQty(String(item.id), -1)}
+                        onClick={() => changeQty(String(item.id), -1, item.variant?.id)}
                       >
                         -
                       </button>
@@ -87,7 +87,7 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ cart, changeQty, removeFrom
                         aria-label="Increase quantity"
                         onFocus={(e) => e.currentTarget.classList.add('ring-2', 'ring-primary')}
                         onBlur={(e) => e.currentTarget.classList.remove('ring-2', 'ring-primary')}
-                        onClick={() => changeQty(String(item.id), 1)}
+                        onClick={() => changeQty(String(item.id), 1, item.variant?.id)}
                       >
                         +
                       </button>
@@ -99,7 +99,7 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ cart, changeQty, removeFrom
                       aria-label="Remove from cart"
                       onFocus={(e) => e.currentTarget.classList.add('ring-2', 'ring-primary')}
                       onBlur={(e) => e.currentTarget.classList.remove('ring-2', 'ring-primary')}
-                      onClick={() => removeFromCart(String(item.id))}
+                      onClick={() => removeFromCart(String(item.id), item.variant?.id)}
                     >
                       <TrashIcon className="w-4 h-4" />
                       <span className="sr-only">Remove</span>

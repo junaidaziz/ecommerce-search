@@ -12,10 +12,12 @@ export interface AppContextValue {
   signup: <T>(url: string, payload: Record<string, unknown>) => Promise<T>;
   logout: () => void;
   addToCart: (product: Product, variant?: Variant) => void;
-  changeQty: (id: string, delta: number) => void;
-  removeFromCart: (id: string) => void;
+  changeQty: (id: string, delta: number, variantId?: number) => void;
+  removeFromCart: (id: string, variantId?: number) => void;
   clearCart: () => void;
   addToWishlist: (product: Product, notifyOnStock?: boolean) => void;
   removeFromWishlist: (productId: string | number) => void;
   placeOrder: (shipping: ShippingInfo) => Promise<boolean>;
+  isInCart: (productId: string | number, variantId?: number) => boolean;
+  getCartItemQuantity: (productId: string | number, variantId?: number) => number;
 }
