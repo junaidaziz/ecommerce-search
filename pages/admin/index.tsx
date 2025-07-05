@@ -7,7 +7,7 @@ import {
 } from 'react';
 import Link from 'next/link';
 import { AppContext } from '@contexts/AppContext';
-import { Product, ProductInput, ApiMessage } from '@/types';
+import { Product, ProductInput, ApiMessage, UserRole } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import { TextInput } from '@components/form-fields';
 import Head from 'next/head';
@@ -136,7 +136,7 @@ export default function Admin() {
   if (!user) {
     return <div className="p-4">Please log in to view your products.</div>;
   }
-  if (user.role !== 'super-admin') {
+  if (user.role !== UserRole.SUPER_ADMIN) {
     return <div className="p-4">Admin access required.</div>;
   }
 

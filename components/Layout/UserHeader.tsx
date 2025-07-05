@@ -25,6 +25,7 @@ import DropdownMenu from '@components/common/DropdownMenu';
 import '@styles/category-dropdown.css';
 import type { Category } from '@/types';
 import type { User } from '@/types';
+import { UserRole } from '@/types';
 
 interface HeaderProps {
   theme?: string;
@@ -163,10 +164,7 @@ const Header: FC<HeaderProps> = ({
   const itemCount = cart.reduce((sum, item) => sum + (item.qty || 0), 0);
   const logout = () => signOut({ callbackUrl: '/', redirect: true });
 
-  const isSuperAdmin =
-    user &&
-    user.role &&
-    user.role.toLowerCase().replace('_', '-') === 'super-admin';
+  const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
 
   const menuItems = [
     { label: 'My Orders', href: '/orders' },
