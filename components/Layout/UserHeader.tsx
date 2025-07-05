@@ -22,6 +22,7 @@ import DEFAULT_CATEGORIES from '@lib/defaultCategories';
 import TrashIcon from '../icons/TrashIcon';
 import SearchBar from './SearchBar';
 import DropdownMenu from '@components/common/DropdownMenu';
+import '@/styles/category-dropdown.css';
 import type { Category } from '@/types';
 import type { User } from '@/types';
 
@@ -58,7 +59,8 @@ const Header: FC<HeaderProps> = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [hoveredCat, setHoveredCat] = useState<Category | null>(null);
+  const [activeCat, setActiveCat] = useState<Category | null>(null);
+  const hoverDelay = useRef<NodeJS.Timeout | null>(null);
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const closeDropdown = () => {
@@ -79,11 +81,26 @@ const Header: FC<HeaderProps> = ({
       clearTimeout(closeTimeout.current);
       closeTimeout.current = null;
     }
+    if (hoverDelay.current) {
+      clearTimeout(hoverDelay.current);
+      hoverDelay.current = null;
+    }
     setMenuOpen(true);
   };
 
   const handleMenuLeave = () => {
+    if (hoverDelay.current) {
+      clearTimeout(hoverDelay.current);
+      hoverDelay.current = null;
+    }
     closeTimeout.current = setTimeout(() => setMenuOpen(false), 150);
+  };
+
+  const handleCategoryHover = (cat: Category) => {
+    if (hoverDelay.current) clearTimeout(hoverDelay.current);
+    hoverDelay.current = setTimeout(() => {
+      setActiveCat(cat);
+    }, 150);
   };
 
   useEffect(() => {
@@ -139,7 +156,7 @@ const Header: FC<HeaderProps> = ({
 
   useEffect(() => {
     if (menuOpen && categories.length > 0) {
-      setHoveredCat(categories[0]);
+      setActiveCat(categories[0]);
     }
   }, [menuOpen, categories]);
 
@@ -228,19 +245,19 @@ const Header: FC<HeaderProps> = ({
                   aria-hidden={!menuOpen}
                 >
                   <div className="flex gap-6">
-                    <div className="pr-4 border-r border-base-200 grid grid-cols-2 sm:grid-cols-3 gap-2 min-w-[220px] max-w-sm">
+                    <div className="pr-4 border-r border-base-200 category-list min-w-[220px] max-w-xs">
                       {categories.map((cat) => (
                         <Link
                           key={cat.name}
                           href={`/categories/${encodeURIComponent(cat.name)}`}
                           role="menuitem"
                           aria-haspopup={!!cat.subcategories?.length}
-                          aria-expanded={hoveredCat?.name === cat.name}
-                          onFocus={() => setHoveredCat(cat)}
-                          onMouseEnter={() => setHoveredCat(cat)}
+                          aria-expanded={activeCat?.name === cat.name}
+                          onFocus={() => handleCategoryHover(cat)}
+                          onMouseEnter={() => handleCategoryHover(cat)}
                           onClick={() => setMenuOpen(false)}
                           title={cat.name}
-                          className="flex items-center gap-1 px-2 py-1 rounded text-left font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 focus:outline-none capitalize whitespace-normal line-clamp-2 hover:bg-base-200 hover:text-primary hover:underline hover:scale-105 cursor-pointer"
+                          className={`flex items-center gap-1 px-2 py-1 rounded text-left font-medium tracking-wide transition-colors transition-transform duration-200 focus:outline-none capitalize whitespace-normal hover:bg-base-200 hover:text-primary hover:underline hover:scale-105 cursor-pointer ${activeCat?.name === cat.name ? 'bg-base-200 text-primary' : 'text-gray-800'}`}
                         >
                           {iconMap[cat.name] || null}
                           <span>{cat.name}</span>
@@ -253,16 +270,16 @@ const Header: FC<HeaderProps> = ({
                         <span>No categories found</span>
                       )}
                     </div>
-                    {hoveredCat?.subcategories &&
-                    hoveredCat.subcategories.length > 0 ? (
+                    {activeCat?.subcategories &&
+                    activeCat.subcategories.length > 0 ? (
                       <ul
                         className="min-w-[200px] pl-4 space-y-1 fade-in"
                         role="menu"
                       >
-                        {hoveredCat.subcategories.map((sub) => (
+                        {activeCat.subcategories.map((sub) => (
                           <li key={sub.name} className="capitalize" role="none">
                             <Link
-                              href={`/categories/${encodeURIComponent(hoveredCat.name)}?type=${encodeURIComponent(sub.name)}`}
+                              href={`/categories/${encodeURIComponent(activeCat.name)}?type=${encodeURIComponent(sub.name)}`}
                               role="menuitem"
                               className="block font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 whitespace-nowrap truncate hover:text-primary hover:underline hover:scale-105"
                             >
