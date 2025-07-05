@@ -3,7 +3,7 @@ import { deleteUserById, findUserById } from '@lib/users';
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { ID_REQUIRED, METHOD_NOT_ALLOWED } from '@/constants/messages';
-import type { ApiMessage } from '@/types';
+import { UserRole, type ApiMessage } from '@/types';
 
 async function handler(
   req: NextApiRequest,
@@ -19,7 +19,7 @@ async function handler(
     if (isNaN(id)) return res.status(400).json({ message: ID_REQUIRED });
 
     const target = await findUserById(id);
-    if (target?.role === 'SUPER_ADMIN') {
+    if (target?.role === UserRole.SUPER_ADMIN) {
       return res.status(403).json({ message: 'cannot delete super admin' });
     }
 
@@ -30,4 +30,4 @@ async function handler(
   }
 }
 
-export default withRole(['SUPER_ADMIN'])(handler);
+export default withRole([UserRole.SUPER_ADMIN])(handler);
