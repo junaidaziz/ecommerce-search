@@ -1,14 +1,12 @@
-import '../styles/globals.css';
-import 'react-quill/dist/quill.snow.css';
-import '@/styles/category-dropdown.css';
+import { SessionProvider } from 'next-auth/react';
+import { AppProps } from 'next/app';
+import { NotificationProvider } from '@contexts/NotificationContext';
+import { ChatProvider } from '@contexts/ChatContext';
 import { AppProvider } from '@contexts/AppContext';
 import Layout from '@components/Layout/Layout';
-import { SessionProvider } from 'next-auth/react';
-import { NotificationProvider } from '@contexts/NotificationContext';
 import { Toaster } from 'sonner';
-import { ChatProvider } from '@contexts/ChatContext';
-
-import type { AppProps } from 'next/app';
+import 'react-quill/dist/quill.snow.css';
+import '../styles/globals.css';
 
 export default function App({
   Component,
@@ -16,6 +14,7 @@ export default function App({
 }: AppProps & { pageProps: { session: any } }) {
   const HeroSecond = (Component as any).heroSecond;
   const maxWidthClass = (Component as any).maxWidthClass;
+
   return (
     <SessionProvider session={session}>
       <NotificationProvider>

@@ -43,6 +43,7 @@ export default function ProductImageSlider({
           fill
           sizes="100vw"
           className={`object-cover ${imgClass}`}
+          loading="lazy"
         />
       </div>
     );
@@ -60,6 +61,7 @@ export default function ProductImageSlider({
         className={`object-cover cursor-zoom-in ${imgClass}`}
         onClick={() => setZoom(true)}
         onError={() => setErrorMap((m) => ({ ...m, [idx]: true }))}
+        loading="lazy"
       />
       {urls.length > 1 && (
         <>
@@ -115,6 +117,7 @@ export default function ProductImageSlider({
                 width={800}
                 height={800}
                 className="w-full h-auto object-contain max-h-[80vh]"
+                loading="lazy"
               />
               {urls.length > 1 && (
                 <>

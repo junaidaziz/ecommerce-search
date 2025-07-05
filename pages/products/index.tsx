@@ -3,12 +3,7 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import ProductFilters from '@components/Product/ProductFilters';
-import ActiveFilters from '@components/ActiveFilters';
-import ProductGrid from '@components/Product/ProductGrid';
 import Loader from '@components/Loader';
-import InfiniteLoader from '@components/InfiniteLoader';
-import SortMenu, { SortValue } from '@components/SortMenu';
 import { getPageTitle } from '@lib/pageTitle';
 import {
   getProductsPaginated,
@@ -18,6 +13,14 @@ import {
 import type { Product, Category } from '@/types';
 import { serializeDates } from '@utils/serializeDates';
 import { NotificationContext } from '../../contexts/NotificationContext';
+import { 
+  ProductFilters,
+  ActiveFilters,
+  ProductGrid,
+  InfiniteLoader,
+  SortMenu
+} from '@lib/dynamicImports';
+import type { SortValue } from '@components/SortMenu';
 
 interface ProductsProps {
   products: Product[];

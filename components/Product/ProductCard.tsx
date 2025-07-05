@@ -1,51 +1,36 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import ProductImageSlider from './ProductImageSlider';
-import { AppContext } from '@contexts/AppContext';
-import type { AppContextValue } from '@/types';
 import type { Product } from '@/types';
 import { formatCurrency } from '@utils/formatCurrency';
+import ProductImageSlider from './ProductImageSlider';
 
 interface ProductCardProps {
   product: Product;
-  highlightTitle?: string;
-  highlightDescription?: string;
-  /** Render a smaller card variant */
-  compact?: boolean;
   className?: string;
+  inWishlist?: boolean;
+  addToWish?: (product: Product) => void;
+  removeFromWish?: (productId: string | number) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
-  highlightTitle,
-  highlightDescription,
-  compact = false,
   className = '',
+  inWishlist = false,
+  addToWish,
+  removeFromWish,
 }) => {
-  const context = useContext(AppContext) as AppContextValue;
-  const addToCart = context?.addToCart;
-  const addToWish = context?.addToWishlist;
-  const removeFromWish = context?.removeFromWishlist;
-  const wishlist = context?.wishlist || [];
-  const inWishlist = wishlist.some((w) => w.product.id === product.id);
-
-  const inventory =
-    product.totalInventory !== undefined
-      ? product.totalInventory
-      : product.quantity;
-  const isOut = typeof inventory === 'number' && inventory <= 0;
-  const finalPrice =
-    product.discountType === 'percentage'
-      ? product.minPrice -
-        ((product.minPrice * (product.discountValue || 0)) / 100)
-      : product.discountType === 'fixed'
-        ? product.minPrice - (product.discountValue || 0)
-        : product.minPrice;
-  const onSale =
-    (product.discountType !== null && product.discountType !== undefined) ||
-    product.maxPrice > product.minPrice;
   const isNew = product.tags?.toLowerCase().includes('new');
   const rating = Math.round(product.averageRating || 0);
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (inWishlist) {
+      removeFromWish && removeFromWish(product.id);
+    } else {
+      addToWish && addToWish(product);
+    }
+  };
 
   return (
     <div
@@ -54,94 +39,49 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <button
         type="button"
         className="absolute top-2 right-2 z-10 btn btn-ghost btn-xs"
-        onClick={(e) => {
-          e.preventDefault();
-          inWishlist
-            ? removeFromWish && removeFromWish(product.id)
-            : addToWish && addToWish(product);
-        }}
+        onClick={handleWishlistToggle}
       >
         {inWishlist ? '❤' : '♡'}
       </button>
       <Link href={`/product/${product.slug}`} className="block overflow-hidden">
         <ProductImageSlider
-          images={
-            product.featuredImage
-              ? [product.featuredImage]
-              : product.images && product.images.length > 0
-                ? [product.images[0]]
-                : []
-          }
-          placeholderSeed={Number(product.id)}
-          className="w-full bg-gray-200 flex items-center justify-center"
-          imgClass="transition-transform duration-200 group-hover:scale-105"
-          aspectRatioClass="aspect-square"
+          images={product.images || []}
+          className="aspect-square w-full"
         />
       </Link>
-      {(isNew || onSale || isOut) && (
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
-          {isNew && <span className="badge badge-primary">New</span>}
-          {onSale && (
-            <span className="badge badge-secondary">
-              {product.discountType === 'percentage'
-                ? `${product.discountValue}% OFF`
-                : product.discountType === 'fixed'
-                ? `${formatCurrency(product.discountValue || 0, product.currency)} OFF`
-                : 'Sale'}
-            </span>
+      <div className="flex-1 p-4 flex flex-col">
+        <div className="flex items-center gap-2 mb-2">
+          {isNew && (
+            <span className="badge badge-primary badge-sm">New</span>
           )}
-          {isOut && <span className="badge">Out of stock</span>}
-        </div>
-      )}
-      <div className={`${compact ? 'p-1 gap-0.5' : 'p-2 gap-1'} flex flex-col`}>
-        <Link
-          href={`/product/${product.slug}`}
-          className={`font-semibold line-clamp-2 hover:underline ${compact ? 'text-sm' : 'text-base'}`}
-        >
-          <span
-            dangerouslySetInnerHTML={{
-              __html: highlightTitle || product.title || 'Untitled Product',
-            }}
-          />
-        </Link>
-        <p
-          className={`text-base-content line-clamp-2 ${compact ? 'text-xs' : 'text-sm'}`}
-        >
-          <span
-            dangerouslySetInnerHTML={{
-              __html:
-                highlightDescription ||
-                product.descriptionText ||
-                product.bodyHtmlText ||
-                'No description available.',
-            }}
-          />
-        </p>
-        <div
-          className={`flex justify-between items-center mt-auto ${compact ? 'text-xs' : 'text-sm'}`}
-        >
-          <span className={`font-bold ${compact ? 'text-sm' : 'text-base'}`}>
-            {formatCurrency(finalPrice ?? 0, product.currency)}
-          </span>
-          {onSale && (
-            <span className="ml-1 line-through text-sm text-gray-500">
-              {formatCurrency(product.minPrice ?? 0, product.currency)}
-            </span>
-          )}
-          {product.reviewCount > 0 && (
-            <span className="text-xs">
-              {'★'.repeat(rating)}
-              {'☆'.repeat(5 - rating)} ({product.averageRating.toFixed(1)})
-            </span>
+          {rating > 0 && (
+            <div className="flex items-center gap-1">
+              <span className="text-yellow-400">★</span>
+              <span className="text-sm text-gray-600">{rating}</span>
+            </div>
           )}
         </div>
-        <button
-          className={`btn btn-primary absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity ${compact ? 'btn-xs' : 'btn-sm'}`}
-          onClick={() => addToCart && addToCart(product)}
-          disabled={!addToCart}
-        >
-          Add to Cart
-        </button>
+        <h3 className="font-medium text-gray-900 line-clamp-2 mb-2">
+          {product.title}
+        </h3>
+        <div className="mt-auto">
+          <p className="text-lg font-semibold text-gray-900">
+            {formatCurrency(product.minPrice)}
+            {product.maxPrice && product.maxPrice > product.minPrice && (
+              <span className="text-gray-500">
+                {' '}
+                - {formatCurrency(product.maxPrice)}
+              </span>
+            )}
+          </p>
+          {product.totalInventory !== undefined && (
+            <p className="text-xs text-gray-500 mt-1">
+              {product.totalInventory > 0
+                ? `${product.totalInventory} in stock`
+                : 'Out of stock'}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
