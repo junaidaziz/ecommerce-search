@@ -3,8 +3,7 @@ import Head from 'next/head';
 import { AppContext } from '@contexts/AppContext';
 import { fetchJson } from '@utils/fetchJson';
 import { getPageTitle } from '@lib/pageTitle';
-import type { SupportTicket } from '@/types';
-import { UserRole } from '@/types';
+import type { SupportTicket, UserRole } from '@/types';
 
 export default function SupportTickets() {
   const { user } = useContext(AppContext)!;
