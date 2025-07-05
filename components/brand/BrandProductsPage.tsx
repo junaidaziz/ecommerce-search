@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { AppContext } from '@contexts/AppContext';
 import type { User } from '@/types';
 import type { Product } from '@/types';
+import { UserRole } from '@/types';
 import { getPageTitle } from '@lib/pageTitle';
 import ProductTable from './ProductTable';
 import ProductDetailsModal from './ProductDetailsModal';
@@ -121,7 +122,7 @@ const BrandProductsPage: React.FC = () => {
   if (!user) {
     return <div className="p-4">Please log in to manage products.</div>;
   }
-  if (user.role !== 'brand') {
+  if (user.role !== 'brand' && user.role !== UserRole.SUPER_ADMIN) {
     return <div className="p-4">Brand access required.</div>;
   }
 

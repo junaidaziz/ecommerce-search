@@ -3,6 +3,7 @@ import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import { NotificationContext } from '@contexts/NotificationContext';
 import type { Order } from '@/types';
+import { UserRole } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 
@@ -49,7 +50,7 @@ export default function VendorOrders() {
   if (!user) {
     return <div className="p-4">Please log in to view orders.</div>;
   }
-  if (user.role !== 'brand') {
+  if (user.role !== 'brand' && user.role !== UserRole.SUPER_ADMIN) {
     return <div className="p-4">Brand access required.</div>;
   }
 
