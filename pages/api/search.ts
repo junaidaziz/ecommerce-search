@@ -108,18 +108,28 @@ export default async function handler(
       .collections('products')
       .documents()
       .search(searchParams);
-    const hits =
+    let hits =
       result.hits?.map((h: any) => ({
         ...h.document,
         highlights: h.highlights,
       })) || [];
+    const brandNames = Array.from(new Set(hits.map((h: any) => h.brand))).filter(Boolean);
+    let activeSet = new Set<string>();
+    if (brandNames.length > 0) {
+      const activeRows = await db.user.findMany({
+        where: { role: 'BRAND', brandName: { in: brandNames }, active: true },
+        select: { brandName: true },
+      });
+      activeSet = new Set(activeRows.map((r) => r.brandName || ''));
+    }
+    hits = hits.filter((h: any) => activeSet.has(h.brand));
     const totalPages = Math.ceil(result.found / searchParams.per_page);
     const brands: string[] = [];
     const categories: string[] = [];
     if (Array.isArray(result.facet_counts)) {
       for (const facet of result.facet_counts as FacetCount[]) {
         if (facet.field_name === 'brand') {
-          brands.push(...facet.counts.map((c) => c.value));
+          brands.push(...facet.counts.map((c) => c.value).filter((b) => activeSet.has(b)));
         }
         if (facet.field_name === 'category') {
           categories.push(...facet.counts.map((c) => c.value));
@@ -153,7 +163,7 @@ export default async function handler(
     }
     return res.status(200).json({
       results: hits,
-      total: result.found,
+      total: hits.length,
       page: searchParams.page,
       totalPages,
       brands,

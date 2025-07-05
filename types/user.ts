@@ -30,6 +30,7 @@ export interface User {
   resetExpires?: Date;
   verified?: boolean;
   disabled?: boolean;
+  active?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
