@@ -26,7 +26,7 @@ function mergeCarts(
   for (const item of serverItems) {
     const idx = merged.findIndex(
       (p) =>
-        p.id === item.id &&
+        String(p.id) === String(item.id) &&
         (item.variant?.id ? p.variant?.id === item.variant.id : !p.variant?.id)
     );
     if (idx >= 0) {
@@ -221,12 +221,12 @@ export function AppProvider({ children }: AppProviderProps) {
     let qty = 1;
     setCart((prev) => {
       const existing = prev.find(
-        (p) => p.id === product.id && (!variant || p.variant?.id === variant.id)
+        (p) => String(p.id) === String(product.id) && (!variant || p.variant?.id === variant.id)
       );
       if (existing) {
         qty = existing.qty + 1;
         return prev.map((p) =>
-          p.id === product.id && (!variant || p.variant?.id === variant.id)
+          String(p.id) === String(product.id) && (!variant || p.variant?.id === variant.id)
             ? { ...p, qty }
             : p
         );
@@ -238,24 +238,34 @@ export function AppProvider({ children }: AppProviderProps) {
 
   const changeQty = (id: string, delta: number, variantId?: number) => {
     setCart((prev) => {
-      return prev
-        .map((item) =>
-          item.id === id && (!variantId || item.variant?.id === variantId)
+      const newCart = prev
+        .map((item) => {
+          // Convert both IDs to strings for comparison
+          const itemIdStr = String(item.id);
+          const targetIdStr = String(id);
+          const shouldUpdate = itemIdStr === targetIdStr && (!variantId || item.variant?.id === variantId);
+          return shouldUpdate
             ? { ...item, qty: item.qty + delta }
-            : item
-        )
+            : item;
+        })
         .filter((item) => item.qty > 0);
+      return newCart;
     });
     addNotification('Quantity updated', 'success');
   };
 
   const removeFromCart = (id: string, variantId?: number) => {
-    setCart((prev) =>
-      prev.filter(
-        (item) =>
-          !(item.id === id && (!variantId || item.variant?.id === variantId))
-      )
-    );
+    setCart((prev) => {
+      const newCart = prev.filter(
+        (item) => {
+          // Convert both IDs to strings for comparison
+          const itemIdStr = String(item.id);
+          const targetIdStr = String(id);
+          return !(itemIdStr === targetIdStr && (!variantId || item.variant?.id === variantId));
+        }
+      );
+      return newCart;
+    });
     addNotification('Product removed from cart', 'error');
   };
 
@@ -308,6 +318,26 @@ export function AppProvider({ children }: AppProviderProps) {
     addNotification('Removed from wishlist', 'warning');
   };
 
+  // Helper function to check if a product is in cart
+  const isInCart = (productId: string | number, variantId?: number) => {
+    const result = cart.some(
+      (item) => 
+        String(item.id) === String(productId) && 
+        (!variantId || item.variant?.id === variantId)
+    );
+    return result;
+  };
+
+  // Helper function to get cart item quantity
+  const getCartItemQuantity = (productId: string | number, variantId?: number) => {
+    const item = cart.find(
+      (item) => 
+        String(item.id) === String(productId) && 
+        (!variantId || item.variant?.id === variantId)
+    );
+    return item?.qty || 0;
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -324,6 +354,8 @@ export function AppProvider({ children }: AppProviderProps) {
         addToWishlist,
         removeFromWishlist,
         placeOrder,
+        isInCart,
+        getCartItemQuantity,
       }}
     >
       {children}

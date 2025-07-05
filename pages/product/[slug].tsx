@@ -17,6 +17,10 @@ import { mapDbRowToProduct } from '@lib/products';
 import { Product, Review } from '@/types';
 import { SelectDropdown, Textarea } from '@components/form-fields';
 import { serializeDates } from '@utils/serializeDates';
+import CheckCircleIcon from '@components/icons/CheckCircleIcon';
+import WarningIcon from '@components/icons/WarningIcon';
+import CartIcon from '@components/icons/CartIcon';
+import ChevronLeftIcon from '@components/icons/ChevronLeftIcon';
 
 type ProductDetailProps = {
   product: Product;
@@ -61,6 +65,7 @@ export default function ProductDetail({
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [averageRating, setAverageRating] = useState<number>(initialAverage);
   const [reviewCount, setReviewCount] = useState<number>(initialCount);
+  const [quantity, setQuantity] = useState<number>(1);
   type ReviewForm = { rating: number; comment: string };
   const { register, handleSubmit, reset, watch, control } = useForm<ReviewForm>(
     {
@@ -69,6 +74,8 @@ export default function ProductDetail({
   );
   const myRating = watch('rating');
   const id = product?.id;
+
+  const [variantId, setVariantId] = useState<string>('');
 
   useEffect(() => {
     try {
@@ -86,15 +93,40 @@ export default function ProductDetail({
   }, [id]);
 
   if (!appCtx) return null;
-  const { addToCart, addToWishlist, removeFromWishlist, wishlist, user } =
-    appCtx;
-  const [variantId, setVariantId] = useState<string>('');
+  const { 
+    addToCart, 
+    addToWishlist, 
+    removeFromWishlist, 
+    removeFromCart,
+    changeQty,
+    isInCart,
+    getCartItemQuantity,
+    wishlist, 
+    user 
+  } = appCtx;
   const selectedVariant = product.variants?.find(
     (v) => String(v.id) === variantId
   );
 
+  const isInWishlist = wishlist?.some((w) => w.product.id === product.id);
+  const isProductInCart = isInCart(product.id, selectedVariant?.id);
+  const cartItemQuantity = getCartItemQuantity(product.id, selectedVariant?.id);
+  
+
+  const stockStatus = product.totalInventory && product.totalInventory > 10
+    ? 'In Stock'
+    : product.totalInventory && product.totalInventory > 0
+      ? 'Low Stock'
+      : 'Out of Stock';
+
+  const price = parseFloat(
+    typeof product.minPrice === 'number'
+      ? product.minPrice.toString()
+      : product.minPrice || '0'
+  ).toFixed(2);
+
   return (
-    <div className="p-6 max-w-screen-2xl mx-auto bg-base-100 rounded-box shadow-md min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-base-100 via-base-200/30 to-base-100">
       <Head>
         <title>{getPageTitle(product.title || 'Product')}</title>
         <meta
@@ -102,30 +134,240 @@ export default function ProductDetail({
           content={product.descriptionText?.slice(0, 150)}
         />
       </Head>
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="md:w-1/2 flex justify-center">
-          <ProductImageSlider
-            className="w-11/12 md:w-10/12 mx-auto max-h-80 md:max-h-96"
-            images={
-              product.images && product.images.length > 0
-                ? product.images
-                : product.featuredImage
-                  ? [product.featuredImage]
-                  : []
-            }
-            imgClass="hover:scale-110 transition"
-            aspectRatioClass="aspect-square md:aspect-[4/3]"
-          />
+
+      {/* Breadcrumb Navigation */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <nav className="flex items-center space-x-2 text-sm text-base-content/70 mb-6">
+          <Link href="/" className="hover:text-primary transition-colors">
+            Home
+          </Link>
+          <span>/</span>
+          <Link href="/products" className="hover:text-primary transition-colors">
+            Products
+          </Link>
+          <span>/</span>
+          <span className="text-base-content font-medium">{product.title}</span>
+        </nav>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Product Images */}
+          <div className="space-y-6">
+            <div className="bg-base-100 rounded-2xl shadow-lg p-6">
+              <ProductImageSlider
+                className="w-full aspect-square"
+                images={
+                  product.images && product.images.length > 0
+                    ? product.images
+                    : product.featuredImage
+                      ? [product.featuredImage]
+                      : []
+                }
+                imgClass="hover:scale-105 transition-transform duration-300 rounded-xl"
+                aspectRatioClass="aspect-square"
+              />
+            </div>
+          </div>
+
+          {/* Product Information */}
+          <div className="space-y-8">
+            {/* Product Header */}
+            <div className="space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h1 className="text-3xl lg:text-4xl font-bold text-base-content mb-2">
+                    {product.title}
+                  </h1>
+                  <div className="flex items-center space-x-4 text-sm text-base-content/70">
+                    <span>Vendor: {product.vendor?.brandName ?? 'Unknown'}</span>
+                    <span>•</span>
+                    <span>SKU: {product.sku || 'N/A'}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => isInWishlist ? removeFromWishlist(product.id) : addToWishlist(product)}
+                  className={`btn btn-circle btn-sm transition-all duration-200 ${
+                    isInWishlist 
+                      ? 'btn-primary text-primary-content' 
+                      : 'btn-ghost hover:btn-primary'
+                  }`}
+                  aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+                >
+                  <svg className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                </button>
+              </div>
+
+                             {/* Rating */}
+               <div className="flex items-center space-x-2">
+                 <div className="flex items-center">
+                   {[1, 2, 3, 4, 5].map((star) => (
+                     <svg
+                       key={star}
+                       className={`w-5 h-5 ${
+                         star <= averageRating
+                           ? 'text-yellow-400 fill-current'
+                           : 'text-gray-300'
+                       }`}
+                       viewBox="0 0 24 24"
+                     >
+                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                     </svg>
+                   ))}
+                 </div>
+                 <span className="text-sm text-base-content/70">
+                   {averageRating.toFixed(1)} ({reviewCount} reviews)
+                 </span>
+               </div>
+            </div>
+
+            {/* Price and Stock */}
+            <div className="bg-base-200/50 rounded-xl p-6 space-y-4">
+                             <div className="flex items-baseline space-x-2">
+                 <span className="text-4xl font-bold text-primary">
+                   {product.currency} {price}
+                 </span>
+               </div>
+
+               <div className="flex items-center space-x-2">
+                 {stockStatus === 'In Stock' ? (
+                   <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                 ) : stockStatus === 'Low Stock' ? (
+                   <WarningIcon className="w-5 h-5 text-yellow-500" />
+                 ) : (
+                   <WarningIcon className="w-5 h-5 text-red-500" />
+                 )}
+                 <span className={`font-medium ${
+                   stockStatus === 'In Stock' ? 'text-green-600' :
+                   stockStatus === 'Low Stock' ? 'text-yellow-600' : 'text-red-600'
+                 }`}>
+                   {stockStatus}
+                 </span>
+                 {product.totalInventory && (
+                   <span className="text-sm text-base-content/70">
+                     ({product.totalInventory} available)
+                   </span>
+                 )}
+               </div>
+            </div>
+
+            {/* Variants */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-base-content">
+                  Select Variant
+                </label>
+                <select
+                  className="select select-bordered w-full"
+                  value={variantId}
+                  onChange={(e) => setVariantId(e.target.value)}
+                >
+                  <option value="">Choose an option</option>
+                  {product.variants.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {Object.entries(v.attributes)
+                        .map(([k, val]) => `${k}: ${val}`)
+                        .join(', ')} - Stock {v.quantity}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Cart Actions */}
+            <div className="space-y-4">
+              {isProductInCart ? (
+                // Product is in cart - show quantity controls and remove button
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-base-content">
+                      Quantity in Cart
+                    </span>
+                    <span className="text-lg font-bold text-primary">
+                      {cartItemQuantity}
+                    </span>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <button
+                      className="btn btn-outline flex-1"
+                      onClick={() => changeQty(String(product.id), -1, selectedVariant?.id)}
+                      disabled={cartItemQuantity <= 1}
+                    >
+                      -
+                    </button>
+                    <button
+                      className="btn btn-outline flex-1"
+                      onClick={() => changeQty(String(product.id), 1, selectedVariant?.id)}
+                    >
+                      +
+                    </button>
+                    <button
+                      className="btn btn-error"
+                      onClick={() => removeFromCart(String(product.id), selectedVariant?.id)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                // Product not in cart - show add to cart
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <label className="text-sm font-medium text-base-content">
+                      Quantity
+                    </label>
+                    <div className="flex items-center border border-base-300 rounded-lg">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="px-3 py-2 hover:bg-base-200 transition-colors"
+                        disabled={quantity <= 1}
+                      >
+                        -
+                      </button>
+                      <span className="px-4 py-2 min-w-[3rem] text-center">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="px-3 py-2 hover:bg-base-200 transition-colors"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    className="btn btn-primary btn-lg w-full transition-all duration-200 hover:scale-105"
+                    onClick={() => addToCart(product, selectedVariant)}
+                    disabled={(product.variants && product.variants.length > 0 && !selectedVariant) || stockStatus === 'Out of Stock'}
+                  >
+                    <CartIcon className="w-5 h-5 mr-2" />
+                    Add to Cart
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Product Type */}
+            {product.productType && (
+              <div className="flex items-center space-x-2 text-sm">
+                <span className="text-base-content/70">Type:</span>
+                <span className="badge badge-outline">{product.productType}</span>
+              </div>
+            )}
+
+
+          </div>
         </div>
-        <div className="md:w-1/2">
-          <h1 className="text-2xl font-bold mb-4">{product.title}</h1>
-          <p className="mb-2">
-            Vendor: {product.vendor?.brandName ?? 'Unknown'}
-          </p>
-          <p className="mb-2">SKU: {product.sku || 'N/A'}</p>
-          <p className="mb-2">Type: {product.productType || 'N/A'}</p>
-          <p
-            className="mb-4"
+
+        {/* Product Description */}
+        <div className="mt-12 bg-base-100 rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold mb-6">Product Description</h2>
+          <div 
+            className="prose prose-lg max-w-none"
             dangerouslySetInnerHTML={{
               __html:
                 product.description ||
@@ -134,139 +376,122 @@ export default function ProductDetail({
                 'No description available.',
             }}
           />
-          <p className="text-lg font-bold mb-4">
-            {product.currency}{' '}
-            {parseFloat(
-              typeof product.minPrice === 'number'
-                ? product.minPrice.toString()
-                : product.minPrice || '0'
-            ).toFixed(2)}
-          </p>
-          {product.variants && product.variants.length > 0 && (
-            <select
-              className="select select-bordered mb-2"
-              value={variantId}
-              onChange={(e) => setVariantId(e.target.value)}
-            >
-              <option value="">Select Variant</option>
-              {product.variants.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {Object.entries(v.attributes)
-                    .map(([k, val]) => `${k}: ${val}`)
-                    .join(', ')}{' '}
-                  - Stock {v.quantity}
-                </option>
-              ))}
-            </select>
-          )}
-          <p className="mb-2 font-medium">
-            Stock:{' '}
-            {product.totalInventory && product.totalInventory > 10
-              ? 'In Stock'
-              : product.totalInventory && product.totalInventory > 0
-                ? 'Low Stock'
-                : 'Out of Stock'}
-          </p>
-          <p className="mb-2">
-            Rating: {averageRating.toFixed(1)} ({reviewCount})
-          </p>
-          <div className="flex gap-2">
-            <button
-              className="btn btn-primary transition-all duration-200"
-              onClick={() => addToCart(product, selectedVariant)}
-              disabled={product.variants && !selectedVariant}
-            >
-              Add to Cart
-            </button>
-            {wishlist?.some((w) => w.product.id === product.id) ? (
-              <button
-                className="btn transition-all duration-200"
-                onClick={() => removeFromWishlist(product.id)}
-              >
-                Remove Wishlist
-              </button>
-            ) : (
-              <button
-                className="btn transition-all duration-200"
-                onClick={() => addToWishlist(product)}
-              >
-                Add Wishlist
-              </button>
-            )}
-          </div>
         </div>
-      </div>
-      <div className="mt-6 w-full">
-        <h3 className="font-semibold mb-2">Reviews</h3>
-        {reviews.map((r, i) => (
-          <div key={i} className="border-b py-2 text-sm">
-            <p className="font-medium">{r.userEmail}</p>
-            <p>
-              {'★'.repeat(r.rating)}
-              {'☆'.repeat(5 - r.rating)} - {r.comment}
-            </p>
-          </div>
-        ))}
-        {reviews.length === 0 && <p>No reviews yet.</p>}
-        {user && (
-          <form
-            onSubmit={handleSubmit(async (data) => {
-              const res = await apiFetch(`/api/products/${id}/reviews`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-              });
-              if (res.ok) {
-                const response = await res.json();
-                setAverageRating(response.averageRating);
-                setReviewCount(response.reviewCount);
-                const rres = await apiFetch(`/api/products/${id}/reviews`);
-                if (rres.ok) {
-                  const rdata = await rres.json();
-                  setReviews(rdata.reviews);
-                }
-                reset({ rating: 5, comment: '' });
-              }
-            })}
-            className="mt-4 space-y-2"
-          >
-            <div>
-              <label className="mr-2">Rating</label>
-              <SelectDropdown
-                name="rating"
-                control={control}
-                options={[1, 2, 3, 4, 5].map((n) => ({
-                  label: String(n),
-                  value: String(n),
-                }))}
-                rules={{ valueAsNumber: true }}
-                className="max-w-xs"
-              />
+
+        {/* Reviews Section */}
+        <div className="mt-12 bg-base-100 rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+          
+          {reviews.length > 0 ? (
+            <div className="space-y-6">
+              {reviews.map((review, i) => (
+                <div key={i} className="border-b border-base-300 pb-6 last:border-b-0">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                                             <div className="flex items-center">
+                         {[1, 2, 3, 4, 5].map((star) => (
+                           <svg
+                             key={star}
+                             className={`w-4 h-4 ${
+                               star <= review.rating
+                                 ? 'text-yellow-400 fill-current'
+                                 : 'text-gray-300'
+                             }`}
+                             viewBox="0 0 24 24"
+                           >
+                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                           </svg>
+                         ))}
+                       </div>
+                      <span className="text-sm text-base-content/70">
+                        by {review.userEmail}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-base-content/90">{review.comment}</p>
+                </div>
+              ))}
             </div>
-            <Textarea
-              className="w-full"
-              placeholder="Write a review"
-              register={register}
-              name="comment"
+          ) : (
+            <p className="text-base-content/70 italic">No reviews yet. Be the first to review this product!</p>
+          )}
+
+          {/* Review Form */}
+          {user && (
+            <div className="mt-8 p-6 bg-base-200/50 rounded-xl">
+              <h3 className="text-lg font-semibold mb-4">Write a Review</h3>
+              <form
+                onSubmit={handleSubmit(async (data) => {
+                  const res = await apiFetch(`/api/products/${id}/reviews`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                  });
+                  if (res.ok) {
+                    const response = await res.json();
+                    setAverageRating(response.averageRating);
+                    setReviewCount(response.reviewCount);
+                    const rres = await apiFetch(`/api/products/${id}/reviews`);
+                    if (rres.ok) {
+                      const rdata = await rres.json();
+                      setReviews(rdata.reviews);
+                    }
+                    reset({ rating: 5, comment: '' });
+                  }
+                })}
+                className="space-y-4"
+              >
+                <div className="flex items-center space-x-4">
+                  <label className="text-sm font-medium">Rating</label>
+                  <SelectDropdown
+                    name="rating"
+                    control={control}
+                    options={[1, 2, 3, 4, 5].map((n) => ({
+                      label: `${n} Star${n !== 1 ? 's' : ''}`,
+                      value: String(n),
+                    }))}
+                    rules={{ valueAsNumber: true }}
+                    className="max-w-xs"
+                  />
+                </div>
+                <Textarea
+                  className="w-full"
+                  placeholder="Share your experience with this product..."
+                  register={register}
+                  name="comment"
+                />
+                <button
+                  className="btn btn-primary transition-all duration-200"
+                  type="submit"
+                >
+                  Submit Review
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+
+        {/* Recommended Products */}
+        {product.category && (
+          <div className="mt-12">
+            <RecommendedProducts
+              category={product.category.name}
+              excludeId={product.id}
+              limit={5}
             />
-            <button
-              className="btn btn-sm btn-primary transition-all duration-200"
-              type="submit"
-            >
-              Submit Review
-            </button>
-          </form>
+          </div>
         )}
-      </div>
-      {product.category && (
-        <RecommendedProducts
-          category={product.category.name}
-          excludeId={product.id}
-          limit={5}
-        />
-      )}
-      <div className="mt-4">
-        <Link href="/products">&larr; Back to products</Link>
+
+        {/* Back to Products */}
+        <div className="mt-8 text-center">
+          <Link 
+            href="/products"
+            className="btn btn-outline btn-lg transition-all duration-200 hover:scale-105"
+          >
+            <ChevronLeftIcon className="w-5 h-5 mr-2" />
+            Back to Products
+          </Link>
+        </div>
       </div>
     </div>
   );
