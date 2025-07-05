@@ -9,6 +9,7 @@ import { AppContext } from '@contexts/AppContext';
 import { NotificationContext } from '@contexts/NotificationContext';
 import type { User } from '@/types';
 import type { Product, ProductFormValues } from '@/types';
+import { UserRole } from '@/types';
 import { getPageTitle } from '@lib/pageTitle';
 import PageContainer from '@components/Layout/PageContainer';
 
@@ -148,7 +149,7 @@ const NewProductPage: React.FC = () => {
   if (!user) {
     return <div className="p-4">Please log in to manage products.</div>;
   }
-  if (user.role !== 'brand') {
+  if (user.role !== 'brand' && user.role !== UserRole.SUPER_ADMIN) {
     return <div className="p-4">Brand access required.</div>;
   }
 

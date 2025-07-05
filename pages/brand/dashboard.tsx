@@ -2,6 +2,7 @@ import { apiFetch } from '@lib/api';
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import type { User } from '@/types';
+import { UserRole } from '@/types';
 import ExistingProductsCard from '@components/dashboard/ExistingProductsCard';
 import TotalProductsCard from '@components/dashboard/TotalProductsCard';
 import TotalSalesCard from '@components/dashboard/TotalSalesCard';
@@ -37,7 +38,7 @@ const BrandDashboard: React.FC = () => {
   if (!user) {
     return <div className="p-4">Please log in to manage products.</div>;
   }
-  if (user.role !== 'brand') {
+  if (user.role !== 'brand' && user.role !== UserRole.SUPER_ADMIN) {
     return <div className="p-4">Brand access required.</div>;
   }
 
