@@ -11,6 +11,7 @@ import { AppContext } from '@contexts/AppContext';
 import { NotificationContext } from '@contexts/NotificationContext';
 import { ConfirmModal } from '@components/UI';
 import type { Product } from '@/types';
+import { UserRole } from '@/types';
 import { TextInput } from '@components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
@@ -198,7 +199,7 @@ export default function VendorDashboard() {
   if (!user) {
     return <div className="p-4">Please log in to manage products.</div>;
   }
-  if (user.role !== 'brand') {
+  if (user.role !== 'brand' && user.role !== UserRole.SUPER_ADMIN) {
     return <div className="p-4">Brand access required.</div>;
   }
 

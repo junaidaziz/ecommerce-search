@@ -9,6 +9,7 @@ import {
   UNAUTHORIZED,
   NAME_REQUIRED,
 } from '@/constants/messages';
+import { UserRole } from '@/types';
 
 export default async function handler(
   req: NextApiRequest,
@@ -19,7 +20,10 @@ export default async function handler(
       return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     }
     const session = await getServerSession(req, res, authOptions);
-    if (!session?.user || session.user.role !== 'BRAND') {
+    if (
+      !session?.user ||
+      (session.user.role !== 'BRAND' && session.user.role !== UserRole.SUPER_ADMIN)
+    ) {
       return res.status(401).json({ message: UNAUTHORIZED });
     }
     const { name, slug } = req.body || {};
