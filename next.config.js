@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
 const s3Domain = process.env.AWS_S3_BUCKET_NAME
   ? `${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com`
   : null;
@@ -12,6 +13,10 @@ const nextConfig = {
       'picsum.photos',
       ...(s3Domain ? [s3Domain] : []),
     ],
+  },
+  webpack: (config) => {
+    config.resolve.alias['@/styles'] = path.join(__dirname, 'styles');
+    return config;
   },
 };
 
