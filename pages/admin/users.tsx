@@ -26,7 +26,7 @@ export default function ManageUsers() {
   }, [fetchUsers]);
 
   const changeRole = async (email: string, role: string) => {
-    const payload: UserRoleUpdateRequest = { email, role };
+    const payload: UserRoleUpdateRequest = { email, role: role.toUpperCase() };
     await fetchJson<ApiMessage>('/api/admin/users', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -47,11 +47,11 @@ export default function ManageUsers() {
     fetchUsers();
   };
 
-  const remove = async (email: string) => {
-    await fetchJson<ApiMessage>(
-      `/api/admin/users?email=${encodeURIComponent(email)}`,
-      { method: 'DELETE' }
-    );
+  const remove = async (id: number, email: string) => {
+    if (!confirm(`Delete user ${email}?`)) return;
+    await fetchJson<ApiMessage>(`/api/admin/users/${id}`, {
+      method: 'DELETE',
+    });
     setMessage('User deleted');
     fetchUsers();
   };
@@ -69,12 +69,18 @@ export default function ManageUsers() {
       {message && <div className="mb-4 text-green-600">{message}</div>}
       <ul className="space-y-2">
         {users.map((u) => (
-          <li key={u.email} className="flex items-center gap-2">
-            <span className="flex-1">{u.email}</span>
+          <li key={u.id} className="flex items-center gap-2">
+            <span className="flex-1">
+              {u.email}
+              {u.role === 'SUPER_ADMIN' && (
+                <span className="ml-2 badge badge-secondary">Super Admin</span>
+              )}
+            </span>
             <select
               className="select select-bordered"
-              value={u.role}
+              value={u.role.toLowerCase()}
               onChange={(e) => changeRole(u.email, e.target.value)}
+              disabled={u.role === 'SUPER_ADMIN'}
             >
               <option value="user">user</option>
               <option value="brand">brand</option>
@@ -87,9 +93,14 @@ export default function ManageUsers() {
                 className="checkbox"
                 checked={u.disabled}
                 onChange={(e) => toggleDisabled(u.email, e.target.checked)}
+                disabled={u.role === 'SUPER_ADMIN'}
               />
             </label>
-            <button onClick={() => remove(u.email)} className="btn btn-sm">
+            <button
+              onClick={() => remove(u.id, u.email)}
+              className="btn btn-sm"
+              disabled={u.role === 'SUPER_ADMIN'}
+            >
               Delete
             </button>
           </li>
