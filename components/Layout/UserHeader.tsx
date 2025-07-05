@@ -163,6 +163,11 @@ const Header: FC<HeaderProps> = ({
   const itemCount = cart.reduce((sum, item) => sum + (item.qty || 0), 0);
   const logout = () => signOut({ callbackUrl: '/', redirect: true });
 
+  const isSuperAdmin =
+    user &&
+    user.role &&
+    user.role.toLowerCase().replace('_', '-') === 'super-admin';
+
   const menuItems = [
     { label: 'My Orders', href: '/orders' },
     { label: 'Profile', href: '/profile' },
@@ -174,6 +179,15 @@ const Header: FC<HeaderProps> = ({
     { label: 'Notifications', href: '/user/notifications' },
     { label: 'Permissions', href: '/user/permissions' },
     { label: 'Settings', href: '/settings' },
+    ...(isSuperAdmin
+      ? [
+          { divider: true },
+          { label: 'Admin Dashboard', href: '/admin' },
+          { label: 'All Users', href: '/admin/users' },
+          { label: 'All Brands', href: '/admin/brands' },
+          { label: 'All Orders', href: '/admin/orders' },
+        ]
+      : []),
     { label: 'Logout', onClick: logout, isButton: true },
   ];
 
