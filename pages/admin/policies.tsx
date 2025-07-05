@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { AppContext } from '@contexts/AppContext';
 import { fetchJson } from '@utils/fetchJson';
 import { getPageTitle } from '@lib/pageTitle';
-import type { UserRole } from '@/types';
+import { UserRole } from '@/types';
 
 const TYPES = [
   { value: 'terms', label: 'Terms & Conditions' },
