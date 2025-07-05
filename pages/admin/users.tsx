@@ -10,11 +10,17 @@ import {
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import { ConfirmModal } from '@components/UI';
 
 export default function ManageUsers() {
   const { user } = useContext(AppContext)!;
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [message, setMessage] = useState<string>('');
+  const [deleteUser, setDeleteUser] = useState<{
+    id: number;
+    email: string;
+  } | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState('');
 
   const fetchUsers = useCallback(async () => {
@@ -51,12 +57,19 @@ export default function ManageUsers() {
     fetchUsers();
   };
 
-  const remove = async (id: number, email: string) => {
-    if (!confirm(`Delete user ${email}?`)) return;
-    await fetchJson<ApiMessage>(`/api/admin/users/${id}`, {
+  const handleDelete = (id: number, email: string) => {
+    setDeleteUser({ id, email });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteUser) return;
+    setDeleting(true);
+    await fetchJson<ApiMessage>(`/api/admin/users/${deleteUser.id}`, {
       method: 'DELETE',
     });
+    setDeleting(false);
     setMessage('User deleted');
+    setDeleteUser(null);
     fetchUsers();
   };
 
@@ -95,7 +108,11 @@ export default function ManageUsers() {
             >
               <option value="user">user</option>
               <option value="brand">brand</option>
-              <option value={UserRole.SUPER_ADMIN.toLowerCase().replace('_', '-')}>{UserRole.SUPER_ADMIN.toLowerCase().replace('_', '-')}</option>
+              <option
+                value={UserRole.SUPER_ADMIN.toLowerCase().replace('_', '-')}
+              >
+                {UserRole.SUPER_ADMIN.toLowerCase().replace('_', '-')}
+              </option>
             </select>
             <label className="label cursor-pointer gap-1">
               <span className="label-text">Disabled</span>
@@ -108,7 +125,7 @@ export default function ManageUsers() {
               />
             </label>
             <button
-              onClick={() => remove(u.id, u.email)}
+              onClick={() => handleDelete(u.id, u.email)}
               className="btn btn-sm"
               disabled={u.role === 'SUPER_ADMIN'}
             >
@@ -117,6 +134,16 @@ export default function ManageUsers() {
           </li>
         ))}
       </ul>
+      <ConfirmModal
+        isOpen={!!deleteUser}
+        title="Are you sure?"
+        description="This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteUser(null)}
+      />
     </div>
   );
 }
