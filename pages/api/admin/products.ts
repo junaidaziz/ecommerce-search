@@ -4,11 +4,11 @@ import { hasOrdersForProduct } from '@lib/orders';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import { uploadFileToS3 } from '@lib/s3';
 import path from 'path';
-import { withRole } from '@lib/withRole';
+import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { slugify } from '@lib/slugify';
-import { Product, ApiMessage, Variant } from '@/types';
+import { Product, ApiMessage, Variant, UserRole } from '@/types';
 import { mapDbRowToProduct } from '@lib/products';
 import {
   METHOD_NOT_ALLOWED,
@@ -43,11 +43,15 @@ async function parseBody(
 }
 
 async function handler(
-  req: NextApiRequest,
+  req: AuthedNextApiRequest,
   res: NextApiResponse<Product[] | ApiMessage>
 ): Promise<void> {
   try {
     const db = getDb();
+    const user = req.user;
+    if (user?.role !== UserRole.SUPER_ADMIN && !user?.brandId) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
 
     if (req.method === 'POST' || req.method === 'PUT') {
       const { fields, files } = await parseBody(req);
