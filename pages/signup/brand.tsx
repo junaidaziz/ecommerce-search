@@ -106,7 +106,10 @@ export default function BrandSignup() {
           <button
             type="button"
             className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white"
-            onClick={() => signIn('google')}
+            onClick={() => {
+              document.cookie = 'signupRole=BRAND; path=/';
+              signIn('google');
+            }}
           >
             <GoogleIcon className="h-5 w-5" />
             Continue with Google
@@ -114,7 +117,10 @@ export default function BrandSignup() {
           <button
             type="button"
             className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-gray-800 hover:text-white"
-            onClick={() => signIn('github')}
+            onClick={() => {
+              document.cookie = 'signupRole=BRAND; path=/';
+              signIn('github');
+            }}
           >
             <GithubIcon className="h-5 w-5" />
             Continue with GitHub
