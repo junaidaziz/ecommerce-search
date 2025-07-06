@@ -282,44 +282,141 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   }, [router, addNotification]);
 
   return (
-    <div className="min-h-screen bg-base-200 py-10">
+    <div className="min-h-screen bg-gradient-to-br from-base-100 via-base-200/30 to-base-100">
       <Head>
         <title>{getPageTitle('Products')}</title>
+        <meta name="description" content="Discover amazing products from top brands" />
       </Head>
-      <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold mb-4">Products</h1>
-        <div className="flex flex-col md:flex-row gap-6">
-          <aside className="md:w-80 w-full flex-shrink-0">
-            <ProductFilters
-              keyword={keyword}
-              setKeyword={setKeyword}
-              selectedCategories={selectedCategories}
-              setSelectedCategories={setSelectedCategories}
-              minPrice={minPrice}
-              setMinPrice={setMinPrice}
-              maxPrice={maxPrice}
-              setMaxPrice={setMaxPrice}
-              inStock={inStock}
-              setInStock={setInStock}
-              categories={categories}
-              clearAll={clearAll}
-            />
-          </aside>
-          <div className="flex-1">
-            <ActiveFilters filters={activeFilters} clearAll={clearAll} />
-            <SortMenu value={sort} onChange={(v) => setSort(v)} />
-            <div className="relative">
-              <ProductGrid products={items} />
-              {loading && (
-                <Loader className="absolute inset-0 bg-base-200/70" />
-              )}
+      
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-base-content mb-4">
+              Discover Amazing Products
+            </h1>
+            <p className="text-lg text-base-content/70 max-w-2xl mx-auto">
+              Explore our curated collection of premium products from trusted brands
+            </p>
+            <div className="mt-6 flex items-center justify-center space-x-4 text-sm text-base-content/60">
+              <span className="flex items-center">
+                <svg className="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                {total} Products Available
+              </span>
+              <span className="flex items-center">
+                <svg className="w-4 h-4 mr-1 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Fast Shipping
+              </span>
+              <span className="flex items-center">
+                <svg className="w-4 h-4 mr-1 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                </svg>
+                Secure Checkout
+              </span>
             </div>
-            <InfiniteLoader
-              onLoadMore={handleLoadMore}
-              hasMore={hasMore}
-              loading={loadingMore}
-              itemsLength={items.length}
-            />
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filters Sidebar */}
+          <aside className="lg:w-80 w-full flex-shrink-0">
+            <div className="bg-base-100 rounded-2xl shadow-lg p-6 sticky top-4">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-base-content">Filters</h2>
+                <button
+                  onClick={clearAll}
+                  className="btn btn-sm btn-ghost text-primary hover:bg-primary/10"
+                >
+                  Clear All
+                </button>
+              </div>
+              <ProductFilters
+                keyword={keyword}
+                setKeyword={setKeyword}
+                selectedCategories={selectedCategories}
+                setSelectedCategories={setSelectedCategories}
+                minPrice={minPrice}
+                setMinPrice={setMinPrice}
+                maxPrice={maxPrice}
+                setMaxPrice={setMaxPrice}
+                inStock={inStock}
+                setInStock={setInStock}
+                categories={categories}
+                clearAll={clearAll}
+              />
+            </div>
+          </aside>
+
+          {/* Main Content */}
+          <div className="flex-1 space-y-6">
+            {/* Results Header */}
+            <div className="bg-base-100 rounded-2xl shadow-lg p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center space-x-4">
+                  <h2 className="text-2xl font-bold text-base-content">
+                    {items.length} Products
+                  </h2>
+                  {activeFilters.length > 0 && (
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-base-content/60">Filtered by:</span>
+                      <ActiveFilters filters={activeFilters} clearAll={clearAll} />
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center space-x-4">
+                  <SortMenu value={sort} onChange={(v) => setSort(v)} />
+                </div>
+              </div>
+            </div>
+
+            {/* Products Grid */}
+            <div className="relative">
+              <div className="bg-base-100 rounded-2xl shadow-lg p-6">
+                <ProductGrid products={items} />
+                {loading && (
+                  <div className="absolute inset-0 bg-base-100/80 rounded-2xl flex items-center justify-center">
+                    <Loader className="w-12 h-12" />
+                  </div>
+                )}
+              </div>
+              
+              {/* Load More */}
+              <div className="mt-6">
+                <InfiniteLoader
+                  onLoadMore={handleLoadMore}
+                  hasMore={hasMore}
+                  loading={loadingMore}
+                  itemsLength={items.length}
+                />
+              </div>
+            </div>
+
+            {/* No Results */}
+            {items.length === 0 && !loading && (
+              <div className="bg-base-100 rounded-2xl shadow-lg p-12 text-center">
+                <div className="max-w-md mx-auto">
+                  <svg className="w-16 h-16 mx-auto text-base-content/30 mb-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                  </svg>
+                  <h3 className="text-xl font-semibold text-base-content mb-2">No products found</h3>
+                  <p className="text-base-content/60 mb-6">
+                    Try adjusting your filters or search terms to find what you&apos;re looking for.
+                  </p>
+                  <button
+                    onClick={clearAll}
+                    className="btn btn-primary"
+                  >
+                    Clear All Filters
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
