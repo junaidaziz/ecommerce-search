@@ -1,53 +1,108 @@
-import type { FC } from 'react';
+import React from 'react';
 
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  className?: string;
 }
 
-const Pagination: FC<PaginationProps> = ({
+const Pagination: React.FC<PaginationProps> = ({
   currentPage,
   totalPages,
   onPageChange,
+  className = '',
 }) => {
   if (totalPages <= 1) return null;
-  let start = Math.max(1, currentPage - 2);
-  let end = Math.min(totalPages, start + 3);
-  if (end - start < 3) {
-    start = Math.max(1, end - 3);
-  }
-  const pages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    const maxVisible = 7;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
+      
+      if (currentPage > 3) {
+        pages.push('...');
+      }
+      
+      // Show pages around current page
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+      
+      if (currentPage < totalPages - 2) {
+        pages.push('...');
+      }
+      
+      // Always show last page
+      if (totalPages > 1) {
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
+
+  const pageNumbers = getPageNumbers();
+
   return (
-    <div className="flex justify-center my-4">
-      <div className="join">
-        <button
-          type="button"
-          className="btn btn-sm join-item"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        {pages.map((p) => (
-          <button
-            key={p}
-            type="button"
-            className={`btn btn-sm join-item ${p === currentPage ? 'btn-active' : ''}`}
-            onClick={() => onPageChange(p)}
-          >
-            {p}
-          </button>
+    <div className={`flex items-center justify-center space-x-2 ${className}`}>
+      {/* Previous Button */}
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="btn btn-sm btn-outline btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Previous page"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      {/* Page Numbers */}
+      <div className="flex items-center space-x-1">
+        {pageNumbers.map((page, index) => (
+          <React.Fragment key={index}>
+            {page === '...' ? (
+              <span className="px-3 py-2 text-base-content/60">...</span>
+            ) : (
+              <button
+                onClick={() => onPageChange(page as number)}
+                className={`btn btn-sm ${
+                  currentPage === page
+                    ? 'btn-primary'
+                    : 'btn-outline btn-primary hover:bg-primary/10'
+                }`}
+                aria-label={`Page ${page}`}
+                aria-current={currentPage === page ? 'page' : undefined}
+              >
+                {page}
+              </button>
+            )}
+          </React.Fragment>
         ))}
-        <button
-          type="button"
-          className="btn btn-sm join-item"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
       </div>
+
+      {/* Next Button */}
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="btn btn-sm btn-outline btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Next page"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
     </div>
   );
 };

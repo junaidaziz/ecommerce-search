@@ -6,6 +6,7 @@ import {
   UserDisabledUpdateRequest,
   ApiMessage,
   UserRole,
+  USER_ROLES,
 } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
@@ -80,7 +81,7 @@ export default function ManageUsers() {
   const totalPages = Math.ceil(total / limit);
 
   if (!user) return <div className="p-4">Please log in to view users.</div>;
-  if (user.role.toUpperCase() !== UserRole.SUPER_ADMIN)
+  if (user.role.toUpperCase() !== USER_ROLES.SUPER_ADMIN)
     return <div className="p-4">Admin access required.</div>;
 
   return (
@@ -115,9 +116,9 @@ export default function ManageUsers() {
               <option value="user">user</option>
               <option value="brand">brand</option>
               <option
-                value={UserRole.SUPER_ADMIN.toLowerCase().replace('_', '-')}
+                value={USER_ROLES.SUPER_ADMIN.toLowerCase().replace('_', '-')}
               >
-                {UserRole.SUPER_ADMIN.toLowerCase().replace('_', '-')}
+                {USER_ROLES.SUPER_ADMIN.toLowerCase().replace('_', '-')}
               </option>
             </select>
             <label className="label cursor-pointer gap-1">

@@ -11,7 +11,7 @@ import SunIcon from '../icons/SunIcon';
 import DEFAULT_CATEGORIES from '@lib/defaultCategories';
 import type { Category } from '@/types';
 import type { User } from '@/types';
-import { UserRole } from '@/types';
+import { USER_ROLES } from '@/types';
 import { 
   CartDropdown,
   CategoryMenu,
@@ -101,7 +101,7 @@ const Header: FC<HeaderProps> = ({
   const itemCount = cart.reduce((sum, item) => sum + (item.qty || 0), 0);
   const logout = () => signOut({ callbackUrl: '/', redirect: true });
 
-  const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
+  const isSuperAdmin = user?.role === USER_ROLES.SUPER_ADMIN;
 
   const menuItems = [
     ...(isSuperAdmin
@@ -141,7 +141,7 @@ const Header: FC<HeaderProps> = ({
         }`}
       >
         <Link
-          href="/"
+          href={isSuperAdmin ? "/admin" : "/"}
           className="p-0 flex items-center cursor-pointer transition-transform duration-300 ease-out hover:scale-110 hover:-translate-y-1 hover:shadow-xl"
         >
           <Image
@@ -189,15 +189,16 @@ const Header: FC<HeaderProps> = ({
             />
           )}
 
-          <label className="swap swap-rotate">
+          <label className="swap swap-rotate btn btn-ghost btn-circle tooltip tooltip-bottom" data-tip={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
             <input
               type="checkbox"
               aria-label="Toggle dark mode"
               checked={theme === 'dark'}
               onChange={() => setTheme?.(theme === 'dark' ? 'light' : 'dark')}
+              className="sr-only"
             />
-            <MoonIcon className="swap-on w-5 h-5" />
-            <SunIcon className="swap-off w-5 h-5" />
+            <MoonIcon className="swap-on w-5 h-5 text-primary" />
+            <SunIcon className="swap-off w-5 h-5 text-primary" />
           </label>
 
           <UserDropdown user={user} menuItems={menuItems} closeDropdown={closeDropdown} isAuthRoute={isAuthRoute} />

@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { CountrySelect } from '@components/form-fields';
 import { useRouter } from 'next/router';
 import { AppContext } from '@contexts/AppContext';
-import { UserRole, type User } from '@/types';
+import { USER_ROLES, type User } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 
@@ -62,7 +62,7 @@ export const UserProfile: React.FC = () => {
   };
 
   if (!user) return <div className="p-4">Please log in.</div>;
-  if (user.role !== UserRole.USER)
+  if (user.role !== USER_ROLES.USER)
     return <div className="p-4">User access required.</div>;
 
   return (

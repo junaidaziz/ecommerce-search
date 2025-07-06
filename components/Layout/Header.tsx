@@ -3,7 +3,7 @@ import { AppContext } from '@contexts/AppContext';
 import { useSession } from 'next-auth/react';
 import UserHeader from './UserHeader';
 import BrandHeader from './BrandHeader';
-import { UserRole } from '@/types';
+import { USER_ROLES } from '@/types';
 
 interface HeaderProps {
   theme?: string;
@@ -23,7 +23,8 @@ const Header: FC<HeaderProps> = ({
     (session?.user as { role?: string } | undefined)?.role ||
     ''
   ).toString();
-  if (role === UserRole.BRAND) {
+  
+  if (role === USER_ROLES.BRAND) {
     return (
       <BrandHeader
         theme={theme}

@@ -73,7 +73,14 @@ export interface PaymentMethod {
 }
 
 // User role enum (matching Prisma)
-export { Role as UserRole };
+export type UserRole = Role;
+
+// User role constants for runtime use
+export const USER_ROLES = {
+  USER: 'USER' as const,
+  BRAND: 'BRAND' as const,
+  SUPER_ADMIN: 'SUPER_ADMIN' as const,
+} as const;
 
 // Helper function to get user roles
 export const getUserRoles = (): Role[] => {

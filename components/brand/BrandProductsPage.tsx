@@ -15,6 +15,31 @@ import { ConfirmModal } from '@components/UI';
 import BrandProductSort, { BrandProductSortValue } from './BrandProductSort';
 import Pagination from '@components/Pagination';
 
+// Inline SVG icons
+const PlusIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+  </svg>
+);
+
+const MagnifyingGlassIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  </svg>
+);
+
+const FunnelIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z" />
+  </svg>
+);
+
+const XMarkIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+
 const SORT_VALUES: BrandProductSortValue[] = [
   'title_asc',
   'title_desc',
@@ -67,15 +92,6 @@ const BrandProductsPage: React.FC = () => {
       .finally(() => setLoading(false));
   }, [user, sort, search, currentPage]);
 
-  // useEffect(() => {
-  //   apiFetch('/api/categories?limit=250')
-  //     .then((res) => (res.ok ? res.json() : { categories: [] }))
-  //     .then((data: { categories: Category[] }) =>
-  //       setCategories(data.categories)
-  //     )
-  //     .catch(() => setCategories([]));
-  // }, [user, sort, search]);
-
   useEffect(() => {
     const pageParam = router.query.page;
     if (pageParam) {
@@ -120,10 +136,28 @@ const BrandProductsPage: React.FC = () => {
   }, [slug, products]);
 
   if (!user) {
-    return <div className="p-4">Please log in to manage products.</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Please log in to manage products.</p>
+        </div>
+      </div>
+    );
   }
-  if (user.role !== 'brand' && user.role !== UserRole.SUPER_ADMIN) {
-    return <div className="p-4">Brand access required.</div>;
+  
+  if (user.role !== 'brand' && user.role !== 'SUPER_ADMIN') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="bg-red-100 rounded-full p-4 mx-auto mb-4 w-16 h-16 flex items-center justify-center">
+            <XMarkIcon className="w-8 h-8 text-red-600" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Access Denied</h2>
+          <p className="text-gray-600">Brand access required.</p>
+        </div>
+      </div>
+    );
   }
 
   const handleDelete = (id: string): void => {
@@ -154,24 +188,15 @@ const BrandProductsPage: React.FC = () => {
     setDeleteId(null);
   };
 
-  const handleSortChange = (
-    field: 'title' | 'category' | 'status' | 'quantity'
-  ) => {
-    setSort((cur) => {
-      const [f, dir] = cur.split('_') as [string, 'asc' | 'desc'];
-      const next =
-        f === field
-          ? `${field}_${dir === 'asc' ? 'desc' : 'asc'}`
-          : `${field}_asc`;
-      const query = {
-        ...router.query,
-        sort: next,
-        page: '1',
-      } as Record<string, string>;
-      router.push({ pathname: '/brand/products', query }, undefined, {
-        shallow: true,
-      });
-      return next as BrandProductSortValue;
+  const handleSortChange = (value: BrandProductSortValue) => {
+    setSort(value);
+    const query = {
+      ...router.query,
+      sort: value,
+      page: '1',
+    } as Record<string, string>;
+    router.push({ pathname: '/brand/products', query }, undefined, {
+      shallow: true,
     });
   };
 
@@ -205,68 +230,161 @@ const BrandProductsPage: React.FC = () => {
   const handleClose = () => {
     setViewProduct(null);
     router.push(
-      { pathname: '/brand/products', query: { page: String(currentPage) } },
+      {
+        pathname: '/brand/products',
+        query: { page: String(currentPage) },
+      },
       undefined,
-      { shallow: true }
+      {
+        shallow: true,
+      }
     );
   };
 
   return (
-    <div className="min-h-screen px-4 py-6 space-y-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
       <Head>
-        <title>{getPageTitle('Products')}</title>
+        <title>{getPageTitle('Brand Products')}</title>
       </Head>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <h1 className="text-2xl font-bold">Products</h1>
-        <Link href="/brand/products/new" className="btn btn-primary">
-          Add New Product
-        </Link>
-      </div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <input
-          type="text"
-          className="input input-bordered w-full sm:w-72"
-          placeholder="Search products"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-      {error && <div className="text-error py-4">{error}</div>}
-      {!error && (
-        <div className="relative">
-          <ProductTable
-            products={products}
-            sort={sort}
-            onSort={handleSortChange}
-            onView={handleView}
-            onDelete={handleDelete}
-          />
-          {loading && (
-            <div className="absolute inset-0 bg-base-100/50 flex items-center justify-center">
-              <span className="loading loading-spinner" />
+      
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Product Management</h1>
+              <p className="text-blue-100">Manage your product catalog and inventory</p>
             </div>
-          )}
+            <div className="mt-6 lg:mt-0">
+              <Link
+                href="/brand/products/new"
+                className="inline-flex items-center px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all duration-200 border border-white/20 hover:border-white/40"
+              >
+                <PlusIcon className="w-5 h-5 mr-2" />
+                Add New Product
+              </Link>
+            </div>
+          </div>
         </div>
-      )}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Search and Filters */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <FunnelIcon className="w-5 h-5 text-gray-400" />
+                <span className="text-sm font-medium text-gray-700">Sort by:</span>
+              </div>
+              <BrandProductSort value={sort} onChange={handleSortChange} />
+            </div>
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <XMarkIcon className="w-5 h-5 text-red-400" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center my-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        )}
+
+        {/* Products Table */}
+        {!loading && products.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <ProductTable
+              products={products}
+              sort={sort}
+              onSort={(field) => {
+                const [currentField] = sort.split('_');
+                const newSort = currentField === field 
+                  ? `${field}_${sort.endsWith('asc') ? 'desc' : 'asc'}`
+                  : `${field}_asc`;
+                handleSortChange(newSort as BrandProductSortValue);
+              }}
+              onView={handleView}
+              onDelete={handleDelete}
+            />
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && products.length === 0 && (
+          <div className="text-center py-12">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <PlusIcon className="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
+            <p className="text-gray-500 mb-6">
+              {search ? 'Try adjusting your search terms.' : 'Get started by adding your first product.'}
+            </p>
+            <Link
+              href="/brand/products/new"
+              className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors duration-200"
+            >
+              <PlusIcon className="w-5 h-5 mr-2" />
+              Add Your First Product
+            </Link>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Modals */}
       <ProductDetailsModal
         product={viewProduct}
         isOpen={!!viewProduct}
         onClose={handleClose}
       />
+      
       <ConfirmModal
         isOpen={!!deleteId}
-        title="Delete Product?"
+        onCancel={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Product"
         description="Are you sure you want to delete this product? This action cannot be undone."
         confirmLabel="Delete"
         cancelLabel="Cancel"
         loading={deleting}
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleteId(null)}
       />
     </div>
   );

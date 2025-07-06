@@ -5,7 +5,7 @@ import type { AnalyticsData, ApiMessage } from '@/types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
-import { UserRole } from '@/types';
+import { UserRole, USER_ROLES } from '@/types';
 
 export default async function handler(
   req: NextApiRequest,
@@ -22,7 +22,7 @@ export default async function handler(
         : undefined;
     if (
       !session?.user ||
-      (session.user.role !== 'BRAND' && session.user.role !== UserRole.SUPER_ADMIN) ||
+      (session.user.role !== 'BRAND' && session.user.role !== USER_ROLES.SUPER_ADMIN) ||
       !brandId
     ) {
       return res.status(401).json({ message: UNAUTHORIZED });

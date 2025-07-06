@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import Head from 'next/head';
 import { AppContext } from '@contexts/AppContext';
 import { getPageTitle } from '@lib/pageTitle';
-import { UserRole } from '@/types';
+import { USER_ROLES } from '@/types';
 import TotalProductsCard from '@components/dashboard/TotalProductsCard';
 import TotalSalesCard from '@components/dashboard/TotalSalesCard';
 import OrdersThisMonthCard from '@components/dashboard/OrdersThisMonthCard';
@@ -14,7 +14,7 @@ const DashboardPage: React.FC = () => {
   const { user } = useContext(AppContext) as { user: any };
   if (!user)
     return <div className="p-4">Please log in to view the dashboard.</div>;
-  if (user.role !== UserRole.BRAND && user.role !== UserRole.SUPER_ADMIN) {
+  if (user.role !== USER_ROLES.BRAND && user.role !== USER_ROLES.SUPER_ADMIN) {
     return <div className="p-4">Access denied.</div>;
   }
   return (

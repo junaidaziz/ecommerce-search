@@ -6,7 +6,6 @@ import { AppContext } from '@contexts/AppContext';
 import { signIn } from 'next-auth/react';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
-import PageContainer from '@components/Layout/PageContainer';
 import GoogleIcon from '@components/icons/GoogleIcon';
 import FacebookIcon from '@components/icons/FacebookIcon';
 import {
@@ -15,7 +14,7 @@ import {
   TextInput,
 } from '@components/form-fields';
 import useEmailAvailability from '@hooks/useEmailAvailability';
-import { UserRole } from '@/types';
+import { USER_ROLES } from '@/types';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -42,8 +41,8 @@ export default function UserSignup() {
 
   useEffect(() => {
     if (user) {
-      if (user.role === UserRole.BRAND) router.push('/brand/profile?complete=1');
-      else if (user.role === UserRole.SUPER_ADMIN) router.push('/admin');
+      if (user.role === USER_ROLES.BRAND) router.push('/brand/profile?complete=1');
+      else if (user.role === USER_ROLES.SUPER_ADMIN) router.push('/admin');
       else router.push('/user/profile?complete=1');
     }
   }, [user, router]);
@@ -96,16 +95,24 @@ export default function UserSignup() {
     (passwordValue !== '' && !passwordRegex.test(passwordValue));
 
   return (
-    <div className="min-h-screen flex items-center justify-center overflow-auto px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-8 px-4">
       <Head>
         <title>{getPageTitle('User Signup')}</title>
       </Head>
-      <PageContainer className="max-w-sm">
-        <h1 className="text-2xl font-bold mb-4 text-center">User Sign Up</h1>
-        <div className="flex flex-col gap-4 mb-6">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 sm:p-10 relative z-10">
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-14 h-14 flex items-center justify-center rounded-full bg-blue-100 mb-3">
+            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Create Your Account</h1>
+          <p className="text-gray-500 text-center text-base">Sign up to shop, track orders, and enjoy exclusive benefits.</p>
+        </div>
+        <div className="flex flex-col gap-3 mb-6">
           <button
             type="button"
-            className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white"
+            className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-200 bg-white hover:bg-blue-50 transition-colors text-gray-700 font-medium shadow-sm"
             onClick={() => {
               document.cookie = 'signupRole=USER; path=/';
               signIn('google');
@@ -116,7 +123,7 @@ export default function UserSignup() {
           </button>
           <button
             type="button"
-            className="btn btn-lg px-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-blue-700 hover:text-white"
+            className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-200 bg-white hover:bg-blue-100 transition-colors text-gray-700 font-medium shadow-sm"
             onClick={() => {
               document.cookie = 'signupRole=USER; path=/';
               signIn('facebook');
@@ -126,7 +133,12 @@ export default function UserSignup() {
             Continue with Facebook
           </button>
         </div>
-        {formError && <div className="text-red-500 mb-2">{formError}</div>}
+        <div className="flex items-center my-6">
+          <div className="flex-grow border-t border-gray-200"></div>
+          <span className="mx-4 text-gray-400 font-medium">or</span>
+          <div className="flex-grow border-t border-gray-200"></div>
+        </div>
+        {formError && <div className="text-red-500 mb-2 text-center">{formError}</div>}
         <form onSubmit={handleSubmit(submit)} className="space-y-4">
           <TextInput
             name="firstName"
@@ -178,7 +190,7 @@ export default function UserSignup() {
             </p>
           )}
           <button
-            className="btn btn-primary w-full"
+            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             type="submit"
             disabled={checkingEmail || !!errors.email}
           >
@@ -188,19 +200,19 @@ export default function UserSignup() {
             Sign Up
           </button>
         </form>
-        <p className="text-center mt-6">
+        <p className="text-center mt-6 text-gray-700">
           Already have an account?{' '}
-          <Link href="/login" className="link">
+          <Link href="/login" className="text-blue-600 hover:underline font-medium">
             Login
           </Link>
         </p>
-        <p className="text-sm text-center mt-2 text-gray-600">
+        <p className="text-sm text-center mt-2 text-gray-500">
           Want to sign up as a brand instead?{' '}
-          <Link href="/signup/brand" className="text-blue-600 hover:underline">
-            Sign up as a brand instead
+          <Link href="/signup/brand" className="text-purple-600 hover:underline font-medium">
+            Sign up as a brand
           </Link>
         </p>
-      </PageContainer>
+      </div>
     </div>
   );
 }

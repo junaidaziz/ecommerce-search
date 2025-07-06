@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { AppContext } from '@contexts/AppContext';
 import { fetchJson } from '@utils/fetchJson';
 import { getPageTitle } from '@lib/pageTitle';
-import { SupportTicket, UserRole } from '@/types';
+import { SupportTicket, UserRole, USER_ROLES } from '@/types';
 
 export default function SupportTickets() {
   const { user } = useContext(AppContext)!;
@@ -17,7 +17,7 @@ export default function SupportTickets() {
   }, [status]);
 
   if (!user) return <div className="p-4">Please log in to view tickets.</div>;
-  if (user.role.toUpperCase() !== UserRole.SUPER_ADMIN)
+  if (user.role.toUpperCase() !== USER_ROLES.SUPER_ADMIN)
     return <div className="p-4">Admin access required.</div>;
 
   return (

@@ -19,7 +19,7 @@ import {
   UNAUTHORIZED,
   PERCENTAGE_DISCOUNT_BETWEEN_1_AND_99,
 } from '@/constants/messages';
-import { UserRole } from '@/types';
+import { USER_ROLES } from '@/types';
 
 export const config = {
   api: {
@@ -55,7 +55,7 @@ async function handler(
       const session = await getServerSession(req, res, authOptions);
       if (
         !session?.user ||
-        (session.user.role !== 'BRAND' && session.user.role !== UserRole.SUPER_ADMIN)
+        (session.user.role !== 'BRAND' && session.user.role !== USER_ROLES.SUPER_ADMIN)
       ) {
         return res.status(401).json({ message: UNAUTHORIZED });
       }

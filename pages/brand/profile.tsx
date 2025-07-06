@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { AppContext } from '@contexts/AppContext';
 import type { User, Vendor } from '@/types';
-import { UserRole } from '@/types';
+import { USER_ROLES } from '@/types';
 import { TextInput, Textarea, CountrySelect } from '@components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
@@ -68,13 +68,13 @@ export const BrandProfile: React.FC = () => {
       const methods = Array.isArray(user.paymentMethods)
         ? user.paymentMethods
         : [];
-      setStripeEnabled(methods.some((m) => m.type === 'stripe'));
-      const jazz = methods.find((m) => m.type === 'jazzcash');
+      setStripeEnabled(methods.some((m: any) => m.type === 'stripe'));
+      const jazz = methods.find((m: any) => m.type === 'jazzcash');
       setJazzcashEnabled(!!jazz);
-      setJazzcashDetails(jazz?.details || '');
-      const bank = methods.find((m) => m.type === 'bank_transfer');
+      setJazzcashDetails((jazz as any)?.details || '');
+      const bank = methods.find((m: any) => m.type === 'bank_transfer');
       setBankEnabled(!!bank);
-      setBankDetails(bank?.details || '');
+      setBankDetails((bank as any)?.details || '');
     }
   }, [user, reset]);
 
@@ -98,13 +98,13 @@ export const BrandProfile: React.FC = () => {
         const methods = Array.isArray(data.paymentMethods)
           ? data.paymentMethods
           : [];
-        setStripeEnabled(methods.some((m) => m.type === 'stripe'));
-        const jazz = methods.find((m) => m.type === 'jazzcash');
+        setStripeEnabled(methods.some((m: any) => m.type === 'stripe'));
+        const jazz = methods.find((m: any) => m.type === 'jazzcash');
         setJazzcashEnabled(!!jazz);
-        setJazzcashDetails(jazz?.details || '');
-        const bank = methods.find((m) => m.type === 'bank_transfer');
+        setJazzcashDetails((jazz as any)?.details || '');
+        const bank = methods.find((m: any) => m.type === 'bank_transfer');
         setBankEnabled(!!bank);
-        setBankDetails(bank?.details || '');
+        setBankDetails((bank as any)?.details || '');
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -128,7 +128,7 @@ export const BrandProfile: React.FC = () => {
   };
 
   if (!user) return <div className="p-4">Please log in.</div>;
-  if (user.role !== 'brand' && user.role !== UserRole.SUPER_ADMIN)
+  if (user.role !== 'brand' && user.role !== USER_ROLES.SUPER_ADMIN)
     return <div className="p-4">Brand access required.</div>;
   if (loading)
     return (
