@@ -292,20 +292,20 @@ export default function ProductDetail({
                   
                   <div className="flex gap-2">
                     <button
-                      className="btn btn-outline flex-1"
+                      className="btn btn-outline flex-1 hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => changeQty(String(product.id), -1, selectedVariant?.id)}
                       disabled={cartItemQuantity <= 1}
                     >
                       -
                     </button>
                     <button
-                      className="btn btn-outline flex-1"
+                      className="btn btn-outline flex-1 hover:bg-green-50 hover:border-green-300 hover:text-green-600 transition-all duration-200"
                       onClick={() => changeQty(String(product.id), 1, selectedVariant?.id)}
                     >
                       +
                     </button>
                     <button
-                      className="btn btn-error"
+                      className="btn btn-error text-white hover:bg-red-700 hover:scale-105 transition-all duration-200"
                       onClick={() => removeFromCart(String(product.id), selectedVariant?.id)}
                     >
                       Remove
@@ -319,20 +319,20 @@ export default function ProductDetail({
                     <label className="text-sm font-medium text-base-content">
                       Quantity
                     </label>
-                    <div className="flex items-center border border-base-300 rounded-lg">
+                    <div className="flex items-center border border-base-300 rounded-lg overflow-hidden">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="px-3 py-2 hover:bg-base-200 transition-colors"
+                        className="px-3 py-2 hover:bg-red-50 hover:text-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border-r border-base-300"
                         disabled={quantity <= 1}
                       >
                         -
                       </button>
-                      <span className="px-4 py-2 min-w-[3rem] text-center">
+                      <span className="px-4 py-2 min-w-[3rem] text-center bg-base-100">
                         {quantity}
                       </span>
                       <button
                         onClick={() => setQuantity(quantity + 1)}
-                        className="px-3 py-2 hover:bg-base-200 transition-colors"
+                        className="px-3 py-2 hover:bg-green-50 hover:text-green-600 transition-all duration-200 border-l border-base-300"
                       >
                         +
                       </button>

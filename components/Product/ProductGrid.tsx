@@ -14,13 +14,19 @@ const ProductGrid: React.FC<ProductGridProps> = ({
 }) => {
   return (
     <div
-      className={`min-h-[300px] grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 ${className}`}
+      className={`min-h-[400px] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ${className}`}
     >
       {products.length === 0 ? (
-        Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)
+        Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="animate-pulse">
+            <ProductCardSkeleton />
+          </div>
+        ))
       ) : (
         products.map((p) => (
-          <ProductCard key={p.id} product={p} className="w-full" />
+          <div key={p.id} className="group">
+            <ProductCard product={p} className="w-full h-full transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl" />
+          </div>
         ))
       )}
     </div>
