@@ -1,14 +1,24 @@
-export interface Category {
-  id?: number | string;
-  uuid?: string;
-  name: string;
-  slug: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  subcategories?: Category[];
-}
+import type { Category as PrismaCategory } from '@prisma/client';
 
-export type CategoryInput = {
-  name: string;
-  slug?: string;
+// Base Category type extending Prisma Category
+export type Category = PrismaCategory & {
+  subcategories?: Category[];
 };
+
+// Input type for creating categories
+export type CategoryInput = Pick<PrismaCategory, 'name'> & {
+  slug?: string;
+  uuid?: string;
+};
+
+// Update type for categories
+export type CategoryUpdate = Partial<Pick<PrismaCategory, 'name' | 'slug'>>;
+
+// Category response type
+export type CategoryResponse = Category;
+
+// Category with minimal fields for lists
+export type CategorySummary = Pick<
+  PrismaCategory,
+  'id' | 'uuid' | 'name' | 'slug' | 'createdAt'
+>;

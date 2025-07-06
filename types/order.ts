@@ -13,24 +13,39 @@ export enum OrderStatus {
   RETURNED = 'returned',
 }
 
-export interface Order extends PrismaOrder {
+// Base Order type extending Prisma Order
+export type Order = PrismaOrder & {
   user: User;
   product: Product;
   status: OrderStatus;
-  paymentMethod?: string | null;
-  paymentReference?: string | null;
-  paymentProof?: string | null;
-}
+};
 
-type OrderResponse = Order;
-
+// Input type for creating orders
 export type OrderInput = Pick<
   PrismaOrder,
   'userId' | 'productId' | 'quantity' | 'total' | 'status'
->;
+> & {
+  paymentMethod?: string;
+  paymentReference?: string;
+  paymentProof?: string;
+};
 
-export interface OrderRow extends PrismaOrder {
-  user?: User | null;
-  product?: Product | null;
-  status: OrderStatus;
-}
+// Update type for orders
+export type OrderUpdate = Partial<Omit<OrderInput, 'userId' | 'productId'>>;
+
+// Order response type
+export type OrderResponse = Order;
+
+// Order with minimal fields for lists
+export type OrderSummary = Pick<
+  PrismaOrder,
+  | 'id'
+  | 'uuid'
+  | 'quantity'
+  | 'total'
+  | 'status'
+  | 'createdAt'
+> & {
+  user: Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>;
+  product: Pick<Product, 'id' | 'title' | 'slug'>;
+};
