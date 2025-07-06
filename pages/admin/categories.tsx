@@ -17,63 +17,85 @@ export default function Categories() {
   const [editName, setEditName] = useState<string>('');
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [confirmAction, setConfirmAction] = useState<null | { type: 'add' | 'edit' | 'delete', payload?: any }>(null);
 
   const load = useCallback(async () => {
     if (!user) return;
-    const data = await fetchJson<Category[]>('/api/admin/categories');
-    setCategories(data);
+    setLoading(true);
+    try {
+      const data = await fetchJson<Category[]>('/api/admin/categories');
+      setCategories(data);
+    } catch (error) {
+      setCategories([]);
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
 
   useEffect(() => {
     load();
   }, [load]);
 
+  const handleAdd = () => setConfirmAction({ type: 'add' });
+  const handleEdit = (cat) => setConfirmAction({ type: 'edit', payload: cat });
+  const handleDelete = (id) => setConfirmAction({ type: 'delete', payload: id });
+
   const add = async () => {
     if (!newCat.trim()) return;
-    const payload: CategoryInput = {
-      name: newCat,
-      slug: slugify(newCat),
-    };
-    await fetchJson<ApiMessage>('/api/admin/categories', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    setNewCat('');
-    setMessage('Category added');
-    load();
+    try {
+      const payload: CategoryInput = {
+        name: newCat,
+        slug: slugify(newCat),
+      };
+      await fetchJson<ApiMessage>('/api/admin/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      setNewCat('');
+      setMessage('Category added successfully');
+      load();
+    } catch (error) {
+      setMessage('Failed to add category');
+    }
   };
 
   const update = async () => {
-    const payload: CategoryInput & { uuid: string } = {
-      uuid: editing as string,
-      name: editName,
-    };
-    await fetchJson<ApiMessage>('/api/admin/categories', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    setEditing(null);
-    setEditName('');
-    setMessage('Category updated');
-    load();
-  };
-
-  const handleDelete = (id: number) => {
-    setDeleteId(id);
+    try {
+      const payload: CategoryInput & { uuid: string } = {
+        uuid: editing as string,
+        name: editName,
+      };
+      await fetchJson<ApiMessage>('/api/admin/categories', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      setEditing(null);
+      setEditName('');
+      setMessage('Category updated successfully');
+      load();
+    } catch (error) {
+      setMessage('Failed to update category');
+    }
   };
 
   const confirmDelete = async () => {
     if (deleteId === null) return;
     setDeleting(true);
-    await fetchJson<ApiMessage>(`/api/admin/categories?id=${deleteId}`, {
-      method: 'DELETE',
-    });
-    setDeleting(false);
-    setMessage('Category deleted');
-    setDeleteId(null);
-    load();
+    try {
+      await fetchJson<ApiMessage>(`/api/admin/categories?id=${deleteId}`, {
+        method: 'DELETE',
+      });
+      setMessage('Category deleted successfully');
+      setDeleteId(null);
+      load();
+    } catch (error) {
+      setMessage('Failed to delete category');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   if (!user)
@@ -82,102 +104,176 @@ export default function Categories() {
     return <div className="p-4">Admin access required.</div>;
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <Head>
         <title>{getPageTitle('Manage Categories')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Categories</h1>
-      {message && <div className="mb-4 text-green-600">{message}</div>}
-      <div className="flex gap-2 mb-4">
-        <TextInput
-          label=""
-          name="new-category"
-          value={newCat}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setNewCat(e.target.value)
-          }
-          onBlur={() => {}}
-          error={undefined}
-          placeholder="New category"
-          className="flex-1"
-          leftAddon={undefined}
-          rightAddon={undefined}
-          register={undefined}
-          rules={undefined}
-        />
-        <button onClick={add} className="btn btn-primary">
-          Add
-        </button>
+      
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Category Management</h1>
+            <p className="text-xl text-indigo-100 max-w-2xl mx-auto">Manage product categories across the platform. Organize and structure your product catalog.</p>
+          </div>
+        </div>
       </div>
-      <ul className="space-y-2">
-        {categories.map((c) => (
-          <CategoryItem key={c.id} cat={c} />
-        ))}
-      </ul>
-      <ConfirmModal
-        isOpen={deleteId !== null}
-        title="Are you sure?"
-        description="This action cannot be undone."
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
-        loading={deleting}
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleteId(null)}
-      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">All Categories</h2>
+              <p className="text-gray-600">Total: {categories.length} categories</p>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="New category name..."
+                value={newCat}
+                onChange={(e) => setNewCat(e.target.value)}
+                className="input input-bordered flex-1"
+                onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
+              />
+              <button 
+                onClick={handleAdd} 
+                className="btn btn-primary text-white"
+                disabled={!newCat.trim()}
+              >
+                Add Category
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {message && (
+          <div className="alert alert-success mb-6">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span>{message}</span>
+          </div>
+        )}
+
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td colSpan={3} className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        <span className="ml-2">Loading categories...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : categories.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="px-6 py-4 text-center text-gray-500">
+                      No categories found
+                    </td>
+                  </tr>
+                ) : (
+                  categories.map((cat) => (
+                    <tr key={cat.id} className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <div className="h-10 w-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
+                              {cat.name?.[0]?.toUpperCase() || 'C'}
+                            </div>
+                          </div>
+                          <div className="ml-4">
+                            {editing === cat.id ? (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  value={editName}
+                                  onChange={(e) => setEditName(e.target.value)}
+                                  className="input input-bordered input-sm"
+                                  onKeyPress={(e) => e.key === 'Enter' && update()}
+                                />
+                                <button 
+                                  onClick={() => handleEdit(cat)} 
+                                  className="btn btn-primary text-white"
+                                  disabled={!editName.trim()}
+                                >
+                                  Save
+                                </button>
+                                <button 
+                                  onClick={() => setEditing(null)} 
+                                  className="btn btn-secondary text-white"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="text-sm font-medium text-gray-900">{cat.name}</div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {cat.slug || slugify(cat.name)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex items-center space-x-2">
+                          {editing !== cat.id && (
+                            <>
+                              <button
+                                onClick={() => handleEdit(cat)}
+                                className="btn btn-primary text-white"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDelete(cat.id)}
+                                className="btn btn-error text-white"
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {confirmAction && (
+        <ConfirmModal
+          isOpen={!!confirmAction}
+          title={`Confirm ${confirmAction.type.charAt(0).toUpperCase() + confirmAction.type.slice(1)}`}
+          description={`Are you sure you want to ${confirmAction.type} this category?`}
+          confirmLabel="Confirm"
+          cancelLabel="Cancel"
+          onConfirm={() => {
+            if (confirmAction.type === 'add') {
+              add();
+            } else if (confirmAction.type === 'edit') {
+              update();
+            } else if (confirmAction.type === 'delete') {
+              confirmDelete();
+            }
+            setConfirmAction(null);
+          }}
+          onCancel={() => setConfirmAction(null)}
+        />
+      )}
     </div>
   );
-
-  function CategoryItem({ cat }: { cat: Category }) {
-    return (
-      <li>
-        <div className="flex items-center gap-2">
-          {editing === cat.id ? (
-            <>
-              <TextInput
-                className="flex-1"
-                label=""
-                name="edit-category"
-                placeholder="Edit category"
-                value={editName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setEditName(e.target.value)
-                }
-                onBlur={() => {}}
-                error={undefined}
-                leftAddon={undefined}
-                rightAddon={undefined}
-                register={undefined}
-                rules={undefined}
-              />
-              <button onClick={update} className="btn btn-sm">
-                Save
-              </button>
-              <button onClick={() => setEditing(null)} className="btn btn-sm">
-                Cancel
-              </button>
-            </>
-          ) : (
-            <>
-              <span className="flex-1">{cat.name}</span>
-              <button
-                onClick={() => {
-                  setEditing(cat.uuid ?? null);
-                  setEditName(cat.name);
-                }}
-                className="btn btn-sm"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(Number(cat.id))}
-                className="btn btn-sm"
-              >
-                Delete
-              </button>
-            </>
-          )}
-        </div>
-      </li>
-    );
-  }
 }

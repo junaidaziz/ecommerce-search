@@ -60,28 +60,28 @@ const Pagination: React.FC<PaginationProps> = ({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="btn btn-sm btn-outline btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+        className="rounded-lg px-3 py-2 border border-primary bg-white text-primary hover:bg-primary/10 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Previous page"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
       {/* Page Numbers */}
-      <div className="flex items-center space-x-1">
+      <div className="flex items-center space-x-2">
         {pageNumbers.map((page, index) => (
           <React.Fragment key={index}>
             {page === '...' ? (
-              <span className="px-3 py-2 text-base-content/60">...</span>
+              <span className="px-3 py-2 text-base-content/40 text-lg select-none">...</span>
             ) : (
               <button
                 onClick={() => onPageChange(page as number)}
-                className={`btn btn-sm ${
-                  currentPage === page
-                    ? 'btn-primary'
-                    : 'btn-outline btn-primary hover:bg-primary/10'
-                }`}
+                className={`rounded-lg px-4 py-2 font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary/50
+                  ${currentPage === page
+                    ? 'bg-primary text-white shadow-md'
+                    : 'border border-primary text-primary bg-white hover:bg-primary/10'}
+                `}
                 aria-label={`Page ${page}`}
                 aria-current={currentPage === page ? 'page' : undefined}
               >
@@ -96,10 +96,10 @@ const Pagination: React.FC<PaginationProps> = ({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="btn btn-sm btn-outline btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+        className="rounded-lg px-3 py-2 border border-primary bg-white text-primary hover:bg-primary/10 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Next page"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </button>

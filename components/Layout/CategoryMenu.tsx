@@ -19,12 +19,63 @@ interface CategoryMenuProps {
 }
 
 const iconMap: Record<string, JSX.Element> = {
-  Electronics: <ElectronicsIcon className="h-5 w-5 mr-1" />,
-  Fashion: <FashionIcon className="h-5 w-5 mr-1" />,
-  Home: <HomeIcon className="h-5 w-5 mr-1" />,
-  Toys: <ToysIcon className="h-5 w-5 mr-1" />,
-  Sports: <SportsIcon className="h-5 w-5 mr-1" />,
+  Electronics: <ElectronicsIcon className="h-5 w-5 mr-2" />,
+  Fashion: <FashionIcon className="h-5 w-5 mr-2" />,
+  Home: <HomeIcon className="h-5 w-5 mr-2" />,
+  Toys: <ToysIcon className="h-5 w-5 mr-2" />,
+  Sports: <SportsIcon className="h-5 w-5 mr-2" />,
 };
+
+// Recursive subcategory renderer
+function SubcategoryList({
+  parent,
+  subcategories,
+  activePath = [],
+  onHover,
+  onClick,
+  level = 1,
+}: {
+  parent: string;
+  subcategories: any[];
+  activePath?: string[];
+  onHover: (path: string[]) => void;
+  onClick: () => void;
+  level?: number;
+}) {
+  return (
+    <div className={`space-y-2 pl-${level * 4}`}> {/* Indent for each level */}
+      {subcategories.map((sub) => {
+        const isActive = activePath[level] === sub.name;
+        const hasChildren = Array.isArray(sub.subcategories) && sub.subcategories.length > 0;
+        return (
+          <div key={sub.name}>
+            <div
+              className={`flex items-center px-4 py-2 rounded-lg font-medium cursor-pointer transition-all duration-200 capitalize
+                ${isActive ? 'bg-primary/10 text-primary' : 'text-base-content/80 hover:bg-primary/5 hover:text-primary'}`}
+              onMouseEnter={() => onHover([...activePath.slice(0, level), sub.name])}
+              onFocus={() => onHover([...activePath.slice(0, level), sub.name])}
+              onClick={onClick}
+              tabIndex={0}
+            >
+              <span className="flex-1">{sub.name}</span>
+              {hasChildren && <ChevronRightIcon className="w-4 h-4 ml-2 text-base-content/60" />}
+            </div>
+            {hasChildren && isActive && (
+              <SubcategoryList
+                parent={parent}
+                subcategories={sub.subcategories}
+                activePath={activePath}
+                onHover={onHover}
+                onClick={onClick}
+                level={level + 1}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -124,42 +175,52 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
 
   return (
     <>
+      {/* Mobile Menu Button */}
       <button
         type="button"
         aria-label="Toggle categories"
-        className="md:hidden btn btn-ghost"
+        className="md:hidden btn btn-ghost btn-sm"
         aria-controls="mobile-cat-menu"
         aria-expanded={mobileOpen}
         onClick={() => setMobileOpen((p) => !p)}
       >
-        <span className="sr-only">Categories</span>
         <MenuIcon className="w-5 h-5" />
       </button>
-      <ul className="menu menu-horizontal hidden md:flex" role="menubar">
-        <li className="relative">
-          <div onMouseEnter={handleMenuEnter} onMouseLeave={handleMenuLeave}>
-            <button
-              type="button"
-              aria-label="Categories menu"
-              className="flex items-center gap-1"
-              onClick={() => setMenuOpen((prev) => !prev)}
-              onMouseEnter={handleMenuEnter}
-            >
-              Categories{' '}
-              <ChevronDownIcon
-                className={`w-4 h-4 transition-transform ${menuOpen ? 'rotate-180' : ''}`}
-              />
-            </button>
-            <div
-              id="mega-menu"
-              role="menu"
-              onMouseEnter={handleMenuEnter}
-              onMouseLeave={handleMenuLeave}
-              className={`absolute left-0 top-full mt-1 z-50 p-4 bg-base-100 bg-opacity-100 border border-base-200 shadow-lg rounded w-screen max-w-sm sm:max-w-xl md:max-w-3xl transition-all transform ${menuOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 -translate-y-2'}`}
-              aria-hidden={!menuOpen}
-            >
-              <div className="flex gap-6">
-                <div className="pr-4 border-r border-base-200 category-list min-w-[220px] max-w-xs">
+
+      {/* Desktop Categories Menu */}
+      <div className="hidden md:block relative">
+        <div onMouseEnter={handleMenuEnter} onMouseLeave={handleMenuLeave}>
+          <button
+            type="button"
+            aria-label="Categories menu"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-base-200 hover:text-primary"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            onMouseEnter={handleMenuEnter}
+          >
+            Categories
+            <ChevronDownIcon
+              className={`w-4 h-4 transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          
+          {/* Mega Menu Dropdown */}
+          <div
+            id="mega-menu"
+            role="menu"
+            onMouseEnter={handleMenuEnter}
+            onMouseLeave={handleMenuLeave}
+            className={`absolute left-0 top-full mt-2 z-50 bg-base-100 border border-base-200 shadow-xl rounded-2xl overflow-hidden transition-all duration-200 transform ${
+              menuOpen 
+                ? 'visible opacity-100 translate-y-0 scale-100' 
+                : 'invisible opacity-0 -translate-y-2 scale-95'
+            }`}
+            aria-hidden={!menuOpen}
+          >
+            <div className="flex min-w-[600px] max-w-4xl">
+              {/* Categories List */}
+              <div className="w-1/2 p-6 border-r border-base-200 bg-base-50">
+                <h3 className="text-lg font-semibold mb-4 text-base-content">Categories</h3>
+                <div className="space-y-2">
                   {categories.map((cat) => (
                     <Link
                       key={cat.name}
@@ -171,79 +232,103 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
                       onMouseEnter={() => handleCategoryHover(cat)}
                       onClick={() => setMenuOpen(false)}
                       title={cat.name}
-                      className={`flex items-center gap-1 px-2 py-1 rounded text-left font-medium tracking-wide transition-colors transition-transform duration-200 focus:outline-none capitalize whitespace-normal hover:bg-base-200 hover:text-primary hover:underline hover:scale-105 cursor-pointer ${activeCat?.name === cat.name ? 'bg-base-200 text-primary' : 'text-gray-800'}`}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg text-left font-medium transition-all duration-200 focus:outline-none capitalize whitespace-normal hover:bg-primary/10 hover:text-primary cursor-pointer ${
+                        activeCat?.name === cat.name 
+                          ? 'bg-primary/20 text-primary shadow-sm' 
+                          : 'text-base-content'
+                      }`}
                     >
-                      {iconMap[cat.name] || null}
-                      <span>{cat.name}</span>
+                      {iconMap[cat.name] || <div className="w-5 h-5 mr-2" />}
+                      <span className="flex-1">{cat.name}</span>
                       {cat.subcategories?.length ? (
-                        <ChevronRightIcon className="w-3 h-3 ml-auto" />
+                        <ChevronRightIcon className="w-4 h-4 text-base-content/60" />
                       ) : null}
                     </Link>
                   ))}
-                  {categories.length === 0 && <span>No categories found</span>}
+                  {categories.length === 0 && (
+                    <div className="px-4 py-3 text-base-content/60">
+                      No categories found
+                    </div>
+                  )}
                 </div>
-                {activeCat?.subcategories && activeCat.subcategories.length > 0 ? (
-                  <ul className="min-w-[200px] pl-4 space-y-1 fade-in" role="menu">
-                    {activeCat.subcategories.map((sub) => (
-                      <li key={sub.name} className="capitalize" role="none">
-                        <Link
-                          href={`/categories/${encodeURIComponent(activeCat.name)}?type=${encodeURIComponent(sub.name)}`}
-                          role="menuitem"
-                          className="block font-medium text-gray-800 tracking-wide transition-colors transition-transform duration-200 whitespace-nowrap truncate hover:text-primary hover:underline hover:scale-105"
-                        >
-                          {sub.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+              </div>
+
+              {/* Subcategories Panel */}
+              <div className="w-1/2 p-6">
+                {activeCat ? (
+                  <>
+                    <div className="flex items-center gap-3 mb-4">
+                      {iconMap[activeCat.name] || <div className="w-6 h-6" />}
+                      <h3 className="text-lg font-semibold capitalize">{activeCat.name}</h3>
+                    </div>
+                    {activeCat.subcategories && activeCat.subcategories.length > 0 ? (
+                      <SubcategoryList
+                        parent={activeCat.name}
+                        subcategories={activeCat.subcategories}
+                        activePath={[activeCat.name]}
+                        onHover={() => {}}
+                        onClick={() => setMenuOpen(false)}
+                        level={1}
+                      />
+                    ) : (
+                      <div className="px-4 py-3 text-base-content/60">
+                        No sub-categories available
+                      </div>
+                    )}
+                  </>
                 ) : (
-                  <div className="min-w-[200px] pl-4 flex items-center text-sm text-gray-500">
-                    No sub-categories
+                  <div className="flex items-center justify-center h-full text-base-content/60">
+                    Select a category to view subcategories
                   </div>
                 )}
               </div>
             </div>
           </div>
-        </li>
-      </ul>
+        </div>
+      </div>
+
+      {/* Mobile Categories Menu */}
       <div
         id="mobile-cat-menu"
-        className={`md:hidden absolute left-0 top-full w-full z-40 bg-base-100 border border-base-200 shadow-lg rounded p-4 transition-all ${mobileOpen ? 'max-h-[80vh] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
+        className={`md:hidden absolute left-0 top-full w-full z-40 bg-base-100 border border-base-200 shadow-xl rounded-2xl transition-all duration-200 ${
+          mobileOpen 
+            ? 'max-h-[80vh] opacity-100 translate-y-0' 
+            : 'max-h-0 opacity-0 -translate-y-2 overflow-hidden'
+        }`}
       >
-        <ul className="space-y-2">
-          {categories.map((cat) => (
-            <details key={cat.name} className="border-b border-base-200 last:border-none">
-              <summary
-                title={cat.name}
-                className="flex items-center gap-2 py-2 cursor-pointer list-none transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105 hover:bg-base-200 rounded"
-              >
-                {iconMap[cat.name] || null}
-                <Link
-                  href={`/categories/${encodeURIComponent(cat.name)}`}
-                  className="capitalize line-clamp-2 whitespace-normal flex-1 cursor-pointer"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {cat.name}
-                </Link>
-              </summary>
-              {cat.subcategories?.length && (
-                <ul className="pl-4 py-2 space-y-1">
-                  {cat.subcategories.map((sub) => (
-                    <li key={sub.name} className="capitalize">
+        <div className="p-4">
+          <h3 className="text-lg font-semibold mb-4">Categories</h3>
+          <div className="space-y-2">
+            {categories.map((cat) => (
+              <details key={cat.name} className="group">
+                <summary className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer list-none transition-all duration-200 hover:bg-base-200 group-open:bg-primary/10 group-open:text-primary">
+                  {iconMap[cat.name] || <div className="w-5 h-5" />}
+                  <span className="flex-1 capitalize font-medium">{cat.name}</span>
+                  <ChevronDownIcon className="w-4 h-4 transition-transform duration-200 group-open:rotate-180" />
+                </summary>
+                {cat.subcategories?.length && (
+                  <div className="pl-8 pr-4 py-2 space-y-1">
+                    {cat.subcategories.map((sub) => (
                       <Link
+                        key={sub.name}
                         href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub.name)}`}
-                        className="block py-1 transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105"
+                        className="block px-4 py-2 rounded-lg transition-all duration-200 hover:bg-primary/10 hover:text-primary capitalize"
+                        onClick={() => setMobileOpen(false)}
                       >
                         {sub.name}
                       </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </details>
-          ))}
-          {categories.length === 0 && <li>No categories found</li>}
-        </ul>
+                    ))}
+                  </div>
+                )}
+              </details>
+            ))}
+            {categories.length === 0 && (
+              <div className="px-4 py-3 text-base-content/60">
+                No categories found
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </>
   );

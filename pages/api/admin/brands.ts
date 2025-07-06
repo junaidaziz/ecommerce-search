@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getVendors, getVendorsCount, setBrandActive } from '@lib/users';
+import { getVendors, getVendorsCount, setBrandActive, setBrandVerified } from '@lib/users';
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import type { Vendor, ApiMessage } from '@/types';
@@ -29,13 +29,25 @@ async function handler(
       return;
     }
     if (req.method === 'PATCH') {
-      const { id, active } = req.body as { id?: number; active?: boolean };
-      if (!id || typeof active !== 'boolean') {
-        res.status(400).json({ message: 'id and active required' });
+      const { id, active, verified } = req.body as { id?: number; active?: boolean; verified?: boolean };
+      if (!id) {
+        res.status(400).json({ message: 'id required' });
         return;
       }
-      await setBrandActive(id, active);
-      res.status(200).json({ message: 'updated' });
+      
+      if (typeof active === 'boolean') {
+        await setBrandActive(id, active);
+        res.status(200).json({ message: 'active status updated' });
+        return;
+      }
+      
+      if (typeof verified === 'boolean') {
+        await setBrandVerified(id, verified);
+        res.status(200).json({ message: 'verification status updated' });
+        return;
+      }
+      
+      res.status(400).json({ message: 'active or verified field required' });
       return;
     }
     res.status(405).json({ message: METHOD_NOT_ALLOWED });

@@ -10,6 +10,11 @@ module.exports = {
         sans: ['Inter', 'sans-serif'],
       },
       colors: {
+        primary: '#10b981', // Emerald 500
+        accent: '#6366f1',  // Indigo 500
+        background: '#f1f5f9', // Slate 100
+        secondary: '#f59e42', // Orange 400
+        text: '#0f172a', // Slate 900
         // Custom button colors
         'btn-primary': {
           DEFAULT: '#10b981', // Emerald green
