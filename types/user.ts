@@ -1,73 +1,81 @@
-import type { Role } from '@prisma/client';
+import type { User as PrismaUser, Role } from '@prisma/client';
 
-export interface User {
-  id?: number | string;
+// Base User type extending Prisma User
+export type User = PrismaUser & {
+  // Additional computed fields
+  name?: string; // Display name from auth providers
+  paymentMethods?: PaymentMethod[];
+};
+
+// Input type for creating users
+export type UserInput = Pick<
+  PrismaUser,
+  | 'email'
+  | 'password'
+  | 'firstName'
+  | 'lastName'
+  | 'brandName'
+  | 'gender'
+  | 'phoneNumber'
+  | 'address'
+  | 'city'
+  | 'state'
+  | 'postalCode'
+  | 'country'
+  | 'businessAddress'
+  | 'website'
+  | 'businessDescription'
+  | 'logo'
+  | 'profileImage'
+  | 'taxId'
+  | 'stripeAccountId'
+  | 'role'
+  | 'verificationToken'
+> & {
   uuid?: string;
-  email: string;
-  /** Optional display name from auth providers */
-  name?: string;
-  firstName?: string;
-  lastName?: string;
-  role?: Role;
-  phoneNumber?: string | null;
-  address?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  country?: string;
-  brandName?: string;
-  gender?: string;
-  businessAddress?: string;
-  website?: string;
-  businessDescription?: string;
-  logo?: string;
-  profileImage?: string;
-  taxId?: string;
-  stripeAccountId?: string;
-  paymentMethods?: import('./vendor').BrandPaymentMethod[];
-  verificationToken?: string;
-  resetToken?: string;
-  resetExpires?: Date;
-  verified?: boolean;
-  disabled?: boolean;
-  active?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+  paymentMethods?: PaymentMethod[];
+};
 
+// Update type for users
+export type UserUpdate = Partial<Omit<UserInput, 'password' | 'email'>>;
+
+// User response type
 export type UserResponse = User;
 
-export interface UserInput {
-  email: string;
-  password?: string;
-  firstName?: string;
-  lastName?: string;
-  brandName?: string;
-  gender?: string;
-  phoneNumber?: string | null;
-  address?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  country?: string;
-  businessAddress?: string;
-  website?: string;
-  businessDescription?: string;
-  logo?: string;
-  profileImage?: string;
-  taxId?: string;
-  stripeAccountId?: string;
-  paymentMethods?: import('./vendor').BrandPaymentMethod[];
-  role?: Role;
-  verificationToken?: string;
+// User with minimal fields for lists
+export type UserSummary = Pick<
+  PrismaUser,
+  | 'id'
+  | 'uuid'
+  | 'email'
+  | 'firstName'
+  | 'lastName'
+  | 'brandName'
+  | 'role'
+  | 'verified'
+  | 'active'
+  | 'createdAt'
+>;
+
+// Payment method type
+export interface PaymentMethod {
+  id: number;
+  userId: number;
+  provider: string;
+  cardLast4: string;
+  cardBrand: string;
+  expMonth: number;
+  expYear: number;
+  token: string;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export enum UserRole {
-  SUPER_ADMIN = 'SUPER_ADMIN',
-  BRAND = 'BRAND',
-  USER = 'USER',
-}
+// User role enum (matching Prisma)
+export { Role as UserRole };
 
-export const getUserRoles = (): UserRole[] => {
-  return Object.values(UserRole);
+// Helper function to get user roles
+export const getUserRoles = (): Role[] => {
+  return ['USER', 'BRAND', 'SUPER_ADMIN'] as Role[];
 };

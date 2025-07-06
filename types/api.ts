@@ -1,94 +1,121 @@
+import type { Product } from './product';
+import type { User } from './user';
+import type { Category } from './category';
+import type { Vendor } from './vendor';
+import type { Coupon } from './coupon';
+
+// Search results interface
 export interface SearchResults {
-  results: import('./product').Product[];
+  results: Product[];
 }
 
+// Suggestions response interface
 export interface SuggestionsResponse {
   suggestions: string[];
 }
 
+// Search API response interface
 export interface SearchApiResponse {
-  results: import('./product').Product[];
+  results: Product[];
   total: number;
   page: number;
   totalPages: number;
   brands: string[];
   categories: string[];
-  fallback: import('./product').Product[];
+  fallback: Product[];
 }
 
+// Trending response interface
 export interface TrendingResponse {
   keywords: string[];
 }
 
+// Checkout session response interface
 export interface CheckoutSessionResponse {
   url: string;
   message?: string;
   id?: string;
 }
 
+// Order ID response interface
 export interface OrderIdResponse {
   id: string;
 }
 
+// Order placed response interface
 export interface OrderPlacedResponse extends OrderIdResponse {
   message: string;
 }
 
+// Login response interface
 export interface LoginResponse {
   message: string;
-  user?: import('./user').User;
+  user?: User;
 }
 
+// Signup response interface
 export interface SignupResponse {
   message: string;
-  user: import('./user').User;
+  user: User;
   token: string;
 }
 
+// Signup token response interface
 export interface SignupTokenResponse {
   token: string;
 }
 
+// Reset token response interface
 export interface ResetTokenResponse {
   message: string;
   token: string;
 }
 
+// Email change tokens response interface
 export interface EmailChangeTokensResponse {
   message: string;
   oldToken: string;
   newToken: string;
 }
 
-type CouponResponse = import('./coupon').Coupon;
+// Coupon response type
+export type CouponResponse = Coupon;
 
+// Categories response interface
 export interface CategoriesResponse {
-  categories: import('./category').Category[];
+  categories: Category[];
 }
 
+// Tags response interface
 export interface TagsResponse {
   tags: string[];
 }
 
-interface UsersResponse {
-  users: (import('./user').User & { disabled?: boolean })[];
+// Users response interface
+export interface UsersResponse {
+  users: (User & { disabled?: boolean })[];
 }
+
+// Category response interface
 export interface CategoryResponse {
-  category: import('./category').Category;
+  category: Category;
 }
 
+// Vendors response interface
 export interface VendorsResponse {
-  vendors: import('./vendor').Vendor[];
+  vendors: Vendor[];
 }
 
+// Category check response interface
 export interface CategoryCheckResponse {
   exists: boolean;
-  category?: import('./category').Category;
+  category?: Category;
 }
 
+// Category check or create response interface
 export interface CategoryCheckOrCreateResponse {
   exists?: boolean;
   success?: boolean;
   name?: string;
-  category?: import('./category').Category;
+  category?: Category;
 }
