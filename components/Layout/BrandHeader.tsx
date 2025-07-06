@@ -103,15 +103,16 @@ const BrandHeader: FC<HeaderProps> = ({
             </div>
           )}
           <NotificationBell />
-          <label className="swap swap-rotate">
+          <label className="swap swap-rotate btn btn-ghost btn-circle tooltip tooltip-bottom" data-tip={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
             <input
               type="checkbox"
               aria-label="Toggle dark mode"
               checked={theme === 'dark'}
               onChange={() => setTheme?.(theme === 'dark' ? 'light' : 'dark')}
+              className="sr-only"
             />
-            <MoonIcon className="swap-on w-5 h-5" />
-            <SunIcon className="swap-off w-5 h-5" />
+            <MoonIcon className="swap-on w-5 h-5 text-primary" />
+            <SunIcon className="swap-off w-5 h-5 text-primary" />
           </label>
           {user ? (
             <div className="dropdown dropdown-end">

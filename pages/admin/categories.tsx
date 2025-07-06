@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import { Category, CategoryInput, ApiMessage, UserRole } from '@/types';
+import { Category, CategoryInput, ApiMessage, UserRole, USER_ROLES } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import { TextInput } from '@components/form-fields';
 import { slugify } from '@lib/slugify';
@@ -78,7 +78,7 @@ export default function Categories() {
 
   if (!user)
     return <div className="p-4">Please log in to view categories.</div>;
-  if (user.role.toUpperCase() !== UserRole.SUPER_ADMIN)
+  if (user.role.toUpperCase() !== USER_ROLES.SUPER_ADMIN)
     return <div className="p-4">Admin access required.</div>;
 
   return (

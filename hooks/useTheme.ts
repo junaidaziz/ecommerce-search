@@ -20,9 +20,21 @@ export default function useTheme() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const html = document.documentElement;
-    html.className = theme;
+    
+    // Remove existing theme classes
+    html.classList.remove('light', 'dark');
+    
+    // Add new theme class
+    html.classList.add(theme);
+    
+    // Set data-theme attribute for DaisyUI
     html.setAttribute('data-theme', theme);
+    
+    // Persist to localStorage
     localStorage.setItem('theme', theme);
+    
+    // Log for debugging
+    console.log('Theme changed to:', theme);
   }, [theme]);
 
   return [theme, setTheme] as const;

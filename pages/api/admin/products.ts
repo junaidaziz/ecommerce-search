@@ -1,14 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@pages/api/auth/[...nextauth]';
+import { withRole } from '@lib/withRole';
 import { getDb } from '@lib/db';
-import { hasOrdersForProduct } from '@lib/orders';
-import formidable, { type Fields, type Files, type File } from 'formidable';
 import { uploadFileToS3 } from '@lib/s3';
-import path from 'path';
-import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { slugify } from '@lib/slugify';
-import { Product, ApiMessage, Variant, UserRole } from '@/types';
+import { Product, ApiMessage, Variant, USER_ROLES } from '@/types';
 import { mapDbRowToProduct } from '@lib/products';
 import {
   METHOD_NOT_ALLOWED,
@@ -16,26 +15,22 @@ import {
   UUID_REQUIRED,
   CANNOT_DELETE_PRODUCT_WITH_ORDERS,
 } from '@/constants/messages';
+import { hasOrdersForProduct } from '@lib/orders';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+export interface AuthedNextApiRequest extends NextApiRequest {
+  user?: any;
+}
 
-async function parseBody(
+interface ProductsListResponse {
+  products: Product[];
+  total: number;
+}
+
+function parseBody(
   req: NextApiRequest
-): Promise<{ fields: Fields; files: Files }> {
-  const type = req.headers['content-type'] || '';
-  if (type.includes('application/json')) {
-    const buffers: Uint8Array[] = [];
-    for await (const chunk of req) buffers.push(chunk);
-    const body = Buffer.concat(buffers).toString();
-    return { fields: JSON.parse(body || '{}') as Fields, files: {} as Files };
-  }
-  return new Promise<{ fields: Fields; files: Files }>((resolve, reject) => {
-    const form = formidable({ multiples: true });
-    form.parse(req, (err, fields, files) => {
+): Promise<{ fields: any; files: any }> {
+  return new Promise((resolve, reject) => {
+    formidable().parse(req, (err, fields, files) => {
       if (err) reject(err);
       else resolve({ fields, files });
     });
@@ -44,12 +39,12 @@ async function parseBody(
 
 async function handler(
   req: AuthedNextApiRequest,
-  res: NextApiResponse<Product[] | ApiMessage>
+  res: NextApiResponse<Product[] | ProductsListResponse | ApiMessage>
 ): Promise<void> {
   try {
     const db = getDb();
     const user = req.user;
-    if (user?.role !== UserRole.SUPER_ADMIN && !user?.brandId) {
+    if (user?.role !== USER_ROLES.SUPER_ADMIN && !user?.brandId) {
       return res.status(403).json({ message: 'Forbidden' });
     }
 
@@ -217,14 +212,69 @@ async function handler(
 
     if (req.method === 'GET') {
       const vendor = getQueryParam(req.query.vendor);
+      const page = parseInt(getQueryParam(req.query.page) || '1', 10);
+      const limit = parseInt(getQueryParam(req.query.limit) || '20', 10);
+      const search = getQueryParam(req.query.q);
+      const sortBy = getQueryParam(req.query.sort) || 'newest';
+      
+      const skip = (page - 1) * limit;
+      
+      // Build where clause
       const where: Record<string, unknown> = {};
       if (vendor) where.vendor = { brandName: vendor };
+      if (search) {
+        where.OR = [
+          { title: { contains: search, mode: 'insensitive' } },
+          { sku: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+
+      // Build orderBy clause
+      let orderBy: any = {};
+      switch (sortBy) {
+        case 'newest':
+          orderBy = { createdAt: 'desc' };
+          break;
+        case 'oldest':
+          orderBy = { createdAt: 'asc' };
+          break;
+        case 'title_asc':
+          orderBy = { title: 'asc' };
+          break;
+        case 'title_desc':
+          orderBy = { title: 'desc' };
+          break;
+        case 'price_asc':
+          orderBy = { minPrice: 'asc' };
+          break;
+        case 'price_desc':
+          orderBy = { minPrice: 'desc' };
+          break;
+        case 'stock_asc':
+          orderBy = { quantity: 'asc' };
+          break;
+        case 'stock_desc':
+          orderBy = { quantity: 'desc' };
+          break;
+        default:
+          orderBy = { createdAt: 'desc' };
+      }
+
+      // Get total count
+      const total = await db.product.count({ where });
+      
+      // Get paginated results
       const rows = await db.product.findMany({
         where,
         include: { category: true, vendor: true, variants: true },
+        orderBy,
+        skip,
+        take: limit,
       });
+      
       const data: Product[] = rows.map((p: any) => mapDbRowToProduct(p));
-      res.status(200).json(data);
+      res.status(200).json({ products: data, total });
       return;
     }
 

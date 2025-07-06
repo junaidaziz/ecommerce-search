@@ -10,7 +10,7 @@ import { getPageTitle } from '@lib/pageTitle';
 import { EmailInput, PasswordInput } from '@components/form-fields';
 import GoogleIcon from '@components/icons/GoogleIcon';
 import FacebookIcon from '@components/icons/FacebookIcon';
-import { User, UserRole } from '../types';
+import { User, USER_ROLES } from '../types';
 import PageContainer from '@components/Layout/PageContainer';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,10 +41,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   useEffect(() => {
     if (user) {
       if (onLoginSuccess) onLoginSuccess(user);
-      if (user.role === UserRole.BRAND) {
+      if (user.role === USER_ROLES.BRAND) {
         if (!user.brandName) router.push('/brand/profile?complete=1');
         else router.push('/brand/dashboard');
-      } else if (user.role === UserRole.SUPER_ADMIN) {
+      } else if (user.role === USER_ROLES.SUPER_ADMIN) {
         router.push('/admin');
       } else {
         if (!user.lastName) router.push('/user/profile?complete=1');
@@ -69,7 +69,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center overflow-auto px-4 py-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-start justify-center overflow-auto px-4 pt-8 sm:px-6 lg:px-8">
       <Head>
         <title>{getPageTitle('Login')}</title>
       </Head>
@@ -128,16 +128,16 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             </Link>
           </div>
           <button
-            className="btn btn-primary w-full"
-          type="submit"
-          disabled={loading}
-        >
-          {loading && <span className="loading loading-spinner mr-2"></span>}
-          Login
-        </button>
+            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            type="submit"
+            disabled={loading}
+          >
+            {loading && <span className="loading loading-spinner mr-2"></span>}
+            Login
+          </button>
       </form>
       <p className="text-center mt-4">
-        Don’t have an account?{' '}
+        Don't have an account?{' '}
         <Link href="/signup" className="link">
           Signup
         </Link>

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Link from 'next/link';
 import type { Product } from '@/types';
 import { formatCurrency } from '@utils/formatCurrency';
 import ProductImageSlider from './ProductImageSlider';
+import { AppContext } from '@contexts/AppContext';
 
 interface ProductCardProps {
   product: Product;
@@ -19,6 +20,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   addToWish,
   removeFromWish,
 }) => {
+  const appContext = useContext(AppContext);
+  const { addToCart } = appContext || {};
+
   const isNew = product.tags?.toLowerCase().includes('new');
   const rating = Math.round(product.averageRating || 0);
   const stockStatus = product.totalInventory && product.totalInventory > 10
@@ -34,6 +38,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
       removeFromWish && removeFromWish(product.id);
     } else {
       addToWish && addToWish(product);
+    }
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (addToCart) {
+      addToCart(product);
     }
   };
 
@@ -121,7 +133,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
           
           {/* Quick Add to Cart */}
-          <button className="w-full btn btn-primary btn-sm transition-all duration-200 hover:scale-105 flex items-center justify-center">
+          <button className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 hover:scale-105 flex items-center justify-center shadow-md hover:shadow-lg" onClick={handleAddToCart}>
             <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
             </svg>
