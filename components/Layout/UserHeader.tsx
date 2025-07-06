@@ -109,6 +109,7 @@ const Header: FC<HeaderProps> = ({
           { label: 'Admin Dashboard', href: '/admin' },
           { label: 'All Users', href: '/admin/users' },
           { label: 'All Brands', href: '/admin/brands' },
+          { label: 'All Products', href: '/admin/products' },
           { label: 'All Orders', href: '/admin/orders' },
           { divider: true },
         ]
@@ -181,12 +182,22 @@ const Header: FC<HeaderProps> = ({
 
         <nav className="flex items-center gap-4">
           {!isSuperAdmin && (
-            <CartDropdown
-              cart={cart}
-              changeQty={changeQty}
-              removeFromCart={removeFromCart}
-              itemCount={itemCount}
-            />
+            <>
+              <Link href="/user/wishlist" className="relative btn btn-ghost btn-circle flex items-center justify-center group" aria-label="Wishlist">
+                <svg className={`w-6 h-6 transition-colors ${appContext?.wishlist?.length > 0 ? 'text-red-500 fill-red-500' : 'text-base-content/60 fill-none'} group-hover:text-red-500`} viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                {appContext?.wishlist?.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow">{appContext.wishlist.length}</span>
+                )}
+              </Link>
+              <CartDropdown
+                cart={cart}
+                changeQty={changeQty}
+                removeFromCart={removeFromCart}
+                itemCount={itemCount}
+              />
+            </>
           )}
 
           <label className="swap swap-rotate btn btn-ghost btn-circle tooltip tooltip-bottom" data-tip={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>

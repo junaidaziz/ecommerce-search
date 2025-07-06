@@ -8,7 +8,7 @@ import TopProductsChart from '@components/analytics/TopProductsChart';
 import DashboardCard from '@components/dashboard/DashboardCard';
 import TotalProductsCard from '@components/dashboard/TotalProductsCard';
 import TotalSalesCard from '@components/dashboard/TotalSalesCard';
-import { UserRole } from '@/types';
+import { UserRole, USER_ROLES } from '@/types';
 import OrdersThisMonthCard from '@components/dashboard/OrdersThisMonthCard';
 import InventoryAlertsCard from '@components/dashboard/InventoryAlertsCard';
 import CartIcon from '@components/icons/CartIcon';
@@ -101,7 +101,7 @@ const BrandAnalytics: React.FC = () => {
   }, [user]);
 
   if (!user) return <div className="p-4">Please log in.</div>;
-  if (user.role !== 'brand' && user.role !== UserRole.SUPER_ADMIN)
+  if (user.role !== 'brand' && user.role !== USER_ROLES.SUPER_ADMIN)
     return <div className="p-4">Brand access required.</div>;
 
   if (loading || data === null) return <div className="p-4">Loading...</div>;

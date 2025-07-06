@@ -4,14 +4,10 @@ import { useEffect, useState } from 'react';
 import { getPageTitle } from '@lib/pageTitle';
 import DEFAULT_CATEGORIES from '@lib/defaultCategories';
 import CATEGORY_IMAGES from '@lib/categoryImages';
-import { 
-  HomeHero, 
+import {
   FeaturedCards, 
   CategoryGrid,
-  Hero,
-  CategoryPromotion,
-  PromoBanner,
-  CategorySlider
+  Hero
 } from '@lib/dynamicImports';
 import type { CategoryItem } from '@components/Category/CategorySlider';
 

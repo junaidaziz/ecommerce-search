@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useContext } from 'react';
 import useRequireAuth from '@hooks/useRequireAuth';
 import { getPageTitle } from '@lib/pageTitle';
 import { NotificationContext } from '@contexts/NotificationContext';
-import { UserRole, type User } from '@/types';
+import { UserRole, type User, USER_ROLES } from '@/types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import PageContainer from '@components/Layout/PageContainer';
@@ -14,6 +14,7 @@ import UserIcon from '@components/icons/UserIcon';
 import HomeIcon from '@components/icons/HomeIcon';
 import MoneyIcon from '@components/icons/MoneyIcon';
 import CheckCircleIcon from '@components/icons/CheckCircleIcon';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
 
 dayjs.extend(relativeTime);
 
@@ -93,138 +94,79 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <PageContainer className="space-y-6 max-w-3xl">
-      <Head>
-        <title>{getPageTitle('My Profile')}</title>
-      </Head>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-4 flex-1">
-          <div className="relative" onClick={() => inputRef.current?.click()}>
-            {imagePreview ? (
-              <img
-                src={imagePreview}
-                alt="preview"
-                className="w-20 h-20 rounded-full object-cover cursor-pointer"
-              />
-            ) : profile?.profileImage ? (
-              <img
-                src={profile.profileImage}
-                alt="avatar"
-                className="w-20 h-20 rounded-full object-cover cursor-pointer"
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer text-white font-semibold text-xl">
-                {(user.firstName?.[0] || '').toUpperCase()}
-                {(user.lastName?.[0] || '').toUpperCase()}
-              </div>
+    <div className="flex justify-center items-center min-h-[70vh] bg-base-100 py-10 px-2">
+      <div className="relative w-full max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col gap-8">
+        {/* Edit Button */}
+        <Link
+          href="/settings"
+          className="absolute top-6 right-6 flex items-center gap-2 px-5 py-2 rounded-full bg-primary text-white font-semibold shadow-lg hover:bg-primary/90 transition text-base"
+        >
+          <PencilSquareIcon className="w-5 h-5" />
+          Edit Profile
+        </Link>
+        {/* Profile Header */}
+        <div className="flex flex-col md:flex-row md:items-center gap-6">
+          <div className="flex-shrink-0 flex flex-col items-center">
+            <div className="w-24 h-24 rounded-full bg-emerald-500 flex items-center justify-center text-white text-4xl font-bold shadow-lg border-4 border-white">
+              {(user.firstName?.[0] || '').toUpperCase()}{(user.lastName?.[0] || '').toUpperCase()}
+            </div>
+            {profile?.role && (
+              <span className={`mt-3 inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide 
+                ${profile.role === USER_ROLES.SUPER_ADMIN ? 'bg-blue-100 text-blue-700' :
+                  profile.role === USER_ROLES.BRAND ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}
+              >
+                {profile.role === USER_ROLES.SUPER_ADMIN ? 'Admin' : profile.role === USER_ROLES.BRAND ? 'Brand' : 'User'}
+              </span>
             )}
-            <input
-              type="file"
-              ref={inputRef}
-              accept="image/jpeg,image/png"
-              className="hidden"
-              onChange={handleChange}
-            />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">{renderValue(fullName)}</h1>
-            <p className="text-gray-600">
-              {renderValue(profile?.email || user.email)}
-            </p>
-            <div className="flex gap-1 mt-2">
+          <div className="flex-1 flex flex-col gap-1 justify-center">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight">{renderValue(fullName)}</h1>
+            <p className="text-lg text-gray-500">{renderValue(profile?.email || user.email)}</p>
+            <div className="flex gap-2 mt-2 flex-wrap">
               {profile && (
-                <StatusLabel
-                  color={profile.verified ? 'success' : 'default'}
-                  size="sm"
-                >
+                <StatusLabel color={profile.verified ? 'success' : 'default'} size="sm">
                   {profile.verified ? 'Verified' : 'Not verified'}
                 </StatusLabel>
               )}
               {profile && (
-                <StatusLabel
-                  color={profile.disabled ? 'error' : 'success'}
-                  size="sm"
-                >
+                <StatusLabel color={profile.disabled ? 'error' : 'success'} size="sm">
                   {profile.disabled ? 'Disabled' : 'Active'}
-                </StatusLabel>
-              )}
-              {profile && (
-                <StatusLabel color="info" size="sm">
-                  {profile.role === UserRole.BRAND
-                    ? 'Brand Admin'
-                    : profile.role === UserRole.SUPER_ADMIN
-                      ? 'Admin'
-                      : 'Customer'}
                 </StatusLabel>
               )}
             </div>
           </div>
         </div>
-        <div className="flex gap-2 sm:flex-col sm:items-end">
-          {imagePreview && (
-            <button onClick={uploadImage} className="btn btn-primary btn-sm">
-              Upload
-            </button>
-          )}
-          <Link
-            href="/settings"
-            className="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-          >
-            Edit Profile
-          </Link>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <section className="card bg-base-100 shadow">
-          <div className="card-body space-y-3">
-            <h2 className="card-title text-base font-semibold flex items-center gap-2">
-              <UserIcon className="w-5 h-5" />
-              Contact Info
+        {/* Info Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Contact Info */}
+          <section className="bg-base-50 rounded-2xl shadow p-6 flex-1 min-w-[220px]">
+            <h2 className="flex items-center gap-2 text-base font-semibold mb-3 text-gray-800">
+              <UserIcon className="w-5 h-5" /> Contact Info
             </h2>
             {renderRow('Email', profile?.email || user.email)}
             {renderRow('Phone', profile?.phoneNumber)}
-          </div>
-        </section>
-        <section className="card bg-base-100 shadow">
-          <div className="card-body space-y-3">
-            <h2 className="card-title text-base font-semibold flex items-center gap-2">
-              <HomeIcon className="w-5 h-5" />
-              Address Info
+          </section>
+          {/* Address Info */}
+          <section className="bg-base-50 rounded-2xl shadow p-6 flex-1 min-w-[220px]">
+            <h2 className="flex items-center gap-2 text-base font-semibold mb-3 text-gray-800">
+              <HomeIcon className="w-5 h-5" /> Address Info
             </h2>
             {renderRow('City', profile?.city)}
             {renderRow('State', profile?.state)}
             {renderRow('Country', profile?.country)}
             {renderRow('Postal Code', profile?.postalCode)}
-          </div>
-        </section>
-        {profile?.role === UserRole.BRAND && (
-          <section className="card bg-base-100 shadow">
-            <div className="card-body space-y-3">
-              <h2 className="card-title text-base font-semibold flex items-center gap-2">
-                <MoneyIcon className="w-5 h-5" />
-                Business Info
-              </h2>
-              {renderRow('Brand Name', profile?.brandName)}
-              {renderRow('Website', profile?.website)}
-              {renderRow('Description', profile?.businessDescription)}
-              {renderRow('Business Address', profile?.businessAddress)}
-            </div>
           </section>
-        )}
-        <section className="card bg-base-100 shadow">
-          <div className="card-body space-y-3">
-            <h2 className="card-title text-base font-semibold flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5" />
-              Account Info
+          {/* Account Info */}
+          <section className="bg-base-50 rounded-2xl shadow p-6 flex-1 min-w-[220px] md:col-span-2">
+            <h2 className="flex items-center gap-2 text-base font-semibold mb-3 text-gray-800">
+              <MoneyIcon className="w-5 h-5" /> Account Info
             </h2>
             {renderRow('Role', profile?.role)}
-            {profile?.role === UserRole.BRAND &&
-              renderRow('Tax ID', profile?.taxId)}
             {renderRow('Last updated', lastUpdated)}
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
-    </PageContainer>
+    </div>
   );
 };
 

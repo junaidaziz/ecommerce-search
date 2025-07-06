@@ -103,7 +103,7 @@ const Footer: FC = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-bold text-base-content mb-6 flex items-center">
+            <h4 className="text-lg font-bold text-base-content/80 mb-6 flex items-center">
               <svg className="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
               </svg>
@@ -111,7 +111,7 @@ const Footer: FC = () => {
             </h4>
             <ul className="space-y-3">
               <li>
-                <Link className="text-base-content/70 hover:text-primary transition-colors duration-200 flex items-center group" href="/products">
+                <Link className="text-base-content/50 hover:text-primary/80 transition-colors duration-200 flex items-center group" href="/products">
                   <svg className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
@@ -119,7 +119,7 @@ const Footer: FC = () => {
                 </Link>
               </li>
               <li>
-                <Link className="text-base-content/70 hover:text-primary transition-colors duration-200 flex items-center group" href="/shipping">
+                <Link className="text-base-content/50 hover:text-primary/80 transition-colors duration-200 flex items-center group" href="/shipping">
                   <svg className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
@@ -127,7 +127,7 @@ const Footer: FC = () => {
                 </Link>
               </li>
               <li>
-                <Link className="text-base-content/70 hover:text-primary transition-colors duration-200 flex items-center group" href="/returns">
+                <Link className="text-base-content/50 hover:text-primary/80 transition-colors duration-200 flex items-center group" href="/returns">
                   <svg className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
@@ -135,7 +135,7 @@ const Footer: FC = () => {
                 </Link>
               </li>
               <li>
-                <Link className="text-base-content/70 hover:text-primary transition-colors duration-200 flex items-center group" href="/support">
+                <Link className="text-base-content/50 hover:text-primary/80 transition-colors duration-200 flex items-center group" href="/support">
                   <svg className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
@@ -143,7 +143,7 @@ const Footer: FC = () => {
                 </Link>
               </li>
               <li>
-                <Link className="text-base-content/70 hover:text-primary transition-colors duration-200 flex items-center group" href="/about">
+                <Link className="text-base-content/50 hover:text-primary/80 transition-colors duration-200 flex items-center group" href="/about">
                   <svg className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
@@ -155,7 +155,7 @@ const Footer: FC = () => {
 
           {/* Legal Links */}
           <div>
-            <h4 className="text-lg font-bold text-base-content mb-6 flex items-center">
+            <h4 className="text-lg font-bold text-base-content/80 mb-6 flex items-center">
               <svg className="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
               </svg>
@@ -163,7 +163,7 @@ const Footer: FC = () => {
             </h4>
             <ul className="space-y-3">
               <li>
-                <Link className="text-base-content/70 hover:text-primary transition-colors duration-200 flex items-center group" href="/privacy-policy">
+                <Link className="text-base-content/50 hover:text-primary/80 transition-colors duration-200 flex items-center group" href="/privacy-policy">
                   <svg className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
@@ -171,7 +171,7 @@ const Footer: FC = () => {
                 </Link>
               </li>
               <li>
-                <Link className="text-base-content/70 hover:text-primary transition-colors duration-200 flex items-center group" href="/terms-and-conditions">
+                <Link className="text-base-content/50 hover:text-primary/80 transition-colors duration-200 flex items-center group" href="/terms-and-conditions">
                   <svg className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
@@ -179,7 +179,7 @@ const Footer: FC = () => {
                 </Link>
               </li>
               <li>
-                <Link className="text-base-content/70 hover:text-primary transition-colors duration-200 flex items-center group" href="/cookie-policy">
+                <Link className="text-base-content/50 hover:text-primary/80 transition-colors duration-200 flex items-center group" href="/cookie-policy">
                   <svg className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
@@ -187,7 +187,7 @@ const Footer: FC = () => {
                 </Link>
               </li>
               <li>
-                <Link className="text-base-content/70 hover:text-primary transition-colors duration-200 flex items-center group" href="/sitemap">
+                <Link className="text-base-content/50 hover:text-primary/80 transition-colors duration-200 flex items-center group" href="/sitemap">
                   <svg className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>

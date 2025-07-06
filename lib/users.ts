@@ -65,16 +65,17 @@ export function findUserById(id: number | string) {
 }
 
 export function getAllUsers(search = '') {
-  const where = search
-    ? {
-        OR: [
-          { firstName: { contains: search, mode: 'insensitive' } },
-          { lastName: { contains: search, mode: 'insensitive' } },
-          { email: { contains: search, mode: 'insensitive' } },
-          { role: search.toUpperCase() as Role },
-        ],
-      }
-    : undefined;
+  const validRoles = ['USER', 'BRAND', 'SUPER_ADMIN'];
+  const searchUpper = search.toUpperCase();
+  const or: any[] = [
+    { firstName: { contains: search, mode: 'insensitive' } },
+    { lastName: { contains: search, mode: 'insensitive' } },
+    { email: { contains: search, mode: 'insensitive' } },
+  ];
+  if (validRoles.includes(searchUpper)) {
+    or.push({ role: searchUpper as any });
+  }
+  const where = search ? { OR: or } : undefined;
   return prisma.user.findMany({
     where,
     select: {
@@ -100,6 +101,10 @@ export function setUserDisabled(email: string, disabled: boolean) {
 
 export function setBrandActive(id: number, active: boolean) {
   return prisma.user.update({ where: { id }, data: { active } });
+}
+
+export function setBrandVerified(id: number, verified: boolean) {
+  return prisma.user.update({ where: { id }, data: { verified } });
 }
 
 export function deleteUser(email: string) {
@@ -184,7 +189,7 @@ export function getVendors(search = '', limit = 20, offset = 0, includeInactive 
       ],
       ...(includeInactive ? {} : { active: true }),
     },
-    select: { id: true, brandName: true, email: true, active: true },
+    select: { id: true, brandName: true, email: true, active: true, verified: true },
     orderBy: { brandName: 'asc' },
     take: limit,
     skip: offset,

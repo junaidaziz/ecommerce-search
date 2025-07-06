@@ -6,6 +6,7 @@ import { TextInput } from '@components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import Pagination from '@components/Pagination';
+import ConfirmModal from '@components/ConfirmModal';
 
 interface ProductsResponse {
   products: Product[];
@@ -24,6 +25,7 @@ export default function AdminProducts() {
   const [photos, setPhotos] = useState<File[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+  const [confirmAction, setConfirmAction] = useState<null | { type: 'add' | 'edit' | 'delete', payload?: any }>(null);
 
   type FormState = Partial<ProductInput> & { id?: string };
   const emptyForm: FormState = {
@@ -106,40 +108,14 @@ export default function AdminProducts() {
       setMessage(msg);
     }
   };
-  const handleEdit = (p: Product) => {
-    setForm({
-      id: p.id,
-      sku: p.sku || '',
-      title: p.title || '',
-      vendorId: p.vendorId,
-      description: p.description || '',
-      productType: p.productType || '',
-      tags: p.tags || '',
-      categoryId: p.categoryId,
-      quantity: p.totalInventory || 0,
-      minPrice: p.minPrice || 0,
-      maxPrice: p.maxPrice || 0,
-      currency: p.currency || 'USD',
-    });
-    setPhotos([]);
-    setEditingId(p.id);
-    setShowModal(true);
-  };
+  const handleAdd = () => setConfirmAction({ type: 'add' });
+  const handleEdit = (product: Product) => setConfirmAction({ type: 'edit', payload: product });
+  const handleDelete = (productId: string) => setConfirmAction({ type: 'delete', payload: productId });
   const cancelEdit = () => {
     setEditingId(null);
     setForm(emptyForm);
     setPhotos([]);
     setShowModal(false);
-  };
-  const handleDelete = async (productId: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
-    try {
-      await fetchJson<ApiMessage>(`/api/admin/products?id=${productId}`, { method: 'DELETE' });
-      setMessage('Product deleted');
-      fetchProducts(currentPage);
-    } catch (error) {
-      setMessage('Failed to delete product');
-    }
   };
   if (!user) return <div className="p-4">Please log in to view products.</div>;
   if (user.role.toUpperCase() !== USER_ROLES.SUPER_ADMIN) return <div className="p-4">Admin access required.</div>;
@@ -165,7 +141,7 @@ export default function AdminProducts() {
               <h2 className="text-2xl font-bold text-gray-900">All Products</h2>
               <p className="text-gray-600">Total: {total} products</p>
             </div>
-            <button className="btn btn-primary" onClick={() => { setEditingId(null); setForm(emptyForm); setPhotos([]); setShowModal(true); }}>
+            <button className="btn btn-primary text-white" onClick={handleAdd}>
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
               Add Product
             </button>
@@ -174,7 +150,7 @@ export default function AdminProducts() {
             <form onSubmit={handleSearch}>
               <div className="flex gap-2">
                 <input type="text" placeholder="Search products..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="input input-bordered flex-1" />
-                <button type="submit" className="btn btn-primary">Search</button>
+                <button type="submit" className="btn btn-primary text-white">Search</button>
               </div>
             </form>
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="select select-bordered">
@@ -203,13 +179,29 @@ export default function AdminProducts() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {loading ? (<tr><td colSpan={7} className="px-6 py-4 text-center"><div className="flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div><span className="ml-2">Loading products...</span></div></td></tr>) : products.length === 0 ? (<tr><td colSpan={7} className="px-6 py-4 text-center text-gray-500">No products found</td></tr>) : (products.map((product) => (<tr key={product.id} className="hover:bg-gray-50 transition-colors duration-150"><td className="px-6 py-4"><div className="flex items-center"><div className="flex-shrink-0 h-12 w-12"><img className="h-12 w-12 rounded-lg object-cover" src={typeof product.featuredImage === 'string' ? product.featuredImage : product.featuredImage?.url || '/placeholder.png'} alt={product.title} /></div><div className="ml-4"><div className="text-sm font-medium text-gray-900">{product.title}</div><div className="text-sm text-gray-500">SKU: {product.sku}</div></div></div></td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.vendor?.brandName || 'Unknown'}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.category?.name || 'Uncategorized'}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">£{product.minPrice}{product.maxPrice && product.maxPrice > product.minPrice && (<span className="text-gray-500"> - £{product.maxPrice}</span>)}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.totalInventory || 0}</td><td className="px-6 py-4 whitespace-nowrap"><span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${product.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>{product.status || 'INACTIVE'}</span></td><td className="px-6 py-4 whitespace-nowrap text-sm font-medium"><div className="flex items-center space-x-2"><button className="text-blue-600 hover:text-blue-900 transition-colors duration-150" onClick={() => handleEdit(product)}>Edit</button><button className="text-red-600 hover:text-red-900 transition-colors duration-150" onClick={() => handleDelete(product.id)}>Delete</button></div></td></tr>)))}</tbody>
+                {loading ? (<tr><td colSpan={7} className="px-6 py-4 text-center"><div className="flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div><span className="ml-2">Loading products...</span></div></td></tr>) : products.length === 0 ? (<tr><td colSpan={7} className="px-6 py-4 text-center text-gray-500">No products found</td></tr>) : (products.map((product) => (<tr key={product.id} className="hover:bg-gray-50 transition-colors duration-150"><td className="px-6 py-4"><div className="flex items-center"><div className="flex-shrink-0 h-12 w-12"><img className="h-12 w-12 rounded-lg object-cover" src={typeof product.featuredImage === 'string' ? product.featuredImage : product.featuredImage?.url || '/placeholder.png'} alt={product.title} /></div><div className="ml-4"><div className="text-sm font-medium text-gray-900">{product.title}</div><div className="text-sm text-gray-500">SKU: {product.sku}</div></div></div></td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.vendor?.brandName || 'Unknown'}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.category?.name || 'Uncategorized'}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">£{product.minPrice}{product.maxPrice && product.maxPrice > product.minPrice && (<span className="text-gray-500"> - £{product.maxPrice}</span>)}</td><td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.totalInventory || 0}</td><td className="px-6 py-4 whitespace-nowrap"><span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${product.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>{product.status || 'INACTIVE'}</span></td><td className="px-6 py-4 whitespace-nowrap text-sm font-medium"><div className="flex items-center space-x-2"><button className="btn btn-primary text-white" onClick={() => handleEdit(product)}>Edit</button><button className="btn btn-error text-white" onClick={() => handleDelete(product.id)}>Delete</button></div></td></tr>)))}</tbody>
             </table>
           </div>
         </div>
         {totalPages > 1 && (<div className="mt-8 flex justify-center"><Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} /></div>)}
       </div>
       {showModal && (<dialog open className="modal"><div className="modal-box max-w-2xl"><h3 className="text-lg font-semibold mb-4">{editingId ? 'Edit Product' : 'Add New Product'}</h3><form onSubmit={submit} className="space-y-4"><div className="grid grid-cols-1 md:grid-cols-2 gap-4">{['id','sku','title','vendorId','description','productType','tags','categoryId','quantity','minPrice','maxPrice','currency'].map((field) => (<TextInput key={field} name={field as keyof FormState} value={String(form[field as keyof FormState] || '')} onChange={handleChange} placeholder={field} />))}</div><div><label className="label"><span className="label-text">Product Images</span></label><input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); setPhotos(files); }} className="file-input file-input-bordered w-full" /></div><div className="flex gap-2 pt-4"><button type="submit" className="btn btn-primary">{editingId ? 'Update Product' : 'Add Product'}</button><button type="button" className="btn btn-ghost" onClick={cancelEdit}>Cancel</button></div></form></div></dialog>)}
+      {confirmAction && (
+        <ConfirmModal
+          isOpen={!!confirmAction}
+          title={`Confirm ${confirmAction.type.charAt(0).toUpperCase() + confirmAction.type.slice(1)}`}
+          description={`Are you sure you want to ${confirmAction.type} this product?`}
+          confirmLabel="Confirm"
+          cancelLabel="Cancel"
+          onConfirm={() => {
+            if (confirmAction.type === 'add') { /* call add logic */ }
+            if (confirmAction.type === 'edit') { /* call edit logic with confirmAction.payload */ }
+            if (confirmAction.type === 'delete') { /* call delete logic with confirmAction.payload */ }
+            setConfirmAction(null);
+          }}
+          onCancel={() => setConfirmAction(null)}
+        />
+      )}
     </div>
   );
 }

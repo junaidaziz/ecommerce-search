@@ -73,22 +73,22 @@ const PasswordInput = <T extends FieldValues>(props: PasswordInputProps<T>) => {
           onBlur={onBlur}
           disabled={disabled}
           required={required}
-          className={`flex-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-            error ? 'border-red-500' : 'border-gray-300'
-          } ${leftAddon ? 'rounded-l-none' : ''} rounded-r-none ${className}`}
+          className={`flex-1 px-3 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-base rounded-l-xl rounded-r-none shadow-sm ${error ? 'border-red-500' : ''} ${leftAddon ? 'rounded-l-none' : ''} ${className}`}
           {...registration}
           {...rest}
         />
         <button
           type="button"
           onClick={toggle}
-          className="inline-flex items-center px-3 border border-l-0 rounded-r-md bg-gray-100 hover:bg-gray-200 focus:outline-none"
+          className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 rounded-r-xl rounded-l-none shadow-sm -ml-px"
           aria-label={show ? 'Hide password' : 'Show password'}
+          tabIndex={0}
+          style={{ border: 'none' }}
         >
           {show ? (
-            <EyeOffIcon className="h-5 w-5" />
+            <EyeOffIcon className="h-6 w-6 text-green-600" />
           ) : (
-            <EyeIcon className="h-5 w-5" />
+            <EyeIcon className="h-6 w-6 text-green-600" />
           )}
         </button>
       </div>

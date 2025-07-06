@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 interface GenericModalProps {
   isOpen: boolean;
@@ -17,7 +17,28 @@ const GenericModal: React.FC<GenericModalProps> = ({
   actions,
 }) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const modalBoxRef = useRef<HTMLDivElement | null>(null);
+  const scrollPositionRef = useRef<number>(0);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Store current scroll position
+      scrollPositionRef.current = window.scrollY;
+      
+      // Focus on the modal box instead of the dialog to prevent scroll jumping
+      if (modalBoxRef.current) {
+        modalBoxRef.current.focus();
+      }
+    } else {
+      // Restore scroll position when modal closes
+      if (scrollPositionRef.current > 0) {
+        window.scrollTo(0, scrollPositionRef.current);
+      }
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
+  
   return (
     <dialog
       ref={dialogRef}
@@ -27,7 +48,11 @@ const GenericModal: React.FC<GenericModalProps> = ({
         if (e.target === dialogRef.current) onClose();
       }}
     >
-      <div className="modal-box max-h-[90vh] flex flex-col">
+      <div 
+        ref={modalBoxRef}
+        className="modal-box max-h-[90vh] flex flex-col"
+        tabIndex={-1}
+      >
         <div className="flex justify-between items-center mb-2">
           {title && <h2 className="font-semibold text-lg">{title}</h2>}
           <button
