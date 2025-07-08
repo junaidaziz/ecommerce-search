@@ -1,5 +1,10 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+
 
 async function main() {
   const token = process.env.BROWSERLESS_API_TOKEN;

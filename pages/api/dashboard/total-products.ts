@@ -18,13 +18,12 @@ async function handler(
     const user = req.user;
     const param = parseInt(getQueryParam(req.query.brandId) || '', 10);
     const queryBrandId = Number.isNaN(param) ? undefined : param;
-    const vendorId =
-      user?.brandId ??
-      (user?.role === USER_ROLES.SUPER_ADMIN ? queryBrandId : undefined);
-    if (!user?.brandId && user?.role !== USER_ROLES.SUPER_ADMIN) {
-      return res.status(401).json({ message: UNAUTHORIZED });
+    let where = {};
+    if (user?.role === USER_ROLES.BRAND) {
+      where = { vendorId: user.brandId };
+    } else if (user?.role === USER_ROLES.SUPER_ADMIN && queryBrandId) {
+      where = { vendorId: queryBrandId };
     }
-    const where = vendorId ? { vendorId } : {};
     const count = await db.product.count({ where });
     return res.status(200).json({ count });
   } catch (error) {

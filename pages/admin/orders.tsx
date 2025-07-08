@@ -7,6 +7,8 @@ import { USER_ROLES } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import Pagination from '@components/Pagination';
+import SuperAdminSidebar from '@components/Layout/SuperAdminSidebar';
+import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
 
 export default function AdminOrders() {
   const { data: session } = useSession();
@@ -57,7 +59,7 @@ export default function AdminOrders() {
     return <div className="p-4">Admin access required.</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <>
       <Head>
         <title>{getPageTitle('Orders')}</title>
       </Head>
@@ -233,6 +235,8 @@ export default function AdminOrders() {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }
+
+(AdminOrders as any).getLayout = (page: React.ReactNode) => <AdminPanelLayout>{page}</AdminPanelLayout>;

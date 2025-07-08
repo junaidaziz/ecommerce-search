@@ -157,7 +157,7 @@ const Header: FC<HeaderProps> = ({
 
         <div className="flex-1 flex items-center gap-x-6 relative">
           <CategoryMenu isSuperAdmin={isSuperAdmin} pathname={pathname} maxWidthClass={maxWidthClass} />
-          <SearchBar placeholder="Search for products, brands..." />
+          {!isSuperAdmin && <SearchBar placeholder="Search for products, brands..." />}
           <nav className="hidden lg:flex gap-6 ml-4">
             <Link
               href="/products"

@@ -1,71 +1,12 @@
 import { JSDOM } from 'jsdom';
 import { getDb } from './db';
-import type { Product, ProductInput, Variant, Category, Vendor } from '@/types';
-import { parseImages } from './utils/parseImages';
+import type { Product, ProductInput, Category } from '@/types';
 import client from './typesenseClient';
 import { Prisma } from '@prisma/client';
 import { getBestSellingProducts } from './orders';
 import { slugify } from './slugify';
 import { ensureTypesenseProductCollection } from './initTypesense';
-
-/**
- * Partial representation of a product record returned from Prisma including
- * related category, vendor and variant records. Prisma's generated types are
- * not available in this environment so we define the minimal shape locally.
- */
-interface ProductWithRelations {
-  id: number | string;
-  uuid?: string | null;
-  slug?: string | null;
-  sku: string;
-  title: string;
-  description?: string | null;
-  productType?: string | null;
-  tags?: string | null;
-  quantity: number;
-  minPrice: number;
-  maxPrice: number;
-  currency: string;
-  discountType?: string | null;
-  discountValue?: number | null;
-  images: string | null;
-  vendor: Vendor & {
-    brandName: string | null;
-    phoneNumber?: string | null | undefined;
-    address?: string | null;
-    paymentMethods?: import('@/types').BrandPaymentMethod[] | null;
-  };
-  category: Category;
-  variants: Variant[];
-}
-
-interface ProductRow {
-  id: number | string;
-  uuid?: string | null;
-  slug?: string | null;
-  sku: string;
-  title: string;
-  vendor?:
-    | (Vendor & {
-        brandName: string | null;
-        phoneNumber?: string | null | undefined;
-        address?: string | null;
-        paymentMethods?: import('@/types').BrandPaymentMethod[] | null;
-      })
-    | null;
-  description?: string | null;
-  productType?: string | null;
-  tags?: string | null;
-  category?: Category | null;
-  images: string | null;
-  quantity: number;
-  minPrice: number;
-  maxPrice: number;
-  currency: string;
-  discountType?: string | null;
-  discountValue?: number | null;
-  variants?: Variant[];
-}
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 /**
  * Simplified representation of a product row returned from the database.
@@ -82,9 +23,9 @@ const stripHtml = (html: string | null | undefined): string => {
   }
 };
 
-function processProductRow(row: Record<string, unknown>): Product {
-  const processed: Record<string, unknown> & Partial<Product> = { ...row };
-  const jsonFields = ['SEO', 'OPTIONS', 'VARIANTS', 'priceRange', 'METAFIELDS'];
+function processProductRow(row: any): Product {
+  const processed: any = { ...row };
+  const jsonFields = ['SEO', 'OPTIONS', 'VARIANTS', 'METAFIELDS'];
   jsonFields.forEach((field) => {
     if (processed[field]) {
       try {
@@ -97,17 +38,15 @@ function processProductRow(row: Record<string, unknown>): Product {
       }
     }
   });
-
   processed.descriptionText = stripHtml(
     processed.description as string | null | undefined
   );
   processed.bodyHtmlText = stripHtml(
     processed.bodyHtml as string | null | undefined
   );
-  processed.minPrice = processed.priceRange?.minVariantPrice?.amount || 0;
-  processed.maxPrice = processed.priceRange?.maxVariantPrice?.amount || 0;
-  processed.currency =
-    processed.priceRange?.minVariantPrice?.currencyCode || 'GBP';
+  processed.minPrice = Number(processed.minPrice) || 0;
+  processed.maxPrice = Number(processed.maxPrice) || 0;
+  processed.currency = processed.currency || 'GBP';
   const meta = processed.METAFIELDS as
     | {
         stoked_inventory_sold_count?: { value?: string };
@@ -129,13 +68,18 @@ function processProductRow(row: Record<string, unknown>): Product {
   if (processed.slug) {
     processed.slug = String(processed.slug);
   }
-  if (processed.images && processed.images.length > 0) {
-    if (typeof processed.images[0] === 'string') {
-      processed.images = (processed.images as unknown as string[]).map((u) => ({
-        url: u,
-      }));
-    }
+  // Always convert images to string[]
+  if (typeof processed.images === 'string') {
+    processed.images = processed.images.split(',').map((s: string) => s.trim()).filter(Boolean);
+  }
+  if (Array.isArray(processed.images) && processed.images.length > 0) {
     processed.featuredImage = processed.images[0];
+  }
+  // Fix vendor.paymentMethods
+  if (processed.vendor && processed.vendor.paymentMethods) {
+    processed.vendor.paymentMethods = Array.isArray(processed.vendor.paymentMethods)
+      ? processed.vendor.paymentMethods
+      : undefined;
   }
   return processed as Product;
 }
@@ -143,7 +87,7 @@ function processProductRow(row: Record<string, unknown>): Product {
 async function loadProductsData(): Promise<Product[]> {
   const db = getDb();
   try {
-    const rows: ProductWithRelations[] = await db.product.findMany({
+    const rows = await db.product.findMany({
       where: { status: 'approved', vendor: { active: true } },
       include: { category: true, vendor: true, variants: true },
     });
@@ -154,7 +98,7 @@ async function loadProductsData(): Promise<Product[]> {
   }
 }
 
-export function mapDbRowToProduct(row: ProductRow): Product {
+export function mapDbRowToProduct(row: any): Product {
   const {
     images,
     quantity,
@@ -165,30 +109,25 @@ export function mapDbRowToProduct(row: ProductRow): Product {
     discountValue,
     ...rest
   } = row;
-
   return processProductRow({
     ...rest,
+    images: typeof images === 'string' ? images.split(',').map((s: string) => s.trim()).filter(Boolean) : images,
+    totalInventory: quantity,
+    variants: row.variants,
+    minPrice,
+    maxPrice,
+    currency,
+    discountType,
+    discountValue,
     vendor: row.vendor
       ? {
           ...row.vendor,
-          brandName: row.vendor.brandName ?? '',
-          phoneNumber: row.vendor.phoneNumber ?? undefined,
-          address: row.vendor.address ?? null,
-          paymentMethods:
-            (row.vendor.paymentMethods as import('@/types').BrandPaymentMethod[] | null) ??
-            null,
+          paymentMethods: Array.isArray(row.vendor.paymentMethods)
+            ? row.vendor.paymentMethods
+            : undefined,
         }
-      : null,
-    category: row.category ?? null,
-    images: parseImages(images),
-    totalInventory: quantity,
-    variants: row.variants,
-    priceRange: {
-      minVariantPrice: { amount: minPrice, currencyCode: currency },
-      maxVariantPrice: { amount: maxPrice, currencyCode: currency },
-    },
-    discountType,
-    discountValue,
+      : undefined,
+    category: row.category,
   });
 }
 
@@ -231,43 +170,19 @@ export async function loadAndIndexProducts(): Promise<{ products: Product[] }> {
 
 export async function addProduct(product: ProductInput): Promise<void> {
   const db = getDb();
-
-  if (!product.vendor?.brandName) {
-    const err = new Error('Vendor is required') as Error & { code?: string };
+  if (!product.vendorId) {
+    const err = new Error('vendorId is required') as Error & { code?: string };
     err.code = 'BAD_REQUEST';
     throw err;
   }
-  if (!product.category || (!product.category.id && !product.category.name)) {
-    const err = new Error('Category is required') as Error & { code?: string };
+  if (!product.categoryId) {
+    const err = new Error('categoryId is required') as Error & { code?: string };
     err.code = 'BAD_REQUEST';
     throw err;
   }
-
-  const vendor = await db.user.findFirst({
-    where: { brandName: product.vendor.brandName },
-  });
-  const category = product.category.id
-    ? await db.category.findUnique({
-        where: { id: Number(product.category.id) },
-      })
-    : await db.category.findFirst({
-        where: { name: product.category.name },
-      });
-
-  if (!vendor) {
-    const err = new Error('Vendor not found') as Error & { code?: string };
-    err.code = 'BAD_REQUEST';
-    throw err;
-  }
-  if (!category) {
-    const err = new Error('Category not found') as Error & { code?: string };
-    err.code = 'BAD_REQUEST';
-    throw err;
-  }
-
   const data = {
     uuid: product.uuid,
-    slug: (product.slug ?? '').trim() || slugify(product.title || product.uuid),
+    slug: (product.slug ?? '').trim() || slugify(product.title || product.uuid || ''),
     sku: product.sku,
     title: product.title,
     description: product.description ?? '',
@@ -280,15 +195,15 @@ export async function addProduct(product: ProductInput): Promise<void> {
     discountType: product.discountType ?? null,
     discountValue: product.discountValue ?? null,
     status: product.status ?? 'approved',
-    vendor: { connect: { id: vendor.id } },
-    category: { connect: { id: category.id } },
+    vendorId: product.vendorId,
+    categoryId: product.categoryId,
+    images: Array.isArray(product.images) ? product.images.join(',') : product.images || '',
   };
-
   try {
     await db.product.create({ data });
-  } catch (error) {
+  } catch (error: any) {
     if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error instanceof PrismaClientKnownRequestError &&
       error.code === 'P2002'
     ) {
       const err = new Error(
@@ -308,35 +223,13 @@ export async function updateProduct(
   const existing = await db.product.findUnique({
     where: { uuid: product.uuid || String(product.id) },
   });
-  if (!product.vendor?.brandName) {
-    const err = new Error('Vendor is required') as Error & { code?: string };
+  if (!product.vendorId) {
+    const err = new Error('vendorId is required') as Error & { code?: string };
     err.code = 'BAD_REQUEST';
     throw err;
   }
-  if (!product.category || (!product.category.id && !product.category.name)) {
-    const err = new Error('Category is required') as Error & { code?: string };
-    err.code = 'BAD_REQUEST';
-    throw err;
-  }
-
-  const vendor = await db.user.findFirst({
-    where: { brandName: product.vendor.brandName },
-  });
-  const category = product.category.id
-    ? await db.category.findUnique({
-        where: { id: Number(product.category.id) },
-      })
-    : await db.category.findFirst({
-        where: { name: product.category.name },
-      });
-
-  if (!vendor) {
-    const err = new Error('Vendor not found') as Error & { code?: string };
-    err.code = 'BAD_REQUEST';
-    throw err;
-  }
-  if (!category) {
-    const err = new Error('Category not found') as Error & { code?: string };
+  if (!product.categoryId) {
+    const err = new Error('categoryId is required') as Error & { code?: string };
     err.code = 'BAD_REQUEST';
     throw err;
   }
@@ -354,8 +247,9 @@ export async function updateProduct(
       currency: product.currency,
       discountType: product.discountType,
       discountValue: product.discountValue,
-      vendor: { connect: { id: vendor.id } },
-      category: { connect: { id: category.id } },
+      vendorId: product.vendorId,
+      categoryId: product.categoryId,
+      images: Array.isArray(product.images) ? product.images.join(',') : product.images || '',
     },
   });
   if (existing && existing.quantity <= 0 && (product.quantity ?? 0) > 0) {
@@ -371,7 +265,7 @@ export async function updateProduct(
 
 export async function getPendingProducts(): Promise<Product[]> {
   const db = getDb();
-  const rows: ProductWithRelations[] = await db.product.findMany({
+  const rows = await db.product.findMany({
     where: { status: 'pending' },
     include: { category: true, vendor: true, variants: true },
   });
@@ -382,7 +276,7 @@ export async function getProductsByCategorySlug(
   slug: string
 ): Promise<Product[]> {
   const db = getDb();
-  const rows: ProductWithRelations[] = await db.product.findMany({
+  const rows = await db.product.findMany({
     where: { status: 'approved', category: { slug }, vendor: { active: true } },
     include: { category: true, vendor: true, variants: true },
   });
@@ -395,7 +289,7 @@ export async function getProductsByCategorySlugPaginated(
   offset = 0
 ): Promise<Product[]> {
   const db = getDb();
-  const rows: ProductWithRelations[] = await db.product.findMany({
+  const rows = await db.product.findMany({
     where: { status: 'approved', category: { slug }, vendor: { active: true } },
     include: { category: true, vendor: true, variants: true },
     take: limit,
@@ -410,7 +304,7 @@ export async function getApprovedProductsPaginated(
   offset = 0
 ): Promise<Product[]> {
   const db = getDb();
-  const rows: ProductWithRelations[] = await db.product.findMany({
+  const rows = await db.product.findMany({
     where: { status: 'approved', vendor: { active: true } },
     include: { category: true, vendor: true, variants: true },
     take: limit,
@@ -424,7 +318,7 @@ export async function getProductsByVendorBrandName(
   brandName: string
 ): Promise<Product[]> {
   const db = getDb();
-  const rows: ProductWithRelations[] = await db.product.findMany({
+  const rows = await db.product.findMany({
     where: { status: 'approved', vendor: { brandName, active: true } },
     include: { category: true, vendor: true, variants: true },
     orderBy: { id: 'asc' },
@@ -456,7 +350,7 @@ export async function getProductsPaginated(
   if (options.categorySlugs && options.categorySlugs.length > 0) {
     where.category = {
       slug: { in: options.categorySlugs },
-    } as Prisma.CategoryRelationFilter;
+    };
   }
   if (options.inStock) {
     where.quantity = { gt: 0 };
@@ -480,16 +374,15 @@ export async function getProductsPaginated(
   const orderBy = (() => {
     switch (options.sort) {
       case 'price_asc':
-        return { minPrice: 'asc' };
+        return { minPrice: 'asc' as const };
       case 'price_desc':
-        return { minPrice: 'desc' };
+        return { minPrice: 'desc' as const };
       case 'newest':
-        return { createdAt: 'desc' };
+        return { createdAt: 'desc' as const };
       default:
-        return { id: 'asc' };
+        return { id: 'asc' as const };
     }
   })();
-
   if (options.sort === 'popularity') {
     const popular = await getBestSellingProducts(
       options.offset + options.limit
@@ -499,13 +392,11 @@ export async function getProductsPaginated(
       products: popular.slice(options.offset, options.offset + options.limit),
     };
   }
-
   let rows = await db.product.findMany({
     where,
     include: { category: true, vendor: true, variants: true },
     orderBy,
   });
-
   const total = rows.length;
   rows = rows.slice(options.offset, options.offset + options.limit);
   return {

@@ -6,6 +6,7 @@ import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import BarChart from '@components/BarChart';
+import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
 
 export default function AdminAnalytics() {
   const { user } = useContext(AppContext)!;
@@ -45,7 +46,7 @@ export default function AdminAnalytics() {
   if (loading || data === null) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8">
+    <>
       <Head>
         <title>{getPageTitle('Admin Analytics')}</title>
       </Head>
@@ -115,6 +116,8 @@ export default function AdminAnalytics() {
           </ul>
         </div>
       )}
-    </div>
+    </>
   );
 }
+
+AdminAnalytics.getLayout = (page: React.ReactNode) => <AdminPanelLayout>{page}</AdminPanelLayout>;

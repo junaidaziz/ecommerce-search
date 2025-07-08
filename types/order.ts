@@ -13,28 +13,28 @@ export enum OrderStatus {
   RETURNED = 'returned',
 }
 
-// Base Order type extending Prisma Order
-export type Order = PrismaOrder & {
+// Base Order type matching Prisma schema
+export type Order = PrismaOrder;
+
+// Order with relations (for app use)
+export type OrderWithRelations = Order & {
   user: User;
   product: Product;
-  status: OrderStatus;
 };
 
-// Input type for creating orders
+// Input type for creating orders (matches Prisma fields)
 export type OrderInput = Pick<
   PrismaOrder,
-  'userId' | 'productId' | 'quantity' | 'total' | 'status'
+  'userId' | 'productId' | 'quantity' | 'total' | 'status' | 'paymentMethod' | 'paymentReference' | 'paymentProof'
 > & {
-  paymentMethod?: string;
-  paymentReference?: string;
-  paymentProof?: string;
+  uuid?: string;
 };
 
 // Update type for orders
 export type OrderUpdate = Partial<Omit<OrderInput, 'userId' | 'productId'>>;
 
 // Order response type
-export type OrderResponse = Order;
+export type OrderResponse = OrderWithRelations;
 
 // Order with minimal fields for lists
 export type OrderSummary = Pick<

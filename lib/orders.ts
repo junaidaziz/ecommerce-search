@@ -37,10 +37,56 @@ export function mapDbRowToOrder(row: OrderWithRelations): Order {
     quantity: row.quantity,
     total: row.total,
     status: row.status as Order['status'],
-    paymentMethod: row.paymentMethod || undefined,
-    paymentReference: row.paymentReference || undefined,
-    paymentProof: row.paymentProof || undefined,
-    user: row.user,
+    paymentMethod: row.paymentMethod ?? null,
+    paymentReference: row.paymentReference ?? null,
+    paymentProof: row.paymentProof ?? null,
+    user: (() => {
+      if (row.user) {
+        const mappedUser = {
+          ...row.user,
+          paymentMethods: Array.isArray(row.user.paymentMethods)
+            ? row.user.paymentMethods
+            : undefined,
+        };
+        if (mappedUser.paymentMethods === undefined) {
+          delete mappedUser.paymentMethods;
+        }
+        return mappedUser as import('../types').User;
+      } else {
+        return {
+          id: 0,
+          uuid: '',
+          email: '',
+          password: '',
+          firstName: '',
+          lastName: '',
+          brandName: null,
+          gender: '',
+          phoneNumber: null,
+          address: null,
+          city: null,
+          state: null,
+          postalCode: null,
+          country: null,
+          businessAddress: null,
+          website: null,
+          businessDescription: null,
+          logo: null,
+          profileImage: null,
+          taxId: null,
+          stripeAccountId: null,
+          role: 'USER',
+          verified: false,
+          disabled: false,
+          active: false,
+          verificationToken: null,
+          resetToken: null,
+          resetExpires: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        } as import('../types').User;
+      }
+    })(),
     product: mapDbRowToProduct(row.product),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,

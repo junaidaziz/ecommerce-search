@@ -1,13 +1,18 @@
 import type { User as PrismaUser, Role } from '@prisma/client';
+import type { PaymentMethod } from './paymentMethod';
 
-// Base User type extending Prisma User
+// Base User type matching Prisma schema
 export type User = PrismaUser & {
-  // Additional computed fields
-  name?: string; // Display name from auth providers
-  paymentMethods?: PaymentMethod[];
+  // Computed property for display name (not in DB)
+  name?: string;
 };
 
-// Input type for creating users
+// User with related payment methods (for queries that include them)
+export type UserWithPaymentMethods = User & {
+  PaymentMethod: PaymentMethod[];
+};
+
+// Input type for creating users (matches Prisma fields)
 export type UserInput = Pick<
   PrismaUser,
   | 'email'
@@ -31,9 +36,14 @@ export type UserInput = Pick<
   | 'stripeAccountId'
   | 'role'
   | 'verificationToken'
+  | 'verified'
+  | 'disabled'
+  | 'active'
+  | 'resetToken'
+  | 'resetExpires'
+  | 'paymentMethods'
 > & {
   uuid?: string;
-  paymentMethods?: PaymentMethod[];
 };
 
 // Update type for users
@@ -56,21 +66,6 @@ export type UserSummary = Pick<
   | 'active'
   | 'createdAt'
 >;
-
-// Payment method type
-export interface PaymentMethod {
-  id: number;
-  userId: number;
-  provider: string;
-  cardLast4: string;
-  cardBrand: string;
-  expMonth: number;
-  expYear: number;
-  token: string;
-  isDefault: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 // User role enum (matching Prisma)
 export type UserRole = Role;

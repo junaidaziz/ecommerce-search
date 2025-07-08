@@ -4,9 +4,12 @@ import { Category, CategoryInput, ApiMessage, UserRole, USER_ROLES } from '@/typ
 import { fetchJson } from '@utils/fetchJson';
 import { TextInput } from '@components/form-fields';
 import { slugify } from '@lib/slugify';
-import { ConfirmModal } from '@components/UI';
+import { Button } from '@components/UI';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
+import PageHero from '@components/UI/PageHero';
+import ConfirmModal from '@components/Modals/ConfirmModal';
 
 export default function Categories() {
   const { user } = useContext(AppContext)!;
@@ -38,8 +41,8 @@ export default function Categories() {
   }, [load]);
 
   const handleAdd = () => setConfirmAction({ type: 'add' });
-  const handleEdit = (cat) => setConfirmAction({ type: 'edit', payload: cat });
-  const handleDelete = (id) => setConfirmAction({ type: 'delete', payload: id });
+  const handleEdit = (cat: Category) => setConfirmAction({ type: 'edit', payload: cat });
+  const handleDelete = (id: number) => setConfirmAction({ type: 'delete', payload: id });
 
   const add = async () => {
     if (!newCat.trim()) return;
@@ -104,21 +107,16 @@ export default function Categories() {
     return <div className="p-4">Admin access required.</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <>
       <Head>
         <title>{getPageTitle('Manage Categories')}</title>
       </Head>
       
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Category Management</h1>
-            <p className="text-xl text-indigo-100 max-w-2xl mx-auto">Manage product categories across the platform. Organize and structure your product catalog.</p>
-          </div>
-        </div>
-      </div>
+      <PageHero
+        heading="Category Management"
+        description="Manage product categories across the platform. Organize and structure your product catalog."
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
@@ -229,18 +227,12 @@ export default function Categories() {
                         <div className="flex items-center space-x-2">
                           {editing !== cat.id && (
                             <>
-                              <button
-                                onClick={() => handleEdit(cat)}
-                                className="btn btn-primary text-white"
-                              >
+                              <Button variant="primary" size="sm" onClick={() => handleEdit(cat)}>
                                 Edit
-                              </button>
-                              <button
-                                onClick={() => handleDelete(cat.id)}
-                                className="btn btn-error text-white"
-                              >
+                              </Button>
+                              <Button variant="danger" size="sm" onClick={() => handleDelete(cat.id)}>
                                 Delete
-                              </button>
+                              </Button>
                             </>
                           )}
                         </div>
@@ -274,6 +266,8 @@ export default function Categories() {
           onCancel={() => setConfirmAction(null)}
         />
       )}
-    </div>
+    </>
   );
 }
+
+(Categories as any).getLayout = (page: React.ReactNode) => <AdminPanelLayout>{page}</AdminPanelLayout>;

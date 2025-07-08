@@ -1,29 +1,30 @@
-// Payment interface matching Prisma schema
-export interface Payment {
-  id: number;
-  orderId: number;
-  amount: number;
-  provider: string;
-  status: string;
-  paymentMethodId: number;
-  transactionId: string;
-  createdAt: Date;
-}
+import type { Payment as PrismaPayment } from '@prisma/client';
+import type { Order } from './order';
+import type { PaymentMethod } from './paymentMethod';
 
-// Payment input for creating payments
+// Base Payment type matching Prisma schema
+export type Payment = PrismaPayment;
+
+// Payment with relations (for app use)
+export type PaymentWithRelations = Payment & {
+  order: Order;
+  paymentMethod: PaymentMethod;
+};
+
+// Payment input for creating payments (matches Prisma fields)
 export type PaymentInput = Pick<
-  Payment,
+  PrismaPayment,
   'orderId' | 'amount' | 'provider' | 'status' | 'paymentMethodId' | 'transactionId'
 >;
 
-// Payment update interface
+// Payment update type
 export type PaymentUpdate = Partial<Omit<PaymentInput, 'orderId'>>;
 
-// Payment response interface
-export type PaymentResponse = Payment;
+// Payment response type
+export type PaymentResponse = PaymentWithRelations;
 
 // Payment summary for lists
 export type PaymentSummary = Pick<
-  Payment,
+  PrismaPayment,
   'id' | 'amount' | 'provider' | 'status' | 'transactionId' | 'createdAt'
 >;

@@ -14,6 +14,9 @@ export default function App({
 }: AppProps & { pageProps: { session: any } }) {
   const HeroSecond = (Component as any).heroSecond;
   const maxWidthClass = (Component as any).maxWidthClass;
+  const getLayout = (Component as any).getLayout || ((page: React.ReactNode) => (
+    <Layout heroSecond={HeroSecond ? <HeroSecond /> : null} maxWidthClass={maxWidthClass}>{page}</Layout>
+  ));
 
   return (
     <SessionProvider session={session}>
@@ -21,12 +24,7 @@ export default function App({
         <AppProvider>
           <ChatProvider>
             <Toaster position="top-right" richColors />
-            <Layout
-              heroSecond={HeroSecond ? <HeroSecond /> : null}
-              maxWidthClass={maxWidthClass}
-            >
-              <Component {...pageProps} />
-            </Layout>
+            {getLayout(<Component {...pageProps} />)}
           </ChatProvider>
         </AppProvider>
       </NotificationProvider>

@@ -1,26 +1,27 @@
 export * from './product';
-export * from './category';
 export * from './order';
 export * from './review';
-export * from './admin';
-export * from './api';
 export * from './brand';
 export * from './cart';
 export * from './vendor';
-export * from './coupon';
 export * from './image';
 export * from './price';
-export * from './user';
 export * from './shipping';
-export * from './shared';
 export * from './forms';
-export * from './paymentMethod';
 export * from './payment';
 export * from './policy';
 export * from './support';
-export * from "./dashboard";
-export * from './notification';
 export * from './message';
 export * from './context';
 export * from './wishlist';
 export * from './variant';
+
+// Explicitly re-export only one version of each conflicting type
+export type { Category } from './category';
+export type { CategoryResponse } from './api';
+export type { CouponResponse } from './api';
+export type { SearchResults } from './api';
+export type { Notification } from './notification';
+export type { PaymentMethod } from './paymentMethod';
+export type { AnalyticsData } from './dashboard';
+export type { User } from './user';

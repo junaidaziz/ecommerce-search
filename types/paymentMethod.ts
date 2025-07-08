@@ -1,32 +1,30 @@
-// Payment method interface matching Prisma schema
-export interface PaymentMethod {
-  id: number;
-  userId: number;
-  provider: string;
-  cardLast4: string;
-  cardBrand: string;
-  expMonth: number;
-  expYear: number;
-  token: string;
-  isDefault: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import type { PaymentMethod as PrismaPaymentMethod } from '@prisma/client';
+import type { User } from './user';
+import type { Payment } from './payment';
 
-// Payment method input for creating payment methods
+// Base PaymentMethod type matching Prisma schema
+export type PaymentMethod = PrismaPaymentMethod;
+
+// PaymentMethod with relations (for app use)
+export type PaymentMethodWithRelations = PaymentMethod & {
+  user: User;
+  payments: Payment[];
+};
+
+// Payment method input for creating payment methods (matches Prisma fields)
 export type PaymentMethodInput = Pick<
-  PaymentMethod,
+  PrismaPaymentMethod,
   'userId' | 'provider' | 'cardLast4' | 'cardBrand' | 'expMonth' | 'expYear' | 'token' | 'isDefault'
 >;
 
-// Payment method update interface
+// Payment method update type
 export type PaymentMethodUpdate = Partial<Omit<PaymentMethodInput, 'userId'>>;
 
-// Payment method response interface
-export type PaymentMethodResponse = PaymentMethod;
+// Payment method response type
+export type PaymentMethodResponse = PaymentMethodWithRelations;
 
 // Payment method summary for lists
 export type PaymentMethodSummary = Pick<
-  PaymentMethod,
+  PrismaPaymentMethod,
   'id' | 'provider' | 'cardLast4' | 'cardBrand' | 'expMonth' | 'expYear' | 'isDefault'
 >;

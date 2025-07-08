@@ -1,14 +1,17 @@
-import type { Product as PrismaProduct, Category as PrismaCategory, User as PrismaUser } from '@prisma/client';
+import type { Product as PrismaProduct } from '@prisma/client';
 import type { Category } from './category';
 import type { User } from './user';
 import type { Variant } from './variant';
 
-// Base Product type extending Prisma Product
-export type Product = PrismaProduct & {
+// Base Product type matching Prisma schema
+export type Product = PrismaProduct;
+
+// Product with relations and computed fields (for app use)
+export type ProductWithRelations = Product & {
   vendor: User;
   category: Category;
-  variants?: Variant[];
-  // Additional computed fields
+  variants: Variant[];
+  // Computed fields
   soldCount?: number;
   reviewCount?: number;
   averageRating?: number;
@@ -16,10 +19,10 @@ export type Product = PrismaProduct & {
   descriptionText?: string;
   bodyHtmlText?: string;
   featuredImage?: string;
-  images?: string[];
+  imagesArray?: string[]; // Parsed from images string
 };
 
-// Input type for creating products
+// Input type for creating products (matches Prisma fields)
 export type ProductInput = Pick<
   PrismaProduct,
   | 'sku'
@@ -36,17 +39,17 @@ export type ProductInput = Pick<
   | 'status'
   | 'vendorId'
   | 'categoryId'
+  | 'images'
 > & {
   slug?: string;
   uuid?: string;
-  images?: string[];
 };
 
 // Update type for products
 export type ProductUpdate = Partial<Omit<ProductInput, 'vendorId' | 'categoryId'>>;
 
 // Product response type
-export type ProductResponse = Product;
+export type ProductResponse = ProductWithRelations;
 
 // Product with minimal fields for lists
 export type ProductSummary = Pick<
