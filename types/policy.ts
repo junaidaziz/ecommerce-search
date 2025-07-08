@@ -1,30 +1,25 @@
+import type { PolicyDocument as PrismaPolicyDocument } from '@prisma/client';
 import type { User } from './user';
 
-// Policy document interface matching Prisma schema
-export interface PolicyDocument {
-  id: number;
-  type: string;
-  content: string;
-  version: number;
-  updatedBy: number;
-  createdAt: Date;
-  updatedAt: Date;
-  updatedByUser?: User;
-}
+// Base PolicyDocument type matching Prisma schema
+export type PolicyDocument = PrismaPolicyDocument;
 
-// Policy document input for creating policies
-export type PolicyDocumentInput = Pick<
-  PolicyDocument,
-  'type' | 'content' | 'updatedBy'
-> & {
-  version?: number;
+// PolicyDocument with relations (for app use)
+export type PolicyDocumentWithRelations = PolicyDocument & {
+  updatedByUser?: User;
 };
 
-// Policy document update interface
+// Policy document input for creating policies (matches Prisma fields)
+export type PolicyDocumentInput = Pick<
+  PrismaPolicyDocument,
+  'type' | 'content' | 'updatedBy' | 'version'
+>;
+
+// Policy document update type
 export type PolicyDocumentUpdate = Partial<Pick<PolicyDocument, 'content' | 'updatedBy'>>;
 
-// Policy document response interface
-export type PolicyDocumentResponse = PolicyDocument;
+// Policy document response type
+export type PolicyDocumentResponse = PolicyDocumentWithRelations;
 
 // Policy document summary for lists
 export type PolicyDocumentSummary = Pick<

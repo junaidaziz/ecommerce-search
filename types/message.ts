@@ -1,35 +1,36 @@
-export interface Message {
-  id: number;
-  senderId: number;
-  receiverId: number;
-  orderId: number;
-  messageType: 'text' | 'image' | 'file';
-  content?: string | null;
-  fileUrl?: string | null;
-  fileName?: string | null;
-  createdAt: Date;
-  seen: boolean;
-}
+import type { Message as PrismaMessage } from '@prisma/client';
+import type { User } from './user';
+import type { Order } from './order';
 
-// Message input for creating messages
+// Base Message type matching Prisma schema
+export type Message = PrismaMessage;
+
+// Message with relations (for app use)
+export type MessageWithRelations = Message & {
+  sender: User;
+  receiver: User;
+  order: Order;
+};
+
+// Message input for creating messages (matches Prisma fields)
 export type MessageInput = Pick<
-  Message,
+  PrismaMessage,
   'senderId' | 'receiverId' | 'orderId' | 'messageType' | 'content' | 'fileUrl' | 'fileName'
 >;
 
-// Message update interface
+// Message update type
 export type MessageUpdate = Partial<Pick<Message, 'seen'>>;
 
-// Message response interface
-export type MessageResponse = Message;
+// Message response type
+export type MessageResponse = MessageWithRelations;
 
 // Message summary for lists
 export type MessageSummary = Pick<
-  Message,
+  PrismaMessage,
   'id' | 'messageType' | 'content' | 'fileUrl' | 'fileName' | 'createdAt' | 'seen'
 >;
 
-// Message thread interface
+// Message thread interface (app-specific, not Prisma)
 export interface MessageThread {
   orderId: number;
   messages: Message[];
