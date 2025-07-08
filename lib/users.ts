@@ -172,6 +172,10 @@ export function updateUserProfile(email: string, data: Prisma.UserUpdateInput) {
   return prisma.user.update({ where: { email }, data });
 }
 
+export function updateBrand(id: number, data: Prisma.UserUpdateInput) {
+  return prisma.user.update({ where: { id }, data });
+}
+
 export function findVendorByName(brandName: string) {
   return prisma.user.findFirst({
     where: { role: 'BRAND', brandName, active: true },

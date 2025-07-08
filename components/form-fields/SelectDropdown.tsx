@@ -31,6 +31,8 @@ export interface SelectDropdownProps<T extends FieldValues> {
   styles?: StylesConfig<SelectOption, boolean, GroupBase<SelectOption>>;
   control?: Control<T>;
   rules?: RegisterOptions<T, Path<T>>;
+  onAddNew?: (inputValue: string) => void;
+  addNewLabel?: string;
   [key: string]: unknown;
 }
 
@@ -53,9 +55,33 @@ const SelectDropdown = <T extends FieldValues>(
     components: selectComponents,
     control,
     rules,
+    onAddNew,
+    addNewLabel = 'Add',
     ...rest
   } = props;
   const inputId: string = typeof rest.id === 'string' ? rest.id : String(name);
+
+  // Custom noOptionsMessage and menuList for add new
+  const customComponents = {
+    ...selectComponents,
+    NoOptionsMessage: (noOptionsProps: any) => (
+      <div className="px-3 py-2 text-gray-500">
+        No options found.
+        {onAddNew && noOptionsProps.selectProps.inputValue ? (
+          <button
+            type="button"
+            className="ml-2 text-blue-600 hover:underline"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              onAddNew(noOptionsProps.selectProps.inputValue);
+            }}
+          >
+            + {addNewLabel} &quot;{noOptionsProps.selectProps.inputValue}&quot;
+          </button>
+        ) : null}
+      </div>
+    ),
+  };
 
   return (
     <div className="mb-4 w-full">
@@ -90,7 +116,7 @@ const SelectDropdown = <T extends FieldValues>(
                 isSearchable={isSearchable}
                 isDisabled={isDisabled}
                 isMulti={isMulti}
-                components={selectComponents}
+                components={customComponents}
                 className={`w-full ${className}`}
                 classNamePrefix="react-select"
                 styles={
@@ -122,7 +148,7 @@ const SelectDropdown = <T extends FieldValues>(
             isSearchable={isSearchable}
             isDisabled={isDisabled}
             isMulti={isMulti}
-            components={selectComponents}
+            components={customComponents}
             className={`w-full ${className}`}
             classNamePrefix="react-select"
             styles={

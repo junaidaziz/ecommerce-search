@@ -1,30 +1,31 @@
-// Notification interface matching Prisma schema
-export interface Notification {
-  id: number;
-  userId: number;
-  orderId: number;
-  message: string;
-  read: boolean;
-  createdAt: Date;
-}
+import type { Notification as PrismaNotification } from '@prisma/client';
+import type { User } from './user';
+import type { Order } from './order';
 
-// Notification input for creating notifications
-export type NotificationInput = Pick<
-  Notification,
-  'userId' | 'orderId' | 'message'
-> & {
-  read?: boolean;
+// Base Notification type matching Prisma schema
+export type Notification = PrismaNotification;
+
+// Notification with relations (for app use)
+export type NotificationWithRelations = Notification & {
+  user: User;
+  order: Order;
 };
 
-// Notification update interface
+// Notification input for creating notifications (matches Prisma fields)
+export type NotificationInput = Pick<
+  PrismaNotification,
+  'userId' | 'orderId' | 'message' | 'read'
+>;
+
+// Notification update type
 export type NotificationUpdate = Partial<Pick<Notification, 'message' | 'read'>>;
 
-// Notification response interface
-export type NotificationResponse = Notification;
+// Notification response type
+export type NotificationResponse = NotificationWithRelations;
 
 // Notification summary for lists
 export type NotificationSummary = Pick<
-  Notification,
+  PrismaNotification,
   'id' | 'message' | 'read' | 'createdAt'
 >;
 

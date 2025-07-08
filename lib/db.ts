@@ -60,7 +60,11 @@ export function addReview(review: {
   const list = reviewsStore.get(review.productId) || [];
   list.push({
     ...review,
-    createdAt: new Date().toISOString(),
+    id: Date.now(), // Dummy id for in-memory
+    productId: Number(review.productId),
+    createdAt: new Date(),
+    userId: 0,
+    user: { id: 0, firstName: '', lastName: '', email: review.userEmail },
   });
   reviewsStore.set(review.productId, list);
 }
@@ -81,5 +85,5 @@ export function getAverageRating(productId: string): {
 
 export function getReviewsByUser(email: string): Review[] {
   const all = Array.from(reviewsStore.values()).flat();
-  return all.filter((r) => r.userEmail === email);
+  return all.filter((r) => r.user && r.user.email === email);
 }

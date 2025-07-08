@@ -1,16 +1,16 @@
-// Base Variant type matching Prisma schema
-export interface Variant {
-  id: number;
-  uuid: string;
-  productId: number;
-  attributes: Record<string, any>;
-  quantity: number;
-  priceModifier?: number | null;
-}
+import type { Variant as PrismaVariant } from '@prisma/client';
 
-// Input type for creating variants
+// Base Variant type matching Prisma schema
+export type Variant = PrismaVariant;
+
+// Variant with parsed attributes (for app use)
+export type VariantWithParsedAttributes = Variant & {
+  attributes: Record<string, any>;
+};
+
+// Input type for creating variants (matches Prisma fields)
 export type VariantInput = Pick<
-  Variant,
+  PrismaVariant,
   'productId' | 'attributes' | 'quantity' | 'priceModifier'
 > & {
   uuid?: string;
@@ -24,6 +24,6 @@ export type VariantResponse = Variant;
 
 // Variant with minimal fields for lists
 export type VariantSummary = Pick<
-  Variant,
+  PrismaVariant,
   'id' | 'uuid' | 'attributes' | 'quantity' | 'priceModifier'
 >;
