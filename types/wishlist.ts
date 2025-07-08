@@ -1,26 +1,25 @@
+import type { WishlistItem as PrismaWishlistItem } from '@prisma/client';
 import type { Product } from './product';
+import type { User } from './user';
 
-// Wishlist item interface matching Prisma schema
-export interface WishlistItem {
-  id: number;
-  uuid: string;
-  userId: number;
-  productId: number;
-  variantId?: string | null;
-  notifyOnStock: boolean;
-  createdAt: Date;
+// Base WishlistItem type matching Prisma schema
+export type WishlistItem = PrismaWishlistItem;
+
+// WishlistItem with relations (for app use)
+export type WishlistItemWithRelations = WishlistItem & {
   product: Product;
-}
+  user: User;
+};
 
-// Wishlist item input for adding to wishlist
+// Wishlist item input for adding to wishlist (matches Prisma fields)
 export type WishlistItemInput = Pick<
-  WishlistItem,
+  PrismaWishlistItem,
   'userId' | 'productId' | 'variantId' | 'notifyOnStock'
 > & {
   uuid?: string;
 };
 
-// Wishlist response interface
+// Wishlist response type (app-specific)
 export interface WishlistResponse {
   items: WishlistItem[];
   total: number;

@@ -1,32 +1,25 @@
+import type { SupportTicket as PrismaSupportTicket } from '@prisma/client';
 import type { User } from './user';
 
-// Support ticket interface matching Prisma schema
-export interface SupportTicket {
-  id: number;
-  uuid: string;
-  userId?: number | null;
-  subject: string;
-  message: string;
-  status: string;
-  createdAt: Date;
-  updatedAt: Date;
-  user?: User;
-}
+// Base SupportTicket type matching Prisma schema
+export type SupportTicket = PrismaSupportTicket;
 
-// Support ticket input for creating tickets
-export type SupportTicketInput = Pick<
-  SupportTicket,
-  'subject' | 'message'
-> & {
-  userId?: number;
-  uuid?: string;
+// SupportTicket with relations (for app use)
+export type SupportTicketWithRelations = SupportTicket & {
+  user?: User;
 };
 
-// Support ticket update interface
+// Support ticket input for creating tickets (matches Prisma fields)
+export type SupportTicketInput = Pick<
+  PrismaSupportTicket,
+  'subject' | 'message' | 'userId' | 'uuid'
+>;
+
+// Support ticket update type
 export type SupportTicketUpdate = Partial<Pick<SupportTicket, 'subject' | 'message' | 'status'>>;
 
-// Support ticket response interface
-export type SupportTicketResponse = SupportTicket;
+// Support ticket response type
+export type SupportTicketResponse = SupportTicketWithRelations;
 
 // Support ticket summary for lists
 export type SupportTicketSummary = Pick<

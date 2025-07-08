@@ -1,30 +1,26 @@
-export interface Review {
-  id: number;
-  productId: number;
-  userId: number;
-  rating: number;
-  comment: string;
-  createdAt: Date;
-  updatedAt?: Date;
-  user?: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-}
+import type { Review as PrismaReview } from '@prisma/client';
+import type { User } from './user';
+import type { Product } from './product';
 
-export interface ReviewInput {
-  productId: number;
-  rating: number;
-  comment: string;
-}
+// Base Review type matching Prisma schema
+export type Review = PrismaReview;
 
-export interface ReviewUpdate {
-  rating?: number;
-  comment?: string;
-}
+// Review with relations (for app use)
+export type ReviewWithRelations = Review & {
+  user: User;
+  product: Product;
+};
 
+// Input type for creating reviews (matches Prisma fields)
+export type ReviewInput = Pick<
+  PrismaReview,
+  'productId' | 'userId' | 'rating' | 'comment'
+>;
+
+// Update type for reviews
+export type ReviewUpdate = Partial<Pick<Review, 'rating' | 'comment'>>;
+
+// Reviews response type (app-specific)
 export interface ReviewsResponse {
   reviews: Review[];
   averageRating: number;
@@ -33,6 +29,7 @@ export interface ReviewsResponse {
   currentPage: number;
 }
 
+// Review added response (app-specific)
 export interface ReviewAddedResponse {
   message: string;
   review: Review;
@@ -40,6 +37,7 @@ export interface ReviewAddedResponse {
   reviewCount: number;
 }
 
+// Review summary (app-specific)
 export interface ReviewSummary {
   averageRating: number;
   reviewCount: number;
@@ -48,6 +46,7 @@ export interface ReviewSummary {
   };
 }
 
+// Review filter (app-specific)
 export interface ReviewFilter {
   rating?: number;
   sortBy?: 'newest' | 'oldest' | 'highest' | 'lowest';
