@@ -10,7 +10,7 @@ import ConfirmModal from '@components/Modals/ConfirmModal';
 import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
 import Link from 'next/link';
 import EditButton from '@components/UI/EditButton';
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import { ArrowTopRightOnSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import SelectDropdown, { SelectOption } from '@components/form-fields/SelectDropdown';
 import GenericModal from '@components/Modals/GenericModal';
 import debounce from 'lodash.debounce';
@@ -33,6 +33,7 @@ export default function AdminProducts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [confirmAction, setConfirmAction] = useState<null | { type: 'add' | 'edit' | 'delete', payload?: any }>(null);
+  const [disableModal, setDisableModal] = useState<{ open: boolean; product: Product | null }>({ open: false, product: null });
 
   type FormState = Partial<ProductInput> & { id?: string };
   const emptyForm: FormState = {
@@ -231,13 +232,28 @@ export default function AdminProducts() {
     setPhotos([]);
     setShowModal(true);
   };
-  const handleEdit = (product: Product) => setConfirmAction({ type: 'edit', payload: product });
+  const handleEdit = (product: Product) => {
+    setEditingId(product.id);
+    setForm({ ...product });
+    setShowModal(true);
+  };
   const handleDelete = (productId: string) => setConfirmAction({ type: 'delete', payload: productId });
   const cancelEdit = () => {
     setEditingId(null);
     setForm(emptyForm);
     setPhotos([]);
     setShowModal(false);
+  };
+  const handleDisable = (product: Product) => setDisableModal({ open: true, product });
+  const confirmDisable = async () => {
+    if (!disableModal.product) return;
+    await fetch('/api/admin/products', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: disableModal.product.id }),
+    });
+    setDisableModal({ open: false, product: null });
+    fetchProducts(currentPage);
   };
   if (!user) return <div className="p-4">Please log in to view products.</div>;
   if (user.role.toUpperCase() !== USER_ROLES.SUPER_ADMIN)
@@ -296,10 +312,8 @@ export default function AdminProducts() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
+                  <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -307,39 +321,13 @@ export default function AdminProducts() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
-                  <tr><td colSpan={7} className="px-6 py-4 text-center"><div className="flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div><span className="ml-2">Loading products...</span></div></td></tr>
+                  <tr><td colSpan={5} className="px-6 py-4 text-center"><div className="flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div><span className="ml-2">Loading products...</span></div></td></tr>
                 ) : products.length === 0 ? (
-                  <tr><td colSpan={7} className="px-6 py-4 text-center text-gray-500">No products found</td></tr>
+                  <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">No products found</td></tr>
                 ) : (
                   products.map((product) => (
                     <tr key={product.id} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-12 w-12">
-                            <img
-                              className="h-12 w-12 rounded-lg object-cover"
-                              src={(() => {
-                                if (typeof product.featuredImage === 'string') return product.featuredImage;
-                                if (
-                                  product.featuredImage &&
-                                  typeof product.featuredImage === 'object' &&
-                                  'url' in product.featuredImage &&
-                                  typeof (product.featuredImage as { url?: string }).url === 'string'
-                                ) {
-                                  return (product.featuredImage as { url: string }).url;
-                                }
-                                return '/placeholder.png';
-                              })()}
-                              alt={product.title}
-                            />
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{product.title}</div>
-                            <div className="text-sm text-gray-500">SKU: {product.sku}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-700 font-semibold">
+                      <td className="px-2 py-4 whitespace-nowrap text-sm text-blue-700 font-semibold">
                         {product.vendor?.id ? (
                           <Link href={`/admin/brands`} className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-50 text-blue-700 font-semibold hover:bg-blue-100 transition">
                             {product.vendor?.brandName || 'Unknown'}
@@ -349,17 +337,7 @@ export default function AdminProducts() {
                           product.vendor?.brandName || 'Unknown'
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.category?.name || 'Uncategorized'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {product.minPrice !== undefined ? (
-                          <>
-                            ${product.minPrice}
-                            {product.maxPrice && product.maxPrice > product.minPrice && (
-                              <span className="text-gray-500"> - ${product.maxPrice}</span>
-                            )}
-                          </>
-                        ) : '—'}
-                      </td>
+                      <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{product.category?.name || 'Uncategorized'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${((product.totalInventory ?? 0) <= 5) ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
                           {product.totalInventory ?? 0}
@@ -371,8 +349,22 @@ export default function AdminProducts() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center space-x-2">
-                          <EditButton onClick={() => handleEdit(product)} />
-                          <button className="btn btn-error text-white" onClick={() => handleDelete(product.id)}>Delete</button>
+                          {user?.role === USER_ROLES.SUPER_ADMIN && (
+                            <button
+                              className="flex items-center gap-1 btn btn-sm bg-yellow-500 text-white hover:bg-yellow-600 font-semibold rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition px-3 py-1.5"
+                              onClick={() => handleDisable(product)}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728" /></svg>
+                              Disable
+                            </button>
+                          )}
+                          <button
+                            className="flex items-center gap-1 btn btn-sm bg-red-500 text-white hover:bg-red-600 font-semibold rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition px-3 py-1.5"
+                            onClick={() => handleDelete(product.id)}
+                          >
+                            <TrashIcon className="w-4 h-4" />
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -413,6 +405,7 @@ export default function AdminProducts() {
                     isAsync
                     onAddNew={(inputValue) => setAddVendorModal({ open: true, value: inputValue })}
                     addNewLabel="Add Vendor"
+                    className="min-w-[180px] w-full md:w-auto"
                   />
                   <SelectDropdown
                     label="Category"
@@ -424,6 +417,7 @@ export default function AdminProducts() {
                     isAsync
                     onAddNew={(inputValue) => setAddCategoryModal({ open: true, value: inputValue })}
                     addNewLabel="Add Category"
+                    className="min-w-[180px] w-full md:w-auto"
                   />
                   <SelectDropdown
                     label="Product Type"
@@ -435,6 +429,7 @@ export default function AdminProducts() {
                     isAsync
                     onAddNew={(inputValue) => setAddTypeModal({ open: true, value: inputValue })}
                     addNewLabel="Add Type"
+                    className="min-w-[180px] w-full md:w-auto"
                   />
                   <SelectDropdown
                     label="Tags"
@@ -447,6 +442,7 @@ export default function AdminProducts() {
                     isAsync
                     onAddNew={(inputValue) => setAddTagModal({ open: true, value: inputValue })}
                     addNewLabel="Add Tag"
+                    className="min-w-[180px] w-full md:w-auto"
                   />
                 </div>
               </div>
@@ -467,7 +463,7 @@ export default function AdminProducts() {
               </div>
               <div className="flex gap-2 pt-4">
                 <button type="submit" className="btn btn-primary">{editingId ? 'Update Product' : 'Add Product'}</button>
-                <button type="button" className="btn btn-ghost" onClick={cancelEdit}>Cancel</button>
+                <button type="button" className="btn btn-ghost hover:bg-gray-100 hover:text-gray-800" onClick={cancelEdit}>Cancel</button>
               </div>
             </form>
           </div>
@@ -517,19 +513,29 @@ export default function AdminProducts() {
       >
         <div>Type: <b>{addTypeModal.value}</b></div>
       </GenericModal>
-      {confirmAction && (
+      {confirmAction && confirmAction.type === 'delete' && (
         <ConfirmModal
           isOpen={!!confirmAction}
-          title={`Confirm ${confirmAction.type.charAt(0).toUpperCase() + confirmAction.type.slice(1)}`}
-          description={`Are you sure you want to ${confirmAction.type} this product?`}
+          title={`Confirm Delete`}
+          description={`Are you sure you want to delete this product?`}
           confirmLabel="Confirm"
           cancelLabel="Cancel"
           onConfirm={() => {
-            if (confirmAction.type === 'edit') { /* call edit logic with confirmAction.payload */ }
-            if (confirmAction.type === 'delete') { /* call delete logic with confirmAction.payload */ }
+            // call delete logic with confirmAction.payload
             setConfirmAction(null);
           }}
           onCancel={() => setConfirmAction(null)}
+        />
+      )}
+      {disableModal.open && disableModal.product && (
+        <ConfirmModal
+          isOpen={disableModal.open}
+          title="Disable Product"
+          description={`Are you sure you want to disable '${disableModal.product.title}' (Brand: ${disableModal.product.vendor?.brandName || 'Unknown'})?`}
+          confirmLabel="Disable"
+          cancelLabel="Cancel"
+          onConfirm={confirmDisable}
+          onCancel={() => setDisableModal({ open: false, product: null })}
         />
       )}
     </>

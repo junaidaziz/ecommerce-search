@@ -18,6 +18,9 @@ async function handler(
     const db = getDb();
     const param = parseInt(String(req.query.threshold || ''), 10);
     const threshold = Number.isNaN(param) ? DEFAULT_LOW_STOCK_THRESHOLD : param;
+    const page = parseInt(String(req.query.page || '1'), 10);
+    const limit = parseInt(String(req.query.limit || '20'), 10);
+    const offset = (page - 1) * limit;
     const rows: Array<{
       id: string | number;
       title: string;
@@ -33,12 +36,15 @@ async function handler(
     });
     const products = rows
       .filter((p) => p.quantity < (p.lowStockThreshold ?? threshold))
-      .map((p) => ({
-        id: String(p.id),
-        title: p.title,
-        quantity: p.quantity,
-      }));
-    res.status(200).json({ products });
+      .sort((a, b) => a.quantity - b.quantity);
+    const total = products.length;
+    const paginated = products.slice(offset, offset + limit);
+    res.status(200).json({
+      products: paginated,
+      total,
+      page,
+      limit
+    });
   } catch (error) {
     handleApiError(res, error, 'Failed to load low stock products');
   }

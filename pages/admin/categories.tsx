@@ -5,6 +5,7 @@ import { fetchJson } from '@utils/fetchJson';
 import { TextInput } from '@components/form-fields';
 import { slugify } from '@lib/slugify';
 import { Button } from '@components/UI';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
@@ -22,6 +23,7 @@ export default function Categories() {
   const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [confirmAction, setConfirmAction] = useState<null | { type: 'add' | 'edit' | 'delete', payload?: any }>(null);
+  const [editModal, setEditModal] = useState<{ open: boolean; cat: Category | null }>({ open: false, cat: null });
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -99,6 +101,21 @@ export default function Categories() {
     } finally {
       setDeleting(false);
     }
+  };
+
+  const openEditModal = (cat: Category) => {
+    setEditName(cat.name);
+    setEditing(cat.id);
+    setEditModal({ open: true, cat });
+  };
+  const closeEditModal = () => {
+    setEditModal({ open: false, cat: null });
+    setEditing(null);
+    setEditName('');
+  };
+  const saveEdit = async () => {
+    await update();
+    closeEditModal();
   };
 
   if (!user)
@@ -227,12 +244,20 @@ export default function Categories() {
                         <div className="flex items-center space-x-2">
                           {editing !== cat.id && (
                             <>
-                              <Button variant="primary" size="sm" onClick={() => handleEdit(cat)}>
+                              <button
+                                onClick={() => openEditModal(cat)}
+                                className="flex items-center gap-1 btn btn-sm bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 hover:text-blue-900 font-semibold rounded-lg shadow-sm transition px-3 py-1.5"
+                              >
+                                <PencilSquareIcon className="w-4 h-4" />
                                 Edit
-                              </Button>
-                              <Button variant="danger" size="sm" onClick={() => handleDelete(cat.id)}>
+                              </button>
+                              <button
+                                onClick={() => handleDelete(cat.id)}
+                                className="flex items-center gap-1 btn btn-sm bg-red-500 text-white hover:bg-red-600 font-semibold rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition px-3 py-1.5"
+                              >
+                                <TrashIcon className="w-4 h-4" />
                                 Delete
-                              </Button>
+                              </button>
                             </>
                           )}
                         </div>
@@ -246,7 +271,7 @@ export default function Categories() {
         </div>
       </div>
 
-      {confirmAction && (
+      {confirmAction && confirmAction.type !== 'edit' && (
         <ConfirmModal
           isOpen={!!confirmAction}
           title={`Confirm ${confirmAction.type.charAt(0).toUpperCase() + confirmAction.type.slice(1)}`}
@@ -256,8 +281,6 @@ export default function Categories() {
           onConfirm={() => {
             if (confirmAction.type === 'add') {
               add();
-            } else if (confirmAction.type === 'edit') {
-              update();
             } else if (confirmAction.type === 'delete') {
               confirmDelete();
             }
@@ -265,6 +288,25 @@ export default function Categories() {
           }}
           onCancel={() => setConfirmAction(null)}
         />
+      )}
+      {editModal.open && editModal.cat && (
+        <dialog open className="modal">
+          <div className="modal-box max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Edit Category</h3>
+            <div className="mb-4">
+              <TextInput
+                name="editName"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Category Name"
+              />
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button className="btn btn-primary" onClick={saveEdit} disabled={!editName.trim()}>Save</button>
+              <button className="btn btn-ghost hover:bg-gray-100 hover:text-gray-800" onClick={closeEditModal}>Cancel</button>
+            </div>
+          </div>
+        </dialog>
       )}
     </>
   );
