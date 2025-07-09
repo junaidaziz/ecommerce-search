@@ -7,13 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "../docs/ERD.svg"
+}
+
+generator jsonSchema {
+  provider = "prisma-json-schema-generator"
+  output   = "../docs/json-schema"
+}
+
 enum Role {
   USER
   BRAND
   SUPER_ADMIN
 }
 
-model User {
+model user {
   id                  Int       @id @default(autoincrement())
   uuid                String    @unique @default(uuid())
   email               String    @unique
@@ -35,7 +45,7 @@ model User {
   profileImage        String?
   taxId               String?
   stripeAccountId     String?
-  paymentMethods      Json?
+  /// USER, BRAND, or SUPER_ADMIN access level.
   role                Role      @default(USER)
   verified            Boolean   @default(false)
   disabled            Boolean   @default(false)
@@ -46,34 +56,36 @@ model User {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  products         Product[]
-  orders           Order[]
-  deletionRequests DeletionRequest[] @relation("BrandDeletionRequests")
-  searchLogs       SearchLog[]
-  couponUsages     CouponUsage[]
-  PaymentMethod    PaymentMethod[]
-  notifications    Notification[]
-  sentMessages     Message[]         @relation("SentMessages")
-  receivedMessages Message[]         @relation("ReceivedMessages")
-  updatedPolicies  PolicyDocument[]  @relation("UserToPolicyDocuments")
-  supportTickets   SupportTicket[]
-  wishlistItems    WishlistItem[]
-  Coupon           Coupon[]
+  products         product[]
+  orders           order[]
+  deletionRequests deletionRequest[] @relation("brandDeletionRequests")
+  searchLogs       searchLog[]
+  couponUsages     couponUsage[]
+  paymentMethod    paymentMethod[]
+  notifications    notification[]
+  sentMessages     message[]         @relation("sentMessages")
+  receivedMessages message[]         @relation("receivedMessages")
+  updatedPolicies  policyDocument[]  @relation("userToPolicyDocuments")
+  supportTickets   supportTicket[]
+  wishlistItems    wishlistItem[]
+  coupon           coupon[]
+  @@index([phoneNumber])
 }
 
-model Category {
+model category {
   id        Int      @id @default(autoincrement())
   uuid      String   @unique @default(uuid())
-  name      String
   slug      String   @unique
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  products         Product[]
-  deletionRequests DeletionRequest[]
+  products         product[]
+  deletionRequests deletionRequest[]
+  @@index([slug])
 }
 
-model Product {
+model product {
   id                Int      @id @default(autoincrement())
   uuid              String   @unique @default(uuid())
   slug              String   @unique
@@ -81,7 +93,7 @@ model Product {
   title             String
   description       String
   productType       String
-  tags              String?
+  tags              String[]
   quantity          Int      @default(0)
   lowStockThreshold Int?     @default(5)
   minPrice          Float    @default(0)
@@ -90,35 +102,39 @@ model Product {
   discountType      String?
   discountValue     Float?
   status            String   @default("approved")
-  images            String?
+  images            String[]
   vendorId          Int
   categoryId        Int
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  vendor        User           @relation(fields: [vendorId], references: [id])
-  category      Category       @relation(fields: [categoryId], references: [id])
-  orders        Order[]
-  wishlistItems WishlistItem[]
-  variants      Variant[]
+  vendor        user           @relation(fields: [vendorId], references: [id])
+  category      category       @relation(fields: [categoryId], references: [id])
+  wishlistItems wishlistItem[]
+  variants      variant[]
+  @@index([slug])
+  @@index([sku])
 }
 
-model Variant {
+model variant {
   id            Int    @id @default(autoincrement())
   uuid          String @unique @default(uuid())
   productId     Int
+  /// attributes: { size: string, color: string }
   attributes    Json
   quantity      Int    @default(0)
   priceModifier Float?
 
-  product Product @relation(fields: [productId], references: [id])
+  product product @relation(fields: [productId], references: [id])
+  orders  order[]
+  @@index([uuid])
 }
 
-model Order {
+model order {
   id               Int      @id @default(autoincrement())
   uuid             String   @unique @default(uuid())
   userId           Int
-  productId        Int
+  variantId        Int
   quantity         Int
   total            Float
   status           String   @default("processing")
@@ -128,14 +144,15 @@ model Order {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  user          User           @relation(fields: [userId], references: [id])
-  product       Product        @relation(fields: [productId], references: [id])
-  Payment       Payment[]
-  notifications Notification[]
-  messages      Message[]
+  user          user           @relation(fields: [userId], references: [id])
+  variant       variant        @relation(fields: [variantId], references: [id])
+  payment       payment[]
+  notifications notification[]
+  messages      message[]
+  @@index([uuid])
 }
 
-model DeletionRequest {
+model deletionRequest {
   id         Int      @id @default(autoincrement())
   uuid       String   @unique @default(uuid())
   categoryId Int
@@ -145,11 +162,11 @@ model DeletionRequest {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  category Category @relation(fields: [categoryId], references: [id])
-  brand    User     @relation("BrandDeletionRequests", fields: [brandId], references: [id])
+  category category @relation(fields: [categoryId], references: [id])
+  brand    user     @relation("brandDeletionRequests", fields: [brandId], references: [id])
 }
 
-model SearchLog {
+model searchLog {
   id        Int      @id @default(autoincrement())
   uuid      String   @unique @default(uuid())
   userId    Int?
@@ -157,10 +174,10 @@ model SearchLog {
   noResults Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user user? @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
-model Coupon {
+model coupon {
   id            Int           @id @default(autoincrement())
   code          String        @unique
   description   String?
@@ -174,23 +191,24 @@ model Coupon {
   isActive      Boolean       @default(true)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
-  user          User?         @relation(fields: [userId], references: [id])
-  usages        CouponUsage[]
+  user          user?         @relation(fields: [userId], references: [id])
+  usages        couponUsage[]
+  @@index([code])
 }
 
-model CouponUsage {
+model couponUsage {
   id        Int      @id @default(autoincrement())
   couponId  Int
   userId    Int
   createdAt DateTime @default(now())
 
-  coupon Coupon @relation(fields: [couponId], references: [id])
-  user   User   @relation(fields: [userId], references: [id])
+  coupon coupon @relation(fields: [couponId], references: [id])
+  user   user   @relation(fields: [userId], references: [id])
 
   @@unique([couponId, userId])
 }
 
-model PaymentMethod {
+model paymentMethod {
   id        Int      @id @default(autoincrement())
   userId    Int
   provider  String
@@ -203,11 +221,11 @@ model PaymentMethod {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user     User      @relation(fields: [userId], references: [id])
-  payments Payment[]
+  user     user      @relation(fields: [userId], references: [id])
+  payments payment[]
 }
 
-model Payment {
+model payment {
   id              Int      @id @default(autoincrement())
   orderId         Int
   amount          Float
@@ -217,11 +235,11 @@ model Payment {
   transactionId   String
   createdAt       DateTime @default(now())
 
-  order         Order         @relation(fields: [orderId], references: [id])
-  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  order         order         @relation(fields: [orderId], references: [id])
+  paymentMethod paymentMethod @relation(fields: [paymentMethodId], references: [id])
 }
 
-model Notification {
+model notification {
   id        Int      @id @default(autoincrement())
   userId    Int
   orderId   Int
@@ -229,11 +247,11 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user  User  @relation(fields: [userId], references: [id])
-  order Order @relation(fields: [orderId], references: [id])
+  user  user  @relation(fields: [userId], references: [id])
+  order order @relation(fields: [orderId], references: [id])
 }
 
-model Message {
+model message {
   id          Int      @id @default(autoincrement())
   senderId    Int
   receiverId  Int
@@ -245,12 +263,12 @@ model Message {
   createdAt   DateTime @default(now())
   seen        Boolean  @default(false)
 
-  sender   User  @relation("SentMessages", fields: [senderId], references: [id])
-  receiver User  @relation("ReceivedMessages", fields: [receiverId], references: [id])
-  order    Order @relation(fields: [orderId], references: [id])
+  sender   user  @relation("sentMessages", fields: [senderId], references: [id])
+  receiver user  @relation("receivedMessages", fields: [receiverId], references: [id])
+  order    order @relation(fields: [orderId], references: [id])
 }
 
-model PolicyDocument {
+model policyDocument {
   id        Int      @id @default(autoincrement())
   type      String
   content   String
@@ -259,12 +277,12 @@ model PolicyDocument {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  updatedByUser User @relation("UserToPolicyDocuments", fields: [updatedBy], references: [id])
+  updatedByUser user @relation("userToPolicyDocuments", fields: [updatedBy], references: [id])
 
   @@unique([type, version])
 }
 
-model SupportTicket {
+model supportTicket {
   id        Int      @id @default(autoincrement())
   uuid      String   @unique @default(uuid())
   userId    Int?
@@ -274,10 +292,10 @@ model SupportTicket {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User? @relation(fields: [userId], references: [id])
+  user user? @relation(fields: [userId], references: [id])
 }
 
-model WishlistItem {
+model wishlistItem {
   id            Int      @id @default(autoincrement())
   uuid          String   @unique @default(uuid())
   userId        Int
@@ -286,6 +304,6 @@ model WishlistItem {
   notifyOnStock Boolean  @default(false)
   createdAt     DateTime @default(now())
 
-  user    User    @relation(fields: [userId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  user    user    @relation(fields: [userId], references: [id])
+  product product @relation(fields: [productId], references: [id])
 }
