@@ -210,6 +210,23 @@ async function handler(
       return;
     }
 
+    if (req.method === 'PATCH') {
+      if (user?.role !== USER_ROLES.SUPER_ADMIN) {
+        return res.status(403).json({ message: 'Only super admins can disable products.' });
+      }
+      const { id, uuid } = req.body;
+      if (!id && !uuid) {
+        return res.status(400).json({ message: 'Product id or uuid required.' });
+      }
+      const where = id ? { id: Number(id) } : { uuid };
+      const product = await db.product.findFirst({ where });
+      if (!product) {
+        return res.status(404).json({ message: NOT_FOUND });
+      }
+      await db.product.update({ where, data: { status: 'DISABLED' } });
+      return res.status(200).json({ message: `Product '${product.title}' disabled.` });
+    }
+
     if (req.method === 'GET') {
       const vendor = getQueryParam(req.query.vendor);
       const page = parseInt(getQueryParam(req.query.page) || '1', 10);

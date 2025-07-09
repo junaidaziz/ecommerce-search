@@ -1,48 +1,63 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import Link from 'next/link';
-import { AnalyticsData, LowStockProduct, USER_ROLES } from '@/types';
+import type { AnalyticsData, LowStockProduct } from '@/types';
+import { USER_ROLES } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
-import BarChart from '@components/BarChart';
+import PageHero from '@components/UI/PageHero';
 import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
+import { ArrowTrendingUpIcon, ShoppingBagIcon, CurrencyPoundIcon } from '@heroicons/react/24/outline';
 
 export default function AdminAnalytics() {
   const { user } = useContext(AppContext)!;
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [start, setStart] = useState('');
-  const [end, setEnd] = useState('');
   const [lowStock, setLowStock] = useState<LowStockProduct[]>([]);
+  const [lowStockPage, setLowStockPage] = useState(1);
+  const [lowStockTotal, setLowStockTotal] = useState(0);
+  const [lowStockLoading, setLowStockLoading] = useState(false);
+  const lowStockRef = useRef<HTMLDivElement>(null);
 
   const load = () => {
     if (!user) return;
     setLoading(true);
-    const params = new URLSearchParams();
-    if (start) params.set('start', start);
-    if (end) params.set('end', end);
-    fetchJson<AnalyticsData>(
-      '/api/admin/analytics' + (params.toString() ? `?${params}` : '')
-    )
+    fetchJson<AnalyticsData>('/api/admin/analytics')
       .then((res) => setData(res))
-      .catch(() =>
-        setData({ totalOrders: 0, totalRevenue: 0, topProducts: [] })
-      )
+      .catch(() => setData({ totalOrders: 0, totalRevenue: 0, topProducts: [] }))
       .finally(() => setLoading(false));
-    fetchJson<{ products: LowStockProduct[] }>('/api/admin/low-stock')
-      .then((res) => setLowStock(res.products))
-      .catch(() => setLowStock([]));
+  };
+
+  const loadLowStock = async (page = 1) => {
+    setLowStockLoading(true);
+    const res = await fetchJson<{ products: LowStockProduct[]; total: number; page: number; limit: number }>(`/api/admin/low-stock?page=${page}&limit=20`);
+    setLowStock((prev) => (page === 1 ? res.products : [...prev, ...res.products]));
+    setLowStockTotal(res.total);
+    setLowStockPage(page);
+    setLowStockLoading(false);
   };
 
   useEffect(() => {
     load();
+    loadLowStock(1);
   }, [user]);
+
+  // Infinite scroll handler
+  useEffect(() => {
+    const el = lowStockRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 40 && !lowStockLoading && lowStock.length < lowStockTotal) {
+        loadLowStock(lowStockPage + 1);
+      }
+    };
+    el.addEventListener('scroll', onScroll);
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [lowStockLoading, lowStock.length, lowStockTotal, lowStockPage]);
 
   if (!user) return <div className="p-4">Please log in to view analytics.</div>;
   if (user.role !== USER_ROLES.SUPER_ADMIN)
     return <div className="p-4">Admin access required.</div>;
-
   if (loading || data === null) return <div className="p-4">Loading...</div>;
 
   return (
@@ -50,72 +65,77 @@ export default function AdminAnalytics() {
       <Head>
         <title>{getPageTitle('Admin Analytics')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Super Admin Dashboard</h1>
-      <div className="mb-4 space-x-2">
-        <Link href="/admin/users" className="btn btn-sm">
-          Users
-        </Link>
-        <Link href="/admin/categories" className="btn btn-sm">
-          Categories
-        </Link>
-        <Link href="/admin/approvals" className="btn btn-sm">
-          Approvals
-        </Link>
-        <Link href="/admin/search-analytics" className="btn btn-sm">
-          Search Logs
-        </Link>
-      </div>
-      <form
-        className="flex flex-wrap gap-2 mb-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          load();
-        }}
-      >
-        <input
-          type="date"
-          value={start}
-          onChange={(e) => setStart(e.target.value)}
-          className="input input-sm input-bordered"
-        />
-        <input
-          type="date"
-          value={end}
-          onChange={(e) => setEnd(e.target.value)}
-          className="input input-sm input-bordered"
-        />
-        <button type="submit" className="btn btn-sm btn-primary">
-          Apply
-        </button>
-      </form>
-      <p>Total Orders: {data.totalOrders}</p>
-      <p>Total Revenue: £{data.totalRevenue.toFixed(2)}</p>
-      <h2 className="text-xl font-semibold mt-4 mb-2">Top Products</h2>
-      <ul className="list-disc list-inside">
-        {data.topProducts.map((p) => (
-          <li key={p.id}>
-            {p.id} - {p.qty} sold
-          </li>
-        ))}
-        {data.topProducts.length === 0 && <li>No sales yet.</li>}
-      </ul>
-      <div className="mt-4">
-        <BarChart
-          data={data.topProducts.map((p) => ({ label: p.id, value: p.qty }))}
-        />
-      </div>
-      {lowStock.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2">Low Stock Products</h2>
-          <ul className="list-disc list-inside text-rose-600">
-            {lowStock.map((p) => (
-              <li key={p.id}>
-                {p.title} - {p.quantity} left
-              </li>
-            ))}
-          </ul>
+      <PageHero
+        heading="Super Admin Analytics"
+        description="Platform-wide sales, orders, and product performance overview."
+      />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow p-6 flex items-center gap-4 border border-gray-100">
+            <ShoppingBagIcon className="w-8 h-8 text-blue-500" />
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{data.totalOrders}</div>
+              <div className="text-gray-500 text-sm">Total Orders</div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow p-6 flex items-center gap-4 border border-gray-100">
+            <CurrencyPoundIcon className="w-8 h-8 text-green-500" />
+            <div>
+              <div className="text-2xl font-bold text-gray-900">£{data.totalRevenue.toFixed(2)}</div>
+              <div className="text-gray-500 text-sm">Total Revenue</div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow p-6 flex items-center gap-4 border border-gray-100">
+            <ArrowTrendingUpIcon className="w-8 h-8 text-emerald-500" />
+            <div>
+              <div className="text-2xl font-bold text-gray-900">{data.topProducts.length}</div>
+              <div className="text-gray-500 text-sm">Top Products</div>
+            </div>
+          </div>
         </div>
-      )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <ArrowTrendingUpIcon className="w-5 h-5 text-emerald-500" /> Top Products
+            </h2>
+            {data.topProducts.length > 0 ? (
+              <ul className="divide-y divide-gray-100">
+                {data.topProducts.map((p) => (
+                  <li key={p.id} className="py-2 flex justify-between items-center">
+                    <span className="font-medium text-gray-800">{p.id}</span>
+                    <span className="text-gray-500 text-sm">{p.qty} sold</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="text-gray-400">No sales yet.</div>
+            )}
+          </div>
+          <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
+            <h2 className="text-lg font-semibold mb-4 text-rose-600">Low Stock Products</h2>
+            <div ref={lowStockRef} className="max-h-72 overflow-y-auto pr-2">
+              {lowStock.length > 0 ? (
+                <ul className="divide-y divide-gray-100">
+                  {lowStock.map((p) => (
+                    <li key={p.id} className="py-2 flex justify-between items-center">
+                      <span className="font-medium text-gray-800">{p.title}</span>
+                      <span className="text-rose-600 text-sm">{p.quantity} left</span>
+                    </li>
+                  ))}
+                  {lowStockLoading && (
+                    <li className="py-2 text-center text-gray-400">Loading...</li>
+                  )}
+                  {lowStock.length >= lowStockTotal && !lowStockLoading && (
+                    <li className="py-2 text-center text-gray-400">End of list</li>
+                  )}
+                </ul>
+              ) : (
+                <div className="text-gray-400">No low stock products.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
     </>
   );
 }

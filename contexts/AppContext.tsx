@@ -124,7 +124,7 @@ export function AppProvider({ children }: AppProviderProps) {
         brandName,
         gender,
         profileImage,
-        role: (role || '').toLowerCase(),
+        role: (role || '').toUpperCase(),
         phoneNumber: '',
         address: '',
         city: '',

@@ -65,18 +65,19 @@ const SelectDropdown = <T extends FieldValues>(
   const customComponents = {
     ...selectComponents,
     NoOptionsMessage: (noOptionsProps: any) => (
-      <div className="px-3 py-2 text-gray-500">
-        No options found.
+      <div className="bg-gray-800 text-white rounded-lg shadow-lg p-0 overflow-hidden min-w-[220px]">
+        <div className="px-4 py-3 text-gray-300 text-sm">No options found.</div>
         {onAddNew && noOptionsProps.selectProps.inputValue ? (
           <button
             type="button"
-            className="ml-2 text-blue-600 hover:underline"
+            className="flex items-center gap-2 w-full px-4 py-3 text-blue-400 hover:text-blue-200 hover:bg-gray-700 font-medium text-base transition text-left"
             onMouseDown={(e) => {
               e.preventDefault();
               onAddNew(noOptionsProps.selectProps.inputValue);
             }}
           >
-            + {addNewLabel} &quot;{noOptionsProps.selectProps.inputValue}&quot;
+            <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+            Add new <span className="font-semibold">{noOptionsProps.selectProps.inputValue}</span>
           </button>
         ) : null}
       </div>
