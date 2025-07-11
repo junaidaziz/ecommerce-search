@@ -8,7 +8,7 @@ import type { Prisma } from '@prisma/client';
 type OrderWithRelations = Prisma.OrderGetPayload<{
   include: {
     user: true;
-    product: { include: { vendor: true; category: true } };
+    variant: { include: { product: { include: { vendor: true, category: true } } } };
   };
 }>;
 
@@ -33,61 +33,13 @@ export function mapDbRowToOrder(row: OrderWithRelations): Order {
     id: row.id,
     uuid: row.uuid,
     userId: row.userId,
-    productId: row.productId,
+    variantId: row.variantId,
     quantity: row.quantity,
     total: row.total,
     status: row.status as Order['status'],
     paymentMethod: row.paymentMethod ?? null,
     paymentReference: row.paymentReference ?? null,
     paymentProof: row.paymentProof ?? null,
-    user: (() => {
-      if (row.user) {
-        const mappedUser = {
-          ...row.user,
-          paymentMethods: Array.isArray(row.user.paymentMethods)
-            ? row.user.paymentMethods
-            : undefined,
-        };
-        if (mappedUser.paymentMethods === undefined) {
-          delete mappedUser.paymentMethods;
-        }
-        return mappedUser as import('../types').User;
-      } else {
-        return {
-          id: 0,
-          uuid: '',
-          email: '',
-          password: '',
-          firstName: '',
-          lastName: '',
-          brandName: null,
-          gender: '',
-          phoneNumber: null,
-          address: null,
-          city: null,
-          state: null,
-          postalCode: null,
-          country: null,
-          businessAddress: null,
-          website: null,
-          businessDescription: null,
-          logo: null,
-          profileImage: null,
-          taxId: null,
-          stripeAccountId: null,
-          role: 'USER',
-          verified: false,
-          disabled: false,
-          active: false,
-          verificationToken: null,
-          resetToken: null,
-          resetExpires: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        } as import('../types').User;
-      }
-    })(),
-    product: mapDbRowToProduct(row.product),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -111,7 +63,7 @@ export async function addOrder({
       db.order.create({
         data: {
           user: { connect: { id: user.id } },
-          product: { connect: { uuid: String(item.uuid ?? item.id) } },
+          variant: { connect: { uuid: String(item.uuid ?? item.id) } },
           quantity: item.qty ?? 1,
           total,
           status,
@@ -121,7 +73,7 @@ export async function addOrder({
         },
         include: {
           user: true,
-          product: { include: { vendor: true, category: true } },
+          variant: { include: { product: { include: { vendor: true, category: true } } } },
         },
       })
     )
@@ -130,16 +82,16 @@ export async function addOrder({
   await Promise.all(
     createdOrders.map((o) =>
       createNotification({
-        userId: o.product.vendor.id,
+        userId: o.variant.product.vendor.id,
         orderId: o.id,
-        message: `New order for ${o.product.title}`,
+        message: `New order for ${o.variant.product.title}`,
       })
     )
   );
 
   await Promise.all(
     createdOrders.map((o) =>
-      sendBrandNewOrder(o.product.vendor.email, { id: o.id })
+      sendBrandNewOrder(o.variant.product.vendor.email, { id: o.id })
     )
   );
 
@@ -152,7 +104,7 @@ export async function getOrdersForUser(email: string): Promise<Order[]> {
     where: { user: { email } },
     include: {
       user: true,
-      product: { include: { vendor: true, category: true } },
+      variant: { include: { product: { include: { vendor: true, category: true } } } },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -164,7 +116,7 @@ export async function getAllOrders(): Promise<Order[]> {
   const rows: OrderWithRelations[] = await db.order.findMany({
     include: {
       user: true,
-      product: { include: { vendor: true, category: true } },
+      variant: { include: { product: { include: { vendor: true, category: true } } } },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -186,8 +138,10 @@ export async function getAllOrdersFiltered(params: {
               OR: [
                 { user: { email: { contains: search, mode: 'insensitive' } } },
                 {
-                  product: {
-                    title: { contains: search, mode: 'insensitive' },
+                  variant: {
+                    product: {
+                      title: { contains: search, mode: 'insensitive' },
+                    },
                   },
                 },
               ],
@@ -197,7 +151,7 @@ export async function getAllOrdersFiltered(params: {
     },
     include: {
       user: true,
-      product: { include: { vendor: true, category: true } },
+      variant: { include: { product: { include: { vendor: true, category: true } } } },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -207,10 +161,10 @@ export async function getAllOrdersFiltered(params: {
 export async function getOrdersForVendor(vendor: string): Promise<Order[]> {
   const db = getDb();
   const rows: OrderWithRelations[] = await db.order.findMany({
-    where: { product: { vendor: { brandName: vendor } } },
+    where: { variant: { product: { vendor: { brandName: vendor } } } },
     include: {
       user: true,
-      product: { include: { vendor: true, category: true } },
+      variant: { include: { product: { include: { vendor: true, category: true } } } },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -220,10 +174,10 @@ export async function getOrdersForVendor(vendor: string): Promise<Order[]> {
 export async function getOrdersForVendorId(vendorId: number): Promise<Order[]> {
   const db = getDb();
   const rows: OrderWithRelations[] = await db.order.findMany({
-    where: { product: { vendorId } },
+    where: { variant: { product: { vendorId } } },
     include: {
       user: true,
-      product: { include: { vendor: true, category: true } },
+      variant: { include: { product: { include: { vendor: true, category: true } } } },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -239,7 +193,9 @@ export async function hasOrdersForProduct(
     select: { id: true },
   });
   if (!product) return false;
-  const count = await db.order.count({ where: { productId: product.id } });
+  const variants = await db.variant.findMany({ where: { productId: product.id }, select: { id: true } });
+  if (!variants.length) return false;
+  const count = await db.order.count({ where: { variantId: { in: variants.map(v => v.id) } } });
   return count > 0;
 }
 
@@ -251,7 +207,7 @@ export async function getOrderByUuid(
     where: { uuid },
     include: {
       user: true,
-      product: { include: { vendor: true, category: true } },
+      variant: { include: { product: { include: { vendor: true, category: true } } } },
     },
   });
   if (!row) return null;
@@ -266,17 +222,19 @@ export async function updateOrderStatus(
   const db = getDb();
   const existing = await db.order.findUnique({
     where: { uuid },
-    include: { product: true },
+    include: { variant: { include: { product: true } } },
   });
   if (!existing) return;
   if (
     status === 'shipped' &&
     !['shipped', 'delivered', 'completed'].includes(existing.status)
   ) {
-    await db.product.update({
-      where: { id: existing.productId },
-      data: { quantity: { decrement: existing.quantity } },
-    });
+    if (existing.variant && existing.variant.productId) {
+      await db.product.update({
+        where: { id: existing.variant.productId },
+        data: { quantity: { decrement: existing.quantity } },
+      });
+    }
   }
   await db.order.update({ where: { uuid }, data: { status } });
 }
@@ -284,20 +242,15 @@ export async function updateOrderStatus(
 export async function getBestSellingProducts(limit = 8): Promise<Product[]> {
   const db = getDb();
   const grouped = await db.order.groupBy({
-    by: ['productId'],
+    by: ['variantId'],
     _sum: { quantity: true },
     orderBy: { _sum: { quantity: 'desc' } },
     take: limit,
   });
-  const ids = grouped.map((g: { productId: number }) => g.productId);
-  const products = await db.product.findMany({
-    where: { id: { in: ids } },
-    include: { category: true, vendor: true },
+  const variantIds = grouped.map((g: { variantId: number }) => g.variantId);
+  const variants = await db.variant.findMany({
+    where: { id: { in: variantIds } },
+    include: { product: { include: { category: true, vendor: true } } },
   });
-
-  return products.map(
-    (
-      p: Prisma.ProductGetPayload<{ include: { category: true; vendor: true } }>
-    ) => mapDbRowToProduct(p)
-  );
+  return variants.map((v: any) => mapDbRowToProduct(v.product));
 }

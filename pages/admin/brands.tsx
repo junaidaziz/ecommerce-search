@@ -12,6 +12,17 @@ import PageHero from '@components/UI/PageHero';
 import InputField from '@components/UI/InputField';
 import Checkbox from '@components/form-fields/Checkbox';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import SearchFilterBar from '@components/common/SearchFilterBar';
+import GenericModal from '@components/Modals/GenericModal';
+
+const brandSortOptions = [
+  { label: 'Newest First', value: 'newest' },
+  { label: 'Oldest First', value: 'oldest' },
+  { label: 'Name A-Z', value: 'name_asc' },
+  { label: 'Name Z-A', value: 'name_desc' },
+  { label: 'Email A-Z', value: 'email_asc' },
+  { label: 'Email Z-A', value: 'email_desc' },
+];
 
 export default function ManageBrands() {
   const { user } = useContext(AppContext)!;
@@ -160,7 +171,9 @@ export default function ManageBrands() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search]);
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortBy]);
 
   if (!user) return <div className="p-4">Please log in to view brands.</div>;
   if (user.role.toUpperCase() !== USER_ROLES.SUPER_ADMIN)
@@ -171,152 +184,180 @@ export default function ManageBrands() {
       <Head>
         <title>{getPageTitle('Manage Brands')}</title>
       </Head>
-      <PageHero
-        heading="Brand Management"
-        description="Manage all brands and vendor accounts across the platform. View, edit, and maintain brand information."
-      />
-      <main className="bg-gray-50 min-h-screen pb-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 mb-10 border border-gray-100">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">All Brands</h2>
-                <p className="text-gray-600">Total: {totalBrands} brands</p>
-              </div>
-            </div>
-            <div className="mb-8">
-              <div className="bg-gray-50 rounded-xl shadow p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
-                <form onSubmit={handleSearch} className="w-full md:w-auto flex-1">
-                  <div className="flex gap-2 w-full">
-                    <input 
-                      type="text" 
-                      placeholder="Search brands..." 
-                      value={search} 
-                      onChange={(e) => setSearch(e.target.value)} 
-                      className="w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 px-4 py-2 text-base bg-white placeholder-gray-400 transition"
-                    />
-                    <button type="submit" className="btn btn-primary text-white px-5 py-2 rounded-lg shadow">Search</button>
-                  </div>
-                </form>
-                <select 
-                  value={sortBy} 
-                  onChange={(e) => setSortBy(e.target.value)} 
-                  className="rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 px-4 py-2 text-base bg-white min-w-[180px] w-full md:w-auto transition"
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                  <option value="name_asc">Name A-Z</option>
-                  <option value="name_desc">Name Z-A</option>
-                  <option value="email_asc">Email A-Z</option>
-                  <option value="email_desc">Email Z-A</option>
-                </select>
-              </div>
-            </div>
-            {message && (
-              <div className="alert alert-success mb-6 rounded-lg shadow flex items-center gap-3 px-4 py-3 bg-green-50 border border-green-200 text-green-800">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>{message}</span>
-              </div>
-            )}
-            <div className="bg-white rounded-xl shadow border border-gray-100 overflow-x-auto">
-              <table className="w-full min-w-[700px]">
-                <thead>
-                  <tr className="bg-gradient-to-r from-blue-50 to-green-50 border-b border-gray-200">
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Brand</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Role</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Verified</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {loading ? (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-6 text-center">
-                        <div className="flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                          <span className="ml-2">Loading brands...</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ) : brands.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-6 text-center text-gray-500">
-                        No brands found
-                      </td>
-                    </tr>
-                  ) : (
-                    brands.map((brand, idx) => (
-                      <tr key={brand.id} className={`transition-colors duration-150 group ${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50`}>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-4">
-                            <div className="flex-shrink-0 h-12 w-12">
-                              {brand.logo ? (
-                                <img 
-                                  className="h-12 w-12 rounded-lg object-cover" 
-                                  src={brand.logo} 
-                                  alt={brand.brandName || 'Brand'} 
-                                />
-                              ) : (
-                                <div className="h-12 w-12 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-bold text-lg uppercase">
-                                  {(brand.brandName || brand.email || 'B')?.[0]?.toUpperCase() || 'B'}
-                                </div>
-                              )}
-                            </div>
-                            <div>
-                              <div className="text-base font-semibold text-gray-900 leading-tight">{brand.brandName || '(no name)'}</div>
-                              <div className="text-xs text-gray-400 font-mono">ID: {brand.id}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-emerald-100 text-emerald-700">Brand</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${brand.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{brand.active ? 'Active' : 'Inactive'}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${brand.verified ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>{brand.verified ? 'Verified' : 'Unverified'}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleEdit(brand)}
-                              className="flex items-center gap-1 btn btn-sm bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 hover:text-blue-900 font-semibold rounded-lg shadow-sm transition px-3 py-1.5"
-                            >
-                              <PencilSquareIcon className="w-4 h-4" />
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDelete(Number(brand.id))}
-                              disabled={deleting === Number(brand.id)}
-                              className="flex items-center gap-1 btn btn-sm bg-red-500 text-white hover:bg-red-600 font-semibold rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition px-3 py-1.5"
-                            >
-                              <TrashIcon className="w-4 h-4" />
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-            {totalPages > 1 && (
-              <div className="mt-8 flex justify-center">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            )}
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-green-600 via-blue-600 to-green-800">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Brand Management</h1>
+            <p className="text-xl text-green-100 max-w-2xl mx-auto">Manage all brands and vendor accounts across the platform. View, edit, and maintain brand information.</p>
           </div>
         </div>
-      </main>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white dark:bg-gray-950 rounded-xl shadow-lg p-6 mb-8 border border-gray-200 dark:border-gray-800 transition-colors duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">All Brands</h2>
+              <p className="text-gray-600 dark:text-gray-300">Total: {totalBrands} brands</p>
+            </div>
+          </div>
+        </div>
+        <div className="mb-8">
+          <SearchFilterBar
+            searchValue={search}
+            onSearchChange={e => setSearch(e.target.value)}
+            onSearchSubmit={handleSearch}
+            filterValue={brandSortOptions.find(opt => opt.value === sortBy) || brandSortOptions[0]}
+            filterOptions={brandSortOptions}
+            onFilterChange={val => { if (val) setSortBy(val.value); }}
+            placeholder="Search brands..."
+            buttonText="Search"
+          />
+        </div>
+        {message && (<div className="alert alert-success mb-6"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg><span>{message}</span></div>)}
+        <div className="bg-white dark:bg-gray-950 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-800">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+            <thead className="bg-gray-100 dark:bg-gray-900">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">Brand</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">Verified</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {brands.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-400 dark:text-gray-500">No brands found.</td>
+                </tr>
+              ) : (
+                brands.map((brand, index) => (
+                  <tr key={brand.id} className={`transition-colors ${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-950'} border-b border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800`}>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-gray-100">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                            <span className="text-sm font-medium text-white">
+                              {brand.brandName?.charAt(0).toUpperCase() || brand.email?.charAt(0).toUpperCase() || 'B'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {brand.brandName || 'Unnamed Brand'}
+                          </div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {brand.email}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">
+                        {brand.role?.replace('_', ' ') || 'BRAND'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
+                        brand.active
+                          ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                          : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
+                      }`}>
+                        {brand.active ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
+                        brand.verified
+                          ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                          : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300'
+                      }`}>
+                        {brand.verified ? 'Verified' : 'Pending'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleEdit(brand)}
+                          className="flex items-center gap-1 btn btn-sm bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-800 font-semibold rounded-lg shadow-sm transition px-3 py-1.5"
+                        >
+                          <PencilSquareIcon className="w-4 h-4" />
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(brand.id)}
+                          disabled={deleting === brand.id}
+                          className="flex items-center gap-1 btn btn-sm bg-red-500 dark:bg-red-600 text-white hover:bg-red-600 dark:hover:bg-red-700 font-semibold rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition px-3 py-1.5"
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        {totalPages > 1 && (<div className="mt-8 flex justify-center"><Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} /></div>)}
+      </div>
+
+      {/* Edit Brand Modal */}
+      {editBrand && (
+        <GenericModal
+          isOpen={!!editBrand}
+          onClose={() => setEditBrand(null)}
+          title="Edit Brand"
+          onSubmit={submitEdit}
+          isSubmitting={editLoading}
+          submitText="Save"
+          cancelText="Cancel"
+          submitButtonClass="btn btn-primary text-white flex-1"
+          cancelButtonClass="btn btn-outline flex-1"
+          submitDisabled={editLoading || (!editBrandName.trim() && editMode)}
+        >
+          <div className="space-y-6">
+            <div className="flex items-center gap-2">
+              <InputField
+                label="Brand Name"
+                name="brandName"
+                value={editBrandName}
+                onChange={e => setEditBrandName(e.target.value)}
+                disabled={!editMode}
+                required
+                className="flex-1"
+                ref={editInputRef}
+              />
+              {!editMode ? (
+                <button
+                  type="button"
+                  className="btn btn-outline px-3 py-2"
+                  onClick={() => setEditMode(true)}
+                  tabIndex={-1}
+                >
+                  Edit
+                </button>
+              ) : null}
+            </div>
+            <Checkbox
+              label="Active"
+              name="active"
+              checked={editActive}
+              onChange={e => setEditActive(e.target.checked)}
+            />
+            <Checkbox
+              label="Verified"
+              name="verified"
+              checked={editVerified}
+              onChange={e => setEditVerified(e.target.checked)}
+            />
+          </div>
+        </GenericModal>
+      )}
+
       {/* Confirmation Modals */}
       {confirmDeleteId !== null && (
         <ConfirmModal
@@ -362,71 +403,8 @@ export default function ManageBrands() {
           onCancel={() => setConfirmAction(null)}
         />
       )}
-      {/* Edit Brand Modal */}
-      {editBrand && (
-        <dialog open className="modal">
-          <form onSubmit={submitEdit} className="modal-box max-w-md">
-            <h3 className="font-bold text-2xl mb-1">Edit Brand</h3>
-            <p className="text-gray-500 mb-4">Update the brand&apos;s name, status, and verification below.</p>
-            <div className="border-b border-gray-200 mb-4"></div>
-            <div className="space-y-6">
-              <div className="flex items-center gap-2">
-                <InputField
-                  label="Brand Name"
-                  name="brandName"
-                  value={editBrandName}
-                  onChange={e => setEditBrandName(e.target.value)}
-                  disabled={!editMode}
-                  required
-                  className="flex-1"
-                  ref={editInputRef}
-                />
-                {!editMode ? (
-                  <button
-                    type="button"
-                    className="btn btn-outline px-3 py-2"
-                    onClick={() => setEditMode(true)}
-                    tabIndex={-1}
-                  >
-                    Edit
-                  </button>
-                ) : null}
-              </div>
-              <Checkbox
-                label="Active"
-                name="active"
-                checked={editActive}
-                onChange={e => setEditActive(e.target.checked)}
-              />
-              <Checkbox
-                label="Verified"
-                name="verified"
-                checked={editVerified}
-                onChange={e => setEditVerified(e.target.checked)}
-              />
-            </div>
-            <div className="modal-action mt-8 flex gap-2">
-              <button
-                type="button"
-                className="btn btn-outline flex-1"
-                onClick={() => setEditBrand(null)}
-                disabled={editLoading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary text-white flex-1"
-                disabled={editLoading || (!editBrandName.trim() && editMode)}
-              >
-                {editLoading ? 'Saving...' : 'Save'}
-              </button>
-            </div>
-          </form>
-        </dialog>
-      )}
     </>
   );
 }
 
-(ManageBrands as any).getLayout = (page: React.ReactNode) => <AdminPanelLayout>{page}</AdminPanelLayout>;
+ManageBrands.getLayout = (page: React.ReactNode) => <AdminPanelLayout>{page}</AdminPanelLayout>;

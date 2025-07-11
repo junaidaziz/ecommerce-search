@@ -9,6 +9,10 @@ import { getPageTitle } from '@lib/pageTitle';
 import Pagination from '@components/Pagination';
 import SuperAdminSidebar from '@components/Layout/SuperAdminSidebar';
 import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
+import PageHero from '@components/UI/PageHero';
+import SearchFilterBar from '@components/common/SearchFilterBar';
+import TableHeader, { TableColumn } from '@components/common/TableHeader';
+import TableBody from '@components/common/TableBody';
 
 export default function AdminOrders() {
   const { data: session } = useSession();
@@ -48,6 +52,10 @@ export default function AdminOrders() {
       });
   }, [session, status, search, currentPage, sortBy]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sortBy]);
+
   const handlePageChange = (page: number) => setCurrentPage(page);
   const handleSearch = (e: React.FormEvent) => { 
     e.preventDefault(); 
@@ -58,13 +66,37 @@ export default function AdminOrders() {
   if (user.role.toUpperCase() !== USER_ROLES.SUPER_ADMIN) 
     return <div className="p-4">Admin access required.</div>;
 
+  // Table columns definition
+  const orderTableColumns: TableColumn[] = [
+    { label: 'Order' },
+    { label: 'Customer' },
+    { label: 'Product' },
+    { label: 'Status' },
+    { label: 'Total' },
+    { label: 'Actions' },
+  ];
+
+  const orderSortOptions = [
+    { label: 'Newest First', value: 'newest' },
+    { label: 'Oldest First', value: 'oldest' },
+    { label: 'Total Low-High', value: 'total_asc' },
+    { label: 'Total High-Low', value: 'total_desc' },
+    { label: 'Status A-Z', value: 'status_asc' },
+    { label: 'Status Z-A', value: 'status_desc' },
+  ];
+  const statusOptions = [
+    { label: 'All Status', value: '' },
+    { label: 'Processing', value: 'processing' },
+    { label: 'Shipped', value: 'shipped' },
+    { label: 'Delivered', value: 'delivered' },
+    { label: 'Cancelled', value: 'cancelled' },
+  ];
+
   return (
     <>
       <Head>
         <title>{getPageTitle('Orders')}</title>
       </Head>
-      
-      {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-r from-green-600 via-blue-600 to-green-800">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -74,164 +106,113 @@ export default function AdminOrders() {
           </div>
         </div>
       </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div className="bg-white dark:bg-gray-950 rounded-xl shadow-lg p-6 mb-8 border border-gray-200 dark:border-gray-800 transition-colors duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">All Orders</h2>
-              <p className="text-gray-600">Total: {total} orders</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">All Orders</h2>
+              <p className="text-gray-600 dark:text-gray-300">Total: {total} orders</p>
             </div>
           </div>
-          
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <form onSubmit={handleSearch}>
-              <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  placeholder="Search orders..." 
-                  value={search} 
-                  onChange={(e) => setSearch(e.target.value)} 
-                  className="input input-bordered flex-1" 
-                />
-                <button type="submit" className="btn btn-primary">Search</button>
-              </div>
-            </form>
-            <select
-              className="select select-bordered"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            >
-              <option value="">All Status</option>
-              <option value="processing">Processing</option>
-              <option value="shipped">Shipped</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-            <select 
-              value={sortBy} 
-              onChange={(e) => setSortBy(e.target.value)} 
-              className="select select-bordered"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="total_asc">Total Low-High</option>
-              <option value="total_desc">Total High-Low</option>
-              <option value="status_asc">Status A-Z</option>
-              <option value="status_desc">Status Z-A</option>
-            </select>
-          </div>
         </div>
-
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
+        <div className="mb-8">
+          <SearchFilterBar
+            searchValue={search}
+            onSearchChange={e => setSearch(e.target.value)}
+            onSearchSubmit={handleSearch}
+            filterValue={orderSortOptions.find(opt => opt.value === sortBy) || orderSortOptions[0]}
+            filterOptions={orderSortOptions}
+            onFilterChange={val => { if (val) setSortBy(val.value); }}
+            placeholder="Search orders..."
+            buttonText="Search"
+          />
+        </div>
+        <div className="bg-white dark:bg-gray-950 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-800 transition-colors duration-300">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+            <TableHeader columns={orderTableColumns} />
+            {loading && (
+              <tbody>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <td colSpan={orderTableColumns.length} className="px-6 py-8 text-center">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                      <span className="ml-2">Loading orders...</span>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {loading ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center">
-                      <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                        <span className="ml-2">Loading orders...</span>
-                      </div>
-                    </td>
-                  </tr>
-                ) : orders.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                      No orders found
-                    </td>
-                  </tr>
-                ) : (
-                  orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-sm">
-                              #{order.id}
-                            </div>
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">Order #{order.id}</div>
-                            <div className="text-sm text-gray-500">
-                              {new Date(order.createdAt || order.created_at || Date.now()).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {order.user?.email || order.customer?.email || 'Unknown'}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {order.user?.name || order.customer?.name || 'No name'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-12 w-12">
-                            <img 
-                              className="h-12 w-12 rounded-lg object-cover" 
-                              src={order.product?.featuredImage || '/placeholder.png'} 
-                              alt={order.product?.title || 'Product'} 
-                            />
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {order.product?.title || 'Unknown Product'}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              Qty: {order.quantity || 1}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                          order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                          order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                          order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {order.status || 'Unknown'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        £{order.total?.toFixed(2) || '0.00'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center space-x-2">
-                          <button className="btn btn-primary text-white">View</button>
-                          <button className="btn btn-secondary text-white">Update</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
               </tbody>
-            </table>
-          </div>
+            )}
+            <TableBody
+              data={!loading ? orders : []}
+              columns={orderTableColumns}
+              emptyMessage={'No orders found'}
+              renderRow={(order, idx) => ([
+                <td key={order.id + '-order'} className="px-6 py-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 h-10 w-10">
+                      <div className="h-10 w-10 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-sm">
+                        #{order.id}
+                      </div>
+                    </div>
+                    <div className="ml-4">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">Order #{order.id}</div>
+                      <div className="text-sm text-gray-500">
+                        {new Date(order.createdAt || order.created_at || Date.now()).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                </td>,
+                <td key={order.id + '-customer'} className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900 dark:text-gray-100">
+                    {order.user?.email || order.customer?.email || 'Unknown'}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {order.user?.name || order.customer?.name || 'No name'}
+                  </div>
+                </td>,
+                <td key={order.id + '-product'} className="px-6 py-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 h-12 w-12">
+                      <img 
+                        className="h-12 w-12 rounded-lg object-cover" 
+                        src={order.product?.featuredImage || '/placeholder.png'} 
+                        alt={order.product?.title || 'Product'} 
+                      />
+                    </div>
+                    <div className="ml-4">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        {order.product?.title || 'Unknown Product'}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Qty: {order.quantity || 1}
+                      </div>
+                    </div>
+                  </div>
+                </td>,
+                <td key={order.id + '-status'} className="px-6 py-4 whitespace-nowrap">
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                    order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                    order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                    order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {order.status}
+                  </span>
+                </td>,
+                <td key={order.id + '-total'} className="px-6 py-4 whitespace-nowrap">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">${order.total?.toFixed(2) || '0.00'}</span>
+                </td>,
+                <td key={order.id + '-actions'} className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <button className="btn btn-sm bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-900 rounded-lg px-3 py-1.5 font-semibold shadow-sm transition">View</button>
+                </td>
+              ])}
+            />
+          </table>
         </div>
-
         {totalPages > 1 && (
           <div className="mt-8 flex justify-center">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
           </div>
         )}
       </div>

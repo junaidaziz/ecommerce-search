@@ -64,7 +64,7 @@ export function findUserById(id: number | string) {
   return prisma.user.findUnique({ where: { id: Number(id) } });
 }
 
-export function getAllUsers(search = '') {
+export function getAllUsers(search = '', sort = 'newest') {
   const validRoles = ['USER', 'BRAND', 'SUPER_ADMIN'];
   const searchUpper = search.toUpperCase();
   const or: any[] = [
@@ -76,6 +76,28 @@ export function getAllUsers(search = '') {
     or.push({ role: searchUpper as any });
   }
   const where = search ? { OR: or } : undefined;
+
+  // Map sort value to Prisma orderBy
+  let orderBy: any = { createdAt: 'desc' };
+  switch (sort) {
+    case 'oldest':
+      orderBy = { createdAt: 'asc' };
+      break;
+    case 'email_asc':
+      orderBy = { email: 'asc' };
+      break;
+    case 'email_desc':
+      orderBy = { email: 'desc' };
+      break;
+    case 'role_asc':
+      orderBy = { role: 'asc' };
+      break;
+    case 'role_desc':
+      orderBy = { role: 'desc' };
+      break;
+    // default: newest
+  }
+
   return prisma.user.findMany({
     where,
     select: {
@@ -88,6 +110,7 @@ export function getAllUsers(search = '') {
       role: true,
       disabled: true,
     },
+    orderBy,
   });
 }
 

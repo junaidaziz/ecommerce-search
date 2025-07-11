@@ -2,8 +2,7 @@ import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import DashboardCard from './DashboardCard';
-import BoxIcon from '../icons/BoxIcon';
-import CartIcon from '../icons/CartIcon';
+import { CubeIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 
 interface Props {
   brandId?: number;
@@ -49,14 +48,24 @@ const TotalProductsCard: React.FC<Props> = ({ brandId }) => {
       title="Total Products"
       loading={count === null && !error}
       error={error}
-      icon={<BoxIcon className="w-5 h-5" />}
+      icon={<CubeIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />}
       onClick={handleClick}
-      className="bg-indigo-50"
     >
       {count !== null && (
-        <div className="flex items-center gap-2">
-          <CartIcon className="w-5 h-5 text-indigo-600" />
-          <p className="text-3xl font-bold">{count}</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <ShoppingBagIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                {count.toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Products in inventory
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </DashboardCard>

@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "user": {
+    "User": {
       "type": "object",
       "properties": {
         "id": {
@@ -116,8 +116,7 @@
             "USER",
             "BRAND",
             "SUPER_ADMIN"
-          ],
-          "description": "USER, BRAND, or SUPER_ADMIN access level."
+          ]
         },
         "verified": {
           "type": "boolean",
@@ -151,138 +150,100 @@
           "format": "date-time"
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "updatedAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "products": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/product"
+            "$ref": "#/definitions/Product"
           }
         },
         "orders": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/order"
+            "$ref": "#/definitions/Order"
           }
         },
         "deletionRequests": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/deletionRequest"
+            "$ref": "#/definitions/DeletionRequest"
           }
         },
         "searchLogs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/searchLog"
+            "$ref": "#/definitions/SearchLog"
           }
         },
         "couponUsages": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/couponUsage"
+            "$ref": "#/definitions/CouponUsage"
           }
         },
-        "paymentMethod": {
+        "paymentMethods": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/paymentMethod"
+            "$ref": "#/definitions/PaymentMethod"
           }
         },
         "notifications": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/notification"
+            "$ref": "#/definitions/Notification"
           }
         },
         "sentMessages": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/message"
+            "$ref": "#/definitions/Message"
           }
         },
         "receivedMessages": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/message"
+            "$ref": "#/definitions/Message"
           }
         },
         "updatedPolicies": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/policyDocument"
+            "$ref": "#/definitions/PolicyDocument"
           }
         },
         "supportTickets": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/supportTicket"
+            "$ref": "#/definitions/SupportTicket"
           }
         },
         "wishlistItems": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/wishlistItem"
+            "$ref": "#/definitions/WishlistItem"
           }
         },
         "coupon": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/coupon"
+            "$ref": "#/definitions/Coupon"
+          }
+        },
+        "reviews": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Review"
           }
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "uuid",
-        "email",
-        "password",
-        "firstName",
-        "lastName",
-        "brandName",
-        "gender",
-        "phoneNumber",
-        "address",
-        "city",
-        "state",
-        "postalCode",
-        "country",
-        "businessAddress",
-        "website",
-        "businessDescription",
-        "logo",
-        "profileImage",
-        "taxId",
-        "stripeAccountId",
-        "role",
-        "verified",
-        "disabled",
-        "active",
-        "verificationToken",
-        "resetToken",
-        "resetExpires",
-        "createdAt",
-        "updatedAt",
-        "products",
-        "orders",
-        "deletionRequests",
-        "searchLogs",
-        "couponUsages",
-        "paymentMethod",
-        "notifications",
-        "sentMessages",
-        "receivedMessages",
-        "updatedPolicies",
-        "supportTickets",
-        "wishlistItems",
-        "coupon"
-      ]
+      }
     },
-    "category": {
+    "Category": {
       "type": "object",
       "properties": {
         "id": {
@@ -298,37 +259,28 @@
           "type": "string"
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "updatedAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "products": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/product"
+            "$ref": "#/definitions/Product"
           }
         },
         "deletionRequests": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/deletionRequest"
+            "$ref": "#/definitions/DeletionRequest"
           }
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "uuid",
-        "slug",
-        "name",
-        "createdAt",
-        "updatedAt",
-        "products",
-        "deletionRequests"
-      ]
+      }
     },
-    "product": {
+    "Product": {
       "type": "object",
       "properties": {
         "id": {
@@ -404,58 +356,34 @@
           }
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "updatedAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "vendor": {
-          "$ref": "#/definitions/user"
+          "$ref": "#/definitions/User"
         },
         "category": {
-          "$ref": "#/definitions/category"
+          "$ref": "#/definitions/Category"
         },
         "wishlistItems": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/wishlistItem"
+            "$ref": "#/definitions/WishlistItem"
           }
         },
         "variants": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/variant"
+            "$ref": "#/definitions/Variant"
           }
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "uuid",
-        "slug",
-        "sku",
-        "title",
-        "description",
-        "productType",
-        "tags",
-        "quantity",
-        "lowStockThreshold",
-        "minPrice",
-        "maxPrice",
-        "currency",
-        "discountType",
-        "discountValue",
-        "status",
-        "images",
-        "createdAt",
-        "updatedAt",
-        "vendor",
-        "category",
-        "wishlistItems",
-        "variants"
-      ]
+      }
     },
-    "variant": {
+    "Variant": {
       "type": "object",
       "properties": {
         "id": {
@@ -472,8 +400,7 @@
             "object",
             "array",
             "null"
-          ],
-          "description": "attributes: { size: string, color: string }"
+          ]
         },
         "quantity": {
           "type": "integer",
@@ -486,27 +413,17 @@
           ]
         },
         "product": {
-          "$ref": "#/definitions/product"
+          "$ref": "#/definitions/Product"
         },
         "orders": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/order"
+            "$ref": "#/definitions/Order"
           }
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "uuid",
-        "attributes",
-        "quantity",
-        "priceModifier",
-        "product",
-        "orders"
-      ]
+      }
     },
-    "order": {
+    "Order": {
       "type": "object",
       "properties": {
         "id": {
@@ -544,56 +461,40 @@
           ]
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "updatedAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "user": {
-          "$ref": "#/definitions/user"
+          "$ref": "#/definitions/User"
         },
         "variant": {
-          "$ref": "#/definitions/variant"
+          "$ref": "#/definitions/Variant"
         },
         "payment": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/payment"
+            "$ref": "#/definitions/Payment"
           }
         },
         "notifications": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/notification"
+            "$ref": "#/definitions/Notification"
           }
         },
         "messages": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/message"
+            "$ref": "#/definitions/Message"
           }
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "uuid",
-        "quantity",
-        "total",
-        "status",
-        "paymentMethod",
-        "paymentReference",
-        "paymentProof",
-        "createdAt",
-        "updatedAt",
-        "user",
-        "variant",
-        "payment",
-        "notifications",
-        "messages"
-      ]
+      }
     },
-    "deletionRequest": {
+    "DeletionRequest": {
       "type": "object",
       "properties": {
         "id": {
@@ -613,31 +514,22 @@
           "default": "pending"
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "updatedAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "category": {
-          "$ref": "#/definitions/category"
+          "$ref": "#/definitions/Category"
         },
         "brand": {
-          "$ref": "#/definitions/user"
+          "$ref": "#/definitions/User"
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "uuid",
-        "reason",
-        "status",
-        "createdAt",
-        "updatedAt",
-        "category",
-        "brand"
-      ]
+      }
     },
-    "searchLog": {
+    "SearchLog": {
       "type": "object",
       "properties": {
         "id": {
@@ -654,30 +546,22 @@
           "default": false
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "user": {
           "anyOf": [
             {
-              "$ref": "#/definitions/user"
+              "$ref": "#/definitions/User"
             },
             {
               "type": "null"
             }
           ]
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "uuid",
-        "query",
-        "noResults",
-        "createdAt",
-        "user"
-      ]
+      }
     },
-    "coupon": {
+    "Coupon": {
       "type": "object",
       "properties": {
         "id": {
@@ -726,15 +610,17 @@
           "default": true
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "updatedAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "user": {
           "anyOf": [
             {
-              "$ref": "#/definitions/user"
+              "$ref": "#/definitions/User"
             },
             {
               "type": "null"
@@ -744,53 +630,30 @@
         "usages": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/couponUsage"
+            "$ref": "#/definitions/CouponUsage"
           }
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "code",
-        "description",
-        "discountType",
-        "discountValue",
-        "minOrderValue",
-        "expiresAt",
-        "usageLimit",
-        "usedCount",
-        "isActive",
-        "createdAt",
-        "updatedAt",
-        "user",
-        "usages"
-      ]
+      }
     },
-    "couponUsage": {
+    "CouponUsage": {
       "type": "object",
       "properties": {
         "id": {
           "type": "integer"
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "coupon": {
-          "$ref": "#/definitions/coupon"
+          "$ref": "#/definitions/Coupon"
         },
         "user": {
-          "$ref": "#/definitions/user"
+          "$ref": "#/definitions/User"
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "createdAt",
-        "coupon",
-        "user"
-      ]
+      }
     },
-    "paymentMethod": {
+    "PaymentMethod": {
       "type": "object",
       "properties": {
         "id": {
@@ -819,38 +682,25 @@
           "default": false
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "updatedAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "user": {
-          "$ref": "#/definitions/user"
+          "$ref": "#/definitions/User"
         },
         "payments": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/payment"
+            "$ref": "#/definitions/Payment"
           }
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "provider",
-        "cardLast4",
-        "cardBrand",
-        "expMonth",
-        "expYear",
-        "token",
-        "isDefault",
-        "createdAt",
-        "updatedAt",
-        "user",
-        "payments"
-      ]
+      }
     },
-    "payment": {
+    "Payment": {
       "type": "object",
       "properties": {
         "id": {
@@ -869,28 +719,18 @@
           "type": "string"
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "order": {
-          "$ref": "#/definitions/order"
+          "$ref": "#/definitions/Order"
         },
         "paymentMethod": {
-          "$ref": "#/definitions/paymentMethod"
+          "$ref": "#/definitions/PaymentMethod"
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "amount",
-        "provider",
-        "status",
-        "transactionId",
-        "createdAt",
-        "order",
-        "paymentMethod"
-      ]
+      }
     },
-    "notification": {
+    "Notification": {
       "type": "object",
       "properties": {
         "id": {
@@ -904,26 +744,18 @@
           "default": false
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "user": {
-          "$ref": "#/definitions/user"
+          "$ref": "#/definitions/User"
         },
         "order": {
-          "$ref": "#/definitions/order"
+          "$ref": "#/definitions/Order"
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "message",
-        "read",
-        "createdAt",
-        "user",
-        "order"
-      ]
+      }
     },
-    "message": {
+    "Message": {
       "type": "object",
       "properties": {
         "id": {
@@ -952,37 +784,25 @@
           ]
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "seen": {
           "type": "boolean",
           "default": false
         },
         "sender": {
-          "$ref": "#/definitions/user"
+          "$ref": "#/definitions/User"
         },
         "receiver": {
-          "$ref": "#/definitions/user"
+          "$ref": "#/definitions/User"
         },
         "order": {
-          "$ref": "#/definitions/order"
+          "$ref": "#/definitions/Order"
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "messageType",
-        "content",
-        "fileUrl",
-        "fileName",
-        "createdAt",
-        "seen",
-        "sender",
-        "receiver",
-        "order"
-      ]
+      }
     },
-    "policyDocument": {
+    "PolicyDocument": {
       "type": "object",
       "properties": {
         "id": {
@@ -999,27 +819,19 @@
           "default": 1
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "updatedAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "updatedByUser": {
-          "$ref": "#/definitions/user"
+          "$ref": "#/definitions/User"
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "type",
-        "content",
-        "version",
-        "createdAt",
-        "updatedAt",
-        "updatedByUser"
-      ]
+      }
     },
-    "supportTicket": {
+    "SupportTicket": {
       "type": "object",
       "properties": {
         "id": {
@@ -1039,35 +851,26 @@
           "default": "open"
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "updatedAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "user": {
           "anyOf": [
             {
-              "$ref": "#/definitions/user"
+              "$ref": "#/definitions/User"
             },
             {
               "type": "null"
             }
           ]
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "uuid",
-        "subject",
-        "message",
-        "status",
-        "createdAt",
-        "updatedAt",
-        "user"
-      ]
+      }
     },
-    "wishlistItem": {
+    "WishlistItem": {
       "type": "object",
       "properties": {
         "id": {
@@ -1087,98 +890,101 @@
           "default": false
         },
         "createdAt": {
-          "$ref": "#/definitions/Timestamp"
+          "type": "string",
+          "format": "date-time"
         },
         "user": {
-          "$ref": "#/definitions/user"
+          "$ref": "#/definitions/User"
         },
         "product": {
-          "$ref": "#/definitions/product"
+          "$ref": "#/definitions/Product"
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "uuid",
-        "variantId",
-        "notifyOnStock",
-        "createdAt",
-        "user",
-        "product"
-      ]
+      }
     },
-    "Timestamp": {
-      "$ref": "#/definitions/Timestamp"
+    "Review": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "entityType": {
+          "type": "string"
+        },
+        "entityId": {
+          "type": "integer"
+        },
+        "rating": {
+          "type": "integer"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
     }
   },
   "type": "object",
   "properties": {
     "user": {
-      "$ref": "#/definitions/user"
+      "$ref": "#/definitions/User"
     },
     "category": {
-      "$ref": "#/definitions/category"
+      "$ref": "#/definitions/Category"
     },
     "product": {
-      "$ref": "#/definitions/product"
+      "$ref": "#/definitions/Product"
     },
     "variant": {
-      "$ref": "#/definitions/variant"
+      "$ref": "#/definitions/Variant"
     },
     "order": {
-      "$ref": "#/definitions/order"
+      "$ref": "#/definitions/Order"
     },
     "deletionRequest": {
-      "$ref": "#/definitions/deletionRequest"
+      "$ref": "#/definitions/DeletionRequest"
     },
     "searchLog": {
-      "$ref": "#/definitions/searchLog"
+      "$ref": "#/definitions/SearchLog"
     },
     "coupon": {
-      "$ref": "#/definitions/coupon"
+      "$ref": "#/definitions/Coupon"
     },
     "couponUsage": {
-      "$ref": "#/definitions/couponUsage"
+      "$ref": "#/definitions/CouponUsage"
     },
     "paymentMethod": {
-      "$ref": "#/definitions/paymentMethod"
+      "$ref": "#/definitions/PaymentMethod"
     },
     "payment": {
-      "$ref": "#/definitions/payment"
+      "$ref": "#/definitions/Payment"
     },
     "notification": {
-      "$ref": "#/definitions/notification"
+      "$ref": "#/definitions/Notification"
     },
     "message": {
-      "$ref": "#/definitions/message"
+      "$ref": "#/definitions/Message"
     },
     "policyDocument": {
-      "$ref": "#/definitions/policyDocument"
+      "$ref": "#/definitions/PolicyDocument"
     },
     "supportTicket": {
-      "$ref": "#/definitions/supportTicket"
+      "$ref": "#/definitions/SupportTicket"
     },
     "wishlistItem": {
-      "$ref": "#/definitions/wishlistItem"
+      "$ref": "#/definitions/WishlistItem"
+    },
+    "review": {
+      "$ref": "#/definitions/Review"
     }
-  },
-  "additionalProperties": false,
-  "required": [
-    "user",
-    "category",
-    "product",
-    "variant",
-    "order",
-    "deletionRequest",
-    "searchLog",
-    "coupon",
-    "couponUsage",
-    "paymentMethod",
-    "payment",
-    "notification",
-    "message",
-    "policyDocument",
-    "supportTicket",
-    "wishlistItem"
-  ]
+  }
 }

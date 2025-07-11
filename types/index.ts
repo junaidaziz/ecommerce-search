@@ -26,7 +26,7 @@ export type { PaymentMethod } from './paymentMethod';
 export type { AnalyticsData } from './dashboard';
 export type { User, UserRole } from './user';
 export { USER_ROLES, getUserRoles } from './user';
-export { ApiMessage } from './admin';
+export type { ApiMessage } from './admin';
 export type { AdminUser, UserRoleUpdateRequest, UserDisabledUpdateRequest } from './admin';
 export * from './admin';
 export type { LowStockProduct } from './admin';

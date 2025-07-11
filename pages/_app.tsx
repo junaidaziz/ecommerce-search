@@ -7,6 +7,7 @@ import Layout from '@components/Layout/Layout';
 import { Toaster } from 'sonner';
 import 'react-quill/dist/quill.snow.css';
 import '../styles/globals.css';
+import { ThemeProvider } from '@contexts/ThemeContext';
 
 export default function App({
   Component,
@@ -23,8 +24,10 @@ export default function App({
       <NotificationProvider>
         <AppProvider>
           <ChatProvider>
-            <Toaster position="top-right" richColors />
-            {getLayout(<Component {...pageProps} />)}
+            <ThemeProvider>
+              <Toaster position="top-right" richColors />
+              {getLayout(<Component {...pageProps} />)}
+            </ThemeProvider>
           </ChatProvider>
         </AppProvider>
       </NotificationProvider>

@@ -38,3 +38,10 @@ export interface ChartConfig {
   data: AnalyticsData;
   options?: Record<string, any>;
 }
+
+// Admin analytics API response type
+export interface AdminAnalyticsData {
+  totalOrders: number;
+  totalRevenue: number;
+  topProducts: { id: string; qty: number }[];
+}

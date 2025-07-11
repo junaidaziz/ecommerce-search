@@ -1,20 +1,29 @@
-import type { Review as PrismaReview } from '@prisma/client';
+// No Prisma import, since Review is not exported by @prisma/client
 import type { User } from './user';
 import type { Product } from './product';
 
-// Base Review type matching Prisma schema
-export type Review = PrismaReview;
+// Custom Review type matching the Prisma model
+export interface Review {
+  id: number;
+  entityType: string; // e.g., "PRODUCT", "BRAND", etc.
+  entityId: number;
+  userId: number;
+  rating: number;
+  comment: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 // Review with relations (for app use)
 export type ReviewWithRelations = Review & {
   user: User;
-  product: Product;
+  product?: Product;
 };
 
 // Input type for creating reviews (matches Prisma fields)
 export type ReviewInput = Pick<
-  PrismaReview,
-  'productId' | 'userId' | 'rating' | 'comment'
+  Review,
+  'entityType' | 'entityId' | 'userId' | 'rating' | 'comment'
 >;
 
 // Update type for reviews

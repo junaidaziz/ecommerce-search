@@ -3,9 +3,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-if (!process.env.DATABASE_URL) {
+// Use Accelerate connection string in production, normal DB locally
+const databaseUrl =
+  process.env.NODE_ENV === 'production'
+    ? process.env.ACCELERATE_DATABASE_URL || process.env.DATABASE_URL
+    : process.env.DATABASE_URL;
+
+if (!databaseUrl) {
   throw new Error(
-    'DATABASE_URL is not set. Please copy `.env.example` to `.env` and set your database connection string.'
+    'DATABASE_URL (or ACCELERATE_DATABASE_URL in production) is not set. Please copy `.env.example` to `.env` and set your database connection string.'
   );
 }
 
@@ -19,6 +25,7 @@ const globalForPrisma = globalThis as typeof globalThis & {
   prisma?: PrismaClient;
 };
 
-export const prisma = globalForPrisma.prisma || new PrismaClient();
+export const prisma =
+  globalForPrisma.prisma || new PrismaClient({ datasources: { db: { url: databaseUrl } } });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;

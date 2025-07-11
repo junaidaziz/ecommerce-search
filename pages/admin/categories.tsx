@@ -11,6 +11,7 @@ import { getPageTitle } from '@lib/pageTitle';
 import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
 import PageHero from '@components/UI/PageHero';
 import ConfirmModal from '@components/Modals/ConfirmModal';
+import GenericModal from '@components/Modals/GenericModal';
 
 export default function Categories() {
   const { user } = useContext(AppContext)!;
@@ -136,11 +137,11 @@ export default function Categories() {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 border border-gray-100 dark:border-gray-800 transition-colors duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">All Categories</h2>
-              <p className="text-gray-600">Total: {categories.length} categories</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">All Categories</h2>
+              <p className="text-gray-600 dark:text-gray-300">Total: {categories.length} categories</p>
             </div>
             <div className="flex gap-2">
               <input
@@ -171,7 +172,7 @@ export default function Categories() {
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white dark:bg-gray-950 rounded-xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
@@ -290,23 +291,25 @@ export default function Categories() {
         />
       )}
       {editModal.open && editModal.cat && (
-        <dialog open className="modal">
-          <div className="modal-box max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Edit Category</h3>
-            <div className="mb-4">
+        <GenericModal
+          isOpen={editModal.open}
+          onClose={closeEditModal}
+          title="Edit Category"
+          onConfirm={saveEdit}
+          confirmLabel="Save"
+          cancelLabel="Cancel"
+          children={
+            <div className="space-y-6">
               <TextInput
                 name="editName"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Category Name"
+                autoFocus
               />
             </div>
-            <div className="flex gap-2 pt-2">
-              <button className="btn btn-primary" onClick={saveEdit} disabled={!editName.trim()}>Save</button>
-              <button className="btn btn-ghost hover:bg-gray-100 hover:text-gray-800" onClick={closeEditModal}>Cancel</button>
-            </div>
-          </div>
-        </dialog>
+          }
+        />
       )}
     </>
   );

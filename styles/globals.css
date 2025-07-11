@@ -7,7 +7,7 @@ html {
 }
 
 body {
-  @apply font-sans bg-base-200 text-base-content;
+  @apply font-sans bg-white text-black dark:bg-gray-900 dark:text-white;
 }
 
 html,
@@ -52,19 +52,19 @@ body {
 
 /* React Select styling */
 .react-select__control {
-  @apply input input-bordered w-full rounded-lg shadow-none;
+  @apply w-full rounded-lg shadow-none border border-gray-300 bg-white px-3 py-2 text-base dark:bg-gray-800 dark:border-gray-700 dark:text-white;
 }
 .react-select__control--is-focused {
   @apply ring-2 ring-blue-500 border-blue-500;
 }
 .react-select__menu {
-  @apply bg-white text-base-content rounded-lg shadow-lg mt-1;
+  @apply bg-white text-black rounded-lg shadow-lg mt-1 dark:bg-gray-900 dark:text-white;
 }
 .react-select__option {
   @apply cursor-pointer px-3 py-2;
 }
 .react-select__option--is-focused {
-  @apply bg-gray-100;
+  @apply bg-gray-100 dark:bg-gray-800;
 }
 .react-select__option--is-selected {
   @apply bg-indigo-500 text-white;
