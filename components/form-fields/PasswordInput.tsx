@@ -52,12 +52,16 @@ const PasswordInput = <T extends FieldValues>(props: PasswordInputProps<T>) => {
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
         >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
-      <div className="relative flex items-stretch w-full">
+      <div
+        className={`relative flex items-stretch w-full group border rounded-md bg-white dark:bg-gray-800 ${
+          error ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-700'
+        } focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 transition-shadow`}
+      >
         {leftAddon && (
           <span className="inline-flex items-center px-3 text-gray-500">
             {leftAddon}
@@ -73,14 +77,14 @@ const PasswordInput = <T extends FieldValues>(props: PasswordInputProps<T>) => {
           onBlur={onBlur}
           disabled={disabled}
           required={required}
-          className={`flex-1 px-3 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-base rounded-l-xl rounded-r-none shadow-sm ${error ? 'border-red-500' : ''} ${leftAddon ? 'rounded-l-none' : ''} ${className}`}
+          className={`flex-1 px-3 h-12 bg-transparent text-base rounded-l-md rounded-r-none shadow-none text-gray-900 dark:text-gray-100 outline-none border-none ${leftAddon ? 'rounded-l-none' : ''} ${className}`}
           {...registration}
           {...rest}
         />
         <button
           type="button"
           onClick={toggle}
-          className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 rounded-r-xl rounded-l-none shadow-sm -ml-px"
+          className="inline-flex items-center justify-center w-12 h-12 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition-colors duration-200 rounded-r-md rounded-l-none -ml-px"
           aria-label={show ? 'Hide password' : 'Show password'}
           tabIndex={0}
           style={{ border: 'none' }}
@@ -92,7 +96,7 @@ const PasswordInput = <T extends FieldValues>(props: PasswordInputProps<T>) => {
           )}
         </button>
       </div>
-      {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{error}</p>}
     </div>
   );
 };

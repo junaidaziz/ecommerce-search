@@ -11,7 +11,7 @@ interface LayoutProps {
 
 const Layout: FC<LayoutProps> = ({ children, heroSecond, maxWidthClass }) => {
   const { theme, setTheme } = useThemeContext();
-  const containerWidth = maxWidthClass ?? 'max-w-[95%] 2xl:max-w-[1440px]';
+  const containerWidth = maxWidthClass ?? 'max-w-[98%] 3xl:max-w-[1440px]';
 
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden bg-gray-50 dark:bg-gray-900 transition-colors duration-300">

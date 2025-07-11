@@ -52,7 +52,7 @@ const TextInput = <T extends FieldValues>(props: TextInputProps<T>) => {
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
         >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
@@ -73,8 +73,8 @@ const TextInput = <T extends FieldValues>(props: TextInputProps<T>) => {
           onBlur={onBlur}
           disabled={disabled}
           required={required}
-          className={`flex-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-            error ? 'border-red-500' : 'border-gray-300'
+          className={`flex-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 ${
+            error ? 'border-red-500' : 'border-gray-300 dark:border-red-500'
           } ${leftAddon ? 'rounded-l-none' : ''} ${rightAddon ? 'rounded-r-none' : ''} ${className}`}
           {...registration}
           {...rest}
@@ -86,7 +86,7 @@ const TextInput = <T extends FieldValues>(props: TextInputProps<T>) => {
         )}
       </div>
       {error && (
-        <p role="alert" className="text-sm text-red-600 mt-1">
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400 mt-1">
           {error}
         </p>
       )}
