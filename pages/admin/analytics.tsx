@@ -6,7 +6,6 @@ import { USER_ROLES } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
-import PageHero from '@components/UI/PageHero';
 import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
 import { ArrowTrendingUpIcon, ShoppingBagIcon, CurrencyPoundIcon } from '@heroicons/react/24/outline';
 
@@ -66,10 +65,15 @@ export default function AdminAnalytics() {
       <Head>
         <title>{getPageTitle('Admin Analytics')}</title>
       </Head>
-      <PageHero
-        heading="Super Admin Analytics"
-        description="Platform-wide sales, orders, and product performance overview."
-      />
+      <div className="relative overflow-hidden bg-gradient-to-r from-green-600 via-blue-600 to-green-800">
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Super Admin Analytics</h1>
+            <p className="text-xl text-green-100 max-w-2xl mx-auto">Platform-wide sales, orders, and product performance overview.</p>
+          </div>
+        </div>
+      </div>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex items-center gap-4 border border-gray-100 dark:border-gray-800 transition-colors duration-300">

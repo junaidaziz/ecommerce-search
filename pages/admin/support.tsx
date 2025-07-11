@@ -4,7 +4,6 @@ import { AppContext } from '@contexts/AppContext';
 import { fetchJson } from '@utils/fetchJson';
 import { getPageTitle } from '@lib/pageTitle';
 import { SupportTicket, USER_ROLES } from '@/types';
-import PageHero from '@components/UI/PageHero';
 import SearchFilterBar from '@components/common/SearchFilterBar';
 
 export default function SupportTickets() {
@@ -61,10 +60,15 @@ export default function SupportTickets() {
       <Head>
         <title>{getPageTitle('Support Tickets')}</title>
       </Head>
-      <PageHero
-        heading="Support Tickets"
-        description="View and manage all support tickets submitted by users. Search, filter, and resolve issues efficiently."
-      />
+      <div className="relative overflow-hidden bg-gradient-to-r from-green-600 via-blue-600 to-green-800">
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Support Tickets</h1>
+            <p className="text-xl text-green-100 max-w-2xl mx-auto">View and manage all support tickets submitted by users. Search, filter, and resolve issues efficiently.</p>
+          </div>
+        </div>
+      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white dark:bg-gray-950 rounded-xl shadow-lg p-6 mb-8 border border-gray-200 dark:border-gray-800 transition-colors duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
