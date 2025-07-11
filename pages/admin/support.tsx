@@ -4,6 +4,7 @@ import { AppContext } from '@contexts/AppContext';
 import { fetchJson } from '@utils/fetchJson';
 import { getPageTitle } from '@lib/pageTitle';
 import { SupportTicket, UserRole, USER_ROLES } from '@/types';
+import PageHero from '@components/UI/PageHero';
 
 export default function SupportTickets() {
   const { user } = useContext(AppContext)!;
@@ -21,12 +22,13 @@ export default function SupportTickets() {
     return <div className="p-4">Admin access required.</div>;
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8">
+    <>
       <Head>
         <title>{getPageTitle('Support Tickets')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Support Tickets</h1>
-      <div className="form-control max-w-xs">
+      <PageHero heading="Support Tickets" />
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="form-control max-w-xs">
         <label className="label">
           <span className="label-text">Status</span>
         </label>
@@ -53,5 +55,6 @@ export default function SupportTickets() {
         {tickets.length === 0 && <li>No tickets</li>}
       </ul>
     </div>
+    </>
   );
 }

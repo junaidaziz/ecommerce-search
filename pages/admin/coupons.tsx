@@ -5,6 +5,7 @@ import { AppContext } from '@contexts/AppContext';
 import { TextInput } from '@components/form-fields';
 import { Coupon, UserRole, USER_ROLES } from '@/types';
 import { getPageTitle } from '@lib/pageTitle';
+import PageHero from '@components/UI/PageHero';
 
 export default function AdminCoupons() {
   const { user } = useContext(AppContext)!;
@@ -58,13 +59,14 @@ export default function AdminCoupons() {
     return <div className="p-4">Admin access required.</div>;
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8">
+    <>
       <Head>
         <title>{getPageTitle('Manage Coupons')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Coupons</h1>
-      {message && <div className="mb-2 text-green-600">{message}</div>}
-      <form onSubmit={submit} className="space-y-2 max-w-md">
+      <PageHero heading="Coupons" />
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        {message && <div className="mb-2 text-green-600">{message}</div>}
+        <form onSubmit={submit} className="space-y-2 max-w-md">
         <TextInput
           name="code"
           value={form.code}
@@ -194,5 +196,6 @@ export default function AdminCoupons() {
         </tbody>
       </table>
     </div>
+    </>
   );
 }
