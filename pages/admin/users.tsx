@@ -166,15 +166,10 @@ export default function ManageUsers() {
         <title>{getPageTitle('Manage Users')}</title>
       </Head>
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-green-600 via-blue-600 to-green-800">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">User Management</h1>
-            <p className="text-xl text-green-100 max-w-2xl mx-auto">Manage all users across the platform. View, edit roles, and maintain user accounts.</p>
-          </div>
-        </div>
-      </div>
+      <PageHero
+        heading="User Management"
+        description="Manage all users across the platform. View, edit roles, and maintain user accounts."
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white dark:bg-gray-950 rounded-xl shadow-lg p-6 mb-8 border border-gray-200 dark:border-gray-800 transition-colors duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
