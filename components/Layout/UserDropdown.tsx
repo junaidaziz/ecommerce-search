@@ -28,13 +28,11 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, menuItems, closeDropd
 
   if (user) {
     return (
-      <div className="relative" ref={dropdownRef}>
-        <button
-          type="button"
-          aria-haspopup="menu"
-          aria-expanded={open}
+      <div className="dropdown dropdown-end" ref={dropdownRef}>
+        <label
+          tabIndex={0}
+          className="flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer hover:bg-base-200 focus:outline-none"
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-2 px-3 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary transition"
         >
           {user.profileImage || user.logo ? (
             <img
@@ -57,10 +55,16 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, menuItems, closeDropd
                 : user.email)}
           </span>
           <svg className={`w-4 h-4 ml-1 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-        </button>
+        </label>
         {open && (
-          <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 animate-fade-in">
-            <DropdownMenu items={menuItems} onItemClick={() => { setOpen(false); closeDropdown(); }} />
+          <div tabIndex={0} className="dropdown-content z-50 mt-2">
+            <DropdownMenu
+              items={menuItems}
+              onItemClick={() => {
+                setOpen(false);
+                closeDropdown();
+              }}
+            />
           </div>
         )}
       </div>
