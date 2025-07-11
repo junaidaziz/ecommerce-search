@@ -6,7 +6,6 @@ import { getPageTitle } from '@lib/pageTitle';
 import { SupportTicket, USER_ROLES } from '@/types';
 import PageHero from '@components/UI/PageHero';
 import SearchFilterBar from '@components/common/SearchFilterBar';
-import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
 
 export default function SupportTickets() {
   const { user } = useContext(AppContext)!;
@@ -154,5 +153,3 @@ export default function SupportTickets() {
     </>
   );
 }
-
-(SupportTickets as any).getLayout = (page: React.ReactNode) => <AdminPanelLayout>{page}</AdminPanelLayout>;
