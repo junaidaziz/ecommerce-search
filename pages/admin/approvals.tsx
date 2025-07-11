@@ -4,6 +4,7 @@ import { PendingProduct, ApiMessage, UserRole, USER_ROLES } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import PageHero from '@components/UI/PageHero';
 
 export default function Approvals() {
   const { user } = useContext(AppContext)!;
@@ -38,13 +39,14 @@ export default function Approvals() {
     return <div className="p-4">Admin access required.</div>;
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8">
+    <>
       <Head>
         <title>{getPageTitle('Vendor Approvals')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Vendor Product Approvals</h1>
-      {message && <div className="mb-4 text-green-600">{message}</div>}
-      <ul className="space-y-2">
+      <PageHero heading="Vendor Product Approvals" />
+      {message && <div className="mb-4 text-green-600 px-4 sm:px-6 lg:px-8">{message}</div>}
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <ul className="space-y-2">
         {pending.map((p) => (
           <li key={p.id} className="flex justify-between items-center">
             <span>{p.title}</span>
@@ -65,7 +67,8 @@ export default function Approvals() {
           </li>
         ))}
         {pending.length === 0 && <li>No pending products.</li>}
-      </ul>
-    </div>
+        </ul>
+      </div>
+    </>
   );
 }

@@ -5,6 +5,7 @@ import { AppContext } from '@contexts/AppContext';
 import { fetchJson } from '@utils/fetchJson';
 import { getPageTitle } from '@lib/pageTitle';
 import { USER_ROLES } from '@/types';
+import PageHero from '@components/UI/PageHero';
 
 const TYPES = [
   { value: 'terms', label: 'Terms & Conditions' },
@@ -38,13 +39,14 @@ export default function ManagePolicies() {
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 space-y-4">
+    <>
       <Head>
         <title>{getPageTitle('Manage Policies')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Manage Policies</h1>
-      {message && <div className="text-green-600">{message}</div>}
-      <div className="form-control w-full max-w-xs">
+      <PageHero heading="Manage Policies" />
+      <div className="w-full px-4 sm:px-6 lg:px-8 space-y-4">
+        {message && <div className="text-green-600">{message}</div>}
+        <div className="form-control w-full max-w-xs">
         <label className="label">
           <span className="label-text">Policy Type</span>
         </label>
@@ -75,5 +77,6 @@ export default function ManagePolicies() {
         </div>
       </div>
     </div>
+    </>
   );
 }

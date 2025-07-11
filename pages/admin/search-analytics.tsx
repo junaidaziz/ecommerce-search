@@ -5,6 +5,7 @@ import { SearchAnalyticsResponse, UserRole, USER_ROLES } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import PageHero from '@components/UI/PageHero';
 
 export default function SearchAnalytics() {
   const { user } = useContext(AppContext)!;
@@ -23,16 +24,17 @@ export default function SearchAnalytics() {
   if (!data) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8">
+    <>
       <Head>
         <title>{getPageTitle('Search Analytics')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Search Analytics</h1>
-      <div className="mb-4 space-x-2">
-        <Link href="/admin/analytics" className="btn btn-sm">
-          Back
-        </Link>
-      </div>
+      <PageHero heading="Search Analytics" />
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="mb-4 space-x-2">
+          <Link href="/admin/analytics" className="btn btn-sm">
+            Back
+          </Link>
+        </div>
       <h2 className="text-xl font-semibold mt-4 mb-2">Top Searches</h2>
       <ul className="list-disc list-inside">
         {data.topSearches.map((s) => (
@@ -52,5 +54,6 @@ export default function SearchAnalytics() {
         {data.failedSearches.length === 0 && <li>None.</li>}
       </ul>
     </div>
+    </>
   );
 }
