@@ -2,10 +2,7 @@ import { useContext, useEffect, useState, useCallback } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import {
   AdminUser,
-  UserRoleUpdateRequest,
-  UserDisabledUpdateRequest,
   ApiMessage,
-  UserRole,
   USER_ROLES,
 } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
@@ -13,9 +10,7 @@ import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import Pagination from '@components/Pagination';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
-import SuperAdminSidebar from '@components/Layout/SuperAdminSidebar';
 import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
-import PageHero from '@components/UI/PageHero';
 import SearchFilterBar from '@components/common/SearchFilterBar';
 import GenericModal from '@components/Modals/GenericModal';
 import ConfirmModal from '@components/Modals/ConfirmModal';
@@ -301,7 +296,7 @@ export default function ManageUsers() {
           onClose={() => setEditModal({ isOpen: false, user: null, role: '', disabled: false })}
           title={`Edit User`}
         >
-          <div className="space-y-6">
+          <div className="space-y-6 px-2 sm:px-4">
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">Email</label>
@@ -371,7 +366,7 @@ export default function ManageUsers() {
           title="Add Super Admin"
         >
           <form
-            className="space-y-6"
+            className="space-y-6 px-2 sm:px-4"
             onSubmit={async (e) => {
               e.preventDefault();
               setNewSuperAdmin((s) => ({ ...s, loading: true, error: '', success: '' }));

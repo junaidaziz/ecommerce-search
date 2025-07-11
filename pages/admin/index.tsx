@@ -268,7 +268,7 @@ export default function Admin() {
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <SuperAdminSidebar />
-      <main className="flex-1 bg-white dark:bg-gray-950 transition-colors duration-300">
+      <div className="flex-1 bg-white dark:bg-gray-950 transition-colors duration-300">
         <Head>
           <title>{getPageTitle('Admin Dashboard')}</title>
         </Head>
@@ -360,7 +360,7 @@ export default function Admin() {
           {/* Admin Sections Grid */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Admin Tools</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
               {adminSections.map((section) => (
                 <Link
                   key={section.title}
@@ -450,7 +450,7 @@ export default function Admin() {
             </div>
           </dialog>
         )}
-      </main>
+      </div>
     </div>
   );
 }
