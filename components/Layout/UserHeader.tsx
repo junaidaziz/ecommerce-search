@@ -18,15 +18,16 @@ import {
   UserDropdown,
   SearchBar
 } from '@lib/dynamicImports';
+import type { Theme } from '@contexts/ThemeContext';
 
 interface HeaderProps {
-  theme?: string;
-  setTheme?: React.Dispatch<React.SetStateAction<string>>;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
   maxWidthClass?: string;
 }
 
 const Header: FC<HeaderProps> = ({
-  theme = 'light',
+  theme,
   setTheme,
   maxWidthClass,
 }) => {
@@ -135,15 +136,15 @@ const Header: FC<HeaderProps> = ({
   };
 
   return (
-    <header className="relative bg-base-300 mb-6 py-4">
+    <header className="relative bg-white dark:bg-gray-900 shadow-sm mb-6 py-4">
       <div
         className={`w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2 mx-auto ${
           maxWidthClass ?? 'max-w-[95%] 2xl:max-w-[1440px]'
         }`}
       >
         <Link
-          href={isSuperAdmin ? "/admin" : "/"}
-          className="p-0 flex items-center cursor-pointer transition-transform duration-300 ease-out hover:scale-110 hover:-translate-y-1 hover:shadow-xl"
+          href="/admin"
+          className="p-0 flex items-center cursor-pointer transition-transform duration-300 ease-out hover:scale-110 hover:-translate-y-1"
         >
           <Image
             src="/images/logo-medium.png"
@@ -156,24 +157,23 @@ const Header: FC<HeaderProps> = ({
         </Link>
 
         <div className="flex-1 flex items-center gap-x-6 relative">
-          <CategoryMenu isSuperAdmin={isSuperAdmin} pathname={pathname} maxWidthClass={maxWidthClass} />
-          {!isSuperAdmin && <SearchBar placeholder="Search for products, brands..." />}
+          {/* No search bar or category menu for super admin */}
           <nav className="hidden lg:flex gap-6 ml-4">
             <Link
               href="/products"
-              className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname.startsWith('/products') ? 'font-semibold text-primary border-primary' : ''}`}
+              className={`border-b-2 border-transparent transition-colors duration-200 hover:text-primary hover:border-primary hover:scale-105 ${pathname.startsWith('/products') ? 'font-semibold text-primary border-primary' : ''}`}
             >
               Shop
             </Link>
             <Link
               href="/about"
-              className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname === '/about' ? 'font-semibold text-primary border-primary' : ''}`}
+              className={`border-b-2 border-transparent transition-colors duration-200 hover:text-primary hover:border-primary hover:scale-105 ${pathname === '/about' ? 'font-semibold text-primary border-primary' : ''}`}
             >
               About
             </Link>
             <Link
               href="/contact"
-              className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname === '/contact' ? 'font-semibold text-primary border-primary' : ''}`}
+              className={`border-b-2 border-transparent transition-colors duration-200 hover:text-primary hover:border-primary hover:scale-105 ${pathname === '/contact' ? 'font-semibold text-primary border-primary' : ''}`}
             >
               Contact
             </Link>
@@ -181,37 +181,22 @@ const Header: FC<HeaderProps> = ({
         </div>
 
         <nav className="flex items-center gap-4">
-          {!isSuperAdmin && (
-            <>
-              <Link href="/user/wishlist" className="relative btn btn-ghost btn-circle flex items-center justify-center group" aria-label="Wishlist">
-                <svg className={`w-6 h-6 transition-colors ${appContext?.wishlist?.length > 0 ? 'text-red-500 fill-red-500' : 'text-base-content/60 fill-none'} group-hover:text-red-500`} viewBox="0 0 24 24">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-                {appContext?.wishlist?.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow">{appContext.wishlist.length}</span>
-                )}
-              </Link>
-              <CartDropdown
-                cart={cart}
-                changeQty={changeQty}
-                removeFromCart={removeFromCart}
-                itemCount={itemCount}
-              />
-            </>
-          )}
+          {/* Theme toggle */}
+          <button
+            type="button"
+            aria-label="Toggle dark mode"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? (
+              <SunIcon className="w-5 h-5 text-yellow-400" />
+            ) : (
+              <MoonIcon className="w-5 h-5 text-blue-500" />
+            )}
+          </button>
 
-          <label className="swap swap-rotate btn btn-ghost btn-circle tooltip tooltip-bottom" data-tip={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
-            <input
-              type="checkbox"
-              aria-label="Toggle dark mode"
-              checked={theme === 'dark'}
-              onChange={() => setTheme?.(theme === 'dark' ? 'light' : 'dark')}
-              className="sr-only"
-            />
-            <MoonIcon className="swap-on w-5 h-5 text-primary" />
-            <SunIcon className="swap-off w-5 h-5 text-primary" />
-          </label>
-
+          {/* User dropdown */}
           <UserDropdown user={user} menuItems={menuItems} closeDropdown={closeDropdown} isAuthRoute={isAuthRoute} />
         </nav>
       </div>

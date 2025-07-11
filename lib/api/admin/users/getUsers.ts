@@ -10,7 +10,8 @@ export default async function getUsersHandler(
   const search = getQueryParam(req.query.search) || '';
   const page = parseInt(getQueryParam(req.query.page) || '1', 10);
   const limit = parseInt(getQueryParam(req.query.limit) || '20', 10);
-  const allUsers: AdminUser[] = await getAllUsers(search);
+  const sort = getQueryParam(req.query.sort) || 'newest';
+  const allUsers: AdminUser[] = await getAllUsers(search, sort);
   const total = allUsers.length;
   const start = (page - 1) * limit;
   const users = allUsers.slice(start, start + limit);

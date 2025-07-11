@@ -72,48 +72,5 @@ module.exports = {
   plugins: [
     require('@tailwindcss/forms'),
     require('@tailwindcss/typography'),
-    require('daisyui'),
   ],
-  daisyui: {
-    themes: [
-      {
-        light: {
-          ...require('daisyui/src/theming/themes')['[data-theme=light]'],
-          primary: '#10b981', // Emerald green
-          'primary-focus': '#059669',
-          'primary-content': '#ffffff',
-          secondary: '#6366f1', // Indigo
-          'secondary-focus': '#4f46e5',
-          'secondary-content': '#ffffff',
-          accent: '#f59e0b', // Amber
-          'accent-focus': '#d97706',
-          'accent-content': '#ffffff',
-          success: '#10b981', // Emerald
-          'success-content': '#ffffff',
-          warning: '#f59e0b', // Amber
-          'warning-content': '#ffffff',
-          error: '#ef4444', // Red
-          'error-content': '#ffffff',
-        },
-        dark: {
-          ...require('daisyui/src/theming/themes')['[data-theme=dark]'],
-          primary: '#10b981', // Emerald green
-          'primary-focus': '#059669',
-          'primary-content': '#ffffff',
-          secondary: '#6366f1', // Indigo
-          'secondary-focus': '#4f46e5',
-          'secondary-content': '#ffffff',
-          accent: '#f59e0b', // Amber
-          'accent-focus': '#d97706',
-          'accent-content': '#ffffff',
-          success: '#10b981', // Emerald
-          'success-content': '#ffffff',
-          warning: '#f59e0b', // Amber
-          'warning-content': '#ffffff',
-          error: '#ef4444', // Red
-          'error-content': '#ffffff',
-        },
-      },
-    ],
-  },
 };

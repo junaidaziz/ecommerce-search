@@ -4,41 +4,29 @@ import { useSession } from 'next-auth/react';
 import UserHeader from './UserHeader';
 import BrandHeader from './BrandHeader';
 import { USER_ROLES } from '@/types';
+import type { Theme } from '@contexts/ThemeContext';
 
 interface HeaderProps {
-  theme?: string;
-  setTheme?: React.Dispatch<React.SetStateAction<string>>;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
   maxWidthClass?: string;
 }
 
 const Header: FC<HeaderProps> = ({
-  theme = 'light',
+  theme,
   setTheme,
   maxWidthClass,
 }) => {
   const app = useContext(AppContext);
   const { data: session } = useSession();
   const role = (
-    app?.user?.role ||
-    (session?.user as { role?: string } | undefined)?.role ||
-    ''
+    app?.user?.role || (session?.user as { role?: string } | undefined)?.role || ''
   ).toString();
-  
+
   if (role === USER_ROLES.BRAND) {
-    return (
-      <BrandHeader
-        theme={theme}
-        setTheme={setTheme}
-      />
-    );
+    return <BrandHeader theme={theme} setTheme={setTheme} />;
   }
-  return (
-    <UserHeader
-      theme={theme}
-      setTheme={setTheme}
-      maxWidthClass={maxWidthClass}
-    />
-  );
+  return <UserHeader theme={theme} setTheme={setTheme} maxWidthClass={maxWidthClass} />;
 };
 
 export default Header;

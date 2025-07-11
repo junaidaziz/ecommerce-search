@@ -7,9 +7,9 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
   const { user } = useContext(AppContext) || {};
   const isSuperAdmin = user && user.role && user.role.toUpperCase() === USER_ROLES.SUPER_ADMIN;
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex">
+    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {isSuperAdmin && <SuperAdminSidebar />}
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 bg-white dark:bg-gray-950 transition-colors duration-300">{children}</main>
     </div>
   );
 } 

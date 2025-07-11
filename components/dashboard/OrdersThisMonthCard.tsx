@@ -1,8 +1,7 @@
 import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import DashboardCard from './DashboardCard';
-import CartIcon from '../icons/CartIcon';
-import ArrowTrendingUpIcon from '../icons/ArrowTrendingUpIcon';
+import { ShoppingCartIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 
 interface Props {
   brandId?: number;
@@ -56,21 +55,38 @@ const OrdersThisMonthCard: React.FC<Props> = ({ brandId }) => {
       title="Orders This Month"
       loading={!data && !error}
       error={error}
-      icon={<CartIcon className="w-5 h-5" />}
+      icon={<ShoppingCartIcon className="w-6 h-6 text-purple-600 dark:text-purple-400" />}
       trend={
         trend !== null
           ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}%`
           : undefined
       }
-      className="bg-yellow-50"
     >
       {data && (
-        <div className="flex items-center gap-2">
-          <ArrowTrendingUpIcon className="w-5 h-5 text-yellow-600" />
-          <div>
-            <p className="text-3xl font-bold">{data.count}</p>
-            <p className="text-sm">£{data.revenue.toFixed(2)}</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <ArrowTrendingUpIcon className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                {data.count.toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                £{data.revenue.toFixed(2)} revenue
+              </p>
+            </div>
           </div>
+          {trend !== null && (
+            <div className={`flex items-center gap-1 text-sm font-medium ${
+              trend > 0 
+                ? 'text-green-600 dark:text-green-400' 
+                : 'text-red-600 dark:text-red-400'
+            }`}>
+              <ArrowTrendingUpIcon className={`w-4 h-4 ${trend < 0 ? 'rotate-180' : ''}`} />
+              {trend > 0 ? '+' : ''}{trend.toFixed(1)}%
+            </div>
+          )}
         </div>
       )}
     </DashboardCard>

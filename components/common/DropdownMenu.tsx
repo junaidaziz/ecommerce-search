@@ -21,14 +21,15 @@ const DropdownMenu: FC<DropdownMenuProps> = ({ items, onItemClick }) => {
   };
   return (
     <ul
-      tabIndex={0}
-      className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded w-40"
+      role="menu"
+      tabIndex={-1}
+      className="py-2 px-1 space-y-1 rounded-md shadow-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 w-full min-w-[10rem]"
     >
       {items.map((item, index) => {
         if (item.divider) {
           return (
             <li key={index} className="py-1" role="separator">
-              <hr className="border-t border-base-300" />
+              <hr className="border-t border-gray-200 dark:border-gray-700" />
             </li>
           );
         }
@@ -36,7 +37,8 @@ const DropdownMenu: FC<DropdownMenuProps> = ({ items, onItemClick }) => {
           <li key={index}>
             <button
               onClick={handleClick(item.onClick)}
-              className="transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105"
+              className="w-full text-left px-4 py-2 rounded transition-colors duration-150 hover:bg-gray-100 dark:hover:bg-gray-800 focus:bg-gray-100 dark:focus:bg-gray-800 focus:outline-none text-gray-700 dark:text-gray-200"
+              role="menuitem"
             >
               {item.label}
             </button>
@@ -46,7 +48,8 @@ const DropdownMenu: FC<DropdownMenuProps> = ({ items, onItemClick }) => {
             <Link
               href={item.href || '#'}
               onClick={onItemClick}
-              className="transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105"
+              className="block px-4 py-2 rounded transition-colors duration-150 hover:bg-gray-100 dark:hover:bg-gray-800 focus:bg-gray-100 dark:focus:bg-gray-800 focus:outline-none text-gray-700 dark:text-gray-200"
+              role="menuitem"
             >
               {item.label}
             </Link>

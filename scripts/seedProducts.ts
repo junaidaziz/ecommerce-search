@@ -88,8 +88,8 @@ async function processRow(row: CsvRow) {
         title,
         description: row.DESCRIPTION || row.BODY_HTML || '',
         productType: row.PRODUCT_TYPE || '',
-        tags: row.TAGS || '',
-        images: row.IMAGES || null,
+        tags: row.TAGS ? row.TAGS.split(',').map(t => t.trim()).filter(Boolean) : [],
+        images: row.IMAGES ? row.IMAGES.split(',').map(i => i.trim()).filter(Boolean) : [],
         quantity: (() => {
           const rand = Math.floor(Math.random() * 20);
           return rand < 6 ? 0 : rand;

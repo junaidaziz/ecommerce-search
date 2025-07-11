@@ -2,7 +2,7 @@ import Link from 'next/link';
 import UserIcon from '../icons/UserIcon';
 import DropdownMenu from '../common/DropdownMenu';
 import type { User } from '@/types';
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 interface UserDropdownProps {
   user: User | undefined;
@@ -12,35 +12,57 @@ interface UserDropdownProps {
 }
 
 const UserDropdown: React.FC<UserDropdownProps> = ({ user, menuItems, closeDropdown, isAuthRoute }) => {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
   if (user) {
     return (
-      <div className="dropdown dropdown-end">
-        <label
-          tabIndex={0}
-          className="flex items-center gap-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-primary"
+      <div className="relative" ref={dropdownRef}>
+        <button
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+          className="flex items-center gap-2 px-3 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary transition"
         >
           {user.profileImage || user.logo ? (
             <img
               src={user.profileImage || user.logo}
               alt="avatar"
-              className="w-6 h-6 rounded-full object-cover"
+              className="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700"
             />
           ) : (
-            <span className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm uppercase">
-              {user.name?.split(' ').map(n => n[0]).join('') ||
+            <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-base uppercase">
+              {user.name?.split(' ').map((n: string) => n[0]).join('') ||
                 (user.firstName || user.lastName
                   ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase()
                   : user.email?.[0]?.toUpperCase() || '?')}
             </span>
           )}
-          <span>
+          <span className="hidden md:inline font-medium text-gray-700 dark:text-gray-200">
             {user.name?.trim() ||
               (user.firstName || user.lastName
                 ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
                 : user.email)}
           </span>
-        </label>
-        <DropdownMenu items={menuItems} onItemClick={closeDropdown} />
+          <svg className={`w-4 h-4 ml-1 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        </button>
+        {open && (
+          <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 animate-fade-in">
+            <DropdownMenu items={menuItems} onItemClick={() => { setOpen(false); closeDropdown(); }} />
+          </div>
+        )}
       </div>
     );
   }
@@ -50,14 +72,14 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, menuItems, closeDropd
         <Link
           href="/login"
           aria-label="Login"
-          className="btn btn-ghost"
+          className="px-4 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
         >
           Login
         </Link>
         <Link
           href="/signup"
           aria-label="Create an account"
-          className="btn btn-primary px-4 hover:opacity-90"
+          className="px-4 py-2 rounded-md bg-primary text-white hover:bg-primary/90 transition"
         >
           Signup
         </Link>

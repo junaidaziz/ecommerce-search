@@ -1,8 +1,7 @@
 import { apiFetch } from '@lib/api';
 import React, { useEffect, useState } from 'react';
 import DashboardCard from './DashboardCard';
-import MoneyIcon from '../icons/MoneyIcon';
-import ArrowTrendingUpIcon from '../icons/ArrowTrendingUpIcon';
+import { CurrencyPoundIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 
 interface Props {
   brandId?: number;
@@ -50,18 +49,38 @@ const TotalSalesCard: React.FC<Props> = ({ brandId }) => {
       title="Total Sales"
       loading={total === null && !error}
       error={error}
-      icon={<MoneyIcon className="w-5 h-5" />}
+      icon={<CurrencyPoundIcon className="w-6 h-6 text-green-600 dark:text-green-400" />}
       trend={
         trend !== null
           ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}%`
           : undefined
       }
-      className="bg-green-50"
     >
       {total !== null && (
-        <div className="flex items-center gap-2">
-          <ArrowTrendingUpIcon className="w-5 h-5 text-green-600" />
-          <p className="text-3xl font-bold">£{total.toFixed(2)}</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <ArrowTrendingUpIcon className="w-8 h-8 text-green-600 dark:text-green-400" />
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                £{total.toFixed(2)}
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Total revenue
+              </p>
+            </div>
+          </div>
+          {trend !== null && (
+            <div className={`flex items-center gap-1 text-sm font-medium ${
+              trend > 0 
+                ? 'text-green-600 dark:text-green-400' 
+                : 'text-red-600 dark:text-red-400'
+            }`}>
+              <ArrowTrendingUpIcon className={`w-4 h-4 ${trend < 0 ? 'rotate-180' : ''}`} />
+              {trend > 0 ? '+' : ''}{trend.toFixed(1)}%
+            </div>
+          )}
         </div>
       )}
     </DashboardCard>

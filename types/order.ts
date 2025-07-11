@@ -25,13 +25,13 @@ export type OrderWithRelations = Order & {
 // Input type for creating orders (matches Prisma fields)
 export type OrderInput = Pick<
   PrismaOrder,
-  'userId' | 'productId' | 'quantity' | 'total' | 'status' | 'paymentMethod' | 'paymentReference' | 'paymentProof'
+  'userId' | 'variantId' | 'quantity' | 'total' | 'status' | 'paymentMethod' | 'paymentReference' | 'paymentProof'
 > & {
   uuid?: string;
 };
 
 // Update type for orders
-export type OrderUpdate = Partial<Omit<OrderInput, 'userId' | 'productId'>>;
+export type OrderUpdate = Partial<Omit<OrderInput, 'userId' | 'variantId'>>;
 
 // Order response type
 export type OrderResponse = OrderWithRelations;

@@ -10,14 +10,15 @@ import SunIcon from '../icons/SunIcon';
 import UserIcon from '../icons/UserIcon';
 import NotificationBell from './NotificationBell';
 import type { User } from '@/types';
+import type { Theme } from '@contexts/ThemeContext';
 
 interface HeaderProps {
-  theme?: string;
-  setTheme?: React.Dispatch<React.SetStateAction<string>>;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
 }
 
 const BrandHeader: FC<HeaderProps> = ({
-  theme = 'light',
+  theme,
   setTheme,
 }) => {
   const router = useRouter();
@@ -108,7 +109,7 @@ const BrandHeader: FC<HeaderProps> = ({
               type="checkbox"
               aria-label="Toggle dark mode"
               checked={theme === 'dark'}
-              onChange={() => setTheme?.(theme === 'dark' ? 'light' : 'dark')}
+              onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className="sr-only"
             />
             <MoonIcon className="swap-on w-5 h-5 text-primary" />

@@ -2,10 +2,7 @@ import type { User as PrismaUser, Role } from '@prisma/client';
 import type { PaymentMethod } from './paymentMethod';
 
 // Base User type matching Prisma schema
-export type User = PrismaUser & {
-  // Computed property for display name (not in DB)
-  name?: string;
-};
+export type User = PrismaUser;
 
 // User with related payment methods (for queries that include them)
 export type UserWithPaymentMethods = User & {
@@ -41,7 +38,6 @@ export type UserInput = Pick<
   | 'active'
   | 'resetToken'
   | 'resetExpires'
-  | 'paymentMethods'
 > & {
   uuid?: string;
 };

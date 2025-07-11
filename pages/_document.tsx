@@ -28,7 +28,6 @@ export default function Document() {
     }
     var html = document.documentElement;
     html.className = theme;
-    html.setAttribute('data-theme', theme);
   } catch (e) {}
 })();
             `,

@@ -141,11 +141,11 @@ export async function indexProductsToTypesense(
     title: p.title,
     name: p.title,
     slug: p.slug ?? slugify(p.title),
-    description: p.descriptionText || p.description || '',
+    description: p.description || '',
     price: p.minPrice,
-    category: p.category?.name?.trim().toLowerCase() ?? '',
-    brand: (p.vendor.brandName ?? '').trim(),
-    sold_count: p.soldCount,
+    category: '', // No nested category object, so leave blank or use categoryId
+    brand: '', // No nested vendor object, so leave blank or use vendorId
+    sold_count: 0, // Not available on Product model
   }));
 
   try {
@@ -197,7 +197,7 @@ export async function addProduct(product: ProductInput): Promise<void> {
     status: product.status ?? 'approved',
     vendorId: product.vendorId,
     categoryId: product.categoryId,
-    images: Array.isArray(product.images) ? product.images.join(',') : product.images || '',
+    images: Array.isArray(product.images) ? product.images : (typeof product.images === 'string' ? [product.images] : []),
   };
   try {
     await db.product.create({ data });
@@ -249,7 +249,7 @@ export async function updateProduct(
       discountValue: product.discountValue,
       vendorId: product.vendorId,
       categoryId: product.categoryId,
-      images: Array.isArray(product.images) ? product.images.join(',') : product.images || '',
+      images: Array.isArray(product.images) ? product.images : (typeof product.images === 'string' ? [product.images] : []),
     },
   });
   if (existing && existing.quantity <= 0 && (product.quantity ?? 0) > 0) {
@@ -489,17 +489,12 @@ export async function deleteProduct(uuid: string): Promise<void> {
 export async function getDistinctTags(search = ''): Promise<string[]> {
   const db = getDb();
   const rows = await db.product.findMany({
-    where: { tags: { not: null } },
     select: { tags: true },
   });
   const term = search.trim().toLowerCase();
   const set = new Set<string>();
   for (const row of rows) {
-    const tags =
-      row.tags
-        ?.split(',')
-        .map((t: string) => t.trim())
-        .filter(Boolean) || [];
+    const tags = Array.isArray(row.tags) ? row.tags : [];
     for (const tag of tags) {
       if (!term || tag.toLowerCase().includes(term)) {
         set.add(tag);

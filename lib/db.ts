@@ -52,25 +52,27 @@ export function setWishlist(email: string, items: Product[]): void {
 }
 
 export function addReview(review: {
-  productId: string;
-  userEmail: string;
+  entityType: string;
+  entityId: number;
+  userId: number;
   rating: number;
   comment: string;
+  userEmail?: string;
 }) {
-  const list = reviewsStore.get(review.productId) || [];
+  const key = `${review.entityType}:${review.entityId}`;
+  const list = reviewsStore.get(key) || [];
   list.push({
     ...review,
     id: Date.now(), // Dummy id for in-memory
-    productId: Number(review.productId),
     createdAt: new Date(),
-    userId: 0,
-    user: { id: 0, firstName: '', lastName: '', email: review.userEmail },
+    updatedAt: new Date(),
   });
-  reviewsStore.set(review.productId, list);
+  reviewsStore.set(key, list);
 }
 
-export function getReviewsForProduct(productId: string): Review[] {
-  return reviewsStore.get(productId) || [];
+export function getReviewsForEntity(entityType: string, entityId: number): Review[] {
+  const key = `${entityType}:${entityId}`;
+  return reviewsStore.get(key) || [];
 }
 
 export function getAverageRating(productId: string): {
@@ -83,7 +85,7 @@ export function getAverageRating(productId: string): {
   return { average: sum / reviews.length, count: reviews.length };
 }
 
-export function getReviewsByUser(email: string): Review[] {
+export function getReviewsByUser(userId: number): Review[] {
   const all = Array.from(reviewsStore.values()).flat();
-  return all.filter((r) => r.user && r.user.email === email);
+  return all.filter((r) => r.userId === userId);
 }

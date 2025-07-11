@@ -266,9 +266,9 @@ export default function Admin() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex">
+    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <SuperAdminSidebar />
-      <main className="flex-1">
+      <main className="flex-1 bg-white dark:bg-gray-950 transition-colors duration-300">
         <Head>
           <title>{getPageTitle('Admin Dashboard')}</title>
         </Head>
@@ -282,7 +282,7 @@ export default function Admin() {
         {/* Quick Stats */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 transition-colors duration-300">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -292,13 +292,13 @@ export default function Admin() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900">1,234</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-green-400">Total Users</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">1,234</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 transition-colors duration-300">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -308,13 +308,13 @@ export default function Admin() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Active Brands</p>
-                  <p className="text-2xl font-bold text-gray-900">89</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-green-400">Active Brands</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">89</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 transition-colors duration-300">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -324,34 +324,34 @@ export default function Admin() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Total Products</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-green-400">Total Products</p>
                   {user.role.toUpperCase() === USER_ROLES.SUPER_ADMIN ? (
                     totalProductError ? (
                       <p className="text-2xl font-bold text-red-500">{totalProductError}</p>
                     ) : totalProductCount === null ? (
                       <p className="text-2xl font-bold text-gray-400 animate-pulse">...</p>
                     ) : (
-                      <p className="text-2xl font-bold text-gray-900">{totalProductCount}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalProductCount}</p>
                     )
                   ) : (
-                    <p className="text-2xl font-bold text-gray-900">{products.length}</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{products.length}</p>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 transition-colors duration-300">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-purple-600 dark:text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                     </svg>
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Revenue</p>
-                  <p className="text-2xl font-bold text-gray-900">£45,678</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-green-400">Revenue</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">£45,678</p>
                 </div>
               </div>
             </div>
@@ -359,24 +359,24 @@ export default function Admin() {
 
           {/* Admin Sections Grid */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Admin Tools</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Admin Tools</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {adminSections.map((section) => (
                 <Link
                   key={section.title}
                   href={section.href}
-                  className="group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 overflow-hidden"
+                  className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-800 overflow-hidden"
                 >
                   <div className="p-6">
-                    <div className={`w-12 h-12 ${section.bgColor} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200`}>
+                    <div className={`w-12 h-12 ${section.bgColor} dark:bg-gray-900 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200`}>
                       <div className={section.textColor}>
                         {section.icon}
                       </div>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors duration-200">
                       {section.title}
                     </h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                       {section.description}
                     </p>
                   </div>
