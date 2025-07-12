@@ -1,4 +1,6 @@
 import React from 'react';
+import ChevronLeftIcon from '@components/icons/ChevronLeftIcon';
+import ChevronRightIcon from '@components/icons/ChevronRightIcon';
 
 interface PaginationProps {
   currentPage: number;
@@ -63,9 +65,7 @@ const Pagination: React.FC<PaginationProps> = ({
         className="rounded-lg px-3 py-2 border border-primary bg-white text-primary hover:bg-primary/10 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Previous page"
       >
-        <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
+        <ChevronLeftIcon className="w-4 h-4 text-primary" />
       </button>
 
       {/* Page Numbers */}
@@ -99,9 +99,7 @@ const Pagination: React.FC<PaginationProps> = ({
         className="rounded-lg px-3 py-2 border border-primary bg-white text-primary hover:bg-primary/10 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Next page"
       >
-        <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
+        <ChevronRightIcon className="w-4 h-4 text-primary" />
       </button>
     </div>
   );
