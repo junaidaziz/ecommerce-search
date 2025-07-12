@@ -1,23 +1,18 @@
 import { apiFetch } from '@lib/api';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import type { FC } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import MoonIcon from '../icons/MoonIcon';
-import SunIcon from '../icons/SunIcon';
 import DEFAULT_CATEGORIES from '@lib/defaultCategories';
 import type { Category } from '@/types';
 import type { User } from '@/types';
 import { USER_ROLES } from '@/types';
-import { 
-  CartDropdown,
-  CategoryMenu,
-  UserDropdown,
-  SearchBar
-} from '@lib/dynamicImports';
+import Logo from '../Header/Logo';
+import CategoryDropdown from '../Header/CategoryDropdown';
+import HeaderSearchInput from '../Header/SearchInput';
+import MenuItems from '../Header/MenuItems';
 import type { Theme } from '@contexts/ThemeContext';
 
 interface HeaderProps {
@@ -26,11 +21,7 @@ interface HeaderProps {
   maxWidthClass?: string;
 }
 
-const Header: FC<HeaderProps> = ({
-  theme,
-  setTheme,
-  maxWidthClass,
-}) => {
+const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
   const router = useRouter();
   const { data: session } = useSession();
   const appContext = useContext(AppContext);
@@ -75,16 +66,22 @@ const Header: FC<HeaderProps> = ({
                   if (typeof s === 'string') {
                     return {
                       name: s,
-                      slug: (s as string).toLowerCase()
+                      slug: (s as string)
+                        .toLowerCase()
                         .replace(/\s+/g, '-')
                         .replace(/[^a-z0-9\-]/g, ''),
                     };
-                  } else if (typeof s === 'object' && s && typeof s.name === 'string') {
+                  } else if (
+                    typeof s === 'object' &&
+                    s &&
+                    typeof s.name === 'string'
+                  ) {
                     return {
                       ...s,
                       slug:
                         s.slug ||
-                        s.name.toLowerCase()
+                        s.name
+                          .toLowerCase()
                           .replace(/\s+/g, '-')
                           .replace(/[^a-z0-9\-]/g, ''),
                     };
@@ -142,28 +139,12 @@ const Header: FC<HeaderProps> = ({
           maxWidthClass ?? 'max-w-[95%] 2xl:max-w-[1440px]'
         }`}
       >
-        <Link
-          href="/admin"
-          className="p-0 flex items-center cursor-pointer transition-transform duration-300 ease-out hover:scale-110 hover:-translate-y-1"
-        >
-          <Image
-            src="/images/logo-medium.png"
-            alt="Logo"
-            width={120}
-            height={40}
-            className="max-h-10 h-auto w-auto"
-            priority
-          />
-        </Link>
+        <Logo />
 
         {/* Categories menu and search bar */}
-        <div className="flex-1 flex items-center gap-x-4 min-w-0">
-          <div className="hidden md:block">
-            <CategoryMenu categories={categories} />
-          </div>
-          <div className="flex-1 min-w-[180px] max-w-xl">
-            <SearchBar categories={categories} />
-          </div>
+        <div className="flex-1 flex items-center gap-x-6 min-w-0">
+          <CategoryDropdown categories={categories} />
+          <HeaderSearchInput categories={categories} />
           {/* Navigation links */}
           <nav className="hidden lg:flex gap-6 ml-4">
             <Link
@@ -187,25 +168,18 @@ const Header: FC<HeaderProps> = ({
           </nav>
         </div>
 
-        <nav className="flex items-center gap-4">
-          {/* Theme toggle */}
-          <button
-            type="button"
-            aria-label="Toggle dark mode"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          >
-            {theme === 'dark' ? (
-              <SunIcon className="w-5 h-5 text-yellow-400" />
-            ) : (
-              <MoonIcon className="w-5 h-5 text-blue-500" />
-            )}
-          </button>
-
-          {/* User dropdown */}
-          <UserDropdown user={user} menuItems={menuItems} closeDropdown={closeDropdown} isAuthRoute={isAuthRoute} />
-        </nav>
+        <MenuItems
+          theme={theme}
+          setTheme={setTheme}
+          user={user}
+          isAuthRoute={isAuthRoute}
+          menuItems={menuItems}
+          cart={cart}
+          changeQty={changeQty}
+          removeFromCart={removeFromCart}
+          itemCount={itemCount}
+          closeDropdown={closeDropdown}
+        />
       </div>
     </header>
   );
