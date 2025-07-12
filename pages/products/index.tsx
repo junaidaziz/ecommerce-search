@@ -282,51 +282,26 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   }, [router, addNotification]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-100 via-base-200/30 to-base-100">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <Head>
         <title>{getPageTitle('Products')}</title>
         <meta name="description" content="Discover amazing products from top brands" />
       </Head>
-      
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-base-content mb-4">
-              Discover Amazing Products
-            </h1>
-            <p className="text-lg text-base-content/70 max-w-2xl mx-auto">
-              Explore our curated collection of premium products from trusted brands
-            </p>
-            <div className="mt-6 flex items-center justify-center space-x-4 text-sm text-base-content/60">
-              <span className="flex items-center">
-                <svg className="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                {total} Products Available
-              </span>
-              <span className="flex items-center">
-                <svg className="w-4 h-4 mr-1 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Fast Shipping
-              </span>
-              <span className="flex items-center">
-                <svg className="w-4 h-4 mr-1 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                </svg>
-                Secure Checkout
-              </span>
-            </div>
+      <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
+        <div className="text-center mb-10">
+          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">Discover Amazing Products</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-4">Explore our curated collection of premium products from trusted brands.</p>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-base text-gray-500 dark:text-gray-400">
+            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>{total} Products Available</span>
+            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Fast Shipping</span>
+            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" /></svg>Secure Checkout</span>
           </div>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-10 items-start">
           {/* Filters Sidebar */}
-          <aside className="lg:w-80 w-full flex-shrink-0">
-            <div className="bg-base-100 rounded-2xl shadow-lg p-6 sticky top-4">
+          <aside className="lg:w-80 w-full flex-shrink-0 mb-8 lg:mb-0">
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 sticky top-4 border border-gray-100 dark:border-gray-700">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-base-content">Filters</h2>
                 <button
