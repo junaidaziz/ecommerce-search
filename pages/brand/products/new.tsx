@@ -13,24 +13,11 @@ import { UserRole } from '@/types';
 import { getPageTitle } from '@lib/pageTitle';
 import PageContainer from '@components/Layout/PageContainer';
 
-// Inline SVG icons
-const ArrowLeftIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-  </svg>
-);
+import ArrowLeftIcon from '@components/icons/ArrowLeftIcon';
+import PlusIcon from '@components/icons/PlusIcon';
+import XMarkIcon from '@components/icons/XMarkIcon';
 
-const PlusIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-  </svg>
-);
-
-const XMarkIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-  </svg>
-);
+// Inline SVG icons removed in favor of reusable components
 
 const NewProductPage: React.FC = () => {
   const router = useRouter();

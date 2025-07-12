@@ -6,6 +6,7 @@ import { AppContext } from '@contexts/AppContext';
 import { signIn } from 'next-auth/react';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import UserIcon from '@components/icons/UserIcon';
 import GoogleIcon from '@components/icons/GoogleIcon';
 import FacebookIcon from '@components/icons/FacebookIcon';
 import {
@@ -102,9 +103,7 @@ export default function UserSignup() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 sm:p-10 relative z-10">
         <div className="flex flex-col items-center mb-6">
           <div className="w-14 h-14 flex items-center justify-center rounded-full bg-blue-100 mb-3">
-            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
+            <UserIcon className="w-8 h-8 text-blue-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Create Your Account</h1>
           <p className="text-gray-500 text-center text-base">Sign up to shop, track orders, and enjoy exclusive benefits.</p>
