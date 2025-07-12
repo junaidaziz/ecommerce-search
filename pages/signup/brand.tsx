@@ -16,6 +16,28 @@ import {
 } from '@components/form-fields';
 import useEmailAvailability from '@hooks/useEmailAvailability';
 import { USER_ROLES } from '@/types';
+import Button from '@components/UI/Button';
+
+// SocialButton component
+const SocialButton: React.FC<{
+  icon: React.ReactNode;
+  provider: string;
+  onClick: () => void;
+  className?: string;
+}> = ({ icon, provider, onClick, className }) => (
+  <Button
+    type="button"
+    onClick={onClick}
+    variant="outline"
+    size="md"
+    fullWidth
+    rounded
+    className={`flex items-center justify-center gap-3 font-semibold text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all ${className}`}
+  >
+    {icon}
+    <span>Continue with {provider}</span>
+  </Button>
+);
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -96,56 +118,54 @@ export default function BrandSignup() {
     (passwordValue !== '' && !passwordRegex.test(passwordValue));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center py-8 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center py-8 px-4 animate-fade-in">
       <Head>
         <title>{getPageTitle('Brand Signup')}</title>
       </Head>
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 sm:p-10 relative z-10">
+      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 sm:p-10 relative z-10">
         <div className="flex flex-col items-center mb-6">
           <div className="w-14 h-14 flex items-center justify-center rounded-full bg-purple-100 mb-3">
             <BuildingIcon className="w-8 h-8 text-purple-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Create Your Brand Account</h1>
-          <p className="text-gray-500 text-center text-base">Sign up to start selling, manage your store, and grow your business.</p>
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-1">Create Your Brand Account</h1>
+          <p className="text-gray-500 dark:text-gray-300 text-center text-base">Sign up to start selling, manage your store, and grow your business.</p>
         </div>
         <div className="flex flex-col gap-3 mb-6">
-          <button
-            type="button"
-            className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-200 bg-white hover:bg-purple-50 transition-colors text-gray-700 font-medium shadow-sm"
+          <SocialButton
+            icon={<GoogleIcon className="h-5 w-5" />}
+            provider="Google"
             onClick={() => {
               document.cookie = 'signupRole=BRAND; path=/';
               signIn('google');
             }}
-          >
-            <GoogleIcon className="h-5 w-5" />
-            Continue with Google
-          </button>
-          <button
-            type="button"
-            className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-200 bg-white hover:bg-purple-100 transition-colors text-gray-700 font-medium shadow-sm"
+            className="border-red-500 hover:border-red-600"
+          />
+          <SocialButton
+            icon={<FacebookIcon className="h-5 w-5" />}
+            provider="Facebook"
             onClick={() => {
               document.cookie = 'signupRole=BRAND; path=/';
               signIn('facebook');
             }}
-          >
-            <FacebookIcon className="h-5 w-5" />
-            Continue with Facebook
-          </button>
+            className="border-blue-600 hover:border-blue-700"
+          />
         </div>
         <div className="flex items-center my-6">
-          <div className="flex-grow border-t border-gray-200"></div>
-          <span className="mx-4 text-gray-400 font-medium">or</span>
-          <div className="flex-grow border-t border-gray-200"></div>
+          <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+          <span className="mx-4 text-gray-400 dark:text-gray-500 font-medium">or</span>
+          <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
         </div>
-        {formError && <div className="text-red-500 mb-2 text-center">{formError}</div>}
-        <form onSubmit={handleSubmit(submit)} className="space-y-4">
+        {formError && <div className="text-red-500 mb-2 text-center font-semibold">{formError}</div>}
+        <form onSubmit={handleSubmit(submit)} className="space-y-5">
           <TextInput
             name="firstName"
             placeholder="First Name"
             register={register}
             rules={{ required: 'First name is required' }}
             error={errors.firstName?.message as string}
+            className={`w-full text-base px-4 py-3 rounded-lg border ${errors.firstName ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
           />
+          {errors.firstName?.message && <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>}
           <EmailInput
             name="email"
             placeholder="Email"
@@ -156,7 +176,9 @@ export default function BrandSignup() {
               pattern: { value: emailRegex, message: 'Invalid email format' },
             }}
             error={errors.email?.message as string}
+            className={`w-full text-base px-4 py-3 rounded-lg border ${errors.email ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
           />
+          {errors.email?.message && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
           <div className="space-y-2">
             <PasswordInput
               name="password"
@@ -173,41 +195,49 @@ export default function BrandSignup() {
               }}
               onFocus={handlePasswordFocus}
               error={errors.password?.message as string}
+              className={`w-full text-base px-4 py-3 rounded-lg border ${errors.password ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
             />
+            {errors.password?.message && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
             <PasswordInput
               name="confirm"
               placeholder="Confirm Password"
               register={register}
               rules={{ validate: handleConfirmBlur }}
               error={errors.confirm?.message as string}
+              className={`w-full text-base px-4 py-3 rounded-lg border ${errors.confirm ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
             />
+            {errors.confirm?.message && <p className="text-red-500 text-sm mt-1">{errors.confirm.message}</p>}
           </div>
           {showPasswordHint && (
-            <p id="password-help" className="text-sm text-gray-500">
+            <p id="password-help" className="text-sm text-gray-500 dark:text-gray-400">
               Password must be at least 8 characters and include uppercase,
               lowercase, number and special character
             </p>
           )}
-          <button
-            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+          <Button
             type="submit"
+            size="lg"
+            fullWidth
+            rounded
+            shadow
             disabled={checkingEmail || !!errors.email}
+            className="mt-2"
           >
             {checkingEmail && (
               <span className="loading loading-spinner mr-2"></span>
             )}
             Sign Up
-          </button>
+          </Button>
         </form>
-        <p className="text-center mt-6 text-gray-700">
+        <p className="text-center mt-6 text-gray-700 dark:text-gray-300">
           Already have an account?{' '}
-          <Link href="/login" className="text-blue-600 hover:underline font-medium">
+          <Link href="/login" className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
             Login
           </Link>
         </p>
-        <p className="text-sm text-center mt-2 text-gray-500">
+        <p className="text-sm text-center mt-2 text-gray-500 dark:text-gray-400">
           Not a brand?{' '}
-          <Link href="/signup/user" className="text-blue-600 hover:underline font-medium">
+          <Link href="/signup/user" className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
             Sign up as a user
           </Link>
         </p>
