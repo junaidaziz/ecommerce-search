@@ -17,33 +17,7 @@ import {
 import useEmailAvailability from '@hooks/useEmailAvailability';
 import { USER_ROLES } from '@/types';
 import Button from '@components/UI/Button';
-
-// SocialButton component
-const SocialButton: React.FC<{
-  icon: React.ReactNode;
-  provider: 'Google' | 'Facebook';
-  onClick: () => void;
-}> = ({ icon, provider, onClick }) => {
-  const isGoogle = provider === 'Google';
-  const isFacebook = provider === 'Facebook';
-  return (
-    <Button
-      type="button"
-      onClick={onClick}
-      variant="outline"
-      size="md"
-      fullWidth
-      rounded
-      className={`flex items-center justify-center gap-3 font-semibold border transition-all
-        ${isGoogle ? 'border-red-500 hover:bg-red-50 dark:hover:bg-red-900 focus:ring-red-500' : ''}
-        ${isFacebook ? 'border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 focus:ring-blue-600' : ''}
-        text-gray-900 dark:text-white hover:scale-[1.03] shadow-sm`}
-    >
-      {icon}
-      <span>Continue with {provider}</span>
-    </Button>
-  );
-};
+import SocialButton from '@components/UI/SocialButton';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -144,7 +118,9 @@ export default function UserSignup() {
               document.cookie = 'signupRole=USER; path=/';
               signIn('google');
             }}
-          />
+          >
+            Continue with Google
+          </SocialButton>
           <SocialButton
             icon={<FacebookIcon className="h-5 w-5" />}
             provider="Facebook"
@@ -152,7 +128,9 @@ export default function UserSignup() {
               document.cookie = 'signupRole=USER; path=/';
               signIn('facebook');
             }}
-          />
+          >
+            Continue with Facebook
+          </SocialButton>
         </div>
         <div className="flex items-center my-6">
           <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
