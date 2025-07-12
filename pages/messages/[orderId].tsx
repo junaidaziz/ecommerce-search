@@ -1,5 +1,5 @@
 import { apiFetch } from '@lib/api';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import useRequireAuth from '@hooks/useRequireAuth';
 import type { Message } from '@/types';
@@ -13,19 +13,19 @@ export default function OrderMessages() {
   const [msgs, setMsgs] = useState<Message[]>([]);
   const [text, setText] = useState('');
 
-  const fetchMsgs = () => {
+  const fetchMsgs = useCallback(() => {
     if (!orderId) return;
     apiFetch(`/api/messages/${orderId}`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setMsgs(data))
       .catch(() => {});
-  };
+  }, [orderId]);
 
   useEffect(() => {
     fetchMsgs();
     const i = setInterval(fetchMsgs, 5000);
     return () => clearInterval(i);
-  }, [orderId]);
+  }, [fetchMsgs]);
 
   const send = () => {
     if (!text.trim()) return;
