@@ -344,7 +344,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
                     </div>
                   )}
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-4 sm:ml-auto">
                   <SortMenu value={sort} onChange={(v) => setSort(v)} />
                 </div>
               </div>
