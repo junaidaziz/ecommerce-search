@@ -1,5 +1,4 @@
 import { apiFetch } from '@lib/api';
-import Link from 'next/link';
 import { useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
@@ -13,6 +12,7 @@ import Logo from '../Header/Logo';
 import CategoryDropdown from '../Header/CategoryDropdown';
 import HeaderSearchInput from '../Header/SearchInput';
 import MenuItems from '../Header/MenuItems';
+import NavLinks from '../Header/NavLinks';
 import type { Theme } from '@contexts/ThemeContext';
 
 interface HeaderProps {
@@ -133,42 +133,20 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
   };
 
   return (
-    <header className="relative bg-white dark:bg-gray-900 shadow-sm mb-6 py-4">
+    <header className="relative bg-white dark:bg-gray-900 shadow-sm mb-6">
       <div
-        className={`w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2 mx-auto ${
+        className={`w-full px-4 sm:px-6 lg:px-8 mx-auto ${
           maxWidthClass ?? 'max-w-[95%] 2xl:max-w-[1440px]'
         }`}
       >
-        <Logo />
-
-        {/* Categories menu and search bar */}
-        <div className="flex-1 flex items-center gap-x-6 min-w-0">
-          <CategoryDropdown categories={categories} />
-          <HeaderSearchInput categories={categories} />
-          {/* Navigation links */}
-          <nav className="hidden lg:flex gap-6 ml-4">
-            <Link
-              href="/products"
-              className={`border-b-2 border-transparent transition-colors duration-200 hover:text-primary hover:border-primary hover:scale-105 ${pathname.startsWith('/products') ? 'font-semibold text-primary border-primary' : ''}`}
-            >
-              Shop
-            </Link>
-            <Link
-              href="/about"
-              className={`border-b-2 border-transparent transition-colors duration-200 hover:text-primary hover:border-primary hover:scale-105 ${pathname === '/about' ? 'font-semibold text-primary border-primary' : ''}`}
-            >
-              About
-            </Link>
-            <Link
-              href="/contact"
-              className={`border-b-2 border-transparent transition-colors duration-200 hover:text-primary hover:border-primary hover:scale-105 ${pathname === '/contact' ? 'font-semibold text-primary border-primary' : ''}`}
-            >
-              Contact
-            </Link>
-          </nav>
-        </div>
-
-        <MenuItems
+        <div className="flex items-center justify-between flex-wrap gap-y-2 py-4">
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            <Logo />
+            <CategoryDropdown categories={categories} />
+            <HeaderSearchInput categories={categories} />
+          </div>
+          <NavLinks />
+          <MenuItems
           theme={theme}
           setTheme={setTheme}
           user={user}
@@ -179,7 +157,8 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
           removeFromCart={removeFromCart}
           itemCount={itemCount}
           closeDropdown={closeDropdown}
-        />
+          />
+        </div>
       </div>
     </header>
   );
