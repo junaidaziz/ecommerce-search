@@ -42,6 +42,7 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
     '/brand/signup',
   ].includes(pathname);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const filterCats = (cats: Category[]) =>
@@ -133,32 +134,80 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
   };
 
   return (
-    <header className="relative bg-white dark:bg-gray-900 shadow-sm mb-6">
+    <header className="sticky top-0 z-30 bg-gray-900/95 dark:bg-gray-950/95 shadow-sm border-b border-gray-800">
       <div
-        className={`w-full px-4 sm:px-6 lg:px-8 mx-auto ${
-          maxWidthClass ?? 'max-w-[95%] 2xl:max-w-[1440px]'
-        }`}
+        className={`w-full px-2 sm:px-4 lg:px-8 mx-auto`}
       >
-        <div className="flex items-center justify-between flex-wrap gap-y-2 py-4">
-          <div className="flex items-center gap-4 flex-1 min-w-0">
+        <div className="flex items-center justify-between h-20">
+          {/* Left: Logo */}
+          <div className="flex items-center gap-2 min-w-0">
             <Logo />
+          </div>
+          {/* Center: Categories + Search + NavLinks (desktop) */}
+          <div className="hidden lg:flex flex-1 items-center justify-center gap-6">
+              <CategoryDropdown categories={categories} />
+              <div className="w-[1px] h-6 bg-gray-700 mx-2" />
+              {/* Search input with increased width and modern style */}
+              <HeaderSearchInput categories={categories} className="w-full" />
+              <NavLinks />
+          </div>
+          {/* Right: Cart, Theme, User, Auth (desktop) */}
+          <div className="hidden lg:flex items-center gap-2 ml-auto">
+            {/* Cart icon with badge, grouped with theme and auth */}
+            <div className="flex items-center gap-2">
+              <MenuItems
+                theme={theme}
+                setTheme={setTheme}
+                user={user}
+                isAuthRoute={isAuthRoute}
+                menuItems={menuItems}
+                cart={cart}
+                changeQty={changeQty}
+                removeFromCart={removeFromCart}
+                itemCount={itemCount}
+                closeDropdown={closeDropdown}
+              />
+            </div>
+          </div>
+          {/* Mobile: Hamburger */}
+          <div className="lg:hidden flex items-center ml-auto">
+            <button
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+              aria-label="Open main menu"
+              onClick={() => setMobileMenuOpen((v) => !v)}
+            >
+              <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden mt-2 rounded-xl bg-gray-800 shadow-lg p-4 flex flex-col gap-4 animate-fade-in">
             <CategoryDropdown categories={categories} />
             <HeaderSearchInput categories={categories} />
+
+            <NavLinks />
+            <MenuItems
+              theme={theme}
+              setTheme={setTheme}
+              user={user}
+              isAuthRoute={isAuthRoute}
+              menuItems={menuItems}
+              cart={cart}
+              changeQty={changeQty}
+              removeFromCart={removeFromCart}
+              itemCount={itemCount}
+              closeDropdown={closeDropdown}
+            />
           </div>
-          <NavLinks />
-          <MenuItems
-          theme={theme}
-          setTheme={setTheme}
-          user={user}
-          isAuthRoute={isAuthRoute}
-          menuItems={menuItems}
-          cart={cart}
-          changeQty={changeQty}
-          removeFromCart={removeFromCart}
-          itemCount={itemCount}
-          closeDropdown={closeDropdown}
-          />
-        </div>
+        )}
       </div>
     </header>
   );

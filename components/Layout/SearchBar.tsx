@@ -12,6 +12,8 @@ interface SearchBarProps {
   showRecent?: boolean;
   showTrending?: boolean;
   className?: string;
+  inputClassName?: string;
+  buttonClassName?: string;
 }
 
 const RECENT_KEY = 'recent-searches';
@@ -22,6 +24,8 @@ const SearchBar: FC<SearchBarProps> = ({
   showRecent = true,
   showTrending = true,
   className = '',
+  inputClassName = '',
+  buttonClassName = '',
 }) => {
   const router = useRouter();
   const [query, setQuery] = useState('');
@@ -158,6 +162,8 @@ const SearchBar: FC<SearchBarProps> = ({
         onKeyDown={handleKeyDown}
         onSearch={handleSearch}
         placeholder={placeholder}
+        inputClassName={inputClassName}
+        buttonClassName={buttonClassName}
       />
       {query && (
         <button

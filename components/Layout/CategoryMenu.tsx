@@ -193,7 +193,7 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
           <button
             type="button"
             aria-label="Categories menu"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors hover:bg-zinc-800 hover:text-white"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors text-gray-900 dark:text-gray-100 hover:text-primary"
             onClick={() => setMenuOpen((prev) => !prev)}
             onMouseEnter={handleMenuEnter}
           >
