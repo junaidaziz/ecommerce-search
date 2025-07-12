@@ -105,44 +105,44 @@ export default function AdminProducts() {
   }, [sortBy]);
 
   // Async option loading for dropdowns
-  const fetchVendors = async (input = '') => {
+  const fetchVendors = useCallback(async (input = '') => {
     const params = new URLSearchParams({ search: input, limit: '20' });
     const res = await fetch(`/api/vendors?${params.toString()}`);
     if (!res.ok) return [];
     const data = await res.json();
     return (data.vendors || []).map((v: any) => ({ label: v.brandName, value: v.id }));
-  };
-  const fetchCategories = async (input = '') => {
+  }, []);
+  const fetchCategories = useCallback(async (input = '') => {
     const params = new URLSearchParams({ search: input, limit: '20' });
     const res = await fetch(`/api/categories?${params.toString()}`);
     if (!res.ok) return [];
     const data = await res.json();
     return (data.categories || []).map((c: any) => ({ label: c.name, value: c.id }));
-  };
-  const fetchTags = async (input = '') => {
+  }, []);
+  const fetchTags = useCallback(async (input = '') => {
     const params = new URLSearchParams({ search: input });
     const res = await fetch(`/api/tags?${params.toString()}`);
     if (!res.ok) return [];
     const data = await res.json();
     return (data.tags || []).map((t: string) => ({ label: t, value: t }));
-  };
+  }, []);
   // For product types, fallback to static list if no endpoint
   const staticTypes = [
     { label: 'Physical', value: 'Physical' },
     { label: 'Digital', value: 'Digital' },
     { label: 'Service', value: 'Service' },
   ];
-  const fetchTypes = async (input = '') => {
+  const fetchTypes = useCallback(async (input = '') => {
     // If you have an endpoint, replace this logic
     return staticTypes.filter((t) => t.label.toLowerCase().includes(input.toLowerCase()));
-  };
+  }, []);
   // Initial load
   useEffect(() => {
     fetchVendors().then(setVendorOptions);
     fetchCategories().then(setCategoryOptions);
     fetchTags().then(setTagOptions);
     fetchTypes().then(setTypeOptions);
-  }, []);
+  }, [fetchVendors, fetchCategories, fetchTags, fetchTypes]);
   // Debounced search handlers
   const debouncedFetchVendors = debounce((input: string, cb: (opts: SelectOption[]) => void) => {
     fetchVendors(input).then(cb);
