@@ -21,6 +21,10 @@ import {
   SortMenu
 } from '@lib/dynamicImports';
 import type { SortValue } from '@components/SortMenu';
+import SearchLargeIcon from '../../components/icons/SearchLargeIcon';
+import CheckIcon from '../../components/icons/CheckIcon';
+import TruckIcon from '../../components/icons/TruckIcon';
+import LockIcon from '../../components/icons/LockIcon';
 
 interface ProductsProps {
   products: Product[];
@@ -282,7 +286,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   }, [router, addNotification]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen">
       <Head>
         <title>{getPageTitle('Products')}</title>
         <meta name="description" content="Discover amazing products from top brands" />
@@ -293,17 +297,17 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
           <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">Discover Amazing Products</h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-4">Explore our curated collection of premium products from trusted brands.</p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-base text-gray-500 dark:text-gray-400">
-            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>{total} Products Available</span>
-            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Fast Shipping</span>
-            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" /></svg>Secure Checkout</span>
+            <span className="flex items-center gap-2"><CheckIcon className="w-5 h-5 text-green-500" />{total} Products Available</span>
+            <span className="flex items-center gap-2"><TruckIcon className="w-5 h-5 text-blue-500" />Fast Shipping</span>
+            <span className="flex items-center gap-2"><LockIcon className="w-5 h-5 text-purple-500" />Secure Checkout</span>
           </div>
         </div>
         <div className="flex flex-col lg:flex-row gap-10 items-start">
           {/* Filters Sidebar */}
-          <aside className="lg:w-80 w-full flex-shrink-0 mb-8 lg:mb-0">
-            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 sticky top-4 border border-gray-100 dark:border-gray-700">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-base-content">Filters</h2>
+          <aside className="lg:w-80 w-full">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sticky border border-gray-100 dark:border-gray-700 transition-all duration-300">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-bold text-base-content">Filters</h2>
                 <button
                   onClick={clearAll}
                   className="btn btn-sm btn-ghost text-primary hover:bg-primary/10"
@@ -376,9 +380,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
             {items.length === 0 && !loading && (
               <div className="bg-base-100 rounded-2xl shadow-lg p-12 text-center">
                 <div className="max-w-md mx-auto">
-                  <svg className="w-16 h-16 mx-auto text-base-content/30 mb-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                  </svg>
+                  <SearchLargeIcon className="w-16 h-16 mx-auto text-base-content/30 mb-4" />
                   <h3 className="text-xl font-semibold text-base-content mb-2">No products found</h3>
                   <p className="text-base-content/60 mb-6">
                     Try adjusting your filters or search terms to find what you&apos;re looking for.
