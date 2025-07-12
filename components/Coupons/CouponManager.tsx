@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react';
 import { TextInput } from '@components/form-fields';
 import type { Coupon } from '@/types';
+import Link from 'next/link';
 
 interface CouponWithStatus extends Coupon {
   status?: 'unused' | 'used' | 'expired';
+  id: number;
+  code: string;
+  description?: string | null;
+  expiresAt?: Date | null;
+  discountType: 'percent' | 'fixed';
+  discountValue: number;
 }
 
 const CouponManager: React.FC = () => {
@@ -82,14 +89,14 @@ const CouponManager: React.FC = () => {
         ))}
         {filtered.length === 0 && (
           <li className="text-center p-6 border rounded">
-            <p>You don't have any coupons or offers available</p>
+            <p>You don&apos;t have any coupons or offers available</p>
             <div className="mt-2 space-x-2">
-              <a href="/login" className="btn btn-sm">
+              <Link href="/login" className="btn btn-sm">
                 Try signing in with another account
-              </a>
-              <a href="/search?q=coupon" className="btn btn-sm">
+              </Link>
+              <Link href="/search?q=coupon" className="btn btn-sm">
                 Self-service to find coupon(s)
-              </a>
+              </Link>
             </div>
           </li>
         )}

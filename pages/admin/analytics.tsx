@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useRef } from 'react';
+import { useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import type { AdminAnalyticsData } from '../../types/dashboard';
 import type { LowStockProduct } from '@/types';
@@ -20,14 +20,14 @@ export default function AdminAnalytics() {
   const [lowStockLoading, setLowStockLoading] = useState(false);
   const lowStockRef = useRef<HTMLDivElement>(null);
 
-  const load = () => {
+  const load = useCallback(() => {
     if (!user) return;
     setLoading(true);
     fetchJson<AdminAnalyticsData>('/api/admin/analytics')
       .then((res) => setData(res))
       .catch(() => setData({ totalOrders: 0, totalRevenue: 0, topProducts: [] }))
       .finally(() => setLoading(false));
-  };
+  }, [user]);
 
   const loadLowStock = async (page = 1) => {
     setLowStockLoading(true);
@@ -41,7 +41,7 @@ export default function AdminAnalytics() {
   useEffect(() => {
     load();
     loadLowStock(1);
-  }, [user]);
+  }, [load]);
 
   // Infinite scroll handler
   useEffect(() => {
