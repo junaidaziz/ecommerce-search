@@ -72,7 +72,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, menuItems, closeDropd
   }
   if (!isAuthRoute) {
     return (
-      <>
+      <div className="flex items-center space-x-2">
         <Link
           href="/login"
           aria-label="Login"
@@ -87,7 +87,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, menuItems, closeDropd
         >
           Signup
         </Link>
-      </>
+      </div>
     );
   }
   return null;
