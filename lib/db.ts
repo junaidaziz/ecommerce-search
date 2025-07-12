@@ -75,11 +75,15 @@ export function getReviewsForEntity(entityType: string, entityId: number): Revie
   return reviewsStore.get(key) || [];
 }
 
+export function getReviewsForProduct(productId: string): Review[] {
+  return getReviewsForEntity('PRODUCT', Number(productId));
+}
+
 export function getAverageRating(productId: string): {
   average: number;
   count: number;
 } {
-  const reviews = reviewsStore.get(productId) || [];
+  const reviews = getReviewsForProduct(productId);
   if (reviews.length === 0) return { average: 0, count: 0 };
   const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
   return { average: sum / reviews.length, count: reviews.length };
