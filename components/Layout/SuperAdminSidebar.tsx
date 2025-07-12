@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { HiOutlineSquares2X2, HiOutlineUsers, HiOutlineBuildingStorefront, HiOutlineCube, HiOutlineClipboard, HiOutlineChartBar, HiOutlineTag, HiOutlineQuestionMarkCircle } from 'react-icons/hi2';
 
@@ -18,8 +19,18 @@ const SuperAdminSidebar: React.FC = () => {
   const active = router.pathname;
   return (
     <aside className="hidden md:flex md:flex-col sticky top-0 h-screen w-60 bg-white dark:bg-gray-950 border-r border-gray-100 dark:border-gray-800 py-8 px-4 flex-shrink-0 shadow-sm z-30">
-      <div className="mb-8 text-center">
-        <span className="text-xl font-bold tracking-tight text-primary">Super Admin</span>
+      {/* Site logo/header */}
+      <div className="mb-6 flex justify-center">
+        <Link href="/" className="block">
+          <Image
+            src="/images/logo-medium.png"
+            alt="Site Logo"
+            width={120}
+            height={40}
+            className="h-10 w-auto object-contain dark:brightness-90"
+            priority
+          />
+        </Link>
       </div>
       <nav className="flex-1">
         <ul className="flex flex-col gap-1">

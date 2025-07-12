@@ -17,6 +17,7 @@ import debounce from 'lodash.debounce';
 import SearchFilterBar from '@components/common/SearchFilterBar';
 import TableHeader, { TableColumn } from '@components/common/TableHeader';
 import TableBody from '@components/common/TableBody';
+import PageHero from '@components/UI/PageHero';
 
 interface ProductsResponse {
   products: Product[];
