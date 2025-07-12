@@ -2,6 +2,7 @@ import React, { FC, ReactNode } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import { useThemeContext } from '@contexts/ThemeContext';
+import { useRouter } from 'next/router';
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,15 +13,19 @@ interface LayoutProps {
 const Layout: FC<LayoutProps> = ({ children, heroSecond, maxWidthClass }) => {
   const { theme, setTheme } = useThemeContext();
   const containerWidth = maxWidthClass ?? 'max-w-[98%] 3xl:max-w-[1440px]';
+  const router = useRouter();
+  const isAdminRoute = router.pathname.startsWith('/admin');
 
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      <Header
-        theme={theme}
-        setTheme={setTheme}
-        maxWidthClass={containerWidth}
-      />
-      {heroSecond && (
+      {!isAdminRoute && (
+        <Header
+          theme={theme}
+          setTheme={setTheme}
+          maxWidthClass={containerWidth}
+        />
+      )}
+      {heroSecond && !isAdminRoute && (
         <div className={`w-full mx-auto ${containerWidth}`}>{heroSecond}</div>
       )}
       <main
@@ -28,7 +33,7 @@ const Layout: FC<LayoutProps> = ({ children, heroSecond, maxWidthClass }) => {
       >
         {children}
       </main>
-      <Footer />
+      {!isAdminRoute && <Footer />}
     </div>
   );
 };

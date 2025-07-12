@@ -15,6 +15,7 @@ export * from './message';
 export * from './context';
 export * from './wishlist';
 export * from './variant';
+export * from './coupon';
 
 // Explicitly re-export only one version of each conflicting type
 export type { Category } from './category';

@@ -17,6 +17,7 @@ import ConfirmModal from '@components/Modals/ConfirmModal';
 import { Button } from '@components/UI/Button';
 import TextInput from '@components/form-fields/TextInput';
 import PasswordInput from '@components/form-fields/PasswordInput';
+import PageHero from '@components/UI/PageHero';
 
 export default function ManageUsers() {
   const { user } = useContext(AppContext)!;

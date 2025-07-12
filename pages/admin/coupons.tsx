@@ -71,7 +71,7 @@ export default function AdminCoupons() {
           name="code"
           value={form.code}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setForm((f) => ({ ...f, code: e.target.value }))
+            setForm((f: Partial<Coupon>) => ({ ...f, code: e.target.value }))
           }
           placeholder="CODE"
         />
@@ -79,7 +79,7 @@ export default function AdminCoupons() {
           className="select select-bordered w-full"
           value={form.discountType}
           onChange={(e) =>
-            setForm((f) => ({
+            setForm((f: Partial<Coupon>) => ({
               ...f,
               discountType: e.target.value as 'percent' | 'amount' | 'bogo',
             }))
@@ -94,7 +94,7 @@ export default function AdminCoupons() {
           type="number"
           value={String(form.discountValue)}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setForm((f) => ({
+            setForm((f: Partial<Coupon>) => ({
               ...f,
               discountValue: parseFloat(e.target.value),
             }))
@@ -106,7 +106,7 @@ export default function AdminCoupons() {
           type="number"
           value={form.minOrderValue ? String(form.minOrderValue) : ''}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setForm((f) => ({
+            setForm((f: Partial<Coupon>) => ({
               ...f,
               minOrderValue: parseFloat(e.target.value),
             }))
@@ -118,7 +118,7 @@ export default function AdminCoupons() {
           type="date"
           value={form.expiresAt?.slice(0, 10) || ''}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setForm((f) => ({ ...f, expiresAt: e.target.value }))
+            setForm((f: Partial<Coupon>) => ({ ...f, expiresAt: e.target.value }))
           }
         />
         <TextInput
@@ -126,7 +126,7 @@ export default function AdminCoupons() {
           type="number"
           value={form.usageLimit ? String(form.usageLimit) : ''}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setForm((f) => ({ ...f, usageLimit: parseInt(e.target.value, 10) }))
+            setForm((f: Partial<Coupon>) => ({ ...f, usageLimit: parseInt(e.target.value, 10) }))
           }
           placeholder="Usage Limit"
         />
