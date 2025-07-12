@@ -30,7 +30,7 @@ const MenuItems: React.FC<Props> = ({
   itemCount,
   closeDropdown,
 }) => (
-  <nav className="flex items-center gap-4 ml-auto">
+  <nav className="flex items-center gap-6 ml-auto">
     <CartDropdown
       cart={cart}
       changeQty={changeQty}
