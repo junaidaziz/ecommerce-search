@@ -39,7 +39,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full sm:w-72 md:w-96 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 border border-transparent px-4 py-2 pr-10 rounded-lg focus:ring-2 focus:ring-primary hover:shadow-sm transition-all duration-200"
+        className="w-full sm:w-80 md:w-96 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 border border-transparent px-4 py-2 pr-10 rounded-lg focus:ring-2 focus:ring-primary hover:shadow-sm transition-all duration-200"
       />
       <button
         type="button"
