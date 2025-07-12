@@ -156,8 +156,15 @@ const Header: FC<HeaderProps> = ({
           />
         </Link>
 
-        <div className="flex-1 flex items-center gap-x-6 relative">
-          {/* No search bar or category menu for super admin */}
+        {/* Categories menu and search bar */}
+        <div className="flex-1 flex items-center gap-x-4 min-w-0">
+          <div className="hidden md:block">
+            <CategoryMenu categories={categories} />
+          </div>
+          <div className="flex-1 min-w-[180px] max-w-xl">
+            <SearchBar categories={categories} />
+          </div>
+          {/* Navigation links */}
           <nav className="hidden lg:flex gap-6 ml-4">
             <Link
               href="/products"

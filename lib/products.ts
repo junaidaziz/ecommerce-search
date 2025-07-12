@@ -76,10 +76,10 @@ function processProductRow(row: any): Product {
     processed.featuredImage = processed.images[0];
   }
   // Fix vendor.paymentMethods
-  if (processed.vendor && processed.vendor.paymentMethods) {
+  if (processed.vendor) {
     processed.vendor.paymentMethods = Array.isArray(processed.vendor.paymentMethods)
       ? processed.vendor.paymentMethods
-      : undefined;
+      : null;
   }
   return processed as Product;
 }
@@ -124,7 +124,7 @@ export function mapDbRowToProduct(row: any): Product {
           ...row.vendor,
           paymentMethods: Array.isArray(row.vendor.paymentMethods)
             ? row.vendor.paymentMethods
-            : undefined,
+            : null,
         }
       : undefined,
     category: row.category,

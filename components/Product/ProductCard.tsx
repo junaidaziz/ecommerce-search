@@ -23,7 +23,39 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const appContext = useContext(AppContext);
   const { addToCart } = appContext || {};
 
-  const isNew = product.tags?.toLowerCase().includes('new');
+  // Robust image handling for ProductImageSlider
+  let imagesArr: { url: string; alt?: string }[] = [];
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    imagesArr = product.images
+      .map((img: any) => {
+        if (typeof img === 'string' && /^(\/|https?:\/\/)/.test(img.trim())) {
+          // Valid string URL (relative or absolute)
+          return { url: img.trim() };
+        } else if (
+          img &&
+          typeof img === 'object' &&
+          typeof img.url === 'string' &&
+          /^(\/|https?:\/\/)/.test(img.url.trim())
+        ) {
+          // Valid object with url
+          return { url: img.url.trim(), alt: typeof img.alt === 'string' ? img.alt : undefined };
+        }
+        // Ignore objects with only id or invalid url
+        return null;
+      })
+      .filter(Boolean) as { url: string; alt?: string }[];
+  }
+  // If no valid images, use placeholder
+  if (imagesArr.length === 0) {
+    imagesArr = [{ url: '/placeholder.png', alt: 'No image available' }];
+  }
+
+  const tagsString = Array.isArray(product.tags)
+    ? product.tags.join(',')
+    : typeof product.tags === 'string'
+      ? product.tags
+      : '';
+  const isNew = tagsString.toLowerCase().includes('new');
   const rating = Math.round(product.averageRating || 0);
   const stockStatus = product.totalInventory && product.totalInventory > 10
     ? 'In Stock'
@@ -70,7 +102,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {/* Product Image */}
       <div className="relative overflow-hidden rounded-2xl mb-3">
         <ProductImageSlider
-          images={(product.images || []).map((img) => typeof img === 'string' ? { url: img } : img)}
+          images={imagesArr}
           className="aspect-square w-full group-hover:scale-105 transition-transform duration-300"
           showControls={false}
         />
