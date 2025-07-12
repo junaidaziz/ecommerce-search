@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import type { FC } from 'react';
 import SearchInput from '../common/SearchInput';
+import XMarkIcon from '../icons/XMarkIcon';
 import type { TrendingResponse, SuggestionsResponse } from '@/types';
 
 interface SearchBarProps {
@@ -77,7 +78,9 @@ const SearchBar: FC<SearchBarProps> = ({
     return (
       <>
         {text.slice(0, idx)}
-        <span className="font-semibold">{text.slice(idx, idx + q.length)}</span>
+        <span className="text-primary font-medium">
+          {text.slice(idx, idx + q.length)}
+        </span>
         {text.slice(idx + q.length)}
       </>
     );
@@ -160,7 +163,7 @@ const SearchBar: FC<SearchBarProps> = ({
         <button
           type="button"
           aria-label="Clear search"
-          className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500"
+          className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
             setQuery('');
@@ -168,19 +171,21 @@ const SearchBar: FC<SearchBarProps> = ({
             setSelectedIdx(-1);
           }}
         >
-          ×
+          <XMarkIcon className="w-4 h-4" />
         </button>
       )}
       {showSuggestions && (
-        <div className="absolute left-0 right-0 mt-1 bg-base-100 border border-base-200 shadow rounded z-50">
+        <div
+          className="absolute left-0 mt-1 w-full max-w-[500px] rounded-md shadow-md border border-zinc-700 bg-white/10 dark:bg-zinc-800 z-50 max-h-[300px] overflow-y-auto py-1"
+        >
           {query && suggestions.length > 0 && (
             <ul>
               {suggestions.map((s, idx) => (
                 <li key={s}>
                   <button
                     type="button"
-                    className={`block w-full text-left px-3 py-1 hover:bg-base-200 ${
-                      idx === selectedIdx ? 'bg-base-200' : ''
+                    className={`block w-full text-left px-4 py-2 h-10 cursor-pointer hover:bg-zinc-700 ${
+                      idx === selectedIdx ? 'bg-zinc-700' : ''
                     }`}
                     onMouseDown={(e) => e.preventDefault()}
                     onMouseEnter={() => setSelectedIdx(idx)}
@@ -195,14 +200,14 @@ const SearchBar: FC<SearchBarProps> = ({
           {!query && (
             <>
               {showRecent && recent.length > 0 && (
-                <div className="px-2 py-1 border-b border-base-200 last:border-none">
-                  <div className="px-3 py-1 text-sm font-semibold">Recent</div>
+                <div className="px-1">
+                  <div className="px-4 py-2 text-xs uppercase text-gray-400">Recent</div>
                   <ul>
                     {recent.map((r) => (
                       <li key={r}>
                         <button
                           type="button"
-                          className="block w-full text-left px-3 py-1 hover:bg-base-200"
+                          className="block w-full text-left px-4 py-2 h-10 cursor-pointer hover:bg-zinc-700"
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => selectSuggestion(r)}
                         >
@@ -213,17 +218,18 @@ const SearchBar: FC<SearchBarProps> = ({
                   </ul>
                 </div>
               )}
+              {showRecent && recent.length > 0 && showTrending && trending.length > 0 && (
+                <hr className="my-2 border-zinc-600" />
+              )}
               {showTrending && trending.length > 0 && (
-                <div className="px-2 py-1">
-                  <div className="px-3 py-1 text-sm font-semibold">
-                    Trending
-                  </div>
+                <div className="px-1">
+                  <div className="px-4 py-2 text-xs uppercase text-gray-400">Trending</div>
                   <ul>
                     {trending.map((t) => (
                       <li key={t}>
                         <button
                           type="button"
-                          className="block w-full text-left px-3 py-1 hover:bg-base-200"
+                          className="block w-full text-left px-4 py-2 h-10 cursor-pointer hover:bg-zinc-700"
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => selectSuggestion(t)}
                         >
