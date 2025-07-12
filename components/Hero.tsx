@@ -27,7 +27,7 @@ const slides = [
 ];
 
 const Hero: FC = () => (
-  <section className="relative w-full rounded-3xl overflow-hidden mb-10 shadow-lg">
+  <section className="w-full mb-12">
     <style jsx global>{`
       .swiper-button-next, .swiper-button-prev {
         @apply !bg-white/80 !text-orange-500 !rounded-full !shadow-lg !w-14 !h-14 !flex !items-center !justify-center !top-1/2 !-translate-y-1/2 !z-20;
@@ -42,39 +42,55 @@ const Hero: FC = () => (
         font-size: 2rem !important;
       }
     `}</style>
-    <Swiper
-      modules={[Autoplay, Pagination, EffectFade, Navigation]}
-      autoplay={{ delay: 5000, disableOnInteraction: false }}
-      pagination={{ clickable: true }}
-      navigation
-      effect="fade"
-      loop
-      className="h-[420px] md:h-[520px]"
-    >
-      {slides.map((slide, i) => (
-        <SwiperSlide key={i} className="relative w-full h-full">
-          <Image
-            src={slide.image}
-            alt={slide.headline}
-            fill
-            sizes="100vw"
-            className="object-cover"
-            priority={i === 0}
-          />
-          <div className="absolute inset-0 bg-black/50" />
-          <div className="absolute inset-0 flex items-center">
-            <div className="max-w-2xl mx-auto md:ml-16 bg-white/70 rounded-2xl p-8 md:p-12 shadow-lg backdrop-blur-sm">
-              <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight drop-shadow-lg">{slide.headline}</h1>
-              <p className="text-lg text-gray-700 mb-8 max-w-lg">{slide.description}</p>
-              <div className="flex gap-4">
-                <Link href="/products" className="btn btn-primary px-6 py-2 rounded-full shadow">Explore Collection</Link>
-                <Link href="/products?sort=best-sellers" className="btn btn-outline px-6 py-2 rounded-full shadow">Best Sellers</Link>
+    <div className="w-full max-w-screen-2xl mx-auto px-4 md:px-8 rounded-xl md:rounded-2xl overflow-hidden shadow-xl">
+      <Swiper
+        modules={[Autoplay, Pagination, Navigation]}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        pagination={{ clickable: true }}
+        navigation
+        effect={undefined} // Remove fade effect
+        loop
+        spaceBetween={30}
+        centeredSlides
+        slidesPerView={1}
+        speed={900}
+        className="h-[420px] md:h-[520px]"
+        // Add creative effect for cool transitions
+        // creativeEffect={{
+        //   prev: {
+        //     shadow: true,
+        //     translate: ["-120%", 0, -500],
+        //   },
+        //   next: {
+        //     translate: ["120%", 0, -500],
+        //   },
+        // }}
+      >
+        {slides.map((slide, i) => (
+          <SwiperSlide key={i} className="relative w-full h-full transition-transform duration-700">
+            <Image
+              src={slide.image}
+              alt={slide.headline}
+              fill
+              sizes="100vw"
+              className="object-cover"
+              priority={i === 0}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="max-w-2xl w-full bg-white/80 dark:bg-gray-900/80 rounded-2xl p-8 md:p-14 shadow-lg backdrop-blur-sm mx-auto text-center">
+                <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 leading-tight drop-shadow-lg">{slide.headline}</h1>
+                <p className="text-lg md:text-2xl text-gray-700 dark:text-gray-200 mb-10 max-w-xl mx-auto">{slide.description}</p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link href="/products" className="btn btn-primary px-8 py-3 rounded-full text-lg font-semibold shadow-lg">Explore Collection</Link>
+                  <Link href="/products?sort=best-sellers" className="btn btn-outline px-8 py-3 rounded-full text-lg font-semibold shadow">Best Sellers</Link>
+                </div>
               </div>
             </div>
-          </div>
-        </SwiperSlide>
-      ))}
-    </Swiper>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </div>
   </section>
 );
 
