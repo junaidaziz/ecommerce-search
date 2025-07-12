@@ -19,11 +19,11 @@ interface CategoryMenuProps {
 }
 
 const iconMap: Record<string, JSX.Element> = {
-  Electronics: <ElectronicsIcon className="h-5 w-5 mr-2" />,
-  Fashion: <FashionIcon className="h-5 w-5 mr-2" />,
-  Home: <HomeIcon className="h-5 w-5 mr-2" />,
-  Toys: <ToysIcon className="h-5 w-5 mr-2" />,
-  Sports: <SportsIcon className="h-5 w-5 mr-2" />,
+  Electronics: <ElectronicsIcon className="w-5 h-5 mr-2" />,
+  Fashion: <FashionIcon className="w-5 h-5 mr-2" />,
+  Home: <HomeIcon className="w-5 h-5 mr-2" />,
+  Toys: <ToysIcon className="w-5 h-5 mr-2" />,
+  Sports: <SportsIcon className="w-5 h-5 mr-2" />,
 };
 
 // Recursive subcategory renderer
@@ -50,15 +50,15 @@ function SubcategoryList({
         return (
           <div key={sub.name}>
             <div
-              className={`flex items-center px-4 py-2 rounded-lg font-medium cursor-pointer transition-all duration-200 capitalize
-                ${isActive ? 'bg-primary/10 text-primary' : 'text-base-content/80 hover:bg-primary/5 hover:text-primary'}`}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer text-sm transition-colors
+                ${isActive ? 'bg-zinc-800 text-white' : 'text-gray-300 hover:bg-zinc-800 hover:text-white'}`}
               onMouseEnter={() => onHover([...activePath.slice(0, level), sub.name])}
               onFocus={() => onHover([...activePath.slice(0, level), sub.name])}
               onClick={onClick}
               tabIndex={0}
             >
-              <span className="flex-1">{sub.name}</span>
-              {hasChildren && <ChevronRightIcon className="w-4 h-4 ml-2 text-base-content/60" />}
+              <span className="flex-1 capitalize">{sub.name}</span>
+              {hasChildren && <ChevronRightIcon className="w-4 h-4 ml-2 text-gray-400" />}
             </div>
             {hasChildren && isActive && (
               <SubcategoryList
@@ -193,7 +193,7 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
           <button
             type="button"
             aria-label="Categories menu"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-base-200 hover:text-primary"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors hover:bg-zinc-800 hover:text-white"
             onClick={() => setMenuOpen((prev) => !prev)}
             onMouseEnter={handleMenuEnter}
           >
@@ -209,17 +209,17 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
             role="menu"
             onMouseEnter={handleMenuEnter}
             onMouseLeave={handleMenuLeave}
-            className={`absolute left-0 top-full mt-2 z-50 bg-base-100 border border-base-200 shadow-xl rounded-2xl overflow-hidden transition-all duration-200 transform ${
-              menuOpen 
-                ? 'visible opacity-100 translate-y-0 scale-100' 
+            className={`absolute left-0 top-full mt-2 z-50 bg-zinc-900 border border-zinc-700 shadow-lg rounded-xl overflow-hidden transition-all duration-200 transform ${
+              menuOpen
+                ? 'visible opacity-100 translate-y-0 scale-100'
                 : 'invisible opacity-0 -translate-y-2 scale-95'
             }`}
             aria-hidden={!menuOpen}
           >
             <div className="flex min-w-[600px] max-w-4xl">
               {/* Categories List */}
-              <div className="w-1/2 p-6 border-r border-base-200 bg-base-50">
-                <h3 className="text-lg font-semibold mb-4 text-base-content">Categories</h3>
+              <div className="w-1/2 p-6 border-r border-zinc-700 bg-zinc-900 overflow-y-auto max-h-80">
+                <h3 className="text-lg font-semibold mb-4 text-gray-100">Categories</h3>
                 <div className="space-y-2">
                   {categories.map((cat) => (
                     <Link
@@ -232,21 +232,21 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
                       onMouseEnter={() => handleCategoryHover(cat)}
                       onClick={() => setMenuOpen(false)}
                       title={cat.name}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg text-left font-medium transition-all duration-200 focus:outline-none capitalize whitespace-normal hover:bg-primary/10 hover:text-primary cursor-pointer ${
-                        activeCat?.name === cat.name 
-                          ? 'bg-primary/20 text-primary shadow-sm' 
-                          : 'text-base-content'
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors cursor-pointer whitespace-normal focus:outline-none capitalize ${
+                        activeCat?.name === cat.name
+                          ? 'bg-zinc-800 text-white'
+                          : 'text-gray-300 hover:bg-zinc-800 hover:text-white'
                       }`}
                     >
                       {iconMap[cat.name] || <div className="w-5 h-5 mr-2" />}
                       <span className="flex-1">{cat.name}</span>
                       {cat.subcategories?.length ? (
-                        <ChevronRightIcon className="w-4 h-4 text-base-content/60" />
+                        <ChevronRightIcon className="w-4 h-4 text-gray-400" />
                       ) : null}
                     </Link>
                   ))}
                   {categories.length === 0 && (
-                    <div className="px-4 py-3 text-base-content/60">
+                    <div className="px-4 py-3 text-gray-400">
                       No categories found
                     </div>
                   )}
@@ -254,7 +254,7 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
               </div>
 
               {/* Subcategories Panel */}
-              <div className="w-1/2 p-6">
+              <div className="w-1/2 p-6 overflow-y-auto max-h-80">
                 {activeCat ? (
                   <>
                     <div className="flex items-center gap-3 mb-4">
@@ -271,13 +271,13 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
                         level={1}
                       />
                     ) : (
-                      <div className="px-4 py-3 text-base-content/60">
+                      <div className="px-4 py-3 text-gray-400">
                         No sub-categories available
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="flex items-center justify-center h-full text-base-content/60">
+                  <div className="flex items-center justify-center h-full text-gray-400">
                     Select a category to view subcategories
                   </div>
                 )}
@@ -290,18 +290,18 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
       {/* Mobile Categories Menu */}
       <div
         id="mobile-cat-menu"
-        className={`md:hidden absolute left-0 top-full w-full z-40 bg-base-100 border border-base-200 shadow-xl rounded-2xl transition-all duration-200 ${
-          mobileOpen 
-            ? 'max-h-[80vh] opacity-100 translate-y-0' 
+        className={`md:hidden absolute left-0 top-full w-full z-40 bg-zinc-900 border border-zinc-700 shadow-lg rounded-xl transition-all duration-200 ${
+          mobileOpen
+            ? 'max-h-[80vh] opacity-100 translate-y-0'
             : 'max-h-0 opacity-0 -translate-y-2 overflow-hidden'
         }`}
       >
         <div className="p-4">
-          <h3 className="text-lg font-semibold mb-4">Categories</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-100">Categories</h3>
           <div className="space-y-2">
             {categories.map((cat) => (
               <details key={cat.name} className="group">
-                <summary className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer list-none transition-all duration-200 hover:bg-base-200 group-open:bg-primary/10 group-open:text-primary">
+                <summary className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer list-none transition-colors duration-200 hover:bg-zinc-800 group-open:bg-zinc-800/70 text-gray-300 group-open:text-white">
                   {iconMap[cat.name] || <div className="w-5 h-5" />}
                   <span className="flex-1 capitalize font-medium">{cat.name}</span>
                   <ChevronDownIcon className="w-4 h-4 transition-transform duration-200 group-open:rotate-180" />
@@ -312,7 +312,7 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
                       <Link
                         key={sub.name}
                         href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub.name)}`}
-                        className="block px-4 py-2 rounded-lg transition-all duration-200 hover:bg-primary/10 hover:text-primary capitalize"
+                        className="block px-4 py-2 rounded-lg transition-colors duration-200 hover:bg-zinc-800 hover:text-white text-gray-300 capitalize"
                         onClick={() => setMobileOpen(false)}
                       >
                         {sub.name}
@@ -323,7 +323,7 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
               </details>
             ))}
             {categories.length === 0 && (
-              <div className="px-4 py-3 text-base-content/60">
+              <div className="px-4 py-3 text-gray-400">
                 No categories found
               </div>
             )}
