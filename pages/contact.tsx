@@ -28,7 +28,7 @@ const ContactPage: React.FC = () => {
         <title>{getPageTitle('Contact')}</title>
       </Head>
       <h1 className="text-2xl font-bold mb-4">Contact Us</h1>
-      <div className="space-y-1 text-sm">
+      <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
         <p>123 Market Street, London</p>
         <p>
           <a href="mailto:info@shopverse.com" className="link">
@@ -41,29 +41,29 @@ const ContactPage: React.FC = () => {
         <input
           type="text"
           placeholder="Your name"
-          className="input input-bordered w-full"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
           {...register('name', { required: 'Name is required' })}
         />
         {errors.name && (
-          <p className="text-red-500 text-sm">{errors.name.message}</p>
+          <p className="text-red-500 dark:text-red-400 text-sm">{errors.name.message}</p>
         )}
         <input
           type="email"
           placeholder="Your email"
-          className="input input-bordered w-full"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
           {...register('email', { required: 'Email is required' })}
         />
         {errors.email && (
-          <p className="text-red-500 text-sm">{errors.email.message}</p>
+          <p className="text-red-500 dark:text-red-400 text-sm">{errors.email.message}</p>
         )}
         <textarea
           placeholder="Your message"
-          className="textarea textarea-bordered w-full"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
           rows={4}
           {...register('message', { required: 'Message is required' })}
         ></textarea>
         {errors.message && (
-          <p className="text-red-500 text-sm">{errors.message.message}</p>
+          <p className="text-red-500 dark:text-red-400 text-sm">{errors.message.message}</p>
         )}
         <button type="submit" className="btn btn-primary">
           Send Message
