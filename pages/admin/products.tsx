@@ -135,7 +135,7 @@ export default function AdminProducts() {
   const fetchTypes = useCallback(async (input = '') => {
     // If you have an endpoint, replace this logic
     return staticTypes.filter((t) => t.label.toLowerCase().includes(input.toLowerCase()));
-  }, []);
+  }, [staticTypes]);
   // Initial load
   useEffect(() => {
     fetchVendors().then(setVendorOptions);
