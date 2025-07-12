@@ -1,5 +1,5 @@
 import { apiFetch } from '@lib/api';
-import { useContext, useState, useEffect, FormEvent, ChangeEvent } from 'react';
+import { useContext, useState, useEffect, FormEvent, ChangeEvent, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -43,7 +43,7 @@ type AppContextType = {
 const Checkout: React.FC = () => {
   const router = useRouter();
   const context = useContext<AppContextValue | undefined>(AppContext);
-  const cart = context?.cart ?? [];
+  const cart = useMemo(() => context?.cart ?? [], [context?.cart]);
   const user = context?.user ?? null;
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
