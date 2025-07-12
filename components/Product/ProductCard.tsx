@@ -134,7 +134,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Product Title */}
         <Link href={`/product/${product.slug}`} className="transition-colors duration-200">
-          <h3 className="font-bold text-lg md:text-xl text-gray-900 dark:text-white truncate mb-1 leading-snug">
+          <h3 className="font-bold text-lg md:text-xl text-gray-900 dark:text-white truncate mb-1 leading-snug" title={product.title}>
             {product.title}
           </h3>
         </Link>

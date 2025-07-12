@@ -39,7 +39,7 @@ const Checkbox = <T extends FieldValues>(props: CheckboxProps<T>) => {
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
   return (
-    <div className="mb-4 w-full">
+    <div className="mb-2 last:mb-0 w-full">
       <div className="flex items-center">
         <input
           type="checkbox"
@@ -50,12 +50,12 @@ const Checkbox = <T extends FieldValues>(props: CheckboxProps<T>) => {
           onBlur={onBlur}
           disabled={disabled}
           required={required}
-          className={`mr-2 border rounded text-blue-600 focus:ring-blue-500 ${className}`}
+          className={`h-4 w-4 mr-2 text-primary border-gray-300 rounded focus:ring-primary dark:border-gray-600 ${className}`}
           {...registration}
           {...rest}
         />
         {label && (
-          <label htmlFor={inputId} className="text-sm text-gray-700">
+          <label htmlFor={inputId} className="text-sm text-base-content">
             {label}
           </label>
         )}

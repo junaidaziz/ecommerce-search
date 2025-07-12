@@ -38,8 +38,6 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       onSubmit={(e) => e.preventDefault()}
       className="space-y-8 bg-white dark:bg-gray-900 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 md:p-8"
     >
-      {/* Filters Heading */}
-      <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6 tracking-tight">Filters</h2>
       {/* Search Keyword */}
       <div className="space-y-3">
         <label className="text-base font-semibold text-gray-900 dark:text-white flex items-center">
