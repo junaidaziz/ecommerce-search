@@ -2,7 +2,7 @@ import { getTrending, getSuggestions } from '@lib/api/search';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import type { FC } from 'react';
-import SearchIcon from '../icons/SearchIcon';
+import SearchInput from '../common/SearchInput';
 import type { TrendingResponse, SuggestionsResponse } from '@/types';
 
 interface SearchBarProps {
@@ -144,9 +144,7 @@ const SearchBar: FC<SearchBarProps> = ({
       ref={formRef}
       className={`relative flex-1 max-w-lg transition-all duration-300 focus-within:max-w-xl ${className}`}
     >
-      <input
-        aria-label="Search"
-        className="input input-bordered w-full h-10 text-sm pr-14 rounded-full shadow-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:shadow-lg"
+      <SearchInput
         value={query}
         onChange={(e) => {
           setQuery(e.target.value);
@@ -155,13 +153,14 @@ const SearchBar: FC<SearchBarProps> = ({
         onFocus={() => setShowSuggestions(true)}
         onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
         onKeyDown={handleKeyDown}
+        onSearch={handleSearch}
         placeholder={placeholder}
       />
       {query && (
         <button
           type="button"
           aria-label="Clear search"
-          className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-500"
+          className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
             setQuery('');
@@ -172,10 +171,6 @@ const SearchBar: FC<SearchBarProps> = ({
           ×
         </button>
       )}
-      <SearchIcon
-        aria-hidden="true"
-        className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-      />
       {showSuggestions && (
         <div className="absolute left-0 right-0 mt-1 bg-base-100 border border-base-200 shadow rounded z-50">
           {query && suggestions.length > 0 && (
