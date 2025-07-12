@@ -19,7 +19,8 @@ describe('hasOrdersForProduct', () => {
   it('returns false when product has no orders', async () => {
     const db = {
       product: { findUnique: jest.fn().mockResolvedValue({ id: 1 }) },
-      order: { count: jest.fn().mockResolvedValue(0) },
+      variant: { findMany: jest.fn().mockResolvedValue([]) },
+      order: { count: jest.fn() },
     } as any;
     mockGetDb.mockReturnValue(db);
     const result = await hasOrdersForProduct('p1');
@@ -28,27 +29,32 @@ describe('hasOrdersForProduct', () => {
       where: { uuid: 'p1' },
       select: { id: true },
     });
-    expect(db.order.count).toHaveBeenCalledWith({ where: { productId: 1 } });
+    expect(db.variant.findMany).toHaveBeenCalledWith({ where: { productId: 1 }, select: { id: true } });
+    expect(db.order.count).not.toHaveBeenCalled();
   });
 
   it('returns true when orders exist', async () => {
     const db = {
       product: { findUnique: jest.fn().mockResolvedValue({ id: 2 }) },
+      variant: { findMany: jest.fn().mockResolvedValue([{ id: 5 }]) },
       order: { count: jest.fn().mockResolvedValue(3) },
     } as any;
     mockGetDb.mockReturnValue(db);
     const result = await hasOrdersForProduct('p2');
     expect(result).toBe(true);
+    expect(db.order.count).toHaveBeenCalledWith({ where: { variantId: { in: [5] } } });
   });
 
   it('returns false when product not found', async () => {
     const db = {
       product: { findUnique: jest.fn().mockResolvedValue(null) },
+      variant: { findMany: jest.fn() },
       order: { count: jest.fn() },
     } as any;
     mockGetDb.mockReturnValue(db);
     const result = await hasOrdersForProduct('bad');
     expect(result).toBe(false);
+    expect(db.variant.findMany).not.toHaveBeenCalled();
     expect(db.order.count).not.toHaveBeenCalled();
   });
 });
