@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import SearchIcon from '@components/icons/SearchIcon';
 
 export default function Custom404() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function Custom404() {
           <a className="mb-8 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow transition">Back to dashboard</a>
         </Link>
         <form onSubmit={handleSearch} className="w-full flex items-center bg-gray-200 dark:bg-gray-800 rounded-lg px-3 py-2 shadow-inner mb-8">
-          <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+          <SearchIcon className="w-5 h-5 text-gray-400 mr-2" />
           <input
             type="text"
             className="flex-1 bg-transparent outline-none text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
