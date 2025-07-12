@@ -35,10 +35,17 @@ export default function ProductImageSlider({
     return () => document.removeEventListener('keydown', handler);
   }, [zoom]);
 
-  const urls = images.map((img) => (typeof img === 'string' ? img : img.url));
+  // Robustly build urls array and fallback
+  let urls: string[] = [];
+  if (Array.isArray(images) && images.length > 0) {
+    urls = images
+      .map((img) => (typeof img === 'string' ? img : img?.url))
+      .filter((u): u is string => typeof u === 'string' && !!u && u !== '[]');
+  }
   const placeholderUrl = `https://picsum.photos/seed/${placeholderSeed}/400/400`;
   const [errorMap, setErrorMap] = useState<Record<number, boolean>>({});
-  
+
+  // If no valid urls, always use placeholder
   if (!urls || urls.length === 0) {
     return (
       <div className={`relative ${aspectRatioClass} ${className}`}>
@@ -62,11 +69,15 @@ export default function ProductImageSlider({
     setZoom(false);
   };
 
+  // Defensive: ensure idx is in bounds
+  const safeIdx = Math.min(Math.max(idx, 0), urls.length - 1);
+  const mainImg = images[safeIdx] && typeof images[safeIdx] === 'object' ? images[safeIdx] : { url: urls[safeIdx], alt: '' };
+
   return (
     <div className={`relative ${aspectRatioClass} ${className}`}>
       <Image
-        src={errorMap[idx] ? placeholderUrl : images[idx].url}
-        alt={images[idx].alt || `Image ${idx + 1}`}
+        src={errorMap[safeIdx] ? placeholderUrl : urls[safeIdx]}
+        alt={mainImg.alt || `Image ${safeIdx + 1}`}
         fill
         sizes="100vw"
         className={`object-cover cursor-zoom-in ${imgClass}`}
@@ -74,7 +85,7 @@ export default function ProductImageSlider({
           console.log('Opening modal');
           setZoom(true);
         }}
-        onError={() => setErrorMap((m) => ({ ...m, [idx]: true }))}
+        onError={() => setErrorMap((m) => ({ ...m, [safeIdx]: true }))}
         loading="lazy"
       />
       {showControls && urls.length > 1 && (
@@ -128,8 +139,8 @@ export default function ProductImageSlider({
               </button>
               <div className="relative w-full flex items-center justify-center min-h-[60vh] p-4">
                 <Image
-                  src={errorMap[idx] ? placeholderUrl : images[idx].url}
-                  alt={images[idx].alt || `Image ${idx + 1}`}
+                  src={errorMap[safeIdx] ? placeholderUrl : urls[safeIdx]}
+                  alt={mainImg.alt || `Image ${safeIdx + 1}`}
                   width={800}
                   height={800}
                   className="w-full h-auto object-contain max-h-[80vh]"
