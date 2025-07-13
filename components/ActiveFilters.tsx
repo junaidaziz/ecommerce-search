@@ -11,20 +11,20 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({ filters, clearAll }) => {
   if (filters.length === 0) return null;
   
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2 max-w-full">
       {filters.map((f, i) => (
-        <span 
-          key={i} 
-          className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-sm font-medium hover:bg-primary/20 transition-all duration-200 group"
+        <span
+          key={i}
+          className="inline-flex items-center px-3 py-1 bg-zinc-200 dark:bg-zinc-700 rounded-full text-sm text-zinc-800 dark:text-zinc-100"
         >
           <span>{f.label}</span>
           <button
             type="button"
             onClick={() => f.clear()}
-            className="ml-1 p-0.5 rounded-full hover:bg-primary/20 transition-colors duration-200 group-hover:scale-110"
+            className="ml-2 p-1 rounded-full hover:bg-red-600 hover:text-white transition-colors"
             aria-label={`Remove ${f.label} filter`}
           >
-            <XMarkIcon className="w-3 h-3" fill="currentColor" />
+            <XMarkIcon className="w-3 h-3" />
           </button>
         </span>
       ))}
@@ -32,9 +32,9 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({ filters, clearAll }) => {
         <button
           type="button"
           onClick={clearAll}
-          className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-base-content/60 hover:text-base-content border border-base-300 rounded-full hover:bg-base-200 transition-all duration-200"
+          className="ml-2 inline-flex items-center gap-1 px-3 py-1 text-sm text-blue-600 dark:text-blue-400 rounded-full hover:bg-blue-50 dark:hover:bg-zinc-600 transition-colors"
         >
-          <XMarkIcon className="w-3 h-3" fill="currentColor" />
+          <XMarkIcon className="w-3 h-3" />
           Clear All
         </button>
       )}
