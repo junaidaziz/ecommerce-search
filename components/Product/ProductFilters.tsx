@@ -41,10 +41,10 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   return (
     <form
       onSubmit={(e) => e.preventDefault()}
-      className="space-y-2 p-4 md:p-4"
+      className="space-y-6 p-4 md:p-4"
     >
       {/* Search Keyword */}
-      <div className="space-y-3">
+      <div className="space-y-3 pb-3 border-b border-gray-200 dark:border-gray-700">
         <label className="text-base font-semibold text-gray-900 dark:text-white flex items-center">
           <SearchIcon className="w-4 h-4 mr-2 text-primary" />
           Search Products
@@ -55,12 +55,12 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
           name="keyword"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
-          className="w-full text-base px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary"
+          className="w-full text-base px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary transition-all duration-300 shadow-sm focus:shadow-lg"
         />
       </div>
 
       {/* In Stock Filter */}
-      <div className="space-y-3">
+      <div className="space-y-3 py-3 border-b border-gray-200 dark:border-gray-700">
         <label className="text-base font-semibold text-gray-900 dark:text-white flex items-center">
           <CheckIcon className="w-4 h-4 mr-2 text-green-500" />
           Availability
@@ -71,13 +71,13 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
             name="inStock"
             checked={inStock}
             onChange={(e) => setInStock(e.target.checked)}
-            className="text-base font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-primary"
+            className="text-base font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-primary transition-colors duration-200 hover:bg-primary/10 dark:hover:bg-primary/20 hover:border-primary dark:hover:border-primary rounded"
           />
         </div>
       </div>
 
       {/* Categories */}
-      <div className="space-y-3">
+      <div className="space-y-3 py-3 border-b border-gray-200 dark:border-gray-700">
         <label className="text-base font-semibold text-gray-900 dark:text-white flex items-center">
           <TagIcon className="w-4 h-4 mr-2 text-blue-500" />
           Categories
@@ -98,7 +98,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                       : prev.filter((s) => s !== slug)
                   );
                 }}
-                className="text-base font-medium text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-2 py-1 transition-colors focus:ring-2 focus:ring-primary"
+                className="text-base font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-primary transition-colors duration-200 hover:bg-primary/10 dark:hover:bg-primary/20 hover:border-primary dark:hover:border-primary rounded"
               />
             ))}
           </div>
@@ -106,7 +106,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       </div>
 
       {/* Price Range */}
-      <div className="space-y-3">
+      <div className="space-y-3 py-2">
         <label className="text-base font-semibold text-gray-900 dark:text-white flex items-center">
           <CurrencyDollarIcon className="w-4 h-4 mr-2 text-yellow-500" />
           Price Range
@@ -121,7 +121,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                 name="minPrice"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
-                className="w-full text-base px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary"
+                className="w-full text-base px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary transition-all duration-300 shadow-sm focus:shadow-lg"
               />
             </div>
             <div>
@@ -132,7 +132,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                 name="maxPrice"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                className="w-full text-base px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary"
+                className="w-full text-base px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary transition-all duration-300 shadow-sm focus:shadow-lg"
               />
             </div>
           </div>
@@ -140,7 +140,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       </div>
 
       {/* Quick Actions */}
-      <div className="pt-6 border-t border-gray-200 dark:border-gray-600">
+      <div className="pt-1">
         <Button
           type="button"
           onClick={clearAll}

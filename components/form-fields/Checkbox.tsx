@@ -50,7 +50,7 @@ const Checkbox = <T extends FieldValues>(props: CheckboxProps<T>) => {
           onBlur={onBlur}
           disabled={disabled}
           required={required}
-          className={`h-4 w-4 rounded border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-green-500 transition checked:bg-blue-600 checked:border-blue-600 dark:checked:bg-green-500 dark:checked:border-green-500 ${className}`}
+          className={`h-4 w-4 rounded border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary dark:focus:ring-green-500 transition checked:bg-primary checked:border-primary dark:checked:bg-green-500 dark:checked:border-green-500 ${className}`}
           {...registration}
           {...rest}
         />
