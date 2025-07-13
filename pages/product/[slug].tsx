@@ -153,104 +153,93 @@ export default function ProductDetail({
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-start">
           {/* Product Images */}
-          <div className="space-y-6">
-            <div className="bg-base-100 rounded-2xl shadow-lg p-6">
-              <ProductImageSlider
-                className="w-full aspect-square"
-                images={
-                  product.images && product.images.length > 0
-                    ? product.images
-                    : product.featuredImage
-                      ? [product.featuredImage]
-                      : []
-                }
-                imgClass="hover:scale-105 transition-transform duration-300 rounded-xl"
-                aspectRatioClass="aspect-square"
-              />
-            </div>
+          <div className="bg-base-100 rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center">
+            <ProductImageSlider
+              className="w-full aspect-[4/3] max-w-lg"
+              images={
+                product.images && product.images.length > 0
+                  ? product.images
+                  : product.featuredImage
+                  ? [product.featuredImage]
+                  : []
+              }
+              imgClass="object-cover rounded-xl border border-base-300 bg-white dark:bg-gray-900"
+              aspectRatioClass="aspect-[4/3]"
+            />
           </div>
 
           {/* Product Information */}
-          <div className="space-y-8">
-            {/* Product Header */}
-            <div className="space-y-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h1 className="text-3xl lg:text-4xl font-bold text-base-content mb-2">
-                    {product.title}
-                  </h1>
-                  <div className="flex items-center space-x-4 text-sm text-base-content/70">
-                    <span>Vendor: {product.vendor?.brandName ?? 'Unknown'}</span>
-                    <span>•</span>
-                    <span>SKU: {product.sku || 'N/A'}</span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => isInWishlist ? removeFromWishlist(product.id) : addToWishlist(product)}
-                  className={`btn btn-circle btn-sm transition-all duration-200 ${
-                    isInWishlist 
-                      ? 'btn-primary text-primary-content' 
-                      : 'btn-ghost hover:btn-primary'
-                  }`}
-                  aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-                >
-                  <HeartIcon className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
-                </button>
-              </div>
+          <div className="relative bg-base-100 rounded-2xl shadow-lg p-6 flex flex-col gap-6">
+            {/* Wishlist Icon */}
+            <button
+              onClick={() => isInWishlist ? removeFromWishlist(product.id) : addToWishlist(product)}
+              className={`absolute top-6 right-6 z-10 btn btn-circle btn-sm transition-all duration-200 border border-base-300 ${
+                isInWishlist 
+                  ? 'bg-primary text-primary-content hover:bg-primary/80' 
+                  : 'bg-base-100 hover:bg-primary hover:text-primary-content'
+              }`}
+              aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+            >
+              <HeartIcon className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+            </button>
 
-                             {/* Rating */}
-               <div className="flex items-center space-x-2">
-                 <div className="flex items-center">
-                   {[1, 2, 3, 4, 5].map((star) => (
-                     <StarIcon
-                       key={star}
-                       className={`w-5 h-5 ${
-                         star <= averageRating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                       }`}
-                     />
-                   ))}
-                 </div>
-                 <span className="text-sm text-base-content/70">
-                   {averageRating.toFixed(1)} ({reviewCount} reviews)
-                 </span>
-               </div>
+            {/* Product Header */}
+            <div className="space-y-2">
+              <h1 className="text-2xl md:text-3xl font-bold text-base-content mb-1">
+                {product.title}
+              </h1>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-base-content/70">
+                <span>Vendor: {product.vendor?.brandName ?? 'Unknown'}</span>
+                <span>•</span>
+                <span>SKU: {product.sku || 'N/A'}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <StarIcon
+                      key={star}
+                      className={`w-5 h-5 ${star <= averageRating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-base-content/60">
+                  {averageRating.toFixed(1)} ({reviewCount} reviews)
+                </span>
+              </div>
             </div>
 
             {/* Price and Stock */}
-            <div className="bg-base-200/50 rounded-xl p-6 space-y-4">
-                             <div className="flex items-baseline space-x-2">
-                 <span className="text-4xl font-bold text-primary">
-                   {product.currency} {price}
-                 </span>
-               </div>
-
-               <div className="flex items-center space-x-2">
-                 {stockStatus === 'In Stock' ? (
-                   <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                 ) : stockStatus === 'Low Stock' ? (
-                   <WarningIcon className="w-5 h-5 text-yellow-500" />
-                 ) : (
-                   <WarningIcon className="w-5 h-5 text-red-500" />
-                 )}
-                 <span className={`font-medium ${
-                   stockStatus === 'In Stock' ? 'text-green-600' :
-                   stockStatus === 'Low Stock' ? 'text-yellow-600' : 'text-red-600'
-                 }`}>
-                   {stockStatus}
-                 </span>
-                 {product.totalInventory && (
-                   <span className="text-sm text-base-content/70">
-                     ({product.totalInventory} available)
-                   </span>
-                 )}
-               </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-3xl font-bold text-primary">
+                {product.currency} {price}
+              </span>
+              <div className="flex items-center gap-2">
+                {stockStatus === 'In Stock' ? (
+                  <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                ) : stockStatus === 'Low Stock' ? (
+                  <WarningIcon className="w-5 h-5 text-yellow-500" />
+                ) : (
+                  <WarningIcon className="w-5 h-5 text-red-500" />
+                )}
+                <span className={`font-medium ${
+                  stockStatus === 'In Stock' ? 'text-green-600' :
+                  stockStatus === 'Low Stock' ? 'text-yellow-600' : 'text-red-600'
+                }`}>
+                  {stockStatus}
+                </span>
+                {product.totalInventory && (
+                  <span className="text-xs text-base-content/60">
+                    ({product.totalInventory} available)
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Variants */}
             {product.variants && product.variants.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <label className="text-sm font-medium text-base-content">
                   Select Variant
                 </label>
@@ -274,7 +263,6 @@ export default function ProductDetail({
             {/* Cart Actions */}
             <div className="space-y-4">
               {isProductInCart ? (
-                // Product is in cart - show quantity controls and remove button
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-base-content">
@@ -284,7 +272,6 @@ export default function ProductDetail({
                       {cartItemQuantity}
                     </span>
                   </div>
-                  
                   <div className="flex gap-2">
                     <button
                       className="btn btn-outline flex-1 hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -308,9 +295,8 @@ export default function ProductDetail({
                   </div>
                 </div>
               ) : (
-                // Product not in cart - show add to cart
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center gap-4">
                     <label className="text-sm font-medium text-base-content">
                       Quantity
                     </label>
@@ -333,7 +319,6 @@ export default function ProductDetail({
                       </button>
                     </div>
                   </div>
-
                   <button
                     className="btn btn-primary btn-lg w-full transition-all duration-200 hover:scale-105"
                     onClick={() => addToCart(product, selectedVariant)}
@@ -348,27 +333,25 @@ export default function ProductDetail({
 
             {/* Product Type */}
             {product.productType && (
-              <div className="flex items-center space-x-2 text-sm">
+              <div className="flex items-center gap-2 text-sm">
                 <span className="text-base-content/70">Type:</span>
                 <span className="badge badge-outline">{product.productType}</span>
               </div>
             )}
-
-
           </div>
         </div>
 
         {/* Product Description */}
         <div className="mt-12 bg-base-100 rounded-2xl shadow-lg p-8">
           <h2 className="text-2xl font-bold mb-6">Product Description</h2>
-          <div 
-            className="prose prose-lg max-w-none"
+          <div
+            className="prose prose-lg max-w-none text-base text-gray-300 dark:text-gray-300"
             dangerouslySetInnerHTML={{
               __html:
                 product.description ||
                 product.bodyHtmlText ||
                 product.descriptionText ||
-                'No description available.',
+                '<span class="text-gray-400">No description available.</span>',
             }}
           />
         </div>
