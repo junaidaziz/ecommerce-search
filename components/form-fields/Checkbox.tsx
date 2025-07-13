@@ -39,8 +39,8 @@ const Checkbox = <T extends FieldValues>(props: CheckboxProps<T>) => {
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
   return (
-    <div className="mb-2 last:mb-0 w-full">
-      <div className="flex items-center">
+    <div className={`mb-2 last:mb-0 w-full ${disabled ? 'opacity-60' : ''}`}>
+      <label htmlFor={inputId} className="cursor-pointer flex items-center gap-2">
         <input
           type="checkbox"
           id={inputId}
@@ -50,16 +50,12 @@ const Checkbox = <T extends FieldValues>(props: CheckboxProps<T>) => {
           onBlur={onBlur}
           disabled={disabled}
           required={required}
-          className={`h-4 w-4 mr-2 text-primary border-gray-300 rounded focus:ring-primary dark:border-gray-600 ${className}`}
+          className={`h-4 w-4 rounded border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-green-500 transition checked:bg-blue-600 checked:border-blue-600 dark:checked:bg-green-500 dark:checked:border-green-500 ${className}`}
           {...registration}
           {...rest}
         />
-        {label && (
-          <label htmlFor={inputId} className="text-sm text-base-content">
-            {label}
-          </label>
-        )}
-      </div>
+        {label && <span className="text-sm">{label}</span>}
+      </label>
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
     </div>
   );

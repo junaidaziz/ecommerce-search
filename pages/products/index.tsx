@@ -304,7 +304,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         </div>
         <div className="flex flex-col lg:flex-row gap-10 items-start">
           {/* Filters Sidebar */}
-          <aside className="lg:w-80 w-full">
+          <aside className="lg:w-80 w-full mb-6 lg:mb-0">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sticky border border-gray-100 dark:border-gray-700 transition-all duration-300">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-base-content">Filters</h2>
@@ -337,12 +337,12 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
             {/* Results Header */}
             <div className="bg-base-100 rounded-2xl shadow-lg p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-wrap items-start sm:items-center gap-2 sm:space-x-4">
                   <h2 className="text-2xl font-bold text-base-content">
                     {items.length} Products
                   </h2>
                   {activeFilters.length > 0 && (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm text-base-content/60">Filtered by:</span>
                       <ActiveFilters filters={activeFilters} clearAll={clearAll} />
                     </div>
