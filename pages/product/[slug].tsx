@@ -1,6 +1,5 @@
 import { apiFetch } from '@lib/api';
 import { useContext, useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import Link from 'next/link';
@@ -9,7 +8,6 @@ import { AppContext } from '@contexts/AppContext';
 import ProductImageSlider from '@components/Product/ProductImageSlider';
 import RecommendedProducts from '@components/Product/RecommendedProducts';
 import HeartIcon from '@components/icons/HeartIcon';
-import StarIcon from '@components/icons/StarIcon';
 import {
   getProductBySlug,
   getReviewsForProduct,
@@ -17,12 +15,17 @@ import {
 } from '@lib/db';
 import { mapDbRowToProduct } from '@lib/products';
 import { Product, Review } from '@/types';
-import { SelectDropdown, Textarea } from '@components/form-fields';
 import { serializeDates } from '@utils/serializeDates';
-import CheckCircleIcon from '@components/icons/CheckCircleIcon';
-import WarningIcon from '@components/icons/WarningIcon';
-import CartIcon from '@components/icons/CartIcon';
 import ChevronLeftIcon from '@components/icons/ChevronLeftIcon';
+import {
+  ProductBreadcrumbs,
+  ProductHeader,
+  ProductPriceStock,
+  ProductVariants,
+  ProductCartActions,
+  ProductDescription,
+  ProductReviews,
+} from '@components/Product/ProductDetail';
 
 type ProductDetailProps = {
   product: Product;
@@ -68,13 +71,6 @@ export default function ProductDetail({
   const [averageRating, setAverageRating] = useState<number>(initialAverage);
   const [reviewCount, setReviewCount] = useState<number>(initialCount);
   const [quantity, setQuantity] = useState<number>(1);
-  type ReviewForm = { rating: number; comment: string };
-  const { register, handleSubmit, reset, watch, control } = useForm<ReviewForm>(
-    {
-      defaultValues: { rating: 5, comment: '' },
-    }
-  );
-  const myRating = watch('rating');
   const id = product?.id;
 
   const [variantId, setVariantId] = useState<string>('');
@@ -121,12 +117,6 @@ export default function ProductDetail({
       ? 'Low Stock'
       : 'Out of Stock';
 
-  const price = parseFloat(
-    typeof product.minPrice === 'number'
-      ? product.minPrice.toString()
-      : product.minPrice || '0'
-  ).toFixed(2);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-base-100 via-base-200/30 to-base-100">
       <Head>
@@ -139,17 +129,7 @@ export default function ProductDetail({
 
       {/* Breadcrumb Navigation */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <nav className="flex items-center space-x-2 text-sm text-base-content/70 mb-6">
-          <Link href="/" className="hover:text-primary transition-colors">
-            Home
-          </Link>
-          <span>/</span>
-          <Link href="/products" className="hover:text-primary transition-colors">
-            Products
-          </Link>
-          <span>/</span>
-          <span className="text-base-content font-medium">{product.title}</span>
-        </nav>
+        <ProductBreadcrumbs product={product} />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
@@ -186,150 +166,35 @@ export default function ProductDetail({
             </button>
 
             {/* Product Header */}
-            <div className="space-y-2">
-              <h1 className="text-2xl md:text-3xl font-bold text-base-content mb-1">
-                {product.title}
-              </h1>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-base-content/70">
-                <span>Vendor: {product.vendor?.brandName ?? 'Unknown'}</span>
-                <span>•</span>
-                <span>SKU: {product.sku || 'N/A'}</span>
-              </div>
-              <div className="flex items-center gap-2 mt-2">
-                <div className="flex items-center">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <StarIcon
-                      key={star}
-                      className={`w-5 h-5 ${star <= averageRating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                    />
-                  ))}
-                </div>
-                <span className="text-sm text-base-content/60">
-                  {averageRating.toFixed(1)} ({reviewCount} reviews)
-                </span>
-              </div>
-            </div>
+            <ProductHeader
+              product={product}
+              averageRating={averageRating}
+              reviewCount={reviewCount}
+            />
 
             {/* Price and Stock */}
-            <div className="flex flex-col gap-2">
-              <span className="text-3xl font-bold text-primary">
-                {product.currency} {price}
-              </span>
-              <div className="flex items-center gap-2">
-                {stockStatus === 'In Stock' ? (
-                  <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                ) : stockStatus === 'Low Stock' ? (
-                  <WarningIcon className="w-5 h-5 text-yellow-500" />
-                ) : (
-                  <WarningIcon className="w-5 h-5 text-red-500" />
-                )}
-                <span className={`font-medium ${
-                  stockStatus === 'In Stock' ? 'text-green-600' :
-                  stockStatus === 'Low Stock' ? 'text-yellow-600' : 'text-red-600'
-                }`}>
-                  {stockStatus}
-                </span>
-                {product.totalInventory && (
-                  <span className="text-xs text-base-content/60">
-                    ({product.totalInventory} available)
-                  </span>
-                )}
-              </div>
-            </div>
+            <ProductPriceStock product={product} />
 
             {/* Variants */}
-            {product.variants && product.variants.length > 0 && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-base-content">
-                  Select Variant
-                </label>
-                <select
-                  className="select select-bordered w-full"
-                  value={variantId}
-                  onChange={(e) => setVariantId(e.target.value)}
-                >
-                  <option value="">Choose an option</option>
-                  {product.variants.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {Object.entries(v.attributes)
-                        .map(([k, val]) => `${k}: ${val}`)
-                        .join(', ')} - Stock {v.quantity}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+            <ProductVariants
+              variants={product.variants}
+              selectedVariantId={variantId}
+              onVariantChange={setVariantId}
+            />
 
             {/* Cart Actions */}
-            <div className="space-y-4">
-              {isProductInCart ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-base-content">
-                      Quantity in Cart
-                    </span>
-                    <span className="text-lg font-bold text-primary">
-                      {cartItemQuantity}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      className="btn btn-outline flex-1 hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => changeQty(String(product.id), -1, selectedVariant?.id)}
-                      disabled={cartItemQuantity <= 1}
-                    >
-                      -
-                    </button>
-                    <button
-                      className="btn btn-outline flex-1 hover:bg-green-50 hover:border-green-300 hover:text-green-600 transition-all duration-200"
-                      onClick={() => changeQty(String(product.id), 1, selectedVariant?.id)}
-                    >
-                      +
-                    </button>
-                    <button
-                      className="btn btn-error text-white hover:bg-red-700 hover:scale-105 transition-all duration-200"
-                      onClick={() => removeFromCart(String(product.id), selectedVariant?.id)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <label className="text-sm font-medium text-base-content">
-                      Quantity
-                    </label>
-                    <div className="flex items-center border border-base-300 rounded-lg overflow-hidden">
-                      <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="px-3 py-2 hover:bg-red-50 hover:text-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border-r border-base-300"
-                        disabled={quantity <= 1}
-                      >
-                        -
-                      </button>
-                      <span className="px-4 py-2 min-w-[3rem] text-center bg-base-100">
-                        {quantity}
-                      </span>
-                      <button
-                        onClick={() => setQuantity(quantity + 1)}
-                        className="px-3 py-2 hover:bg-green-50 hover:text-green-600 transition-all duration-200 border-l border-base-300"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <button
-                    className="btn btn-primary btn-lg w-full transition-all duration-200 hover:scale-105"
-                    onClick={() => addToCart(product, selectedVariant)}
-                    disabled={(product.variants && product.variants.length > 0 && !selectedVariant) || stockStatus === 'Out of Stock'}
-                  >
-                    <CartIcon className="w-5 h-5 mr-2" />
-                    Add to Cart
-                  </button>
-                </div>
-              )}
-            </div>
+            <ProductCartActions
+              product={product}
+              selectedVariant={selectedVariant}
+              quantity={quantity}
+              onQuantityChange={setQuantity}
+              onAddToCart={addToCart}
+              onRemoveFromCart={removeFromCart}
+              onChangeQty={changeQty}
+              isInCart={isProductInCart}
+              cartItemQuantity={cartItemQuantity}
+              stockStatus={stockStatus}
+            />
 
             {/* Product Type */}
             {product.productType && (
@@ -342,109 +207,27 @@ export default function ProductDetail({
         </div>
 
         {/* Product Description */}
-        <div className="mt-12 bg-base-100 rounded-2xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold mb-6">Product Description</h2>
-          <div
-            className="prose prose-lg max-w-none text-base text-gray-300 dark:text-gray-300"
-            dangerouslySetInnerHTML={{
-              __html:
-                product.description ||
-                product.bodyHtmlText ||
-                product.descriptionText ||
-                '<span class="text-gray-400">No description available.</span>',
-            }}
-          />
-        </div>
+        <ProductDescription
+          description={product.description}
+          bodyHtmlText={product.bodyHtmlText}
+          descriptionText={product.descriptionText}
+          className="mt-12"
+        />
 
         {/* Reviews Section */}
-        <div className="mt-12 bg-base-100 rounded-2xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
-          
-          {reviews.length > 0 ? (
-            <div className="space-y-6">
-              {reviews.map((review, i) => (
-                <div key={i} className="border-b border-base-300 pb-6 last:border-b-0">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                                             <div className="flex items-center">
-                         {[1, 2, 3, 4, 5].map((star) => (
-                           <StarIcon
-                             key={star}
-                             className={`w-4 h-4 ${
-                               star <= review.rating
-                                 ? 'text-yellow-400 fill-current'
-                                 : 'text-gray-300'
-                             }`}
-                           />
-                         ))}
-                       </div>
-                      <span className="text-sm text-base-content/70">
-                        by {review.userEmail}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-base-content/90">{review.comment}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-base-content/70 italic">No reviews yet. Be the first to review this product!</p>
-          )}
-
-          {/* Review Form */}
-          {user && (
-            <div className="mt-8 p-6 bg-base-200/50 rounded-xl">
-              <h3 className="text-lg font-semibold mb-4">Write a Review</h3>
-              <form
-                onSubmit={handleSubmit(async (data) => {
-                  const res = await apiFetch(`/api/products/${id}/reviews`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                  });
-                  if (res.ok) {
-                    const response = await res.json();
-                    setAverageRating(response.averageRating);
-                    setReviewCount(response.reviewCount);
-                    const rres = await apiFetch(`/api/products/${id}/reviews`);
-                    if (rres.ok) {
-                      const rdata = await rres.json();
-                      setReviews(rdata.reviews);
-                    }
-                    reset({ rating: 5, comment: '' });
-                  }
-                })}
-                className="space-y-4"
-              >
-                <div className="flex items-center space-x-4">
-                  <label className="text-sm font-medium">Rating</label>
-                  <SelectDropdown
-                    name="rating"
-                    control={control}
-                    options={[1, 2, 3, 4, 5].map((n) => ({
-                      label: `${n} Star${n !== 1 ? 's' : ''}`,
-                      value: String(n),
-                    }))}
-                    rules={{ valueAsNumber: true }}
-                    className="max-w-xs"
-                  />
-                </div>
-                <Textarea
-                  className="w-full"
-                  placeholder="Share your experience with this product..."
-                  register={register}
-                  name="comment"
-                />
-                <button
-                  className="btn btn-primary transition-all duration-200"
-                  type="submit"
-                >
-                  Submit Review
-                </button>
-              </form>
-            </div>
-          )}
-        </div>
+        <ProductReviews
+          productId={String(product.id)}
+          reviews={reviews}
+          averageRating={averageRating}
+          reviewCount={reviewCount}
+          user={user}
+          onReviewsUpdate={(newReviews, newAverage, newCount) => {
+            setReviews(newReviews);
+            setAverageRating(newAverage);
+            setReviewCount(newCount);
+          }}
+          className="mt-12"
+        />
 
         {/* Recommended Products */}
         {product.category && (
