@@ -19,8 +19,10 @@ export default async function handler(
   res: NextApiResponse<Notification[] | ApiMessage>
 ): Promise<void> {
   try {
-    const session = await getServerSession(req, res, authOptions);
-    if (!session?.user) return res.status(401).json({ message: UNAUTHORIZED });
+    const session = await getServerSession(req, res, authOptions(req, res));
+    if (!session?.user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const user = await findUser(session.user.email);
     if (!user) return res.status(404).json({ message: USER_NOT_FOUND });
 

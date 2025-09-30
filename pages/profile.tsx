@@ -6,8 +6,8 @@ import ProfilePage from '@components/pages/ProfilePage';
 export default ProfilePage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
-  if (!session?.user) {
+  const session = await getServerSession(context.req, context.res, authOptions(context.req, context.res));
+  if (!session?.user?.email) {
     return {
       redirect: { destination: '/login', permanent: false },
     };
