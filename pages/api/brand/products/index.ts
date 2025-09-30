@@ -203,7 +203,7 @@ async function handler(
         title: String(title),
         slug: slugify(String(title || id)),
         uuid: String(id),
-        vendor: { email: '', brandName: String(vendor) },
+        vendorId: Number(vendor),
         description: String(description || ''),
         productType: String(product_type || ''),
         tags: String(tags || ''),

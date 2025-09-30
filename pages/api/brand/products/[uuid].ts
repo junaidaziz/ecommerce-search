@@ -123,7 +123,7 @@ export default async function handler(
         uuid: String(uuid),
         sku: String(sku ?? existing.sku),
         title: String(title ?? existing.title),
-        vendor: { email: '', brandName: String(vendor ?? existing.vendor) },
+        vendorId: Number(vendor ?? existing.vendorId),
         description: String(description ?? existing.description),
         productType: String(product_type ?? existing.productType),
         tags: String(tags ?? existing.tags),

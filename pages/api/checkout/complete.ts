@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { addOrder } from '@lib/orders';
 import { sendOrderConfirmation } from '@lib/email';
 import { handleApiError } from '@utils/handleApiError';
-import type { OrderIdResponse, ApiMessage } from '@/types';
+import type { OrderResponse, ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -12,7 +12,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<OrderIdResponse | ApiMessage>
+  res: NextApiResponse<OrderResponse | ApiMessage>
 ): Promise<void> {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: METHOD_NOT_ALLOWED });

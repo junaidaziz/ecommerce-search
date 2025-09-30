@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { findUser } from '@lib/users';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '@utils/handleApiError';
-import type { LoginResponse } from '@/types';
+type LoginResponse = { success: boolean; redirect?: string };
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export default async function handler(
