@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getCategoryTree } from '@lib/products';
 import { handleApiError } from '@utils/handleApiError';
-import type { CategoriesResponse, ApiMessage } from '@/types';
+import type { CategoryResponse, ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<CategoriesResponse | ApiMessage>
+  res: NextApiResponse<CategoryResponse | ApiMessage>
 ): Promise<void> {
   try {
     if (req.method === 'GET') {

@@ -58,7 +58,7 @@ export default async function handler(
   }
 
   const db = getDb();
-  const session = await getServerSession(req, res, authOptions);
+  const session = await getServerSession(req, res, authOptions(req, res));
   let userId: number | null = null;
   if (session?.user?.email) {
     const user = await db.user.findUnique({
