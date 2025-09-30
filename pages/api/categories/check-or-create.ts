@@ -25,7 +25,7 @@ export default async function handler(
     if (req.method !== 'POST') {
       return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     }
-    const session = await getServerSession(req, res, authOptions);
+    const session = await getServerSession(req, res, authOptions(req, res));
     if (!session?.user || session.user.role !== 'BRAND') {
       return res.status(401).json({ message: UNAUTHORIZED });
     }

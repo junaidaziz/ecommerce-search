@@ -18,8 +18,10 @@ export default async function handler(
   res: NextApiResponse<Message[] | Message | ApiMessage>
 ): Promise<void> {
   try {
-    const session = await getServerSession(req, res, authOptions);
-    if (!session?.user) return res.status(401).json({ message: UNAUTHORIZED });
+    const session = await getServerSession(req, res, authOptions(req, res));
+    if (!session?.user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     const orderUuid = getQueryParam(req.query.orderId);
     if (!orderUuid)

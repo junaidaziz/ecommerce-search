@@ -14,8 +14,10 @@ export default async function handler(
   try {
     if (req.method !== 'POST')
       return res.status(405).json({ message: METHOD_NOT_ALLOWED });
-    const session = await getServerSession(req, res, authOptions);
-    if (!session?.user) return res.status(401).json({ message: UNAUTHORIZED });
+    const session = await getServerSession(req, res, authOptions(req, res));
+    if (!session?.user?.email) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     const { currentPassword, newPassword } = req.body as {
       currentPassword?: string;

@@ -15,7 +15,7 @@ export default async function handler(
     if (req.method !== 'GET') {
       return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     }
-    const session = await getServerSession(req, res, authOptions);
+    const session = await getServerSession(req, res, authOptions(req, res));
     const brandId =
       typeof session?.user?.brandId === 'number'
         ? session.user.brandId
