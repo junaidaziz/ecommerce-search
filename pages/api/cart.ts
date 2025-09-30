@@ -16,9 +16,9 @@ export default async function handler(
   res: NextApiResponse<CartItem[] | ApiMessage>
 ): Promise<void> {
   try {
-    const session = await getServerSession(req, res, authOptions);
-    if (!session?.user) {
-      return res.status(401).json({ message: UNAUTHORIZED });
+    const session = await getServerSession(req, res, authOptions(req, res));
+    if (!session?.user?.email) {
+      return res.status(401).json({ message: 'Unauthorized' });
     }
     const email = session.user.email;
     if (req.method === 'GET') {

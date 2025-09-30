@@ -52,7 +52,7 @@ async function handler(
 ): Promise<void> {
   try {
     if (req.method === 'GET') {
-      const session = await getServerSession(req, res, authOptions);
+      const session = await getServerSession(req, res, authOptions(req, res));
       if (
         !session?.user ||
         (session.user.role !== 'BRAND' && session.user.role !== USER_ROLES.SUPER_ADMIN)

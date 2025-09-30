@@ -12,7 +12,7 @@ import { sendOrderConfirmation } from '@lib/email';
 import { handleApiError } from '@utils/handleApiError';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
-import { type Order, type OrderPlacedResponse, type ApiMessage, UserRole, getUserRoles, USER_ROLES } from '@/types';
+import { type Order, type OrderResponse, type ApiMessage, getUserRoles, USER_ROLES } from '@/types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
@@ -49,7 +49,7 @@ async function parseBody(
 
 async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Order[] | OrderPlacedResponse | ApiMessage>
+  res: NextApiResponse<Order[] | OrderResponse | ApiMessage>
 ): Promise<void> {
   try {
     if (req.method === 'POST') {
@@ -129,7 +129,7 @@ async function handler(
     }
 
     if (req.method === 'GET') {
-      const session = await getServerSession(req, res, authOptions);
+      const session = await getServerSession(req, res, authOptions(req, res));
       const email = session?.user?.email;
       if (!email) return res.status(401).json({ message: UNAUTHORIZED });
       const user = await findUser(email);
@@ -137,7 +137,8 @@ async function handler(
       if (user.role === USER_ROLES.SUPER_ADMIN) {
         return res.status(200).json(await getAllOrders());
       }
-      if (user.role === UserRole.BRAND) {
+      if (user.role === 'BRAND') {
+        // brand-specific orders
         return res.status(200).json(await getOrdersForVendor(user.brandName));
       }
       return res.status(200).json(await getOrdersForUser(email));
