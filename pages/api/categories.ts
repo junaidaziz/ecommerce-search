@@ -9,10 +9,9 @@ import { handleApiError } from '@utils/handleApiError';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import type {
-  CategoriesResponse,
+  Category,
   CategoryResponse,
   ApiMessage,
-  Category,
 } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
@@ -23,7 +22,7 @@ import {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<CategoriesResponse | CategoryResponse | ApiMessage>
+  res: NextApiResponse<CategoryResponse | ApiMessage>
 ): Promise<void> {
   try {
     if (req.method === 'GET') {
@@ -43,7 +42,7 @@ export default async function handler(
       return res.status(200).json({ categories });
     }
     if (req.method === 'POST') {
-      const session = await getServerSession(req, res, authOptions);
+      const session = await getServerSession(req, res, authOptions(req, res));
       if (!session?.user) {
         return res.status(401).json({ message: UNAUTHORIZED });
       }
