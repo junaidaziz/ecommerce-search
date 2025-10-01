@@ -5,7 +5,7 @@ import ChatInput from './ChatInput';
 import MessageList from './MessageList';
 
 const ChatWindow: React.FC = () => {
-  const { messages, isOpen, openChat, closeChat } = useContext(ChatContext);
+  const { messages, isOpen, isLoading, openChat, closeChat } = useContext(ChatContext);
   const [isTyping, setIsTyping] = useState(false);
 
   const toggle = () => {
@@ -30,7 +30,7 @@ const ChatWindow: React.FC = () => {
               ✕
             </button>
           </div>
-          <MessageList messages={messages} isTyping={isTyping} />
+          <MessageList messages={messages} isTyping={isTyping} isLoading={isLoading} />
           <ChatInput onTyping={setIsTyping} />
         </div>
       ) : (

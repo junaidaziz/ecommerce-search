@@ -14,6 +14,7 @@ export interface ChatMessage {
 interface ChatContextValue {
   messages: ChatMessage[];
   isOpen: boolean;
+  isLoading: boolean;
   openChat: (context?: { orderId?: string; customerName?: string }) => void;
   closeChat: () => void;
   sendMessage: (data: {
@@ -31,6 +32,7 @@ interface ChatContextValue {
 export const ChatContext = createContext<ChatContextValue>({
   messages: [],
   isOpen: false,
+  isLoading: false,
   openChat: () => {},
   closeChat: () => {},
   sendMessage: () => {},
@@ -50,7 +52,33 @@ export function ChatProvider({ children }: ProviderProps) {
       }
     | undefined
   >();
+  const [sessionId, setSessionId] = useState<number | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  // Load chat history when opening chat
+  useEffect(() => {
+    if (isOpen && messages.length === 0 && !isLoadingHistory) {
+      setIsLoadingHistory(true);
+      apiFetch('/api/chat/history')
+        .then(async (res) => {
+          if (res.ok) {
+            const data = await res.json();
+            setSessionId(data.sessionId);
+            setMessages(data.messages.map((m: any) => ({
+              ...m,
+              timestamp: new Date(m.timestamp),
+            })));
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to load chat history:', error);
+        })
+        .finally(() => {
+          setIsLoadingHistory(false);
+        });
+    }
+  }, [isOpen, messages.length, isLoadingHistory]);
 
   // Initialize SSE connection when component mounts
   useEffect(() => {
@@ -63,7 +91,10 @@ export function ChatProvider({ children }: ProviderProps) {
           const data = JSON.parse(event.data);
           
           if (data.type === 'message') {
-            setMessages((prev) => [...prev, data.data]);
+            setMessages((prev) => [...prev, {
+              ...data.data,
+              timestamp: new Date(data.data.timestamp),
+            }]);
           } else if (data.type === 'connected') {
             console.log('Connected to chat stream');
           }
@@ -136,6 +167,7 @@ export function ChatProvider({ children }: ProviderProps) {
         messages,
         sendMessage,
         isOpen,
+        isLoading: isLoadingHistory,
         openChat,
         closeChat,
         context: chatCtx,

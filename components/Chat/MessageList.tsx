@@ -5,9 +5,10 @@ import type { ChatMessage } from '@contexts/ChatContext';
 interface Props {
   messages: ChatMessage[];
   isTyping?: boolean;
+  isLoading?: boolean;
 }
 
-const MessageList: React.FC<Props> = ({ messages, isTyping }) => {
+const MessageList: React.FC<Props> = ({ messages, isTyping, isLoading }) => {
   const endRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -16,7 +17,11 @@ const MessageList: React.FC<Props> = ({ messages, isTyping }) => {
 
   return (
     <div className="flex-1 overflow-y-auto p-3 space-y-1">
-      {messages.length === 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-gray-500 text-sm">Loading chat history...</div>
+        </div>
+      ) : messages.length === 0 ? (
         <div className="flex items-center justify-center h-full text-gray-500 text-sm">
           <p>No messages yet. Start a conversation!</p>
         </div>
