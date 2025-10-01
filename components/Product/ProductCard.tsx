@@ -31,7 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   let imagesArr: { url: string; alt?: string }[] = [];
   if (Array.isArray(product.images) && product.images.length > 0) {
     imagesArr = product.images
-      .map((img: any) => {
+      .map((img: string | { url?: string; alt?: string }) => {
         if (typeof img === 'string' && /^(\/|https?:\/\/)/.test(img.trim())) {
           // Valid string URL (relative or absolute)
           return { url: img.trim() };

@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { apiFetch } from '@lib/api';
 import StarIcon from '../../icons/StarIcon';
 import { SelectDropdown, Textarea } from '../../form-fields';
-import type { Review } from '@/types';
+import type { Review, User } from '@/types';
 
 // Extended Review type for app use
 interface ReviewWithEmail extends Review {
@@ -15,7 +15,7 @@ interface ProductReviewsProps {
   reviews: ReviewWithEmail[];
   averageRating: number;
   reviewCount: number;
-  user?: any;
+  user?: User;
   onReviewsUpdate: (reviews: ReviewWithEmail[], average: number, count: number) => void;
   className?: string;
 }
