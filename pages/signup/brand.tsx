@@ -9,7 +9,7 @@ import BuildingIcon from '@components/icons/BuildingIcon';
 import { PasswordInput, TextInput } from '@components/form-fields';
 import useEmailAvailability from '@hooks/useEmailAvailability';
 import { USER_ROLES } from '@/types';
-import { AuthCard, AuthInput, AuthButton, AuthSocialLogin, AuthDivider } from '@components/Auth';
+import { AuthCard, AuthInput, AuthButton, AuthSocialLogin, AuthDivider, FormError } from '@components/Auth';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -103,7 +103,7 @@ export default function BrandSignup() {
         <AuthSocialLogin role="BRAND" />
         <AuthDivider />
         
-        {formError && <div className="text-red-500 mb-2 text-center font-semibold">{formError}</div>}
+        <FormError message={formError} />
         
         <form onSubmit={handleSubmit(submit)} className="space-y-5">
           <AuthInput
@@ -129,37 +129,31 @@ export default function BrandSignup() {
           />
           
           <div className="space-y-2">
-            <div>
-              <PasswordInput
-                name="password"
-                placeholder="Password"
-                register={register}
-                rules={{
-                  required: 'Password is required',
-                  pattern: {
-                    value: passwordRegex,
-                    message:
-                      'Password must be at least 8 characters and include uppercase, lowercase, number and special character',
-                  },
-                  onBlur: handlePasswordBlur,
-                }}
-                onFocus={handlePasswordFocus}
-                error={errors.password?.message as string}
-                className={`w-full text-base px-4 py-3 rounded-lg border ${errors.password ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
-              />
-              {errors.password?.message && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
-            </div>
-            <div>
-              <PasswordInput
-                name="confirm"
-                placeholder="Confirm Password"
-                register={register}
-                rules={{ validate: handleConfirmBlur }}
-                error={errors.confirm?.message as string}
-                className={`w-full text-base px-4 py-3 rounded-lg border ${errors.confirm ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
-              />
-              {errors.confirm?.message && <p className="text-red-500 text-sm mt-1">{errors.confirm.message}</p>}
-            </div>
+            <PasswordInput
+              name="password"
+              placeholder="Password"
+              register={register}
+              rules={{
+                required: 'Password is required',
+                pattern: {
+                  value: passwordRegex,
+                  message:
+                    'Password must be at least 8 characters and include uppercase, lowercase, number and special character',
+                },
+                onBlur: handlePasswordBlur,
+              }}
+              onFocus={handlePasswordFocus}
+              error={errors.password?.message as string}
+              className={`w-full text-base px-4 py-3 rounded-lg border ${errors.password ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
+            />
+            <PasswordInput
+              name="confirm"
+              placeholder="Confirm Password"
+              register={register}
+              rules={{ validate: handleConfirmBlur }}
+              error={errors.confirm?.message as string}
+              className={`w-full text-base px-4 py-3 rounded-lg border ${errors.confirm ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
+            />
           </div>
           
           {showPasswordHint && (
