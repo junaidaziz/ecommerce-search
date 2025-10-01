@@ -1,0 +1,14 @@
+name: Copilot Workspace Tasks
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  run-copilot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Copilot Workspace
+        run: |
+          npx copilot-workspace run "@workspace read TODO.md"
