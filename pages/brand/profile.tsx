@@ -138,117 +138,156 @@ export const BrandProfile: React.FC = () => {
     );
 
   return (
-    <div className="min-h-screen flex items-center justify-center overflow-auto px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-8">
       <Head>
         <title>{getPageTitle('Brand Profile')}</title>
       </Head>
       <PageContainer>
-        <h1 className="text-2xl font-bold mb-4">Brand Profile</h1>
-        {showComplete && (
-          <div className="alert alert-info mb-2">
-            Please complete your profile.
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Brand Profile</h1>
+            <p className="text-gray-600 dark:text-gray-400">Manage your brand information and settings</p>
           </div>
-        )}
-        {message && <div className="mb-2 text-green-600">{message}</div>}
-        <form onSubmit={handleSubmit(submit)} className="space-y-2">
-          <TextInput
-            name="brandName"
-            register={register}
-            rules={{ required: 'Required' }}
-            error={errors.brandName?.message}
-            placeholder="Brand Name"
-          />
-          <TextInput
-            name="phoneNumber"
-            register={register}
-            placeholder="Phone Number"
-            error={errors.phoneNumber?.message}
-          />
-          <TextInput
-            name="businessAddress"
-            register={register}
-            placeholder="Business Address"
-            error={errors.businessAddress?.message}
-          />
-          <TextInput
-            name="city"
-            register={register}
-            placeholder="City"
-            error={errors.city?.message}
-          />
-          <CountrySelect<FormValues>
-            name="country"
-            control={control}
-            error={errors.country?.message as string}
-          />
-          <TextInput
-            name="website"
-            register={register}
-            placeholder="Website"
-            error={errors.website?.message}
-          />
-          <Textarea
-            name="businessDescription"
-            register={register}
-            placeholder="Business Description"
-            error={errors.businessDescription?.message}
-          />
-          <TextInput
-            name="taxId"
-            register={register}
-            placeholder="Tax ID"
-            error={errors.taxId?.message}
-          />
-          <div className="border p-3 rounded space-y-2">
-            <label className="font-semibold">Payment Methods</label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                className="checkbox"
-                checked={stripeEnabled}
-                onChange={(e) => setStripeEnabled(e.target.checked)}
-              />
-              Stripe
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                className="checkbox"
-                checked={jazzcashEnabled}
-                onChange={(e) => setJazzcashEnabled(e.target.checked)}
-              />
-              JazzCash
-            </label>
-            {jazzcashEnabled && (
+          {showComplete && (
+            <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl text-blue-800 dark:text-blue-200">
+              Please complete your profile.
+            </div>
+          )}
+          {message && (
+            <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl text-green-800 dark:text-green-200">
+              {message}
+            </div>
+          )}
+          <form onSubmit={handleSubmit(submit)} className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 p-6 sm:p-8 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <TextInput
-                name="jazzcashDetails"
-                placeholder="JazzCash account"
-                value={jazzcashDetails}
-                onChange={(e) => setJazzcashDetails(e.target.value)}
+                label="Brand Name"
+                name="brandName"
+                register={register}
+                rules={{ required: 'Required' }}
+                error={errors.brandName?.message}
+                placeholder="Enter your brand name"
               />
-            )}
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                className="checkbox"
-                checked={bankEnabled}
-                onChange={(e) => setBankEnabled(e.target.checked)}
+              <TextInput
+                label="Phone Number"
+                name="phoneNumber"
+                register={register}
+                placeholder="Enter phone number"
+                error={errors.phoneNumber?.message}
               />
-              Bank Transfer
-            </label>
-            {bankEnabled && (
-              <Textarea
-                name="bankDetails"
-                placeholder="Bank details"
-                value={bankDetails}
-                onChange={(e) => setBankDetails(e.target.value)}
+            </div>
+            
+            <TextInput
+              label="Business Address"
+              name="businessAddress"
+              register={register}
+              placeholder="Enter business address"
+              error={errors.businessAddress?.message}
+            />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <TextInput
+                label="City"
+                name="city"
+                register={register}
+                placeholder="Enter city"
+                error={errors.city?.message}
               />
-            )}
-          </div>
-          <button className="btn btn-primary w-full" type="submit">
-            Update
-          </button>
-        </form>
+              <CountrySelect<FormValues>
+                label="Country"
+                name="country"
+                control={control}
+                error={errors.country?.message as string}
+              />
+            </div>
+            
+            <TextInput
+              label="Website"
+              name="website"
+              register={register}
+              placeholder="https://example.com"
+              error={errors.website?.message}
+            />
+            
+            <Textarea
+              label="Business Description"
+              name="businessDescription"
+              register={register}
+              placeholder="Describe your business"
+              error={errors.businessDescription?.message}
+            />
+            
+            <TextInput
+              label="Tax ID"
+              name="taxId"
+              register={register}
+              placeholder="Enter tax ID"
+              error={errors.taxId?.message}
+            />
+            
+            <div className="border border-gray-200 dark:border-gray-700 p-6 rounded-xl bg-gray-50 dark:bg-gray-800 space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Payment Methods</h3>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                  checked={stripeEnabled}
+                  onChange={(e) => setStripeEnabled(e.target.checked)}
+                />
+                <span className="font-medium text-gray-700 dark:text-gray-300">Stripe</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                  checked={jazzcashEnabled}
+                  onChange={(e) => setJazzcashEnabled(e.target.checked)}
+                />
+                <span className="font-medium text-gray-700 dark:text-gray-300">JazzCash</span>
+              </label>
+              {jazzcashEnabled && (
+                <div className="ml-8">
+                  <TextInput
+                    label="JazzCash Account"
+                    name="jazzcashDetails"
+                    placeholder="Enter JazzCash account details"
+                    value={jazzcashDetails}
+                    onChange={(e) => setJazzcashDetails(e.target.value)}
+                  />
+                </div>
+              )}
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                  checked={bankEnabled}
+                  onChange={(e) => setBankEnabled(e.target.checked)}
+                />
+                <span className="font-medium text-gray-700 dark:text-gray-300">Bank Transfer</span>
+              </label>
+              {bankEnabled && (
+                <div className="ml-8">
+                  <Textarea
+                    label="Bank Details"
+                    name="bankDetails"
+                    placeholder="Enter bank transfer details"
+                    value={bankDetails}
+                    onChange={(e) => setBankDetails(e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
+            
+            <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-800">
+              <button 
+                className="px-8 py-3 text-base font-semibold text-white bg-primary hover:bg-primary-dark dark:bg-primary dark:hover:bg-primary-light rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02]" 
+                type="submit"
+              >
+                Update Profile
+              </button>
+            </div>
+          </form>
+        </div>
       </PageContainer>
     </div>
   );
