@@ -20,8 +20,8 @@ body {
 }
 /* Spinner styles */
 .loader {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3b82f6;
+  border: 4px solid var(--spinner-border);
+  border-top: 4px solid var(--spinner-top);
   border-radius: 50%;
   width: 36px;
   height: 36px;
@@ -71,25 +71,25 @@ body {
 }
 
 a {
-  color: #10b981;
+  color: var(--link-color);
   transition: color 0.2s;
 }
 a:hover {
-  color: #6366f1;
+  color: var(--link-hover);
 }
 
 button, .btn-primary {
-  background-color: #10b981;
-  color: #f1f5f9;
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-color);
   border-radius: 0.5rem;
   transition: background 0.2s;
 }
 button:hover, .btn-primary:hover {
-  background-color: #6366f1;
-  color: #f1f5f9;
+  background-color: var(--btn-primary-hover-bg);
+  color: var(--btn-primary-hover-color);
 }
 
 .btn-secondary {
-  background-color: #f59e42;
-  color: #0f172a;
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-color);
 }

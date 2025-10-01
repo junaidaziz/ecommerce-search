@@ -1,0 +1,146 @@
+/* CSS Custom Properties (Variables) for consistent theming */
+:root {
+  /* Color Variables - Light Mode */
+  --color-primary: #2563eb;
+  --color-primary-light: #3b82f6;
+  --color-primary-dark: #1e40af;
+  
+  --color-secondary: #6366f1;
+  --color-secondary-light: #818cf8;
+  --color-secondary-dark: #3730a3;
+  
+  --color-success: #22c55e;
+  --color-success-light: #4ade80;
+  --color-success-dark: #166534;
+  
+  --color-warning: #f59e42;
+  --color-warning-light: #fbbf24;
+  --color-warning-dark: #b45309;
+  
+  --color-danger: #ef4444;
+  --color-danger-light: #f87171;
+  --color-danger-dark: #991b1b;
+  
+  --color-neutral: #64748b;
+  --color-neutral-light: #cbd5e1;
+  --color-neutral-dark: #1e293b;
+  
+  --color-background: #f8fafc;
+  --color-card: #fff;
+  --color-border: #e5e7eb;
+  --color-text: #000;
+  --color-text-muted: #64748b;
+  
+  /* Spinner colors */
+  --spinner-border: #f3f3f3;
+  --spinner-top: #3b82f6;
+  
+  /* Link colors */
+  --link-color: #22c55e;
+  --link-hover: #6366f1;
+  
+  /* Button colors */
+  --btn-primary-bg: #22c55e;
+  --btn-primary-color: #f1f5f9;
+  --btn-primary-hover-bg: #6366f1;
+  --btn-primary-hover-color: #f1f5f9;
+  
+  --btn-secondary-bg: #f59e42;
+  --btn-secondary-color: #0f172a;
+  
+  /* Font family */
+  --font-family: 'Inter', sans-serif;
+}
+
+/* Dark Mode Variables */
+.dark {
+  --color-primary: #3b82f6;
+  --color-primary-light: #60a5fa;
+  --color-primary-dark: #2563eb;
+  
+  --color-secondary: #818cf8;
+  --color-secondary-light: #a5b4fc;
+  --color-secondary-dark: #6366f1;
+  
+  --color-success: #4ade80;
+  --color-success-light: #86efac;
+  --color-success-dark: #22c55e;
+  
+  --color-warning: #fbbf24;
+  --color-warning-light: #fcd34d;
+  --color-warning-dark: #f59e42;
+  
+  --color-danger: #f87171;
+  --color-danger-light: #fca5a5;
+  --color-danger-dark: #ef4444;
+  
+  --color-neutral: #94a3b8;
+  --color-neutral-light: #cbd5e1;
+  --color-neutral-dark: #334155;
+  
+  --color-background: #0f172a;
+  --color-card: #1e293b;
+  --color-border: #334155;
+  --color-text: #fff;
+  --color-text-muted: #94a3b8;
+  
+  /* Spinner colors for dark mode */
+  --spinner-border: #334155;
+  --spinner-top: #60a5fa;
+  
+  /* Link colors for dark mode */
+  --link-color: #4ade80;
+  --link-hover: #818cf8;
+  
+  /* Button colors for dark mode */
+  --btn-primary-bg: #4ade80;
+  --btn-primary-color: #0f172a;
+  --btn-primary-hover-bg: #818cf8;
+  --btn-primary-hover-color: #0f172a;
+  
+  --btn-secondary-bg: #fbbf24;
+  --btn-secondary-color: #0f172a;
+}
+
+/* Swiper Navigation Button Styles */
+.swiper-button-next,
+.swiper-button-prev {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  color: var(--color-warning) !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  width: 3.5rem !important;
+  height: 3.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 20 !important;
+  font-size: 2rem;
+  border: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dark .swiper-button-next,
+.dark .swiper-button-prev {
+  background-color: rgba(30, 41, 59, 0.9) !important;
+  color: var(--color-warning-light) !important;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background-color: #fed7aa !important;
+  color: #ea580c !important;
+}
+
+.dark .swiper-button-next:hover,
+.dark .swiper-button-prev:hover {
+  background-color: rgba(51, 65, 85, 0.95) !important;
+  color: var(--color-warning) !important;
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 2rem !important;
+}
