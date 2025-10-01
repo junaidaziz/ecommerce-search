@@ -9,13 +9,14 @@ import { withRole } from '@lib/withRole';
 import { logAudit } from '@lib/audit';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import { Category, CategoryInput, ApiMessage } from '@/types';
+import { Category, ApiMessage } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   UUID_REQUIRED,
   NAME_REQUIRED,
   CATEGORY_EXISTS,
 } from '@/constants/messages';
+import { CategoryInput } from 'types/category';
 
 async function handler(
   req: NextApiRequest,
