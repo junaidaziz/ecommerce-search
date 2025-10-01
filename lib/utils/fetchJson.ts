@@ -7,7 +7,7 @@ export async function fetchJson<T>(
   const res = await fetch(input, init);
   if (!res.ok) {
     let message = res.statusText;
-    let info: any = undefined;
+    let info: unknown = undefined;
     
     // Clone the response to avoid "body stream already read" error
     const clonedRes = res.clone();
@@ -15,7 +15,7 @@ export async function fetchJson<T>(
     try {
       info = await clonedRes.json();
       if (info && typeof info === 'object' && 'message' in info) {
-        message = (info as any).message as string;
+        message = (info as { message: string }).message;
       }
     } catch {
       try {
