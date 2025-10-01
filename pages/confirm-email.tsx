@@ -13,7 +13,7 @@ export default function ConfirmEmail() {
     
     setResending(true);
     try {
-      const res = await apiFetch('/api/resend-verification', {
+      await apiFetch('/api/resend-verification', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -21,11 +21,7 @@ export default function ConfirmEmail() {
         body: JSON.stringify({ email }),
       });
 
-      if (res.ok) {
-        alert('Confirmation email resent! Please check your inbox.');
-      } else {
-        alert('Failed to resend email. Please try again.');
-      }
+      alert('Confirmation email resent! Please check your inbox.');
     } catch (error) {
       alert('Failed to resend email. Please try again.');
     } finally {

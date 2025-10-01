@@ -15,14 +15,14 @@ export default function Confirm() {
   useEffect(() => {
     if (!token) return;
     async function verify() {
-      const res = await apiFetch(`/api/verify-email?token=${token}`);
-      if (res.ok) {
+      try {
+        await apiFetch(`/api/verify-email?token=${token}`);
         setStatus('success');
         // Redirect to login after 3 seconds
         setTimeout(() => {
           router.push('/login');
         }, 3000);
-      } else {
+      } catch (error) {
         setStatus('error');
       }
     }
