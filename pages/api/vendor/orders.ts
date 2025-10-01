@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getOrdersForVendor, getAllOrders } from '@lib/orders';
-import { withRole } from '@lib/withRole';
+import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import type { Order, ApiMessage } from '@/types';
@@ -8,7 +8,7 @@ import { METHOD_NOT_ALLOWED, VENDOR_REQUIRED } from '@/constants/messages';
 import { USER_ROLES } from '@/types';
 
 async function handler(
-  req: NextApiRequest,
+  req: AuthedNextApiRequest,
   res: NextApiResponse<Order[] | ApiMessage>
 ): Promise<void> {
   try {
@@ -17,7 +17,7 @@ async function handler(
     }
     const vendor = getQueryParam(req.query.vendor);
     if (!vendor) {
-      if ((req as any).user?.role === USER_ROLES.SUPER_ADMIN) {
+      if (req.user?.role === USER_ROLES.SUPER_ADMIN) {
         const orders = await getAllOrders();
         return res.status(200).json(orders);
       }

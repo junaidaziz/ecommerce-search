@@ -3,11 +3,16 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
-const history: Record<string, { id: string; title: string }[]> = {};
+interface HistoryItem {
+  id: string;
+  title: string;
+}
+
+const history: Record<string, HistoryItem[]> = {};
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<any>
+  res: NextApiResponse<HistoryItem[] | { message: string }>
 ) {
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user) return res.status(401).json({ message: UNAUTHORIZED });
