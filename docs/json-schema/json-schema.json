@@ -223,6 +223,12 @@
             "$ref": "#/definitions/SupportTicket"
           }
         },
+        "chatSessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatSession"
+          }
+        },
         "wishlistItems": {
           "type": "array",
           "items": {
@@ -870,6 +876,90 @@
         }
       }
     },
+    "ChatSession": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "default": "active"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "user": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "chatMessages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessage"
+          }
+        }
+      }
+    },
+    "ChatMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "sender": {
+          "type": "string",
+          "default": "user"
+        },
+        "messageType": {
+          "type": "string",
+          "default": "text"
+        },
+        "content": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fileUrl": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fileName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "seen": {
+          "type": "boolean",
+          "default": false
+        },
+        "session": {
+          "$ref": "#/definitions/ChatSession"
+        }
+      }
+    },
     "WishlistItem": {
       "type": "object",
       "properties": {
@@ -979,6 +1069,12 @@
     },
     "supportTicket": {
       "$ref": "#/definitions/SupportTicket"
+    },
+    "chatSession": {
+      "$ref": "#/definitions/ChatSession"
+    },
+    "chatMessage": {
+      "$ref": "#/definitions/ChatMessage"
     },
     "wishlistItem": {
       "$ref": "#/definitions/WishlistItem"
