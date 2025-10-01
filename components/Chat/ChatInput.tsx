@@ -121,11 +121,11 @@ const ChatInput: React.FC<Props> = ({ onSend, onTyping }) => {
     <div className="p-3 border-t border-base-300">
       {isUploading && (
         <div className="mb-2">
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+          <div className="flex items-center justify-between text-xs text-base-content/60 mb-1">
             <span>Uploading...</span>
             <span>{uploadProgress}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-1.5">
+          <div className="w-full bg-base-300 rounded-full h-1.5">
             <div
               className="bg-primary h-1.5 rounded-full transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}
@@ -152,7 +152,7 @@ const ChatInput: React.FC<Props> = ({ onSend, onTyping }) => {
             {!isUploading && (
               <button
                 type="button"
-                className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+                className="absolute -top-1 -right-1 w-4 h-4 bg-danger text-white rounded-full text-xs flex items-center justify-center hover:bg-danger/80"
                 onClick={() => {
                   setFile(null);
                   setPreview(null);
@@ -164,12 +164,12 @@ const ChatInput: React.FC<Props> = ({ onSend, onTyping }) => {
           </div>
         )}
         {file && !preview && (
-          <div className="text-xs text-gray-500 flex items-center gap-1">
+          <div className="text-xs text-base-content/60 flex items-center gap-1">
             <span>{file.name}</span>
             {!isUploading && (
               <button
                 type="button"
-                className="text-red-500 hover:text-red-700"
+                className="text-danger hover:text-danger/80"
                 onClick={() => {
                   setFile(null);
                   setPreview(null);

@@ -15,6 +15,7 @@ interface ChatContextValue {
   messages: ChatMessage[];
   isOpen: boolean;
   isLoading: boolean;
+  unreadCount: number;
   openChat: (context?: { orderId?: string; customerName?: string }) => void;
   closeChat: () => void;
   sendMessage: (data: {
@@ -33,6 +34,7 @@ export const ChatContext = createContext<ChatContextValue>({
   messages: [],
   isOpen: false,
   isLoading: false,
+  unreadCount: 0,
   openChat: () => {},
   closeChat: () => {},
   sendMessage: () => {},
@@ -55,6 +57,19 @@ export function ChatProvider({ children }: ProviderProps) {
   const [sessionId, setSessionId] = useState<number | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Track unread messages
+  useEffect(() => {
+    if (isOpen) {
+      // Reset unread count when chat is opened
+      setUnreadCount(0);
+    } else {
+      // Count support messages that came while chat was closed
+      const supportMessages = messages.filter(m => m.sender === 'support');
+      setUnreadCount(supportMessages.length);
+    }
+  }, [isOpen, messages]);
 
   // Load chat history when opening chat
   useEffect(() => {
@@ -168,6 +183,7 @@ export function ChatProvider({ children }: ProviderProps) {
         sendMessage,
         isOpen,
         isLoading: isLoadingHistory,
+        unreadCount,
         openChat,
         closeChat,
         context: chatCtx,

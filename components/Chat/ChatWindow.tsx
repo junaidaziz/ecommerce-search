@@ -5,7 +5,7 @@ import ChatInput from './ChatInput';
 import MessageList from './MessageList';
 
 const ChatWindow: React.FC = () => {
-  const { messages, isOpen, isLoading, openChat, closeChat } = useContext(ChatContext);
+  const { messages, isOpen, isLoading, unreadCount, openChat, closeChat } = useContext(ChatContext);
   const [isTyping, setIsTyping] = useState(false);
 
   const toggle = () => {
@@ -34,14 +34,21 @@ const ChatWindow: React.FC = () => {
           <ChatInput onTyping={setIsTyping} />
         </div>
       ) : (
-        <button
-          type="button"
-          className="btn btn-primary btn-circle shadow-lg hover:shadow-xl transition-shadow"
-          onClick={toggle}
-          title="Open Support Chat"
-        >
-          <ChatIcon size={20} />
-        </button>
+        <div className="relative">
+          <button
+            type="button"
+            className="btn btn-primary btn-circle shadow-lg hover:shadow-xl transition-shadow"
+            onClick={toggle}
+            title="Open Support Chat"
+          >
+            <ChatIcon size={20} />
+          </button>
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-danger text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </div>
       )}
     </div>
   );
