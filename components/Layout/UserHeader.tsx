@@ -136,7 +136,7 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
   return (
     <header className="sticky top-0 z-30 bg-white/95 dark:bg-gray-950/95 shadow-sm border-b border-gray-200 dark:border-gray-800">
       <div
-        className={`w-full px-2 sm:px-4 lg:px-8 mx-auto ${maxWidthClass || 'max-w-7xl'}`}
+        className={`w-full px-2 sm:px-4 lg:px-8 mx-auto ${maxWidthClass || 'max-w-screen-2xl'}`}
       >
         <div className="flex items-center justify-between h-20">
           {/* Left: Logo */}

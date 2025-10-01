@@ -401,6 +401,6 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   );
 };
 
-ProductsPage.maxWidthClass = 'max-w-7xl';
+ProductsPage.maxWidthClass = 'max-w-screen-2xl';
 
 export default ProductsPage;
