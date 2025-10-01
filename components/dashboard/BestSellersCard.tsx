@@ -38,25 +38,25 @@ const BestSellersCard: React.FC<Props> = ({ brandId }) => {
       title="Best-Selling Products"
       loading={!products && !error}
       error={error}
-      icon={<StarIcon className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />}
+      icon={<StarIcon className="w-6 h-6 text-warning dark:text-warning-light" />}
       onClick={handleClick}
     >
       {products && products.length > 0 ? (
         <div className="space-y-3">
           <div className="space-y-2">
             {products.slice(0, 3).map((product, index) => (
-              <div key={product.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div key={product.id} className="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
-                    <span className="text-xs font-bold text-yellow-600 dark:text-yellow-400">
+                  <div className="flex-shrink-0 w-6 h-6 bg-warning-100 dark:bg-warning-dark/30 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-bold text-warning dark:text-warning-light">
                       {index + 1}
                     </span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    <p className="text-sm font-medium text-neutral-900 dark:text-white truncate">
                       {product.title}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-neutral dark:text-neutral-400">
                       {product.quantity} sold
                     </p>
                   </div>
@@ -65,7 +65,7 @@ const BestSellersCard: React.FC<Props> = ({ brandId }) => {
             ))}
           </div>
           <div className="flex items-center justify-end">
-            <span className="text-sm font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1">
+            <span className="text-sm font-medium text-primary dark:text-primary-light flex items-center gap-1">
               View all
               <ArrowTopRightOnSquareIcon className="w-4 h-4" />
             </span>
@@ -74,7 +74,7 @@ const BestSellersCard: React.FC<Props> = ({ brandId }) => {
       ) : (
         !error && (
           <div className="text-center py-4">
-            <p className="text-gray-500 dark:text-gray-400">No sales yet.</p>
+            <p className="text-neutral dark:text-neutral-400">No sales yet.</p>
           </div>
         )
       )}

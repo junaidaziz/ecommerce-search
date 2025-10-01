@@ -55,7 +55,7 @@ const OrdersThisMonthCard: React.FC<Props> = ({ brandId }) => {
       title="Orders This Month"
       loading={!data && !error}
       error={error}
-      icon={<ShoppingCartIcon className="w-6 h-6 text-purple-600 dark:text-purple-400" />}
+      icon={<ShoppingCartIcon className="w-6 h-6 text-secondary dark:text-secondary-light" />}
       trend={
         trend !== null
           ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}%`
@@ -65,14 +65,14 @@ const OrdersThisMonthCard: React.FC<Props> = ({ brandId }) => {
       {data && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <ArrowTrendingUpIcon className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+            <div className="p-3 bg-secondary-100 dark:bg-secondary-dark/30 rounded-lg">
+              <ArrowTrendingUpIcon className="w-8 h-8 text-secondary dark:text-secondary-light" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white">
                 {data.count.toLocaleString()}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
                 £{data.revenue.toFixed(2)} revenue
               </p>
             </div>
@@ -80,8 +80,8 @@ const OrdersThisMonthCard: React.FC<Props> = ({ brandId }) => {
           {trend !== null && (
             <div className={`flex items-center gap-1 text-sm font-medium ${
               trend > 0 
-                ? 'text-green-600 dark:text-green-400' 
-                : 'text-red-600 dark:text-red-400'
+                ? 'text-success dark:text-success-light' 
+                : 'text-danger dark:text-danger-light'
             }`}>
               <ArrowTrendingUpIcon className={`w-4 h-4 ${trend < 0 ? 'rotate-180' : ''}`} />
               {trend > 0 ? '+' : ''}{trend.toFixed(1)}%

@@ -155,9 +155,9 @@ export default function Admin() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
         </svg>
       ),
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'bg-blue-50',
-      textColor: 'text-blue-600'
+      color: 'from-primary to-primary-dark',
+      bgColor: 'bg-primary-50',
+      textColor: 'text-primary'
     },
     {
       title: 'Brand Management',
@@ -168,9 +168,9 @@ export default function Admin() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
         </svg>
       ),
-      color: 'from-purple-500 to-purple-600',
-      bgColor: 'bg-purple-50',
-      textColor: 'text-purple-600'
+      color: 'from-secondary to-secondary-dark',
+      bgColor: 'bg-secondary-50',
+      textColor: 'text-secondary'
     },
     {
       title: 'Product Management',
@@ -181,9 +181,9 @@ export default function Admin() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
         </svg>
       ),
-      color: 'from-green-500 to-green-600',
-      bgColor: 'bg-green-50',
-      textColor: 'text-green-600'
+      color: 'from-success to-success-dark',
+      bgColor: 'bg-success-50',
+      textColor: 'text-success'
     },
     {
       title: 'Order Management',
@@ -194,9 +194,9 @@ export default function Admin() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
-      color: 'from-green-500 to-green-600',
-      bgColor: 'bg-green-50',
-      textColor: 'text-green-600'
+      color: 'from-success to-success-dark',
+      bgColor: 'bg-success-50',
+      textColor: 'text-success'
     },
     {
       title: 'Analytics',
@@ -207,9 +207,9 @@ export default function Admin() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
       ),
-      color: 'from-orange-500 to-orange-600',
-      bgColor: 'bg-orange-50',
-      textColor: 'text-orange-600'
+      color: 'from-warning to-warning-dark',
+      bgColor: 'bg-warning-50',
+      textColor: 'text-warning'
     },
     {
       title: 'Categories',
@@ -220,9 +220,9 @@ export default function Admin() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
         </svg>
       ),
-      color: 'from-indigo-500 to-indigo-600',
-      bgColor: 'bg-indigo-50',
-      textColor: 'text-indigo-600'
+      color: 'from-secondary to-secondary-dark',
+      bgColor: 'bg-secondary-50',
+      textColor: 'text-secondary'
     },
     {
       title: 'Approvals',
@@ -233,9 +233,9 @@ export default function Admin() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      color: 'from-yellow-500 to-yellow-600',
-      bgColor: 'bg-yellow-50',
-      textColor: 'text-yellow-600'
+      color: 'from-warning to-warning-dark',
+      bgColor: 'bg-warning-50',
+      textColor: 'text-warning'
     },
     {
       title: 'Policies',
@@ -246,9 +246,9 @@ export default function Admin() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
-      color: 'from-red-500 to-red-600',
-      bgColor: 'bg-red-50',
-      textColor: 'text-red-600'
+      color: 'from-danger to-danger-dark',
+      bgColor: 'bg-danger-50',
+      textColor: 'text-danger'
     },
     {
       title: 'Support',
@@ -259,16 +259,16 @@ export default function Admin() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z" />
         </svg>
       ),
-      color: 'from-pink-500 to-pink-600',
-      bgColor: 'bg-pink-50',
-      textColor: 'text-pink-600'
+      color: 'from-info to-info-dark',
+      bgColor: 'bg-info-light/20',
+      textColor: 'text-info'
     }
   ];
 
   return (
-    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen flex bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300">
       <SuperAdminSidebar />
-      <div className="flex-1 bg-white dark:bg-gray-950 transition-colors duration-300">
+      <div className="flex-1 bg-white dark:bg-neutral-950 transition-colors duration-300">
         <Head>
           <title>{getPageTitle('Admin Dashboard')}</title>
         </Head>
@@ -282,76 +282,76 @@ export default function Admin() {
         {/* Quick Stats */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 transition-colors duration-300">
+            <div className="bg-card-light dark:bg-card-dark rounded-xl shadow-lg p-6 border border-border-light dark:border-border-dark transition-colors duration-300">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-8 h-8 bg-primary-100 dark:bg-primary-dark/30 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-primary dark:text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                     </svg>
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-green-400">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">1,234</p>
+                  <p className="text-sm font-medium text-neutral dark:text-neutral-400">Total Users</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-white">1,234</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 transition-colors duration-300">
+            <div className="bg-card-light dark:bg-card-dark rounded-xl shadow-lg p-6 border border-border-light dark:border-border-dark transition-colors duration-300">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-8 h-8 bg-success-100 dark:bg-success-dark/30 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-success dark:text-success-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-green-400">Active Brands</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">89</p>
+                  <p className="text-sm font-medium text-neutral dark:text-neutral-400">Active Brands</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-white">89</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 transition-colors duration-300">
+            <div className="bg-card-light dark:bg-card-dark rounded-xl shadow-lg p-6 border border-border-light dark:border-border-dark transition-colors duration-300">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-8 h-8 bg-warning-100 dark:bg-warning-dark/30 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-warning dark:text-warning-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-green-400">Total Products</p>
+                  <p className="text-sm font-medium text-neutral dark:text-neutral-400">Total Products</p>
                   {user.role.toUpperCase() === USER_ROLES.SUPER_ADMIN ? (
                     totalProductError ? (
-                      <p className="text-2xl font-bold text-red-500">{totalProductError}</p>
+                      <p className="text-2xl font-bold text-danger">{totalProductError}</p>
                     ) : totalProductCount === null ? (
-                      <p className="text-2xl font-bold text-gray-400 animate-pulse">...</p>
+                      <p className="text-2xl font-bold text-neutral-400 animate-pulse">...</p>
                     ) : (
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalProductCount}</p>
+                      <p className="text-2xl font-bold text-neutral-900 dark:text-white">{totalProductCount}</p>
                     )
                   ) : (
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{products.length}</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-white">{products.length}</p>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 transition-colors duration-300">
+            <div className="bg-card-light dark:bg-card-dark rounded-xl shadow-lg p-6 border border-border-light dark:border-border-dark transition-colors duration-300">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-purple-600 dark:text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-8 h-8 bg-secondary-100 dark:bg-secondary-dark/30 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-secondary dark:text-secondary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                     </svg>
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-green-400">Revenue</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">£45,678</p>
+                  <p className="text-sm font-medium text-neutral dark:text-neutral-400">Revenue</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-white">£45,678</p>
                 </div>
               </div>
             </div>
@@ -359,13 +359,13 @@ export default function Admin() {
 
           {/* Admin Sections Grid */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Admin Tools</h2>
+            <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6">Admin Tools</h2>
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
               {adminSections.map((section) => (
                 <Link
                   key={section.title}
                   href={section.href}
-                  className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-800 overflow-hidden"
+                  className="group relative bg-card-light dark:bg-card-dark rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-border-light dark:border-border-dark overflow-hidden"
                 >
                   <div className="p-6">
                     <div className={`w-12 h-12 ${section.bgColor} dark:bg-gray-900 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200`}>
