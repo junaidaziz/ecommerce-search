@@ -63,6 +63,7 @@ export interface SignupResponse {
 // Signup token response interface
 export interface SignupTokenResponse {
   token: string;
+  autoConfirmed?: boolean;
 }
 
 // Reset token response interface

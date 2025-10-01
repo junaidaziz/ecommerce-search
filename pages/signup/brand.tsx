@@ -73,20 +73,18 @@ export default function BrandSignup() {
 
   const submit = async (values: any) => {
     try {
-      const data = await signup<{ token: string }>('/api/signup/brand', {
+      const data = await signup<{ token: string; autoConfirmed?: boolean }>('/api/signup/brand', {
         firstName: values.brandName,
         email: values.email,
         password: values.password,
       });
       
-      // On local dev: redirect to /confirm-email?token=xxx for testing
-      // On staging/production: redirect to /confirm-email with email
-      const isLocalDev = process.env.NODE_ENV === 'development';
-      
-      if (isLocalDev) {
-        router.push(`/confirm-email?token=${data.token}&email=${encodeURIComponent(values.email)}`);
+      // If auto-confirmed (local dev), redirect to brand dashboard
+      if (data.autoConfirmed) {
+        router.push('/brand/profile?complete=1');
       } else {
-        router.push(`/confirm-email?email=${encodeURIComponent(values.email)}`);
+        // Production: redirect to confirmation page
+        router.push('/brand/confirmation');
       }
     } catch (e) {
       setFormError('Signup failed');
