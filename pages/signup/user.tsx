@@ -30,7 +30,7 @@ export default function UserSignup() {
     email: string;
     password: string;
     confirm: string;
-  }>({ mode: 'onChange' });
+  }>({ mode: 'onBlur' });
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [formError, setFormError] = useState('');
 

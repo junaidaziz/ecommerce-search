@@ -79,7 +79,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         <AuthSocialLogin />
         <AuthDivider />
         
-        {formError && <div className="text-red-500 mb-2 text-center font-semibold">{formError}</div>}
+        {formError && <div className="text-red-500 text-sm mt-1">{formError}</div>}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <AuthInput

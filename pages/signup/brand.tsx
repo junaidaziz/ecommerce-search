@@ -26,11 +26,11 @@ export default function BrandSignup() {
     clearErrors,
     formState: { errors },
   } = useForm<{
-    firstName: string;
+    brandName: string;
     email: string;
     password: string;
     confirm: string;
-  }>({ mode: 'onChange' });
+  }>({ mode: 'onBlur' });
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -74,7 +74,7 @@ export default function BrandSignup() {
   const submit = async (values: any) => {
     try {
       const data = await signup<{ token: string }>('/api/signup/brand', {
-        firstName: values.firstName,
+        firstName: values.brandName,
         email: values.email,
         password: values.password,
       });
@@ -108,11 +108,11 @@ export default function BrandSignup() {
         <form onSubmit={handleSubmit(submit)} className="space-y-5">
           <AuthInput
             type="text"
-            name="firstName"
-            placeholder="First Name"
+            name="brandName"
+            placeholder="Brand Name"
             register={register}
-            rules={{ required: 'First name is required' }}
-            error={errors.firstName?.message as string}
+            rules={{ required: 'Brand name is required' }}
+            error={errors.brandName?.message as string}
           />
           
           <AuthInput
