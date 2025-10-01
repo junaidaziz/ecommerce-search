@@ -31,18 +31,36 @@ export default async function handler(
     if (await findUser(email)) {
       return res.status(409).json({ message: USER_EXISTS });
     }
+    
     const hashed = await bcrypt.hash(password, 10);
-    const token = crypto.randomBytes(20).toString('hex');
-    await addUser({
-      email,
-      password: hashed,
-      firstName,
-      lastName: '',
-      brandName: '',
-      role: 'BRAND',
-      verificationToken: token,
-    });
-    return res.status(201).json({ token });
+    const autoConfirm = process.env.AUTO_CONFIRM_BRANDS === 'true';
+    
+    if (autoConfirm) {
+      // Local dev: auto-confirm brand accounts
+      await addUser({
+        email,
+        password: hashed,
+        firstName,
+        lastName: '',
+        brandName: '',
+        role: 'BRAND',
+        verified: true,
+      });
+      return res.status(201).json({ token: '', autoConfirmed: true });
+    } else {
+      // Production: require email verification
+      const token = crypto.randomBytes(20).toString('hex');
+      await addUser({
+        email,
+        password: hashed,
+        firstName,
+        lastName: '',
+        brandName: '',
+        role: 'BRAND',
+        verificationToken: token,
+      });
+      return res.status(201).json({ token, autoConfirmed: false });
+    }
   } catch (error) {
     return handleApiError(res, error, 'Failed to sign up brand');
   }

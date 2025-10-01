@@ -2,6 +2,7 @@ import { apiFetch } from '@lib/api';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import { getPageTitle } from '@lib/pageTitle';
 import ConfirmationPage from '@components/pages/ConfirmationPage';
 
