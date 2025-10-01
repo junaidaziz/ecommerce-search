@@ -78,7 +78,16 @@ export default function UserSignup() {
         email: values.email,
         password: values.password,
       });
-      router.push(`/confirm/${data.token}`);
+      
+      // On local dev: redirect to /confirm/${token} for testing
+      // On staging/production: redirect to /confirm-email with email
+      const isLocalDev = process.env.NODE_ENV === 'development';
+      
+      if (isLocalDev) {
+        router.push(`/confirm/${data.token}`);
+      } else {
+        router.push(`/confirm-email?email=${encodeURIComponent(values.email)}`);
+      }
     } catch (e) {
       setFormError('Signup failed');
     }
