@@ -11,7 +11,7 @@ const NavLinks: React.FC = () => {
   ];
   return (
     <nav className="hidden lg:flex gap-6">
-      {links.map(({ href, label }, idx) => (
+      {links.map(({ href, label }) => (
         <Link
           key={href}
           href={href}
@@ -19,7 +19,7 @@ const NavLinks: React.FC = () => {
             (href === '/products' && pathname.startsWith('/products')) || pathname === href
               ? 'font-semibold text-primary border-primary'
               : ''
-          } ${idx === links.length - 1 ? 'mr-8' : ''}`}
+          }`}
         >
           {label}
         </Link>
