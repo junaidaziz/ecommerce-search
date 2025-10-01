@@ -3,15 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import { AppContext } from '@contexts/AppContext';
-import type { AppContextValue } from '../types';
-
-// Define the type for a cart item
-type CartItem = {
-  id: string | number;
-  title: string;
-  minPrice?: string;
-  qty: number;
-};
+import { CartItem, CartTotals, CartActions } from '@components/Cart';
 
 const Cart: React.FC = () => {
   const router = useRouter();
@@ -40,88 +32,82 @@ const Cart: React.FC = () => {
   const shippingCost = cart.length > 0 ? 5 : 0;
 
   return (
-    <div className="max-w-3xl mx-auto min-h-screen p-4">
+    <div className="max-w-4xl mx-auto min-h-screen p-4 sm:p-6 lg:p-8">
       <Head>
         <title>{getPageTitle('Cart')}</title>
       </Head>
-      <h1 className="text-3xl font-bold mb-4">Summary</h1>
-      {cart.length === 0 && <p>Your cart is empty.</p>}
-      <ul className="space-y-4 mb-6">
-        {cart.map((item) => {
-          const price = parseFloat(
-            typeof item.minPrice === 'number'
-              ? item.minPrice.toString()
-              : item.minPrice || '0'
-          );
-          const subtotal = price * item.qty;
-          return (
-            <li
-              key={item.id}
-              className="bg-base-100 border p-4 rounded shadow flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+      
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          Shopping Cart
+        </h1>
+        {cart.length > 0 && (
+          <p className="text-gray-600 dark:text-gray-400">
+            {itemCount} {itemCount === 1 ? 'item' : 'items'} in your cart
+          </p>
+        )}
+      </div>
+
+      {/* Empty State */}
+      {cart.length === 0 && (
+        <div className="text-center py-12">
+          <div className="mb-4">
+            <svg
+              className="mx-auto h-24 w-24 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <div className="flex-1">
-                <p className="font-medium">{item.title}</p>
-                <p className="text-sm text-gray-500">
-                  £{price.toFixed(2)} each
-                </p>
-              </div>
-              <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-end">
-                <div className="flex items-center gap-2">
-                  <button
-                    className="btn btn-xs"
-                    onClick={() =>
-                      changeQty(item.id as string, -1, item.variant?.id)
-                    }
-                  >
-                    -
-                  </button>
-                  <span>{item.qty}</span>
-                  <button
-                    className="btn btn-xs"
-                    onClick={() =>
-                      changeQty(item.id as string, 1, item.variant?.id)
-                    }
-                  >
-                    +
-                  </button>
-                </div>
-                <span className="font-semibold">£{subtotal.toFixed(2)}</span>
-                <button
-                  className="btn btn-ghost btn-xs text-gray-500 hover:bg-red-200"
-                  onClick={() =>
-                    removeFromCart(item.id as string, item.variant?.id)
-                  }
-                  aria-label="Remove"
-                >
-                  🗑️
-                </button>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-      {cart.length > 0 && (
-        <div className="border-t pt-4 space-y-2">
-          <div>
-            <p className="font-semibold">Total Items: {itemCount}</p>
-            <p className="font-semibold">Subtotal: £{totalPrice.toFixed(2)}</p>
-            <p className="font-semibold">
-              Estimated Shipping: £{shippingCost.toFixed(2)}
-            </p>
-            <p className="font-semibold">
-              Total: £{(totalPrice + shippingCost).toFixed(2)}
-            </p>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+              />
+            </svg>
           </div>
-          <div className="flex justify-between">
-            <button className="btn btn-outline" onClick={clearCart}>
-              Empty Cart
-            </button>
-            <button
-              className="btn btn-primary"
-              onClick={() => router.push('/checkout')}
-            >
-              Checkout
-            </button>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+            Your cart is empty
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Start shopping to add items to your cart
+          </p>
+          <button
+            className="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary-light transition-colors"
+            onClick={() => router.push('/')}
+          >
+            Continue Shopping
+          </button>
+        </div>
+      )}
+
+      {/* Cart Items */}
+      {cart.length > 0 && (
+        <div className="space-y-6">
+          <ul className="space-y-4">
+            {cart.map((item) => (
+              <CartItem
+                key={`${item.id}-${item.variant?.id || 'no-variant'}`}
+                item={item}
+                onChangeQty={changeQty}
+                onRemove={removeFromCart}
+              />
+            ))}
+          </ul>
+
+          {/* Totals and Actions */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+            <CartTotals
+              itemCount={itemCount}
+              subtotal={totalPrice}
+              shipping={shippingCost}
+              total={totalPrice + shippingCost}
+            />
+            <CartActions
+              onEmptyCart={clearCart}
+              onCheckout={() => router.push('/checkout')}
+            />
           </div>
         </div>
       )}
