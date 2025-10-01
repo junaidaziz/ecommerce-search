@@ -182,7 +182,7 @@ const SearchBar: FC<SearchBarProps> = ({
       )}
       {showSuggestions && (
         <div
-          className="absolute left-0 mt-1 w-full max-w-[500px] rounded-md shadow-md border border-zinc-700 bg-white/10 dark:bg-zinc-800 z-50 max-h-[300px] overflow-y-auto py-1"
+          className="absolute left-0 mt-1 w-full max-w-[500px] rounded-md shadow-md border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 z-50 max-h-[300px] overflow-y-auto py-1"
         >
           {query && suggestions.length > 0 && (
             <ul>
@@ -190,8 +190,8 @@ const SearchBar: FC<SearchBarProps> = ({
                 <li key={s}>
                   <button
                     type="button"
-                    className={`block w-full text-left px-4 py-2 h-10 cursor-pointer hover:bg-zinc-700 ${
-                      idx === selectedIdx ? 'bg-zinc-700' : ''
+                    className={`block w-full text-left px-4 py-2 h-10 cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700 ${
+                      idx === selectedIdx ? 'bg-gray-100 dark:bg-zinc-700' : ''
                     }`}
                     onMouseDown={(e) => e.preventDefault()}
                     onMouseEnter={() => setSelectedIdx(idx)}
@@ -207,13 +207,13 @@ const SearchBar: FC<SearchBarProps> = ({
             <>
               {showRecent && recent.length > 0 && (
                 <div className="px-1">
-                  <div className="px-4 py-2 text-xs uppercase text-gray-400">Recent</div>
+                  <div className="px-4 py-2 text-xs uppercase text-gray-400 dark:text-gray-500">Recent</div>
                   <ul>
                     {recent.map((r) => (
                       <li key={r}>
                         <button
                           type="button"
-                          className="block w-full text-left px-4 py-2 h-10 cursor-pointer hover:bg-zinc-700"
+                          className="block w-full text-left px-4 py-2 h-10 cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700"
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => selectSuggestion(r)}
                         >
@@ -225,17 +225,17 @@ const SearchBar: FC<SearchBarProps> = ({
                 </div>
               )}
               {showRecent && recent.length > 0 && showTrending && trending.length > 0 && (
-                <hr className="my-2 border-zinc-600" />
+                <hr className="my-2 border-gray-200 dark:border-zinc-600" />
               )}
               {showTrending && trending.length > 0 && (
                 <div className="px-1">
-                  <div className="px-4 py-2 text-xs uppercase text-gray-400">Trending</div>
+                  <div className="px-4 py-2 text-xs uppercase text-gray-400 dark:text-gray-500">Trending</div>
                   <ul>
                     {trending.map((t) => (
                       <li key={t}>
                         <button
                           type="button"
-                          className="block w-full text-left px-4 py-2 h-10 cursor-pointer hover:bg-zinc-700"
+                          className="block w-full text-left px-4 py-2 h-10 cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700"
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => selectSuggestion(t)}
                         >
