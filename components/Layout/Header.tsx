@@ -24,7 +24,7 @@ const Header: FC<HeaderProps> = ({
   ).toString();
 
   if (role === USER_ROLES.BRAND) {
-    return <BrandHeader theme={theme} setTheme={setTheme} />;
+    return <BrandHeader theme={theme} setTheme={setTheme} maxWidthClass={maxWidthClass} />;
   }
   return <UserHeader theme={theme} setTheme={setTheme} maxWidthClass={maxWidthClass} />;
 };
