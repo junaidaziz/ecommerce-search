@@ -24,7 +24,7 @@ export default function Categories() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [confirmAction, setConfirmAction] = useState<null | { type: 'add' | 'edit' | 'delete', payload?: any }>(null);
+  const [confirmAction, setConfirmAction] = useState<null | { type: 'add' | 'edit' | 'delete', payload?: Category }>(null);
   const [editModal, setEditModal] = useState<{ open: boolean; cat: Category | null }>({ open: false, cat: null });
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState({ label: 'A-Z', value: 'az' });
@@ -361,4 +361,6 @@ export default function Categories() {
   );
 }
 
-(Categories as any).getLayout = (page: React.ReactNode) => <AdminPanelLayout>{page}</AdminPanelLayout>;
+Object.assign(Categories, {
+  getLayout: (page: React.ReactNode) => <AdminPanelLayout>{page}</AdminPanelLayout>
+});

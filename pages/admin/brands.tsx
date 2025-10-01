@@ -36,7 +36,7 @@ export default function ManageBrands() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   const [message, setMessage] = useState<string>('');
   const [sortBy, setSortBy] = useState('newest');
-  const [confirmAction, setConfirmAction] = useState<null | { type: 'delete' | 'toggle' | 'verify', payload: any }>(null);
+  const [confirmAction, setConfirmAction] = useState<null | { type: 'delete' | 'toggle' | 'verify', payload: Vendor }>(null);
   const [editBrand, setEditBrand] = useState<Vendor | null>(null);
   const [editBrandName, setEditBrandName] = useState('');
   const [editLoading, setEditLoading] = useState(false);

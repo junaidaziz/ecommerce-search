@@ -36,7 +36,7 @@ export default function AdminProducts() {
   const [photos, setPhotos] = useState<File[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SelectOption>({ label: 'Newest', value: 'newest' });
-  const [confirmAction, setConfirmAction] = useState<null | { type: 'add' | 'edit' | 'delete', payload?: any }>(null);
+  const [confirmAction, setConfirmAction] = useState<null | { type: 'add' | 'edit' | 'delete', payload?: Product }>(null);
   const [disableModal, setDisableModal] = useState<{ open: boolean; product: Product | null }>({ open: false, product: null });
 
   const sortOptions: SelectOption[] = [
@@ -110,14 +110,14 @@ export default function AdminProducts() {
     const res = await fetch(`/api/vendors?${params.toString()}`);
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.vendors || []).map((v: any) => ({ label: v.brandName, value: v.id }));
+    return (data.vendors || []).map((v: { brandName: string; id: number }) => ({ label: v.brandName, value: v.id }));
   }, []);
   const fetchCategories = useCallback(async (input = '') => {
     const params = new URLSearchParams({ search: input, limit: '20' });
     const res = await fetch(`/api/categories?${params.toString()}`);
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.categories || []).map((c: any) => ({ label: c.name, value: c.id }));
+    return (data.categories || []).map((c: { name: string; id: number }) => ({ label: c.name, value: c.id }));
   }, []);
   const fetchTags = useCallback(async (input = '') => {
     const params = new URLSearchParams({ search: input });
@@ -208,8 +208,8 @@ export default function AdminProducts() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
   // Helper to extract value for submission
-  const getValue = (option: any) => (option && typeof option === 'object' && 'value' in option ? option.value : option);
-  const getMultiValues = (options: any) => Array.isArray(options) ? options.map(getValue) : [];
+  const getValue = (option: SelectOption | string | number) => (option && typeof option === 'object' && 'value' in option ? option.value : option);
+  const getMultiValues = (options: SelectOption[] | string[] | number[]) => Array.isArray(options) ? options.map(getValue) : [];
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData();
