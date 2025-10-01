@@ -3,6 +3,7 @@ import Image from 'next/image';
 import type { Image as ProductImage } from '@/types';
 import ChevronLeftIcon from '../icons/ChevronLeftIcon';
 import ChevronRightIcon from '../icons/ChevronRightIcon';
+import { getProductPlaceholderImage } from '@utils/productImageUtils';
 
 export interface ProductImageSliderProps {
   images?: ProductImage[];
@@ -42,7 +43,9 @@ export default function ProductImageSlider({
       .map((img) => (typeof img === 'string' ? img : img?.url))
       .filter((u): u is string => typeof u === 'string' && !!u && u !== '[]');
   }
-  const placeholderUrl = `https://picsum.photos/seed/${placeholderSeed}/400/400`;
+  
+  // Use Unsplash for better placeholder images
+  const placeholderUrl = getProductPlaceholderImage(placeholderSeed, 'product');
   const [errorMap, setErrorMap] = useState<Record<number, boolean>>({});
 
   // If no valid urls, always use placeholder
