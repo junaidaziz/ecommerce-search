@@ -77,7 +77,7 @@ export function AppProvider({ children }: AppProviderProps) {
     if (!hasMergedCart.current) {
       hasMergedCart.current = true;
       const mergedFor = localStorage.getItem(CART_MERGED_KEY);
-      const promises: Promise<any>[] = [];
+      const promises: Promise<unknown>[] = [];
 
       if (mergedFor !== user.email) {
         promises.push(

@@ -36,7 +36,7 @@ export default async function handler(
     return;
   }
   if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as any;
+    const session = event.data.object as Stripe.Checkout.Session;
     const orderId = session.metadata?.orderId;
     try {
       if (orderId) {

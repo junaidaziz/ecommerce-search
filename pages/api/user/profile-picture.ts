@@ -5,6 +5,7 @@ import { updateUserProfile } from '@lib/users';
 import { uploadFileToS3 } from '@lib/s3';
 import { handleApiError } from '@utils/handleApiError';
 import formidable, { type Fields, type Files, type File } from 'formidable';
+import { Prisma } from '@prisma/client';
 import {
   METHOD_NOT_ALLOWED,
   UNAUTHORIZED,
@@ -48,7 +49,7 @@ export default async function handler(
 
     const { fields, files } = await parseBody(req);
     const remove = fields.remove === 'true';
-    const update: any = {};
+    const update: Prisma.UserUpdateInput = {};
 
     const profileImageFile = files.profileImage as File | File[] | undefined;
     if (profileImageFile) {

@@ -34,7 +34,7 @@ export default function ManageUsers() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('newest');
-  const [confirmAction, setConfirmAction] = useState<null | { type: 'delete' | 'edit', payload: any }>(null);
+  const [confirmAction, setConfirmAction] = useState<null | { type: 'delete' | 'edit', payload: AdminUser }>(null);
   const [editModal, setEditModal] = useState<{
     isOpen: boolean;
     user: AdminUser | null;
@@ -375,8 +375,9 @@ export default function ManageUsers() {
                 if (!res.ok) throw new Error((await res.json()).message || 'Failed to add super admin');
                 setNewSuperAdmin({ email: '', password: '', loading: false, error: '', success: 'Super admin added!' });
                 fetchUsers();
-              } catch (err: any) {
-                setNewSuperAdmin((s) => ({ ...s, loading: false, error: err.message || 'Failed to add super admin', success: '' }));
+              } catch (err) {
+                const errorMessage = err instanceof Error ? err.message : 'Failed to add super admin';
+                setNewSuperAdmin((s) => ({ ...s, loading: false, error: errorMessage, success: '' }));
               }
             }}
           >

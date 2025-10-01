@@ -36,7 +36,7 @@ export interface AnalyticsData {
 export interface ChartConfig {
   type: 'line' | 'bar' | 'doughnut' | 'pie';
   data: AnalyticsData;
-  options?: Record<string, any>;
+  options?: Record<string, unknown>;
 }
 
 // Admin analytics API response type

@@ -1,4 +1,4 @@
-import type { Coupon as PrismaCoupon } from '@prisma/client';
+import type { Coupon as PrismaCoupon, CouponUsage as PrismaCouponUsage } from '@prisma/client';
 import type { User } from './user';
 
 // Base Coupon type matching Prisma schema
@@ -7,7 +7,7 @@ export type Coupon = PrismaCoupon;
 // Coupon with relations (for app use)
 export type CouponWithRelations = Coupon & {
   user?: User;
-  usages?: any[]; // Replace with CouponUsage[] if you have that type
+  usages?: PrismaCouponUsage[];
 };
 
 // Input type for creating coupons (matches Prisma fields)
