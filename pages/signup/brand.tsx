@@ -79,12 +79,12 @@ export default function BrandSignup() {
         password: values.password,
       });
       
-      // On local dev: redirect to /confirm/${token} for testing
+      // On local dev: redirect to /confirm-email?token=xxx for testing
       // On staging/production: redirect to /confirm-email with email
       const isLocalDev = process.env.NODE_ENV === 'development';
       
       if (isLocalDev) {
-        router.push(`/confirm/${data.token}`);
+        router.push(`/confirm-email?token=${data.token}&email=${encodeURIComponent(values.email)}`);
       } else {
         router.push(`/confirm-email?email=${encodeURIComponent(values.email)}`);
       }
