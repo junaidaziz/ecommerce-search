@@ -12,7 +12,7 @@ interface LayoutProps {
 
 const Layout: FC<LayoutProps> = ({ children, heroSecond, maxWidthClass }) => {
   const { theme, setTheme } = useThemeContext();
-  const containerWidth = maxWidthClass ?? 'max-w-[98%] 3xl:max-w-[1440px]';
+  const containerWidth = maxWidthClass ?? 'max-w-7xl';
   const router = useRouter();
   const isAdminRoute = router.pathname.startsWith('/admin');
 

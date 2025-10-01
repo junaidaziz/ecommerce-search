@@ -292,7 +292,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         <meta name="description" content="Discover amazing products from top brands" />
       </Head>
       {/* Hero Section */}
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
         <div className="text-center mb-10">
           <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">Discover Amazing Products</h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-4">Explore our curated collection of premium products from trusted brands.</p>
@@ -302,10 +302,10 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
             <span className="flex items-center gap-2"><LockIcon className="w-5 h-5 text-purple-500" />Secure Checkout</span>
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row gap-10 items-start">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 xl:gap-10 items-start">
           {/* Filters Sidebar */}
-          <aside className="lg:w-80 w-full mb-6 lg:mb-0">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sticky border border-gray-100 dark:border-gray-700 transition-all duration-300">
+          <aside className="w-full lg:w-72 xl:w-80 mb-6 lg:mb-0 lg:sticky lg:top-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-100 dark:border-gray-700 transition-all duration-300">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-base-content">Filters</h2>
                 <button
@@ -401,6 +401,6 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   );
 };
 
-ProductsPage.maxWidthClass = 'max-w-[95%] 2xl:max-w-[1440px]';
+ProductsPage.maxWidthClass = 'max-w-7xl';
 
 export default ProductsPage;
