@@ -137,7 +137,7 @@ const BrandOrders: React.FC = () => {
       </Head>
       
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white">
+      <div className="brand-panel-gradient text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">

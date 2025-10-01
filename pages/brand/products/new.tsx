@@ -184,7 +184,7 @@ const NewProductPage: React.FC = () => {
       </Head>
       
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white">
+      <div className="brand-panel-gradient text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center space-x-4 mb-6">
             <Link

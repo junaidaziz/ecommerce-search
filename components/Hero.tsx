@@ -62,7 +62,7 @@ const Hero: FC = () => (
               className="object-cover"
               priority={i === 0}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
+            <div className="hero-image-overlay" />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="max-w-2xl w-full bg-white/80 dark:bg-gray-900/80 rounded-2xl p-8 md:p-14 shadow-lg backdrop-blur-sm mx-auto text-center">
                 <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 leading-tight drop-shadow-lg">{slide.headline}</h1>

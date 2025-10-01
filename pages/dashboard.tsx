@@ -24,7 +24,7 @@ const DashboardPage: React.FC = () => {
         <title>{getPageTitle('Dashboard')}</title>
       </Head>
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-green-600 via-blue-600 to-green-800">
+      <div className="relative overflow-hidden hero-gradient">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
