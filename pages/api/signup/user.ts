@@ -30,7 +30,16 @@ export default async function handler(
       return res.status(409).json({ message: USER_EXISTS });
     }
     const hashed = await bcrypt.hash(password, 10);
-    const token = crypto.randomBytes(20).toString('hex');
+    
+    // Check if we're in production environment
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    // Generate token only in production
+    const token = isProduction ? crypto.randomBytes(20).toString('hex') : null;
+    
+    // In local/dev, auto-confirm by setting verified to true
+    const verified = !isProduction;
+    
     await addUser({
       email,
       password: hashed,
@@ -39,8 +48,11 @@ export default async function handler(
       gender: 'other',
       role: 'USER',
       verificationToken: token,
+      verified,
     });
-    return res.status(201).json({ token });
+    
+    // Return token only in production (for email confirmation flow)
+    return res.status(201).json({ token: token || '' });
   } catch (error) {
     return handleApiError(res, error, 'Failed to sign up user');
   }

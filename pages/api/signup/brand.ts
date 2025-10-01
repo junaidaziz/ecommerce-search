@@ -3,12 +3,13 @@ import { addUser, findUser } from '@lib/users';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '@utils/handleApiError';
-import type { SignupTokenResponse, ApiMessage } from '@/types';
+import type { ApiMessage } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   MISSING_REQUIRED_FIELDS,
   USER_EXISTS,
 } from '@/constants/messages';
+import { SignupTokenResponse } from 'types/api';
 
 export default async function handler(
   req: NextApiRequest,
@@ -33,34 +34,29 @@ export default async function handler(
     }
     
     const hashed = await bcrypt.hash(password, 10);
-    const autoConfirm = process.env.AUTO_CONFIRM_BRANDS === 'true';
     
-    if (autoConfirm) {
-      // Local dev: auto-confirm brand accounts
-      await addUser({
-        email,
-        password: hashed,
-        firstName,
-        lastName: '',
-        brandName: '',
-        role: 'BRAND',
-        verified: true,
-      });
-      return res.status(201).json({ token: '', autoConfirmed: true });
-    } else {
-      // Production: require email verification
-      const token = crypto.randomBytes(20).toString('hex');
-      await addUser({
-        email,
-        password: hashed,
-        firstName,
-        lastName: '',
-        brandName: '',
-        role: 'BRAND',
-        verificationToken: token,
-      });
-      return res.status(201).json({ token, autoConfirmed: false });
-    }
+    // Check if we're in production environment
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    // Generate token only in production
+    const token = isProduction ? crypto.randomBytes(20).toString('hex') : null;
+    
+    // In local/dev, auto-confirm by setting verified to true
+    const verified = !isProduction;
+    
+    await addUser({
+      email,
+      password: hashed,
+      firstName,
+      lastName: '',
+      brandName: '',
+      role: 'BRAND',
+      verificationToken: token,
+      verified,
+    });
+    
+    // Return token only in production (for email confirmation flow)
+    return res.status(201).json({ token: token || '' });
   } catch (error) {
     return handleApiError(res, error, 'Failed to sign up brand');
   }
