@@ -15,11 +15,13 @@ import type { Theme } from '@contexts/ThemeContext';
 interface HeaderProps {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  maxWidthClass?: string;
 }
 
 const BrandHeader: FC<HeaderProps> = ({
   theme,
   setTheme,
+  maxWidthClass,
 }) => {
   const router = useRouter();
   const { data: session } = useSession();
@@ -36,10 +38,11 @@ const BrandHeader: FC<HeaderProps> = ({
   const logout = () => signOut({ callbackUrl: '/', redirect: true });
 
   return (
-    <header className="relative bg-white/95 dark:bg-gray-950/95 mb-6 py-4 shadow-md border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm transition-colors duration-300">
+    <header className="sticky top-0 z-30 bg-white/95 dark:bg-gray-950/95 shadow-sm border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm transition-colors duration-300">
       <div
-        className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2"
+        className={`w-full px-4 sm:px-6 lg:px-8 mx-auto ${maxWidthClass || 'max-w-7xl'}`}
       >
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 min-h-20 py-4">
         <Link
           href="/"
           className="p-0 flex items-center cursor-pointer transition-transform duration-300 ease-out hover:scale-110 hover:-translate-y-1 hover:shadow-xl"
@@ -200,6 +203,7 @@ const BrandHeader: FC<HeaderProps> = ({
             )
           )}
         </nav>
+        </div>
       </div>
     </header>
   );
