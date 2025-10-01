@@ -13,7 +13,7 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({ inWishlist, onToggle })
       type="button"
       variant="ghost"
       size="sm"
-      className="absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-base-200 border border-base-300 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-110 hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary p-0"
+      className="button-top-right-sm bg-base-200 border border-base-300 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-110 hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary p-0"
       onClick={onToggle}
       aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
     >

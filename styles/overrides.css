@@ -1,0 +1,143 @@
+/**
+ * Overrides and One-Off Styles
+ * 
+ * This file contains special-case styles, overrides, and one-off utility classes
+ * that don't fit into component-specific styles. This keeps component files clean
+ * and focused on their core functionality.
+ */
+
+/* ==================== Status Badge Styles ==================== */
+
+/* Base status badge - used across multiple pages for consistent styling */
+.status-badge {
+  @apply inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide;
+}
+
+/* Status badge color variants */
+.status-badge-success {
+  @apply bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300;
+}
+
+.status-badge-warning {
+  @apply bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300;
+}
+
+.status-badge-danger {
+  @apply bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300;
+}
+
+.status-badge-info {
+  @apply bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300;
+}
+
+.status-badge-neutral {
+  @apply bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200;
+}
+
+.status-badge-emerald {
+  @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300;
+}
+
+/* ==================== Avatar & Circle Styles ==================== */
+
+/* Profile avatar circle - used in profile pages */
+.avatar-circle {
+  @apply w-24 h-24 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg border-4 border-white;
+}
+
+.avatar-circle-emerald {
+  @apply bg-emerald-500;
+}
+
+/* Avatar image - used in profile components */
+.avatar-image {
+  @apply w-24 h-24 rounded-full object-cover;
+}
+
+/* Placeholder avatar */
+.avatar-placeholder {
+  @apply w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-white font-semibold text-xl;
+}
+
+/* ==================== Absolute Positioning Overrides ==================== */
+
+/* Edit button positioned at top-right */
+.edit-button-top-right {
+  @apply absolute top-6 right-6 flex items-center gap-2 px-5 py-2 rounded-full bg-primary text-white font-semibold shadow-lg hover:bg-primary/90 transition text-base;
+}
+
+/* Small button positioned at top-right corner */
+.button-top-right-sm {
+  @apply absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center rounded-full;
+}
+
+.button-top-right-corner {
+  @apply absolute top-6 right-6 z-10;
+}
+
+/* ==================== Gradient Background Styles ==================== */
+
+/* Hero gradient - used in dashboard and landing pages */
+.hero-gradient {
+  @apply bg-gradient-to-r from-green-600 via-blue-600 to-green-800;
+}
+
+/* Brand panel gradient - used in brand admin pages */
+.brand-panel-gradient {
+  @apply bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600;
+}
+
+/* Signup gradient overlay */
+.signup-gradient-overlay {
+  @apply absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 dark:from-primary-dark/20 dark:to-secondary-dark/20;
+}
+
+/* Hover gradient overlay */
+.hover-gradient-overlay {
+  @apply absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300;
+}
+
+/* Hero image overlay */
+.hero-image-overlay {
+  @apply absolute inset-0 bg-gradient-to-r from-black/60 to-transparent;
+}
+
+/* ==================== Image Thumbnail Styles ==================== */
+
+/* Small product image thumbnail */
+.product-thumbnail-sm {
+  @apply w-16 h-16 rounded object-cover border;
+}
+
+/* ==================== Special Layout Overrides ==================== */
+
+/* Profile page container with specific styling */
+.profile-container {
+  @apply relative w-full max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col gap-8;
+}
+
+/* Info card used in profile sections */
+.info-card {
+  @apply bg-base-50 rounded-2xl shadow p-6 flex-1 min-w-[220px];
+}
+
+/* ==================== Table Role Badge (admin pages) ==================== */
+
+/* Role badge specifically for table cells */
+.table-role-badge {
+  @apply inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide;
+}
+
+/* ==================== Special Margin & Alignment Overrides ==================== */
+
+/* Special margin for role badge under avatar */
+.role-badge-below-avatar {
+  @apply mt-3;
+}
+
+/* ==================== Card & Panel Overrides ==================== */
+
+/* Order detail card */
+.order-detail-card {
+  @apply bg-white rounded-xl shadow p-6;
+}

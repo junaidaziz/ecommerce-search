@@ -8,6 +8,7 @@ import { Toaster } from 'sonner';
 import 'react-quill/dist/quill.snow.css';
 import '../styles/globals.css';
 import '../styles/custom.css';
+import '../styles/overrides.css';
 import { ThemeProvider } from '@contexts/ThemeContext';
 
 interface PageComponent {

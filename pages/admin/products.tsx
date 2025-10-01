@@ -342,13 +342,13 @@ export default function AdminProducts() {
                 <td key={product.id + '-category'} className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{product.category?.name || 'Uncategorized'}</td>,
                 <td key={product.id + '-stock'} className="px-6 py-4 whitespace-nowrap">
                   {product.quantity > 5 ? (
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">{product.quantity}</span>
+                    <span className="status-badge status-badge-success">{product.quantity}</span>
                   ) : (
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300">{product.quantity} Low</span>
+                    <span className="status-badge status-badge-danger">{product.quantity} Low</span>
                   )}
                 </td>,
                 <td key={product.id + '-status'} className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${product.status === 'ACTIVE' ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200'}`}>{product.status === 'ACTIVE' ? 'Active' : 'Inactive'}</span>
+                  <span className={`status-badge ${product.status === 'ACTIVE' ? 'status-badge-success' : 'status-badge-neutral'}`}>{product.status === 'ACTIVE' ? 'Active' : 'Inactive'}</span>
                 </td>,
                 <td key={product.id + '-actions'} className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex items-center space-x-2">

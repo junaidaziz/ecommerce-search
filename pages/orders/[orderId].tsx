@@ -56,14 +56,14 @@ export default function OrderDetail() {
       <Head>
         <title>{getPageTitle(`Order #${order.id}`)}</title>
       </Head>
-      <div className="bg-white rounded-xl shadow p-6">
+      <div className="order-detail-card">
         <h1 className="text-2xl font-bold mb-2">Order #{order.id}</h1>
         <div className="flex flex-wrap gap-4 items-center mb-4">
-          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide 
-            ${order.status === 'completed' || order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-              order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-              order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-              'bg-blue-100 text-blue-700'}`}
+          <span className={`status-badge 
+            ${order.status === 'completed' || order.status === 'delivered' ? 'status-badge-success' :
+              order.status === 'pending' ? 'status-badge-warning' :
+              order.status === 'cancelled' ? 'status-badge-danger' :
+              'status-badge-info'}`}
           >
             {order.status}
           </span>
@@ -74,9 +74,9 @@ export default function OrderDetail() {
           <div className="flex items-center gap-3 mt-1">
             {order.product?.featuredImage &&
               (typeof order.product.featuredImage === 'string' ? (
-                <img src={order.product.featuredImage} alt={order.product.title} className="w-16 h-16 rounded object-cover border" />
+                <img src={order.product.featuredImage} alt={order.product.title} className="product-thumbnail-sm" />
               ) : (order.product.featuredImage && typeof order.product.featuredImage === 'object' && 'url' in order.product.featuredImage) ? (
-                <img src={(order.product.featuredImage as { url: string }).url} alt={order.product.title} className="w-16 h-16 rounded object-cover border" />
+                <img src={(order.product.featuredImage as { url: string }).url} alt={order.product.title} className="product-thumbnail-sm" />
               ) : null)
             }
             <div>

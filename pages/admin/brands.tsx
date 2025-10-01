@@ -250,24 +250,20 @@ export default function ManageBrands() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">
+                      <span className="status-badge status-badge-success">
                         {brand.role?.replace('_', ' ') || 'BRAND'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
-                        brand.active
-                          ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
-                          : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
+                      <span className={`status-badge ${
+                        brand.active ? 'status-badge-success' : 'status-badge-danger'
                       }`}>
                         {brand.active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
-                        brand.verified
-                          ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                          : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300'
+                      <span className={`status-badge ${
+                        brand.verified ? 'status-badge-info' : 'status-badge-warning'
                       }`}>
                         {brand.verified ? 'Verified' : 'Pending'}
                       </span>

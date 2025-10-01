@@ -85,16 +85,16 @@ const ProfileAvatarUploader: React.FC = () => {
           <img
             src={preview}
             alt="preview"
-            className="w-24 h-24 rounded-full object-cover"
+            className="avatar-image"
           />
         ) : current ? (
           <img
             src={current}
             alt="avatar"
-            className="w-24 h-24 rounded-full object-cover"
+            className="avatar-image"
           />
         ) : (
-          <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-white font-semibold text-xl">
+          <div className="avatar-placeholder">
             {initials}
           </div>
         )}

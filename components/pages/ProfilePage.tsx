@@ -95,11 +95,11 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center min-h-[70vh] bg-base-100 py-10 px-2">
-      <div className="relative w-full max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col gap-8">
+      <div className="profile-container">
         {/* Edit Button */}
         <Link
           href="/settings"
-          className="absolute top-6 right-6 flex items-center gap-2 px-5 py-2 rounded-full bg-primary text-white font-semibold shadow-lg hover:bg-primary/90 transition text-base"
+          className="edit-button-top-right"
         >
           <PencilSquareIcon className="w-5 h-5" />
           Edit Profile
@@ -107,13 +107,13 @@ const ProfilePage: React.FC = () => {
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row md:items-center gap-6">
           <div className="flex-shrink-0 flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full bg-emerald-500 flex items-center justify-center text-white text-4xl font-bold shadow-lg border-4 border-white">
+            <div className="avatar-circle avatar-circle-emerald">
               {(user.firstName?.[0] || '').toUpperCase()}{(user.lastName?.[0] || '').toUpperCase()}
             </div>
             {profile?.role && (
-              <span className={`mt-3 inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide 
-                ${profile.role === USER_ROLES.SUPER_ADMIN ? 'bg-blue-100 text-blue-700' :
-                  profile.role === USER_ROLES.BRAND ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}
+              <span className={`status-badge role-badge-below-avatar
+                ${profile.role === USER_ROLES.SUPER_ADMIN ? 'status-badge-info' :
+                  profile.role === USER_ROLES.BRAND ? 'status-badge-emerald' : 'status-badge-neutral'}`}
               >
                 {profile.role === USER_ROLES.SUPER_ADMIN ? 'Admin' : profile.role === USER_ROLES.BRAND ? 'Brand' : 'User'}
               </span>
@@ -139,7 +139,7 @@ const ProfilePage: React.FC = () => {
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Contact Info */}
-          <section className="bg-base-50 rounded-2xl shadow p-6 flex-1 min-w-[220px]">
+          <section className="info-card">
             <h2 className="flex items-center gap-2 text-base font-semibold mb-3 text-gray-800">
               <UserIcon className="w-5 h-5" /> Contact Info
             </h2>
@@ -147,7 +147,7 @@ const ProfilePage: React.FC = () => {
             {renderRow('Phone', profile?.phoneNumber)}
           </section>
           {/* Address Info */}
-          <section className="bg-base-50 rounded-2xl shadow p-6 flex-1 min-w-[220px]">
+          <section className="info-card">
             <h2 className="flex items-center gap-2 text-base font-semibold mb-3 text-gray-800">
               <HomeIcon className="w-5 h-5" /> Address Info
             </h2>
@@ -157,7 +157,7 @@ const ProfilePage: React.FC = () => {
             {renderRow('Postal Code', profile?.postalCode)}
           </section>
           {/* Account Info */}
-          <section className="bg-base-50 rounded-2xl shadow p-6 flex-1 min-w-[220px] md:col-span-2">
+          <section className="info-card md:col-span-2">
             <h2 className="flex items-center gap-2 text-base font-semibold mb-3 text-gray-800">
               <MoneyIcon className="w-5 h-5" /> Account Info
             </h2>

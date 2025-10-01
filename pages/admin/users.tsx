@@ -237,23 +237,21 @@ export default function ManageUsers() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
+                      <span className={`status-badge ${
                         user.role === 'SUPER_ADMIN' 
                           ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300'
                           : user.role === 'ADMIN'
-                          ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                          ? 'status-badge-info'
                           : user.role === 'BRAND'
-                          ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
-                          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200'
+                          ? 'status-badge-success'
+                          : 'status-badge-neutral'
                       }`}>
                         {user.role.replace('_', ' ')}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
-                        user.disabled
-                          ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
-                          : 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                      <span className={`status-badge ${
+                        user.disabled ? 'status-badge-danger' : 'status-badge-success'
                       }`}>
                         {user.disabled ? 'Disabled' : 'Active'}
                       </span>
