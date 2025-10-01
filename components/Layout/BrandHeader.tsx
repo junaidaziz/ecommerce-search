@@ -36,7 +36,7 @@ const BrandHeader: FC<HeaderProps> = ({
   const logout = () => signOut({ callbackUrl: '/', redirect: true });
 
   return (
-    <header className="relative bg-base-300 mb-6 py-4 shadow-md border-b border-base-200">
+    <header className="relative bg-white/95 dark:bg-gray-950/95 mb-6 py-4 shadow-md border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm transition-colors duration-300">
       <div
         className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-6 gap-y-2"
       >
@@ -58,19 +58,19 @@ const BrandHeader: FC<HeaderProps> = ({
             <>
               <Link
                 href="/brand/dashboard"
-                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname === '/brand/dashboard' ? 'font-semibold text-primary border-primary' : ''}`}
+                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-300 hover:text-primary hover:border-primary hover:scale-105 ${pathname === '/brand/dashboard' ? 'font-semibold text-primary border-primary' : ''}`}
               >
                 Dashboard
               </Link>
               <Link
                 href="/brand/orders"
-                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname === '/brand/orders' ? 'font-semibold text-primary border-primary' : ''}`}
+                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-300 hover:text-primary hover:border-primary hover:scale-105 ${pathname === '/brand/orders' ? 'font-semibold text-primary border-primary' : ''}`}
               >
                 Orders
               </Link>
               <Link
                 href="/brand/analytics"
-                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 hover:text-primary/80 hover:border-primary hover:scale-105 ${pathname === '/brand/analytics' ? 'font-semibold text-primary border-primary' : ''}`}
+                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-300 hover:text-primary hover:border-primary hover:scale-105 ${pathname === '/brand/analytics' ? 'font-semibold text-primary border-primary' : ''}`}
               >
                 Analytics
               </Link>
@@ -83,68 +83,76 @@ const BrandHeader: FC<HeaderProps> = ({
               <Link
                 href="/brand/products/new"
                 title="Add a new product"
-                className="btn btn-primary btn-sm"
+                className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
               >
                 + Add Product
               </Link>
               <Link
                 href="/brand/orders"
                 title="View orders"
-                className={`btn btn-sm ${pathname.startsWith('/brand/orders') ? 'btn-primary' : ''}`}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md ${
+                  pathname.startsWith('/brand/orders')
+                    ? 'text-white bg-primary'
+                    : 'text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
               >
                 🧾 View Orders
               </Link>
               <Link
                 href="/brand/analytics"
                 title="Open analytics"
-                className={`btn btn-sm ${pathname.startsWith('/brand/analytics') ? 'btn-primary' : ''}`}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md ${
+                  pathname.startsWith('/brand/analytics')
+                    ? 'text-white bg-primary'
+                    : 'text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
               >
                 📈 Open Analytics
               </Link>
             </div>
           )}
           <NotificationBell />
-          <label className="swap swap-rotate btn btn-ghost btn-circle tooltip tooltip-bottom" data-tip={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
-            <input
-              type="checkbox"
-              aria-label="Toggle dark mode"
-              checked={theme === 'dark'}
-              onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="sr-only"
-            />
-            <MoonIcon className="swap-on w-5 h-5 text-primary" />
-            <SunIcon className="swap-off w-5 h-5 text-primary" />
-          </label>
+          <button
+            type="button"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+            aria-label="Toggle dark mode"
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? (
+              <SunIcon className="w-5 h-5 text-primary" />
+            ) : (
+              <MoonIcon className="w-5 h-5 text-primary" />
+            )}
+          </button>
           {user ? (
-            <div className="dropdown dropdown-end">
-              <label
-                tabIndex={0}
-                className="flex items-center gap-2 cursor-pointer"
+            <div className="relative group">
+              <button
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer"
               >
                 {user.logo ? (
                   <img
                     src={user.logo}
                     alt="avatar"
-                    className="w-6 h-6 rounded-full object-cover"
+                    className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
                   />
                 ) : (
-                  <UserIcon className="w-5 h-5" />
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                    <UserIcon className="w-5 h-5 text-white" />
+                  </div>
                 )}
-                <span>
+                <span className="font-medium">
                   {user.name?.trim() ||
                     (user.firstName || user.lastName
                       ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
                       : user.email)}
                 </span>
-              </label>
-              <ul
-                tabIndex={0}
-                className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded w-40"
-              >
+              </button>
+              <ul className="absolute right-0 top-full mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
                 <li>
                   <Link
                     href="/brand/profile"
-                    className="transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105"
+                    className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-t-lg transition-colors duration-200"
                   >
                     Profile
                   </Link>
@@ -152,7 +160,7 @@ const BrandHeader: FC<HeaderProps> = ({
                 <li>
                   <button
                     onClick={logout}
-                    className="transition-colors transition-transform duration-200 hover:text-primary hover:underline hover:scale-105"
+                    className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-b-lg transition-colors duration-200"
                   >
                     Logout
                   </button>
@@ -165,14 +173,14 @@ const BrandHeader: FC<HeaderProps> = ({
                 <Link
                   href="/login"
                   aria-label="Login"
-                  className="btn btn-ghost"
+                  className="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200"
                 >
                   Login
                 </Link>
                 <Link
                   href="/signup"
                   aria-label="Create an account"
-                  className="btn btn-primary px-4 hover:opacity-90"
+                  className="px-4 py-2 text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
                 >
                   Signup
                 </Link>
