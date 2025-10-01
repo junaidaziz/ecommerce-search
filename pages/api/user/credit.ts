@@ -3,11 +3,22 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
-const balanceStore = new Map<string, { balance: number; history: { amount: number; date: string; type: string }[] }>();
+interface CreditHistory {
+  amount: number;
+  date: string;
+  type: string;
+}
+
+interface CreditBalance {
+  balance: number;
+  history: CreditHistory[];
+}
+
+const balanceStore = new Map<string, CreditBalance>();
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<any>
+  res: NextApiResponse<CreditBalance | { message: string }>
 ): Promise<void> {
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user) return res.status(401).json({ message: UNAUTHORIZED });
@@ -18,5 +29,5 @@ export default async function handler(
   if (!balanceStore.has(session.user.email))
     balanceStore.set(session.user.email, { balance: 0, history: [] });
 
-  res.status(200).json(balanceStore.get(session.user.email));
+  res.status(200).json(balanceStore.get(session.user.email)!);
 }

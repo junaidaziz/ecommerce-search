@@ -10,6 +10,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 
 type CheckoutSessionOut = { id: string; url: string };
 
+interface CheckoutItem {
+  title: string;
+  minPrice?: number | string;
+  qty: number;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CheckoutSessionOut | ApiMessage>
@@ -26,11 +32,11 @@ export default async function handler(
   try {
     const stripeLineItems = lineItems
       ? lineItems
-      : items.map((it: any) => ({
+      : (items as CheckoutItem[]).map((it) => ({
           price_data: {
             currency: 'usd',
             product_data: { name: it.title },
-            unit_amount: Math.round(parseFloat(it.minPrice || 0) * 100),
+            unit_amount: Math.round(parseFloat(String(it.minPrice || 0)) * 100),
           },
           quantity: it.qty,
         }));
