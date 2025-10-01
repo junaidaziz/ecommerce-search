@@ -27,6 +27,7 @@ export async function addUser({
   stripeAccountId,
   role = 'USER',
   verificationToken,
+  verified,
 }: UserInput): Promise<void> {
   await prisma.user.create({
     data: {
@@ -52,6 +53,7 @@ export async function addUser({
       disabled: false,
       active: true,
       verificationToken,
+      verified: verified ?? false,
     },
   });
 }
