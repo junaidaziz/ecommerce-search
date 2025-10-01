@@ -8,6 +8,7 @@ import ProductBadges from './ProductBadges';
 import ProductInfo from './ProductInfo';
 import ProductPrice from './ProductPrice';
 import WishlistButton from './WishlistButton';
+import { parseProductImages } from '@utils/productImageUtils';
 
 interface ProductCardProps {
   product: Product;
@@ -27,35 +28,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const appContext = useContext(AppContext);
   const { addToCart } = appContext || {};
 
-  // Robust image handling for ProductImageSlider
-  let imagesArr: { url: string; alt?: string }[] = [];
-  if (Array.isArray(product.images) && product.images.length > 0) {
-    imagesArr = product.images
-      .map((img: string | { url?: string; alt?: string }) => {
-        if (typeof img === 'string' && /^(\/|https?:\/\/)/.test(img.trim())) {
-          // Valid string URL (relative or absolute)
-          return { url: img.trim() };
-        } else if (
-          img &&
-          typeof img === 'object' &&
-          typeof img.url === 'string' &&
-          /^(\/|https?:\/\/)/.test(img.url.trim())
-        ) {
-          // Valid object with url
-          return {
-            url: img.url.trim(),
-            alt: typeof img.alt === 'string' ? img.alt : undefined,
-          };
-        }
-        // Ignore objects with only id or invalid url
-        return null;
-      })
-      .filter(Boolean) as { url: string; alt?: string }[];
-  }
-  // If no valid images, use placeholder
-  if (imagesArr.length === 0) {
-    imagesArr = [{ url: '/placeholder.png', alt: 'No image available' }];
-  }
+  // Use utility function to parse and get images with placeholders
+  const imagesArr = parseProductImages(
+    product.images, 
+    product.id,
+    product.productType || undefined
+  );
 
   const tagsString = Array.isArray(product.tags)
     ? product.tags.join(',')
