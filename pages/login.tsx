@@ -71,7 +71,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center py-8 px-4 animate-fade-in">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-gray-900 dark:from-blue-900 dark:via-gray-900 dark:to-black flex items-center justify-center py-8 px-4 animate-fade-in">
       <Head>
         <title>{getPageTitle('Login')}</title>
       </Head>
