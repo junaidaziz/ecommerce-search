@@ -15,7 +15,7 @@ const NavLinks: React.FC = () => {
         <Link
           key={href}
           href={href}
-          className={`border-b-2 border-transparent transition-colors duration-200 hover:text-primary hover:border-primary hover:scale-105 ${
+          className={`text-gray-700 dark:text-gray-300 border-b-2 border-transparent transition-colors duration-200 hover:text-primary hover:border-primary hover:scale-105 ${
             (href === '/products' && pathname.startsWith('/products')) || pathname === href
               ? 'font-semibold text-primary border-primary'
               : ''

@@ -134,7 +134,7 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-gray-900/95 dark:bg-gray-950/95 shadow-sm border-b border-gray-800">
+    <header className="sticky top-0 z-30 bg-white/95 dark:bg-gray-950/95 shadow-sm border-b border-gray-200 dark:border-gray-800">
       <div
         className={`w-full px-2 sm:px-4 lg:px-8 mx-auto`}
       >
@@ -146,7 +146,7 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
           {/* Center: Categories + Search + NavLinks (desktop) */}
           <div className="hidden lg:flex flex-1 items-center justify-center gap-6">
               <CategoryDropdown categories={categories} />
-              <div className="w-[1px] h-6 bg-gray-700 mx-2" />
+              <div className="w-[1px] h-6 bg-gray-300 dark:bg-gray-700 mx-2" />
               {/* Search input with increased width and modern style */}
               <HeaderSearchInput categories={categories} className="w-full" />
               <NavLinks />
@@ -172,7 +172,7 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
           {/* Mobile: Hamburger */}
           <div className="lg:hidden flex items-center ml-auto">
             <button
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
               aria-label="Open main menu"
               onClick={() => setMobileMenuOpen((v) => !v)}
             >
@@ -189,7 +189,7 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
         </div>
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden mt-2 rounded-xl bg-gray-800 shadow-lg p-4 flex flex-col gap-4 animate-fade-in">
+          <div className="lg:hidden mt-2 rounded-xl bg-gray-100 dark:bg-gray-800 shadow-lg p-4 flex flex-col gap-4 animate-fade-in">
             <CategoryDropdown categories={categories} />
             <HeaderSearchInput categories={categories} />
 
