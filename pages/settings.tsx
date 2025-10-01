@@ -44,18 +44,26 @@ const SettingsPage: React.FC = () => {
 
   return (
     <PageContainer>
-      <div className="flex flex-col md:flex-row gap-6 items-start">
-        <Head>
-          <title>{getPageTitle('Settings')}</title>
-        </Head>
-        <SettingsSidebar active={active} onSelect={handleSelect} />
-        <div className="flex-1">
-          {active === 'profile' && <UpdateProfileSection />}
-          {active === 'password' && <ChangePasswordSection />}
-          {active === 'address' && <ManageAddressSection />}
-          {active === 'email' && <ChangeEmailSection />}
-          {active === 'payments' && <PaymentMethodsSection />}
-          {active === 'coupons' && <CouponsSection />}
+      <Head>
+        <title>{getPageTitle('Settings')}</title>
+      </Head>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Settings</h1>
+            <p className="text-gray-600 dark:text-gray-400">Manage your account settings and preferences</p>
+          </div>
+          <div className="flex flex-col lg:flex-row gap-6 items-start">
+            <SettingsSidebar active={active} onSelect={handleSelect} />
+            <div className="flex-1 w-full">
+              {active === 'profile' && <UpdateProfileSection />}
+              {active === 'password' && <ChangePasswordSection />}
+              {active === 'address' && <ManageAddressSection />}
+              {active === 'email' && <ChangeEmailSection />}
+              {active === 'payments' && <PaymentMethodsSection />}
+              {active === 'coupons' && <CouponsSection />}
+            </div>
+          </div>
         </div>
       </div>
     </PageContainer>

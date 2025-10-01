@@ -51,17 +51,17 @@ const UpdateProfileSection: React.FC = () => {
   return (
     <form
       onSubmit={profileForm.handleSubmit(submitProfile)}
-      className="relative max-w-xl mx-auto bg-base-100 rounded-2xl shadow-lg p-8 flex flex-col gap-6 mt-4"
+      className="relative w-full max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 p-6 sm:p-8 flex flex-col gap-6"
     >
-      <div className="flex flex-col items-center gap-2 mb-2">
+      <div className="flex flex-col items-center gap-3 mb-4 pb-6 border-b border-gray-200 dark:border-gray-800">
         <div className="relative">
           <ProfileAvatarUploader />
         </div>
-        <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mt-2">
+        <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light text-sm font-semibold uppercase tracking-wide">
           {role}
         </span>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
         <TextInput
           label="First Name"
           register={profileForm.register}
@@ -89,7 +89,7 @@ const UpdateProfileSection: React.FC = () => {
           </div>
           <Link
             href={{ pathname: '/settings', query: { tab: 'email' } }}
-            className="btn btn-sm btn-outline"
+            className="px-4 py-2.5 text-sm font-medium text-primary hover:text-white bg-primary/10 hover:bg-primary dark:bg-primary/20 dark:hover:bg-primary rounded-lg transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap"
           >
             Change Email
           </Link>
@@ -110,12 +110,14 @@ const UpdateProfileSection: React.FC = () => {
           className="md:col-span-2"
         />
       </div>
-      <button
-        type="submit"
-        className="btn btn-primary w-full md:w-auto md:absolute md:right-8 md:bottom-8 mt-4 md:mt-0 shadow-lg"
-      >
-        Save Changes
-      </button>
+      <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-800">
+        <button
+          type="submit"
+          className="px-8 py-3 text-base font-semibold text-white bg-primary hover:bg-primary-dark dark:bg-primary dark:hover:bg-primary-light rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02]"
+        >
+          Save Changes
+        </button>
+      </div>
     </form>
   );
 };
