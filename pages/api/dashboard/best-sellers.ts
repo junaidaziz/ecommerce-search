@@ -5,6 +5,7 @@ import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { UserRole, type ApiMessage, type Product, USER_ROLES } from '@/types';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
+import { Prisma } from '@prisma/client';
 
 async function handler(
   req: AuthedNextApiRequest,
@@ -26,7 +27,7 @@ async function handler(
     if (!user?.brandId && user?.role !== USER_ROLES.SUPER_ADMIN) {
       return res.status(401).json({ message: UNAUTHORIZED });
     }
-    const where: any = {};
+    const where: Prisma.OrderWhereInput = {};
     if (vendorId) where.product = { vendorId };
     const grouped = await db.order.groupBy({
       by: ['productId'],

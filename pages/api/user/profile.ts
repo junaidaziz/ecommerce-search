@@ -7,6 +7,7 @@ import { handleApiError } from '@utils/handleApiError';
 import type { User, ApiMessage } from '@/types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import { uploadFileToS3 } from '@lib/s3';
+import { Prisma } from '@prisma/client';
 import {
   METHOD_NOT_ALLOWED,
   UNAUTHORIZED,
@@ -66,7 +67,7 @@ export default async function handler(
         postalCode,
         country,
       } = fields as Partial<User> & { password?: string };
-      const update: any = {
+      const update: Prisma.UserUpdateInput = {
         firstName,
         lastName,
         gender,

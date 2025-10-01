@@ -5,6 +5,7 @@ import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { UserRole, type ApiMessage, type Product, USER_ROLES } from '@/types';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
+import { Prisma } from '@prisma/client';
 
 async function handler(
   req: AuthedNextApiRequest,
@@ -27,7 +28,7 @@ async function handler(
       return res.status(401).json({ message: UNAUTHORIZED });
     }
     const threshold = parseInt(getQueryParam(req.query.threshold) || '10', 10);
-    const where: any = { quantity: { lt: threshold } };
+    const where: Prisma.ProductWhereInput = { quantity: { lt: threshold } };
     if (vendorId) where.vendorId = vendorId;
     const products = await db.product.findMany({
       where,

@@ -5,6 +5,7 @@ import { AnalyticsData, ApiMessage } from '@/types';
 import { getDb } from '@lib/db';
 import { getQueryParam } from '@utils/getQueryParam';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
+import { Prisma } from '@prisma/client';
 
 async function handler(
   req: NextApiRequest,
@@ -20,7 +21,7 @@ async function handler(
     const endParam = getQueryParam(req.query.end);
     const brandIdParam = getQueryParam(req.query.brandId);
     const categoryParam = getQueryParam(req.query.categoryId);
-    const where: any = {};
+    const where: Prisma.OrderWhereInput = {};
     if (startParam || endParam) {
       const start = startParam ? new Date(startParam) : new Date(0);
       const end = endParam ? new Date(endParam) : new Date();
