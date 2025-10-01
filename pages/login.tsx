@@ -8,9 +8,16 @@ import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import { User, USER_ROLES } from '../types';
 import UserIcon from '@components/icons/UserIcon';
-import { AuthCard, AuthInput, AuthButton, AuthSocialLogin, AuthDivider } from '@components/Auth';
-
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { AuthCard, AuthInput, AuthButton, AuthSocialLogin, AuthDivider, FormError } from '@components/Auth';
+import { 
+  AUTH_PLACEHOLDERS, 
+  AUTH_ERRORS, 
+  AUTH_TITLES, 
+  AUTH_BUTTONS, 
+  AUTH_LINKS,
+  getEmailValidation,
+  getPasswordValidation,
+} from '@/config/auth.config';
 
 export interface LoginFormInputs {
   email: string;
@@ -59,7 +66,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       setLoading(true);
       await login(email, password);
     } catch (e) {
-      setFormError('Invalid credentials');
+      setFormError(AUTH_ERRORS.invalidCredentials);
     } finally {
       setLoading(false);
     }
@@ -72,25 +79,22 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       </Head>
       <AuthCard
         icon={<UserIcon className="w-8 h-8 text-blue-600" />}
-        title="Welcome Back"
-        subtitle="Sign in to your account to continue."
+        title={AUTH_TITLES.login.title}
+        subtitle={AUTH_TITLES.login.subtitle}
         iconBgClass="bg-blue-100"
       >
         <AuthSocialLogin />
         <AuthDivider />
         
-        {formError && <div className="text-red-500 text-sm mt-1">{formError}</div>}
+        <FormError message={formError} align="left" className="mb-4" />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <AuthInput
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder={AUTH_PLACEHOLDERS.email}
             register={register}
-            rules={{
-              required: 'Email is required',
-              pattern: { value: emailRegex, message: 'Invalid email format' },
-            }}
+            rules={getEmailValidation()}
             error={errors.email?.message as string}
             required
           />
@@ -98,34 +102,34 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           <AuthInput
             type="password"
             name="password"
-            placeholder="Password"
+            placeholder={AUTH_PLACEHOLDERS.password}
             register={register}
-            rules={{ required: 'Password is required' }}
+            rules={getPasswordValidation()}
             error={errors.password?.message as string}
             required
           />
 
           <div className="flex justify-end mt-1">
             <Link href="/auth/forgot-password" className="text-sm font-medium text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
-              Forgot Password?
+              {AUTH_BUTTONS.forgotPassword}
             </Link>
           </div>
 
           <AuthButton loading={loading}>
-            Login
+            {AUTH_BUTTONS.login}
           </AuthButton>
         </form>
 
         <p className="text-center mt-6 text-gray-700 dark:text-gray-300">
-          Don&apos;t have an account?{' '}
+          {AUTH_LINKS.noAccount}{' '}
           <Link href="/signup" className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
-            Sign up
+            {AUTH_LINKS.signupLink}
           </Link>
         </p>
         <p className="text-sm text-center mt-2 text-gray-500 dark:text-gray-400">
-          Want to sign up as a brand?{' '}
+          {AUTH_LINKS.brandSignupPrompt}{' '}
           <Link href="/signup/brand" className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
-            Sign up as a brand
+            {AUTH_LINKS.brandSignupLink}
           </Link>
         </p>
       </AuthCard>
