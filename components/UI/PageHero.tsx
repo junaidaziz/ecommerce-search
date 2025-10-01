@@ -9,7 +9,7 @@ interface PageHeroProps {
 const PageHero: React.FC<PageHeroProps> = ({ heading, description, className = '' }) => (
   <div className={`relative overflow-hidden bg-gradient-to-r from-green-600 via-blue-600 to-green-800 ${className}`}>
     <div className="absolute inset-0 bg-black/10" />
-    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="relative max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{heading}</h1>
         {description && (

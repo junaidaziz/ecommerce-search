@@ -40,7 +40,7 @@ const BrandHeader: FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-30 bg-white/95 dark:bg-gray-950/95 shadow-sm border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm transition-colors duration-300">
       <div
-        className={`w-full px-4 sm:px-6 lg:px-8 mx-auto ${maxWidthClass || 'max-w-7xl'}`}
+        className={`w-full px-4 sm:px-6 lg:px-8 mx-auto ${maxWidthClass || 'max-w-screen-2xl'}`}
       >
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 min-h-20 py-4">
         <Link
