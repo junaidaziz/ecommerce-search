@@ -3,7 +3,7 @@ import Button from './Button';
 
 interface SocialButtonProps {
   icon: React.ReactNode;
-  provider: 'Google' | 'Facebook' | 'GitHub';
+  provider: 'Google' | 'Facebook' | 'GitHub' | 'Twitter';
   onClick: () => void;
   className?: string;
   children?: React.ReactNode;
@@ -19,6 +19,7 @@ const SocialButton: React.FC<SocialButtonProps> = ({
   const isGoogle = provider === 'Google';
   const isFacebook = provider === 'Facebook';
   const isGitHub = provider === 'GitHub';
+  const isTwitter = provider === 'Twitter';
 
   // Provider-specific styles
   const getProviderStyles = () => {
@@ -27,11 +28,11 @@ const SocialButton: React.FC<SocialButtonProps> = ({
         border-gray-300 dark:border-gray-600
         bg-white dark:bg-gray-800
         text-gray-700 dark:text-gray-300
-        hover:bg-[#f8f9fa] dark:hover:bg-[#1a1a1a]
-        hover:border-[#4285F4] dark:hover:border-[#4285F4]
-        hover:shadow-[0_2px_8px_rgba(66,133,244,0.15)]
-        hover:text-[#4285F4] dark:hover:text-[#4285F4]
-        focus:ring-[#4285F4] focus:ring-opacity-20
+        hover:bg-[#DB4437] dark:hover:bg-[#DB4437]
+        hover:border-[#DB4437] dark:hover:border-[#DB4437]
+        hover:text-white dark:hover:text-white
+        hover:shadow-[0_2px_8px_rgba(219,68,55,0.25)]
+        focus:ring-[#DB4437] focus:ring-opacity-20
         transition-all duration-300 ease-in-out
       `;
     }
@@ -41,8 +42,9 @@ const SocialButton: React.FC<SocialButtonProps> = ({
         border-gray-300 dark:border-gray-600
         bg-white dark:bg-gray-800
         text-gray-700 dark:text-gray-300
-        hover:bg-[#1877F2] hover:text-white
-        hover:border-[#1877F2]
+        hover:bg-[#1877F2] dark:hover:bg-[#1877F2]
+        hover:border-[#1877F2] dark:hover:border-[#1877F2]
+        hover:text-white dark:hover:text-white
         hover:shadow-[0_2px_8px_rgba(24,119,242,0.25)]
         focus:ring-[#1877F2] focus:ring-opacity-20
         transition-all duration-300 ease-in-out
@@ -54,11 +56,25 @@ const SocialButton: React.FC<SocialButtonProps> = ({
         border-gray-300 dark:border-gray-600
         bg-white dark:bg-gray-800
         text-gray-700 dark:text-gray-300
-        hover:bg-[#24292e] dark:hover:bg-[#0d1117]
+        hover:bg-[#000000] dark:hover:bg-[#000000]
+        hover:border-[#000000] dark:hover:border-[#000000]
         hover:text-white dark:hover:text-white
-        hover:border-[#24292e] dark:hover:border-[#58a6ff]
-        hover:shadow-[0_2px_8px_rgba(36,41,46,0.2)] dark:hover:shadow-[0_2px_8px_rgba(88,166,255,0.15)]
-        focus:ring-[#24292e] dark:focus:ring-[#58a6ff] focus:ring-opacity-20
+        hover:shadow-[0_2px_8px_rgba(0,0,0,0.2)]
+        focus:ring-[#000000] focus:ring-opacity-20
+        transition-all duration-300 ease-in-out
+      `;
+    }
+
+    if (isTwitter) {
+      return `
+        border-gray-300 dark:border-gray-600
+        bg-white dark:bg-gray-800
+        text-gray-700 dark:text-gray-300
+        hover:bg-[#1DA1F2] dark:hover:bg-[#1DA1F2]
+        hover:border-[#1DA1F2] dark:hover:border-[#1DA1F2]
+        hover:text-white dark:hover:text-white
+        hover:shadow-[0_2px_8px_rgba(29,161,242,0.25)]
+        focus:ring-[#1DA1F2] focus:ring-opacity-20
         transition-all duration-300 ease-in-out
       `;
     }

@@ -16,7 +16,7 @@ const AuthCard: React.FC<AuthCardProps> = ({
   iconBgClass = 'bg-blue-100',
 }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-gray-900 dark:from-blue-900 dark:via-gray-900 dark:to-black flex items-center justify-center py-8 px-4 animate-fade-in">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center py-8 px-4 animate-fade-in">
       <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 sm:p-10 relative z-10">
         <div className="flex flex-col items-center mb-6">
           <div className={`w-14 h-14 flex items-center justify-center rounded-full mb-3 ${iconBgClass}`}>
