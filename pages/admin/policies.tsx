@@ -20,7 +20,7 @@ export default function ManagePolicies() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetchJson<any>(`/api/admin/policies?type=${type}`)
+    fetchJson<{ content?: string }>(`/api/admin/policies?type=${type}`)
       .then((doc) => setContent(doc?.content || ''))
       .catch(() => setContent(''));
   }, [type]);
