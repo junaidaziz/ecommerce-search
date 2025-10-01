@@ -1,5 +1,4 @@
 import React from 'react';
-import Button from './Button';
 
 interface SocialButtonProps {
   icon: React.ReactNode;
@@ -83,24 +82,24 @@ const SocialButton: React.FC<SocialButtonProps> = ({
   };
 
   return (
-    <Button
+    <button
       type="button"
       onClick={onClick}
-      variant="outline"
-      size="md"
-      fullWidth
-      rounded
       className={`
-        flex items-center justify-center gap-3 
+        inline-flex items-center justify-center gap-3 
+        w-full px-4 py-2 rounded-full
         font-semibold text-base
+        border
         hover:scale-[1.02] active:scale-[0.98]
+        focus:outline-none focus:ring-2 focus:ring-offset-2
+        disabled:opacity-60 disabled:pointer-events-none
         ${getProviderStyles()}
         ${className}
       `}
     >
       {icon}
       <span>{children || `Continue with ${provider}`}</span>
-    </Button>
+    </button>
   );
 };
 
