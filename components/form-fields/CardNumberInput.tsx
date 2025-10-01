@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { IMaskInput } from 'react-imask';
+import type { InputMask } from 'imask';
 import {
   FieldValues,
   Path,
@@ -76,7 +77,7 @@ const CardNumberInput = <T extends FieldValues>(
     setBrand(detectCardBrand(val));
   }, [valueProp]);
 
-  const handleAccept = (val: string, mask: any) => {
+  const handleAccept = (val: string, mask: InputMask<{ unmaskedValue: string; value: string }>) => {
     try {
       const digits = mask.unmaskedValue;
       const b = detectCardBrand(digits);
@@ -90,8 +91,8 @@ const CardNumberInput = <T extends FieldValues>(
       setBrand(b);
       onCardTypeChange?.(b);
       const event = { target: { value: val, name } } as unknown as React.ChangeEvent<HTMLInputElement>;
-      if (register && (registration as any).onChange) {
-        (registration as any).onChange(event);
+      if (register && registration && 'onChange' in registration && typeof registration.onChange === 'function') {
+        registration.onChange(event);
       }
       onChange?.(event);
     } catch (err) {
@@ -132,7 +133,7 @@ const CardNumberInput = <T extends FieldValues>(
           className={`input input-bordered w-full pr-10 ${
             error ? 'border-red-500' : ''
           } ${className}`}
-          inputRef={(ref: any) => {
+          inputRef={(ref: HTMLInputElement | null) => {
             if (typeof registration.ref === 'function') registration.ref(ref);
             else if (registration.ref)
               (
