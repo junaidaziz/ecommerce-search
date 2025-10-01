@@ -49,7 +49,7 @@ const TotalSalesCard: React.FC<Props> = ({ brandId }) => {
       title="Total Sales"
       loading={total === null && !error}
       error={error}
-      icon={<CurrencyPoundIcon className="w-6 h-6 text-green-600 dark:text-green-400" />}
+      icon={<CurrencyPoundIcon className="w-6 h-6 text-success dark:text-success-light" />}
       trend={
         trend !== null
           ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}%`
@@ -59,14 +59,14 @@ const TotalSalesCard: React.FC<Props> = ({ brandId }) => {
       {total !== null && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <ArrowTrendingUpIcon className="w-8 h-8 text-green-600 dark:text-green-400" />
+            <div className="p-3 bg-success-100 dark:bg-success-dark/30 rounded-lg">
+              <ArrowTrendingUpIcon className="w-8 h-8 text-success dark:text-success-light" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white">
                 £{total.toFixed(2)}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
                 Total revenue
               </p>
             </div>
@@ -74,8 +74,8 @@ const TotalSalesCard: React.FC<Props> = ({ brandId }) => {
           {trend !== null && (
             <div className={`flex items-center gap-1 text-sm font-medium ${
               trend > 0 
-                ? 'text-green-600 dark:text-green-400' 
-                : 'text-red-600 dark:text-red-400'
+                ? 'text-success dark:text-success-light' 
+                : 'text-danger dark:text-danger-light'
             }`}>
               <ArrowTrendingUpIcon className={`w-4 h-4 ${trend < 0 ? 'rotate-180' : ''}`} />
               {trend > 0 ? '+' : ''}{trend.toFixed(1)}%

@@ -48,20 +48,20 @@ const TotalProductsCard: React.FC<Props> = ({ brandId }) => {
       title="Total Products"
       loading={count === null && !error}
       error={error}
-      icon={<CubeIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />}
+      icon={<CubeIcon className="w-6 h-6 text-primary dark:text-primary-light" />}
       onClick={handleClick}
     >
       {count !== null && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <ShoppingBagIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            <div className="p-3 bg-primary-100 dark:bg-primary-dark/30 rounded-lg">
+              <ShoppingBagIcon className="w-8 h-8 text-primary dark:text-primary-light" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white">
                 {count.toLocaleString()}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
                 Products in inventory
               </p>
             </div>

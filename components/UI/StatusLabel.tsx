@@ -15,14 +15,14 @@ const StatusLabel: React.FC<StatusLabelProps> = ({
 }) => {
   const colorClass =
     color === 'success'
-      ? 'bg-green-100 text-green-800'
+      ? 'bg-success-100 text-success-dark dark:bg-success-dark/30 dark:text-success-light'
       : color === 'info'
-        ? 'bg-blue-100 text-blue-800'
+        ? 'bg-info-light/20 text-info-dark dark:bg-info-dark/30 dark:text-info-light'
         : color === 'warning'
-          ? 'bg-yellow-100 text-yellow-800'
+          ? 'bg-warning-100 text-warning-dark dark:bg-warning-dark/30 dark:text-warning-light'
           : color === 'error'
-            ? 'bg-red-100 text-red-800'
-            : 'bg-gray-100 text-gray-800';
+            ? 'bg-danger-100 text-danger-dark dark:bg-danger-dark/30 dark:text-danger-light'
+            : 'bg-neutral-100 text-neutral-700 dark:bg-neutral-dark/30 dark:text-neutral-light';
   const sizeClass = size === 'sm' ? 'text-xs' : 'text-sm';
   return (
     <span
