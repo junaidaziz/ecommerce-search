@@ -20,6 +20,7 @@ import {
   PERCENTAGE_DISCOUNT_BETWEEN_1_AND_99,
 } from '@/constants/messages';
 import { USER_ROLES } from '@/types';
+import { Prisma } from '@prisma/client';
 
 export const config = {
   api: {
@@ -98,7 +99,7 @@ async function handler(
       const minQty = String((req.query.minQty as string) || '');
       const maxQty = String((req.query.maxQty as string) || '');
 
-      const where: any = { vendorId };
+      const where: Prisma.ProductWhereInput = { vendorId };
       if (search) {
         where.OR = [
           { title: { contains: search, mode: 'insensitive' } },
@@ -108,7 +109,7 @@ async function handler(
       if (category) {
         where.category = { slug: category };
       }
-      const qtyFilter: any = {};
+      const qtyFilter: { gte?: number; lte?: number } = {};
       if (minQty) qtyFilter.gte = parseInt(minQty, 10);
       if (maxQty) qtyFilter.lte = parseInt(maxQty, 10);
       if (Object.keys(qtyFilter).length) {
@@ -126,7 +127,7 @@ async function handler(
         db.product.count({ where }),
       ]);
 
-      const products = rows.map((row: any) => mapDbRowToProduct(row));
+      const products = rows.map((row) => mapDbRowToProduct(row));
 
       return res.status(200).json({ products, total });
     }
