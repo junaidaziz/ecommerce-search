@@ -67,19 +67,19 @@ const ChangePasswordSection: React.FC = () => {
   return (
     <form
       onSubmit={passwordForm.handleSubmit(submitPassword)}
-      className="max-w-md mx-auto bg-base-100 rounded-2xl shadow-lg p-8 mt-4"
+      className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 p-6 sm:p-8"
     >
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-primary/10 rounded-full">
+      <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-200 dark:border-gray-800">
+        <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-xl">
           <LockClosedIcon className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h2 className="text-xl font-bold">Change Password</h2>
-          <p className="text-sm text-gray-600">Update your account password</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Change Password</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Update your account password</p>
         </div>
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-5">
         <PasswordInput
           label="Current Password"
           register={passwordForm.register}
@@ -101,19 +101,19 @@ const ChangePasswordSection: React.FC = () => {
             onChange={(e) => setPasswordStrength(getPasswordStrength(e.target.value))}
           />
           {passwordForm.watch('password') && (
-            <div className="mt-2">
+            <div className="mt-3">
               <div className="flex items-center gap-2 mb-1">
-                <div className="flex gap-1">
+                <div className="flex gap-1.5 flex-1">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <div
                       key={i}
-                      className={`h-1 w-8 rounded-full transition-colors ${
-                        i <= passwordStrength ? getStrengthColor(passwordStrength) : 'bg-gray-200'
+                      className={`h-2 flex-1 rounded-full transition-all duration-300 ${
+                        i <= passwordStrength ? getStrengthColor(passwordStrength) : 'bg-gray-200 dark:bg-gray-700'
                       }`}
                     />
                   ))}
                 </div>
-                <span className={`text-xs font-medium ${
+                <span className={`text-xs font-semibold uppercase tracking-wide ${
                   passwordStrength <= 2 ? 'text-red-500' :
                   passwordStrength <= 3 ? 'text-yellow-500' :
                   passwordStrength <= 4 ? 'text-blue-500' : 'text-green-500'
@@ -139,13 +139,15 @@ const ChangePasswordSection: React.FC = () => {
         />
       </div>
       
-      <button 
-        type="submit" 
-        className="btn btn-primary w-full mt-6 shadow-lg"
-      >
-        <ShieldCheckIcon className="w-4 h-4" />
-        Change Password
-      </button>
+      <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-800 mt-6">
+        <button 
+          type="submit" 
+          className="px-8 py-3 text-base font-semibold text-white bg-primary hover:bg-primary-dark dark:bg-primary dark:hover:bg-primary-light rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] flex items-center gap-2"
+        >
+          <ShieldCheckIcon className="w-5 h-5" />
+          Change Password
+        </button>
+      </div>
     </form>
   );
 };

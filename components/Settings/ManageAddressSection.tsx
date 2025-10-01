@@ -56,19 +56,19 @@ const ManageAddressSection: React.FC = () => {
   return (
     <form
       onSubmit={addressForm.handleSubmit(submitAddress)}
-      className="max-w-lg mx-auto bg-base-100 rounded-2xl shadow-lg p-8 mt-4"
+      className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 p-6 sm:p-8"
     >
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-primary/10 rounded-full">
+      <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-200 dark:border-gray-800">
+        <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-xl">
           <MapPinIcon className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h2 className="text-xl font-bold">Manage Address</h2>
-          <p className="text-sm text-gray-600">Update your shipping address</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Manage Address</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Update your shipping address</p>
         </div>
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-5">
         <TextInput
           label="Address"
           placeholder="123 Main St"
@@ -116,23 +116,25 @@ const ManageAddressSection: React.FC = () => {
         </div>
       </div>
       
-      <button
-        type="submit"
-        className="btn btn-primary w-full mt-6 shadow-lg"
-        disabled={savingAddress}
-      >
-        {savingAddress ? (
-          <>
-            <div className="loading loading-spinner loading-sm"></div>
-            Saving...
-          </>
-        ) : (
-          <>
-            <CheckIcon className="w-4 h-4" />
-            Save Address
-          </>
-        )}
-      </button>
+      <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-800 mt-6">
+        <button
+          type="submit"
+          className="px-8 py-3 text-base font-semibold text-white bg-success hover:bg-success-dark dark:bg-success dark:hover:bg-success-light rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] flex items-center gap-2"
+          disabled={savingAddress}
+        >
+          {savingAddress ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Saving...
+            </>
+          ) : (
+            <>
+              <CheckIcon className="w-5 h-5" />
+              Save Address
+            </>
+          )}
+        </button>
+      </div>
     </form>
   );
 };

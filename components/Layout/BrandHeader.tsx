@@ -147,20 +147,32 @@ const BrandHeader: FC<HeaderProps> = ({
                       ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
                       : user.email)}
                 </span>
+                <svg className="w-4 h-4 transition-transform group-hover:rotate-180 duration-200" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
               </button>
-              <ul className="absolute right-0 top-full mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+              <ul className="absolute right-0 top-full mt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
                 <li>
                   <Link
                     href="/brand/profile"
-                    className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-t-lg transition-colors duration-200"
+                    className="block px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-primary hover:text-white transition-all duration-200 font-medium"
                   >
                     Profile
                   </Link>
                 </li>
                 <li>
+                  <Link
+                    href="/settings"
+                    className="block px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-primary hover:text-white transition-all duration-200 font-medium"
+                  >
+                    Settings
+                  </Link>
+                </li>
+                <li>
+                  <hr className="border-gray-200 dark:border-gray-700" />
+                </li>
+                <li>
                   <button
                     onClick={logout}
-                    className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-b-lg transition-colors duration-200"
+                    className="w-full text-left px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 font-medium"
                   >
                     Logout
                   </button>
