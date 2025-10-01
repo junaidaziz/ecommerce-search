@@ -12,7 +12,7 @@ import { sendOrderConfirmation } from '@lib/email';
 import { handleApiError } from '@utils/handleApiError';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
-import { type Order, type OrderResponse, type ApiMessage, getUserRoles, USER_ROLES } from '@/types';
+import { type Order, type OrderResponse, type ApiMessage, type PaymentMethod, getUserRoles, USER_ROLES } from '@/types';
 import formidable, { type Fields, type Files, type File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
@@ -75,14 +75,14 @@ async function handler(
       }
 
       let allowed = true;
-      let vendorMethods: any[] = [];
+      let vendorMethods: PaymentMethod[] = [];
       if (items.length > 0) {
         const product = await getProductByUuid(
           String(items[0].uuid || items[0].id)
         );
         if (product) {
           const vendor = await findUserById(product.vendorId);
-          vendorMethods = (vendor?.paymentMethods as any[]) || [];
+          vendorMethods = (vendor?.paymentMethods as PaymentMethod[]) || [];
           if (
             paymentMethod &&
             !vendorMethods.some((m) => m.type === paymentMethod)

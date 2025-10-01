@@ -23,8 +23,12 @@ const stripHtml = (html: string | null | undefined): string => {
   }
 };
 
-function processProductRow(row: any): Product {
-  const processed: any = { ...row };
+type DbProductRow = Prisma.ProductGetPayload<{
+  include: { category: true; vendor: true; variants: true };
+}>;
+
+function processProductRow(row: DbProductRow): Product {
+  const processed: Record<string, unknown> = { ...row };
   const jsonFields = ['SEO', 'OPTIONS', 'VARIANTS', 'METAFIELDS'];
   jsonFields.forEach((field) => {
     if (processed[field]) {
@@ -98,7 +102,7 @@ async function loadProductsData(): Promise<Product[]> {
   }
 }
 
-export function mapDbRowToProduct(row: any): Product {
+export function mapDbRowToProduct(row: DbProductRow): Product {
   const {
     images,
     quantity,
@@ -201,7 +205,7 @@ export async function addProduct(product: ProductInput): Promise<void> {
   };
   try {
     await db.product.create({ data });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (
       error instanceof PrismaClientKnownRequestError &&
       error.code === 'P2002'

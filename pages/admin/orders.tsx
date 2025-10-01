@@ -215,4 +215,6 @@ export default function AdminOrders() {
   );
 }
 
-(AdminOrders as any).getLayout = (page: React.ReactNode) => <AdminPanelLayout>{page}</AdminPanelLayout>;
+Object.assign(AdminOrders, {
+  getLayout: (page: React.ReactNode) => <AdminPanelLayout>{page}</AdminPanelLayout>
+});

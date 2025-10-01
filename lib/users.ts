@@ -67,18 +67,18 @@ export function findUserById(id: number | string) {
 export function getAllUsers(search = '', sort = 'newest') {
   const validRoles = ['USER', 'BRAND', 'SUPER_ADMIN'];
   const searchUpper = search.toUpperCase();
-  const or: any[] = [
+  const or: Prisma.UserWhereInput[] = [
     { firstName: { contains: search, mode: 'insensitive' } },
     { lastName: { contains: search, mode: 'insensitive' } },
     { email: { contains: search, mode: 'insensitive' } },
   ];
   if (validRoles.includes(searchUpper)) {
-    or.push({ role: searchUpper as any });
+    or.push({ role: searchUpper as Role });
   }
   const where = search ? { OR: or } : undefined;
 
   // Map sort value to Prisma orderBy
-  let orderBy: any = { createdAt: 'desc' };
+  let orderBy: Prisma.UserOrderByWithRelationInput = { createdAt: 'desc' };
   switch (sort) {
     case 'oldest':
       orderBy = { createdAt: 'asc' };

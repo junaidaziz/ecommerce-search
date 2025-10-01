@@ -117,7 +117,7 @@ const OrderDetailsModal: React.FC<Props> = ({
             id="status-select"
             className="select select-bordered w-full"
             value={status}
-            onChange={(e) => setStatus(e.target.value as any)}
+            onChange={(e) => setStatus(e.target.value)}
           >
             {[
               'pending',

@@ -5,7 +5,7 @@ import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<any>
+  res: NextApiResponse<Record<string, never> | { message: string }>
 ) {
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user) return res.status(401).json({ message: UNAUTHORIZED });

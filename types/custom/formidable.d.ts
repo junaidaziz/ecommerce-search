@@ -13,17 +13,17 @@ declare module 'formidable' {
   }
 
   export interface Fields {
-    [key: string]: any;
+    [key: string]: string | string[];
   }
 
   interface IncomingForm {
     parse(
       req: IncomingMessage,
-      callback: (err: any, fields: Fields, files: Files) => void
+      callback: (err: Error | null, fields: Fields, files: Files) => void
     ): void;
   }
 
-  function formidable(options?: Record<string, any>): IncomingForm;
+  function formidable(options?: Record<string, unknown>): IncomingForm;
 
   export default formidable;
   export { File };

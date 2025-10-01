@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { updateUserProfile, findUser } from '@lib/users';
-import type { Vendor, ApiMessage } from '@/types';
+import type { Vendor, ApiMessage, PaymentMethod } from '@/types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import { handleApiError } from '@utils/handleApiError';
@@ -36,7 +36,7 @@ export default async function handler(
         website: userData.website ?? undefined,
         description: userData.businessDescription ?? undefined,
         taxId: userData.taxId ?? undefined,
-        paymentMethods: (userData.paymentMethods as any) ?? undefined,
+        paymentMethods: (userData.paymentMethods as unknown as PaymentMethod[]) ?? undefined,
         status: userData.disabled ? 'disabled' : 'active',
         createdAt: userData.createdAt ?? undefined,
         updatedAt: userData.updatedAt ?? undefined,
