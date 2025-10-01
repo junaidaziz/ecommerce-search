@@ -2,30 +2,57 @@ import { apiFetch } from '@lib/api';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import { getPageTitle } from '@lib/pageTitle';
+import ConfirmationPage from '@components/pages/ConfirmationPage';
 
 export default function Confirm() {
   const router = useRouter();
   const { token } = router.query;
-  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [resending, setResending] = useState(false);
+
   useEffect(() => {
     if (!token) return;
     async function verify() {
-      const res = await apiFetch(`/api/verify-email?token=${token}`);
-      if (res.ok) {
-        setMessage('Email verified');
-      } else {
-        setMessage('Verification failed');
+      try {
+        await apiFetch(`/api/verify-email?token=${token}`);
+        setStatus('success');
+      } catch (error) {
+        setStatus('error');
+        const errorMessage = error instanceof Error ? error.message : 'Verification failed. The link may be invalid or expired.';
+        setErrorMessage(errorMessage);
       }
     }
     verify();
   }, [token]);
+
+  const handleResend = async () => {
+    setResending(true);
+    try {
+      // TODO: Implement resend functionality when the API endpoint is available
+      // For now, just redirect to signup or show a message
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      alert('Please contact support or try signing up again to receive a new verification email.');
+    } catch (error) {
+      alert('Failed to resend verification email. Please try again later.');
+    } finally {
+      setResending(false);
+    }
+  };
+
   return (
-    <div className="p-4">
+    <>
       <Head>
         <title>{getPageTitle('Email Confirmation')}</title>
       </Head>
-      {message || 'Verifying...'}
-    </div>
+      <ConfirmationPage
+        status={status}
+        errorMessage={errorMessage}
+        onResend={handleResend}
+        resending={resending}
+      />
+    </>
   );
 }

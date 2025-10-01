@@ -3,12 +3,13 @@ import { addUser, findUser } from '@lib/users';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '@utils/handleApiError';
-import type { SignupTokenResponse, ApiMessage } from '@/types';
+import type { ApiMessage } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   MISSING_REQUIRED_FIELDS,
   USER_EXISTS,
 } from '@/constants/messages';
+import { SignupTokenResponse } from 'types/api';
 
 export default async function handler(
   req: NextApiRequest,
@@ -31,6 +32,7 @@ export default async function handler(
     if (await findUser(email)) {
       return res.status(409).json({ message: USER_EXISTS });
     }
+    
     const hashed = await bcrypt.hash(password, 10);
     
     // Check if we're in production environment

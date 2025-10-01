@@ -6,13 +6,21 @@ import { AppContext } from '@contexts/AppContext';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import BuildingIcon from '@components/icons/BuildingIcon';
-import { PasswordInput, TextInput } from '@components/form-fields';
+import { PasswordInput } from '@components/form-fields';
 import useEmailAvailability from '@hooks/useEmailAvailability';
 import { USER_ROLES } from '@/types';
-import { AuthCard, AuthInput, AuthButton, AuthSocialLogin, AuthDivider } from '@components/Auth';
-
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+import { AuthCard, AuthInput, AuthButton, AuthSocialLogin, AuthDivider, FormError, AuthMessage } from '@components/Auth';
+import {
+  AUTH_PLACEHOLDERS,
+  AUTH_ERRORS,
+  AUTH_TITLES,
+  AUTH_BUTTONS,
+  AUTH_LINKS,
+  AUTH_INFO,
+  PASSWORD_REGEX,
+  getEmailValidation,
+  getBrandNameValidation,
+} from '@/config/auth.config';
 
 export default function BrandSignup() {
   const router = useRouter();
@@ -63,9 +71,9 @@ export default function BrandSignup() {
     if (password && confirm && password !== confirm) {
       setError('confirm', {
         type: 'manual',
-        message: 'Passwords do not match',
+        message: AUTH_ERRORS.passwordsNoMatch,
       });
-      return 'Passwords do not match';
+      return AUTH_ERRORS.passwordsNoMatch;
     }
     clearErrors('confirm');
     return true;
@@ -73,21 +81,28 @@ export default function BrandSignup() {
 
   const submit = async (values: any) => {
     try {
-      const data = await signup<{ token: string }>('/api/signup/brand', {
+      const data = await signup<{ token: string; autoConfirmed?: boolean }>('/api/signup/brand', {
         firstName: values.brandName,
         email: values.email,
         password: values.password,
       });
-      router.push(`/confirm/${data.token}`);
+      
+      // If auto-confirmed (local dev), redirect to brand dashboard
+      if (data.autoConfirmed) {
+        router.push('/brand/profile?complete=1');
+      } else {
+        // Production: redirect to confirmation page
+        router.push('/brand/confirmation');
+      }
     } catch (e) {
-      setFormError('Signup failed');
+      setFormError(AUTH_ERRORS.signupFailed);
     }
   };
 
   const passwordValue = watch('password');
   const showPasswordHint =
     passwordFocused ||
-    (passwordValue !== '' && !passwordRegex.test(passwordValue));
+    (passwordValue !== '' && !PASSWORD_REGEX.test(passwordValue));
 
   return (
     <>
@@ -96,35 +111,32 @@ export default function BrandSignup() {
       </Head>
       <AuthCard
         icon={<BuildingIcon className="w-8 h-8 text-purple-600" />}
-        title="Create Your Brand Account"
-        subtitle="Sign up to start selling, manage your store, and grow your business."
+        title={AUTH_TITLES.brandSignup.title}
+        subtitle={AUTH_TITLES.brandSignup.subtitle}
         iconBgClass="bg-purple-100"
       >
         <AuthSocialLogin role="BRAND" />
         <AuthDivider />
         
-        {formError && <div className="text-red-500 mb-2 text-center font-semibold">{formError}</div>}
+        <FormError message={formError} align="left" className="mb-4" />
         
         <form onSubmit={handleSubmit(submit)} className="space-y-5">
           <AuthInput
             type="text"
             name="brandName"
-            placeholder="Brand Name"
+            placeholder={AUTH_PLACEHOLDERS.brandName}
             register={register}
-            rules={{ required: 'Brand name is required' }}
+            rules={getBrandNameValidation()}
             error={errors.brandName?.message as string}
           />
           
           <AuthInput
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder={AUTH_PLACEHOLDERS.email}
             register={register}
             onBlur={handleEmailBlur}
-            rules={{
-              required: 'Email is required',
-              pattern: { value: emailRegex, message: 'Invalid email format' },
-            }}
+            rules={getEmailValidation()}
             error={errors.email?.message as string}
           />
           
@@ -132,14 +144,13 @@ export default function BrandSignup() {
             <div>
               <PasswordInput
                 name="password"
-                placeholder="Password"
+                placeholder={AUTH_PLACEHOLDERS.password}
                 register={register}
                 rules={{
-                  required: 'Password is required',
+                  required: AUTH_ERRORS.passwordRequired,
                   pattern: {
-                    value: passwordRegex,
-                    message:
-                      'Password must be at least 8 characters and include uppercase, lowercase, number and special character',
+                    value: PASSWORD_REGEX,
+                    message: AUTH_ERRORS.passwordInvalid,
                   },
                   onBlur: handlePasswordBlur,
                 }}
@@ -152,7 +163,7 @@ export default function BrandSignup() {
             <div>
               <PasswordInput
                 name="confirm"
-                placeholder="Confirm Password"
+                placeholder={AUTH_PLACEHOLDERS.confirmPassword}
                 register={register}
                 rules={{ validate: handleConfirmBlur }}
                 error={errors.confirm?.message as string}
@@ -163,27 +174,24 @@ export default function BrandSignup() {
           </div>
           
           {showPasswordHint && (
-            <p id="password-help" className="text-sm text-gray-500 dark:text-gray-400">
-              Password must be at least 8 characters and include uppercase,
-              lowercase, number and special character
-            </p>
+            <AuthMessage message={AUTH_INFO.passwordHint} type="info" />
           )}
           
           <AuthButton loading={checkingEmail} disabled={checkingEmail || !!errors.email}>
-            Sign Up
+            {AUTH_BUTTONS.signup}
           </AuthButton>
         </form>
         
         <p className="text-center mt-6 text-gray-700 dark:text-gray-300">
-          Already have an account?{' '}
+          {AUTH_LINKS.haveAccount}{' '}
           <Link href="/login" className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
-            Login
+            {AUTH_LINKS.loginLink}
           </Link>
         </p>
         <p className="text-sm text-center mt-2 text-gray-500 dark:text-gray-400">
-          Not a brand?{' '}
+          {AUTH_LINKS.notBrand}{' '}
           <Link href="/signup/user" className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
-            Sign up as a user
+            {AUTH_LINKS.userSignupLink}
           </Link>
         </p>
       </AuthCard>
