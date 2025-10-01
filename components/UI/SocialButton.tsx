@@ -3,7 +3,7 @@ import Button from './Button';
 
 interface SocialButtonProps {
   icon: React.ReactNode;
-  provider: 'Google' | 'Facebook';
+  provider: 'Google' | 'Facebook' | 'GitHub';
   onClick: () => void;
   className?: string;
   children?: React.ReactNode;
@@ -18,6 +18,7 @@ const SocialButton: React.FC<SocialButtonProps> = ({
 }) => {
   const isGoogle = provider === 'Google';
   const isFacebook = provider === 'Facebook';
+  const isGitHub = provider === 'GitHub';
 
   // Provider-specific styles
   const getProviderStyles = () => {
@@ -43,6 +44,20 @@ const SocialButton: React.FC<SocialButtonProps> = ({
         hover:border-[#1877F2]
         hover:shadow-[0_2px_8px_rgba(24,119,242,0.25)]
         focus:ring-[#1877F2] focus:ring-opacity-20
+        transition-all duration-200 ease-in-out
+      `;
+    }
+
+    if (isGitHub) {
+      return `
+        border-gray-300 dark:border-gray-600
+        bg-white dark:bg-gray-800
+        text-gray-700 dark:text-gray-300
+        hover:bg-[#24292e] dark:hover:bg-[#0d1117]
+        hover:text-white dark:hover:text-white
+        hover:border-[#24292e] dark:hover:border-[#30363d]
+        hover:shadow-[0_2px_8px_rgba(36,41,46,0.2)]
+        focus:ring-[#24292e] focus:ring-opacity-20
         transition-all duration-200 ease-in-out
       `;
     }
