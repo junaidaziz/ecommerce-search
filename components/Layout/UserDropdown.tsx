@@ -28,20 +28,19 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, menuItems, closeDropd
 
   if (user) {
     return (
-      <div className="dropdown dropdown-end" ref={dropdownRef}>
-        <label
-          tabIndex={0}
-          className="flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer hover:bg-base-200 focus:outline-none"
+      <div className="relative" ref={dropdownRef}>
+        <button
+          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 focus:outline-none"
           onClick={() => setOpen((v) => !v)}
         >
           {user.profileImage || user.logo ? (
             <img
               src={user.profileImage || user.logo}
               alt="avatar"
-              className="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700"
+              className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
             />
           ) : (
-            <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-base uppercase">
+            <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm uppercase">
               {user.name?.split(' ').map((n: string) => n[0]).join('') ||
                 (user.firstName || user.lastName
                   ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase()
@@ -54,10 +53,10 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, menuItems, closeDropd
                 ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
                 : user.email)}
           </span>
-          <svg className={`w-4 h-4 ml-1 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-        </label>
+          <svg className={`w-4 h-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        </button>
         {open && (
-          <div tabIndex={0} className="dropdown-content z-50 mt-2">
+          <div className="absolute right-0 top-full mt-2 z-50">
             <DropdownMenu
               items={menuItems}
               onItemClick={() => {
@@ -76,14 +75,14 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, menuItems, closeDropd
         <Link
           href="/login"
           aria-label="Login"
-          className="px-4 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+          className="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
         >
           Login
         </Link>
         <Link
           href="/signup"
           aria-label="Create an account"
-          className="px-4 py-2 rounded-md bg-primary text-white hover:bg-primary/90 transition"
+          className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark transition-colors duration-200 shadow-sm hover:shadow-md"
         >
           Signup
         </Link>
