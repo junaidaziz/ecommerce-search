@@ -1,13 +1,11 @@
 import React from 'react';
 import type { Category } from '@/types';
-import InputField from '../UI/InputField';
-import { Checkbox } from '../form-fields';
 import Button from '../UI/Button';
-import SearchIcon from '../icons/SearchIcon';
-import CheckIcon from '../icons/CheckIcon';
-import TagIcon from '../icons/TagIcon';
-import CurrencyDollarIcon from '../icons/CurrencyDollarIcon';
 import XMarkIcon from '../icons/XMarkIcon';
+import SearchFilter from './SearchFilter';
+import AvailabilityFilter from './AvailabilityFilter';
+import CategoryFilter from './CategoryFilter';
+import PriceRangeFilter from './PriceRangeFilter';
 
 interface ProductFiltersProps {
   keyword: string;
@@ -44,100 +42,25 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       className="space-y-6 p-4 md:p-4"
     >
       {/* Search Keyword */}
-      <div className="space-y-3 pb-3 border-b border-gray-200 dark:border-gray-700">
-        <label className="text-base font-semibold text-gray-900 dark:text-white flex items-center">
-          <SearchIcon className="w-4 h-4 mr-2 text-primary" />
-          Search Products
-        </label>
-        <InputField
-          type="text"
-          placeholder="Search by name or description..."
-          name="keyword"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          className="w-full text-base px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary transition-all duration-300 shadow-sm focus:shadow-lg"
-        />
-      </div>
+      <SearchFilter keyword={keyword} setKeyword={setKeyword} />
 
       {/* In Stock Filter */}
-      <div className="space-y-3 py-3 border-b border-gray-200 dark:border-gray-700">
-        <label className="text-base font-semibold text-gray-900 dark:text-white flex items-center">
-          <CheckIcon className="w-4 h-4 mr-2 text-green-500" />
-          Availability
-        </label>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-          <Checkbox
-            label="In Stock Only"
-            name="inStock"
-            checked={inStock}
-            onChange={(e) => setInStock(e.target.checked)}
-            className="text-base font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-primary transition-colors duration-200 hover:bg-primary/10 dark:hover:bg-primary/20 hover:border-primary dark:hover:border-primary rounded"
-          />
-        </div>
-      </div>
+      <AvailabilityFilter inStock={inStock} setInStock={setInStock} />
 
       {/* Categories */}
-      <div className="space-y-3 py-3 border-b border-gray-200 dark:border-gray-700">
-        <label className="text-base font-semibold text-gray-900 dark:text-white flex items-center">
-          <TagIcon className="w-4 h-4 mr-2 text-blue-500" />
-          Categories
-        </label>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 max-h-64 overflow-y-auto">
-          <div className="space-y-2">
-            {categories.map((c) => (
-              <Checkbox
-                key={c.slug}
-                label={c.name}
-                name={`cat-${c.slug}`}
-                checked={selectedCategories.includes(c.slug || '')}
-                onChange={(e) => {
-                  const slug = c.slug || '';
-                  setSelectedCategories((prev) =>
-                    e.target.checked
-                      ? [...prev, slug]
-                      : prev.filter((s) => s !== slug)
-                  );
-                }}
-                className="text-base font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-primary transition-colors duration-200 hover:bg-primary/10 dark:hover:bg-primary/20 hover:border-primary dark:hover:border-primary rounded"
-              />
-            ))}
-          </div>
-        </div>
-      </div>
+      <CategoryFilter 
+        categories={categories} 
+        selectedCategories={selectedCategories} 
+        setSelectedCategories={setSelectedCategories} 
+      />
 
       {/* Price Range */}
-      <div className="space-y-3 py-2">
-        <label className="text-base font-semibold text-gray-900 dark:text-white flex items-center">
-          <CurrencyDollarIcon className="w-4 h-4 mr-2 text-yellow-500" />
-          Price Range
-        </label>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Min Price</label>
-              <InputField
-                type="number"
-                placeholder="£0"
-                name="minPrice"
-                value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
-                className="w-full text-base px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary transition-all duration-300 shadow-sm focus:shadow-lg"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Max Price</label>
-              <InputField
-                type="number"
-                placeholder="£1000"
-                name="maxPrice"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
-                className="w-full text-base px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary transition-all duration-300 shadow-sm focus:shadow-lg"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <PriceRangeFilter 
+        minPrice={minPrice} 
+        setMinPrice={setMinPrice} 
+        maxPrice={maxPrice} 
+        setMaxPrice={setMaxPrice} 
+      />
 
       {/* Quick Actions */}
       <div className="pt-1">
