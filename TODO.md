@@ -8,7 +8,7 @@
   - Redirect: Local → dashboard | Prod → “Check your email” page.  
   - Add `.env` config toggle for confirm mode.  
 
-- [ ] Task 2: Brand Signup UI/UX  
+- [x] Task 2: Brand Signup UI/UX  
   - Replace "First Name" → "Brand Name".  
   - Validation → “Brand name is required”.  
   - Show errors only on blur/submit (no duplicates).  
