@@ -13,6 +13,13 @@ A fast, scalable product search web app built with **Next.js** and **Typesense**
 - Fully deployable on **Vercel** with CI/CD
 - Modern responsive UI built with **Tailwind CSS** and **DaisyUI**
 - User-selectable light or dark mode with automatic theme persistence
+- **Real-time Support Chat System** with file/image upload to S3
+  - Server-Sent Events for instant message delivery
+  - Typing indicators
+  - Upload progress tracking
+  - Message persistence and history
+  - Unread message notifications
+  - Mobile-responsive design
 
 ---
 
@@ -45,6 +52,15 @@ Next.js runtime variables go in `.env.local`:
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 NEXTAUTH_SECRET=random-secret
+```
+
+For the chat system with S3 file uploads, also add:
+
+```env
+AWS_REGION=us-east-1
+AWS_S3_BUCKET_NAME=your-bucket-name
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
 ```
 
 4. **Initialize the database**
@@ -205,6 +221,18 @@ const options = [
 Run `npm run generate:erd` to generate `docs/ERD.png` using a remote rendering service.
 
 ![ERD](docs/ERD.png)
+
+## 💬 Chat System
+
+This app includes a comprehensive real-time support chat system with file/image uploads. For detailed documentation, see:
+
+- [Chat System Documentation](docs/CHAT_SYSTEM.md) - Complete feature overview and API reference
+- [Implementation Summary](docs/CHAT_IMPLEMENTATION_SUMMARY.md) - Implementation details and testing checklist
+
+### Quick Start
+1. Configure AWS S3 credentials in `.env` (see step 3 above)
+2. Run database migrations: `npx prisma migrate dev`
+3. The chat button appears in the bottom-right corner when logged in
 
 ## 👨‍💻 Author
 
