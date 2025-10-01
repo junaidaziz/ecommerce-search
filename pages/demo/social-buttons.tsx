@@ -17,7 +17,7 @@ export default function SocialButtonDemo() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-gray-900 dark:from-blue-900 dark:via-gray-900 dark:to-black flex items-center justify-center py-8 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center py-8 px-4">
       <Head>
         <title>{getPageTitle('Social Button Demo')}</title>
       </Head>
@@ -28,7 +28,7 @@ export default function SocialButtonDemo() {
             Social Login Buttons
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Hover over the buttons to see the enhanced hover effects
+            Hover over the buttons to see the enhanced hover effects with official brand colors
           </p>
         </div>
 
@@ -47,7 +47,7 @@ export default function SocialButtonDemo() {
               Continue with Google
             </SocialButton>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Light background tint with blue border and text highlight on hover
+              Official Google Red (#DB4437) background with white text on hover
             </p>
           </div>
 
@@ -64,7 +64,7 @@ export default function SocialButtonDemo() {
               Continue with Facebook
             </SocialButton>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Full blue background with white text on hover
+              Official Facebook Blue (#1877F2) background with white text on hover
             </p>
           </div>
 
@@ -81,7 +81,7 @@ export default function SocialButtonDemo() {
               Continue with GitHub
             </SocialButton>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Dark background with white text on hover (adapts to theme)
+              Black (#000000) background with white text on hover
             </p>
           </div>
         </div>
@@ -98,11 +98,11 @@ export default function SocialButtonDemo() {
             </li>
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
-              <span>Brand-appropriate colors (Google Blue, Facebook Blue, GitHub Dark)</span>
+              <span>Official brand colors (Google #DB4437, Facebook #1877F2, GitHub #000000)</span>
             </li>
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
-              <span>Subtle box shadows that match brand identity</span>
+              <span>White text on hover for optimal readability</span>
             </li>
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
