@@ -21,3 +21,6 @@ export const PERCENTAGE_DISCOUNT_BETWEEN_1_AND_99 =
   'Percentage discount must be between 1 and 99';
 export const INVALID_FORM_DATA = 'Invalid form data';
 export const CANNOT_CANCEL_THIS_ORDER = 'Cannot cancel this order';
+export const INVALID_TOKEN = 'Invalid or expired verification token';
+export const TOKEN_REQUIRED = 'Verification token required';
+export const EMAIL_VERIFIED = 'Email verified successfully';
