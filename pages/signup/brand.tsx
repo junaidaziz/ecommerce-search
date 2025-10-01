@@ -3,21 +3,13 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { AppContext } from '@contexts/AppContext';
-import { signIn } from 'next-auth/react';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import BuildingIcon from '@components/icons/BuildingIcon';
-import GoogleIcon from '@components/icons/GoogleIcon';
-import FacebookIcon from '@components/icons/FacebookIcon';
-import {
-  EmailInput,
-  PasswordInput,
-  TextInput,
-} from '@components/form-fields';
+import { PasswordInput, TextInput } from '@components/form-fields';
 import useEmailAvailability from '@hooks/useEmailAvailability';
 import { USER_ROLES } from '@/types';
-import Button from '@components/UI/Button';
-import SocialButton from '@components/UI/SocialButton';
+import { AuthCard, AuthInput, AuthButton, AuthSocialLogin, AuthDivider } from '@components/Auth';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -98,73 +90,44 @@ export default function BrandSignup() {
     (passwordValue !== '' && !passwordRegex.test(passwordValue));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-gray-900 dark:from-blue-900 dark:via-gray-900 dark:to-black flex items-center justify-center py-8 px-4 animate-fade-in">
+    <>
       <Head>
         <title>{getPageTitle('Brand Signup')}</title>
       </Head>
-      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 sm:p-10 relative z-10">
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-14 h-14 flex items-center justify-center rounded-full bg-purple-100 mb-3">
-            <BuildingIcon className="w-8 h-8 text-purple-600" />
-          </div>
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-1">Create Your Brand Account</h1>
-          <p className="text-gray-500 dark:text-gray-300 text-center text-base">Sign up to start selling, manage your store, and grow your business.</p>
-        </div>
-        <div className="flex flex-col gap-3 mb-6">
-          <SocialButton
-            icon={<GoogleIcon className="h-5 w-5" />}
-            provider="Google"
-            onClick={() => {
-              document.cookie = 'signupRole=BRAND; path=/';
-              signIn('google');
-            }}
-          >
-            Continue with Google
-          </SocialButton>
-          <SocialButton
-            icon={<FacebookIcon className="h-5 w-5" />}
-            provider="Facebook"
-            onClick={() => {
-              document.cookie = 'signupRole=BRAND; path=/';
-              signIn('facebook');
-            }}
-          >
-            Continue with Facebook
-          </SocialButton>
-        </div>
-        <div className="flex items-center my-6">
-          <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
-          <span className="mx-4 text-gray-400 dark:text-gray-500 font-medium">or</span>
-          <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
-        </div>
+      <AuthCard
+        icon={<BuildingIcon className="w-8 h-8 text-purple-600" />}
+        title="Create Your Brand Account"
+        subtitle="Sign up to start selling, manage your store, and grow your business."
+        iconBgClass="bg-purple-100"
+      >
+        <AuthSocialLogin role="BRAND" />
+        <AuthDivider />
+        
         {formError && <div className="text-red-500 mb-2 text-center font-semibold">{formError}</div>}
+        
         <form onSubmit={handleSubmit(submit)} className="space-y-5">
-          <div>
-            <TextInput
-              name="firstName"
-              placeholder="First Name"
-              register={register}
-              rules={{ required: 'First name is required' }}
-              error={errors.firstName?.message as string}
-              className={`w-full text-base px-4 py-3 rounded-lg border ${errors.firstName ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
-            />
-            {errors.firstName?.message && <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>}
-          </div>
-          <div>
-            <EmailInput
-              name="email"
-              placeholder="Email"
-              register={register}
-              onBlur={handleEmailBlur}
-              rules={{
-                required: 'Email is required',
-                pattern: { value: emailRegex, message: 'Invalid email format' },
-              }}
-              error={errors.email?.message as string}
-              className={`w-full text-base px-4 py-3 rounded-lg border ${errors.email ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
-            />
-            {errors.email?.message && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
-          </div>
+          <AuthInput
+            type="text"
+            name="firstName"
+            placeholder="First Name"
+            register={register}
+            rules={{ required: 'First name is required' }}
+            error={errors.firstName?.message as string}
+          />
+          
+          <AuthInput
+            type="email"
+            name="email"
+            placeholder="Email"
+            register={register}
+            onBlur={handleEmailBlur}
+            rules={{
+              required: 'Email is required',
+              pattern: { value: emailRegex, message: 'Invalid email format' },
+            }}
+            error={errors.email?.message as string}
+          />
+          
           <div className="space-y-2">
             <div>
               <PasswordInput
@@ -198,27 +161,19 @@ export default function BrandSignup() {
               {errors.confirm?.message && <p className="text-red-500 text-sm mt-1">{errors.confirm.message}</p>}
             </div>
           </div>
+          
           {showPasswordHint && (
             <p id="password-help" className="text-sm text-gray-500 dark:text-gray-400">
               Password must be at least 8 characters and include uppercase,
               lowercase, number and special character
             </p>
           )}
-          <Button
-            type="submit"
-            size="lg"
-            fullWidth
-            rounded
-            shadow
-            disabled={checkingEmail || !!errors.email}
-            className="mt-2"
-          >
-            {checkingEmail && (
-              <span className="loading loading-spinner mr-2"></span>
-            )}
+          
+          <AuthButton loading={checkingEmail} disabled={checkingEmail || !!errors.email}>
             Sign Up
-          </Button>
+          </AuthButton>
         </form>
+        
         <p className="text-center mt-6 text-gray-700 dark:text-gray-300">
           Already have an account?{' '}
           <Link href="/login" className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
@@ -231,7 +186,7 @@ export default function BrandSignup() {
             Sign up as a user
           </Link>
         </p>
-      </div>
-    </div>
+      </AuthCard>
+    </>
   );
 }
