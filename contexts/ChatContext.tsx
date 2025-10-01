@@ -1,4 +1,5 @@
 import React, { createContext, useState, ReactNode, useEffect, useRef } from 'react';
+import { useSession } from 'next-auth/react';
 import { apiFetch } from '@lib/api';
 
 export interface ChatMessage {
@@ -45,6 +46,7 @@ interface ProviderProps {
 }
 
 export function ChatProvider({ children }: ProviderProps) {
+  const { data: session, status } = useSession();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [chatCtx, setChatCtx] = useState<
@@ -75,16 +77,13 @@ export function ChatProvider({ children }: ProviderProps) {
   useEffect(() => {
     if (isOpen && messages.length === 0 && !isLoadingHistory) {
       setIsLoadingHistory(true);
-      apiFetch('/api/chat/history')
-        .then(async (res) => {
-          if (res.ok) {
-            const data = await res.json();
-            setSessionId(data.sessionId);
-            setMessages(data.messages.map((m: any) => ({
-              ...m,
-              timestamp: new Date(m.timestamp),
-            })));
-          }
+      apiFetch<{ sessionId: number; messages: any[] }>('/api/chat/history')
+        .then((data) => {
+          setSessionId(data.sessionId);
+          setMessages(data.messages.map((m: any) => ({
+            ...m,
+            timestamp: new Date(m.timestamp),
+          })));
         })
         .catch((error) => {
           console.error('Failed to load chat history:', error);
@@ -95,8 +94,16 @@ export function ChatProvider({ children }: ProviderProps) {
     }
   }, [isOpen, messages.length, isLoadingHistory]);
 
-  // Initialize SSE connection when component mounts
+  // Initialize SSE connection when component mounts and user is authenticated
   useEffect(() => {
+    // Only connect if user is authenticated
+    if (status !== 'authenticated' || !session) {
+      return;
+    }
+
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+
     // Connect to SSE stream
     const connectSSE = () => {
       try {
@@ -112,14 +119,23 @@ export function ChatProvider({ children }: ProviderProps) {
             }]);
           } else if (data.type === 'connected') {
             console.log('Connected to chat stream');
+            reconnectAttempts = 0; // Reset reconnect attempts on successful connection
           }
         };
         
-        eventSource.onerror = () => {
-          console.error('SSE connection error, reconnecting...');
+        eventSource.onerror = (error) => {
+          console.error('SSE connection error:', error);
           eventSource.close();
-          // Reconnect after 5 seconds
-          setTimeout(connectSSE, 5000);
+          
+          // Check if we should reconnect
+          if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000); // Exponential backoff
+            console.log(`Reconnecting in ${delay}ms... (attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
+            setTimeout(connectSSE, delay);
+          } else {
+            console.error('Max reconnection attempts reached. Please refresh the page.');
+          }
         };
         
         eventSourceRef.current = eventSource;
@@ -136,7 +152,7 @@ export function ChatProvider({ children }: ProviderProps) {
         eventSourceRef.current.close();
       }
     };
-  }, []);
+  }, [status, session]);
 
   const sendMessage = async (data: {
     content?: string;
@@ -170,6 +186,13 @@ export function ChatProvider({ children }: ProviderProps) {
   };
 
   const openChat = (context?: { orderId?: string; customerName?: string }) => {
+    // Check if user is authenticated before opening chat
+    if (status !== 'authenticated' || !session) {
+      // Redirect to login page
+      window.location.href = '/login?callbackUrl=' + encodeURIComponent(window.location.pathname);
+      return;
+    }
+    
     if (context) setChatCtx(context);
     setIsOpen(true);
   };
