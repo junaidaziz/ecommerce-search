@@ -28,20 +28,6 @@ const slides = [
 
 const Hero: FC = () => (
   <section className="w-full mb-12">
-    <style jsx global>{`
-      .swiper-button-next, .swiper-button-prev {
-        @apply !bg-white/80 !text-orange-500 !rounded-full !shadow-lg !w-14 !h-14 !flex !items-center !justify-center !top-1/2 !-translate-y-1/2 !z-20;
-        font-size: 2rem;
-        border: none;
-        transition: background 0.2s, color 0.2s;
-      }
-      .swiper-button-next:hover, .swiper-button-prev:hover {
-        @apply !bg-orange-100 !text-orange-600;
-      }
-      .swiper-button-next:after, .swiper-button-prev:after {
-        font-size: 2rem !important;
-      }
-    `}</style>
     <div className="w-full max-w-screen-2xl mx-auto px-4 md:px-8 rounded-xl md:rounded-2xl overflow-hidden shadow-xl">
       <Swiper
         modules={[Autoplay, Pagination, Navigation]}
