@@ -25,7 +25,13 @@ interface SearchParams {
 }
 
 interface TypesenseHit {
-  document: Product;
+  document: Product & { brand?: string; category?: string };
+  highlights: unknown[];
+}
+
+interface HitResult extends Product {
+  brand?: string;
+  category?: string;
   highlights: unknown[];
 }
 
@@ -108,12 +114,12 @@ export default async function handler(
       .collections('products')
       .documents()
       .search(searchParams);
-    let hits =
-      result.hits?.map((h: any) => ({
+    let hits: HitResult[] =
+      result.hits?.map((h: TypesenseHit) => ({
         ...h.document,
         highlights: h.highlights,
       })) || [];
-    const brandNames = Array.from(new Set(hits.map((h: any) => h.brand))).filter(Boolean);
+    const brandNames = Array.from(new Set(hits.map((h) => h.brand))).filter(Boolean) as string[];
     let activeSet = new Set<string>();
     if (brandNames.length > 0) {
       const activeRows = await db.user.findMany({
@@ -122,7 +128,7 @@ export default async function handler(
       });
       activeSet = new Set(activeRows.map((r) => r.brandName || ''));
     }
-    hits = hits.filter((h: any) => activeSet.has(h.brand));
+    hits = hits.filter((h) => h.brand && activeSet.has(h.brand));
     const totalPages = Math.ceil(result.found / searchParams.per_page);
     const brands: string[] = [];
     const categories: string[] = [];

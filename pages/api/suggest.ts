@@ -5,6 +5,21 @@ import { ObjectNotFound } from 'typesense/lib/Typesense/Errors';
 import type { SuggestionsResponse, ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
+interface TypesenseDocument {
+  title: string;
+  [key: string]: unknown;
+}
+
+interface TypesenseHit {
+  document: TypesenseDocument;
+  [key: string]: unknown;
+}
+
+interface TypesenseSearchResult {
+  hits?: TypesenseHit[];
+  [key: string]: unknown;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuggestionsResponse | ApiMessage>
@@ -27,10 +42,10 @@ export default async function handler(
       prefix: 'true',
       page: 1,
       per_page: 5,
-    });
+    }) as TypesenseSearchResult;
 
     const suggestions = Array.isArray(result.hits)
-      ? result.hits.map((h: any) => h.document.title).filter(Boolean)
+      ? result.hits.map((h) => h.document.title).filter(Boolean)
       : [];
     return res.status(200).json({ suggestions });
   } catch (err) {

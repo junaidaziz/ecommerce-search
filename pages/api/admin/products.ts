@@ -7,7 +7,7 @@ import { uploadFileToS3 } from '@lib/s3';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { slugify } from '@lib/slugify';
-import { Product, ApiMessage, Variant, USER_ROLES } from '@/types';
+import { Product, ApiMessage, Variant, USER_ROLES, User } from '@/types';
 import { mapDbRowToProduct } from '@lib/products';
 import {
   METHOD_NOT_ALLOWED,
@@ -16,9 +16,11 @@ import {
   CANNOT_DELETE_PRODUCT_WITH_ORDERS,
 } from '@/constants/messages';
 import { hasOrdersForProduct } from '@lib/orders';
+import { Prisma } from '@prisma/client';
+import formidable, { Fields, Files } from 'formidable';
 
 export interface AuthedNextApiRequest extends NextApiRequest {
-  user?: any;
+  user?: User;
 }
 
 interface ProductsListResponse {
@@ -28,7 +30,7 @@ interface ProductsListResponse {
 
 function parseBody(
   req: NextApiRequest
-): Promise<{ fields: any; files: any }> {
+): Promise<{ fields: Fields; files: Files }> {
   return new Promise((resolve, reject) => {
     formidable().parse(req, (err, fields, files) => {
       if (err) reject(err);
@@ -72,7 +74,7 @@ async function handler(
           variantList =
             typeof variants === 'string'
               ? JSON.parse(variants)
-              : (variants as any);
+              : (variants as Variant[]);
           if (!Array.isArray(variantList)) variantList = [];
         } catch {
           variantList = [];
@@ -248,7 +250,7 @@ async function handler(
       }
 
       // Build orderBy clause
-      let orderBy: any = {};
+      let orderBy: Prisma.ProductOrderByWithRelationInput = {};
       switch (sortBy) {
         case 'newest':
           orderBy = { createdAt: 'desc' };
@@ -290,7 +292,7 @@ async function handler(
         take: limit,
       });
       
-      const data: Product[] = rows.map((p: any) => mapDbRowToProduct(p));
+      const data: Product[] = rows.map((p) => mapDbRowToProduct(p));
       res.status(200).json({ products: data, total });
       return;
     }
