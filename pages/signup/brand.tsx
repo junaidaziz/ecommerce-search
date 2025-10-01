@@ -73,12 +73,19 @@ export default function BrandSignup() {
 
   const submit = async (values: any) => {
     try {
-      const data = await signup<{ token: string }>('/api/signup/brand', {
+      const data = await signup<{ token: string; autoConfirmed?: boolean }>('/api/signup/brand', {
         firstName: values.brandName,
         email: values.email,
         password: values.password,
       });
-      router.push(`/confirm/${data.token}`);
+      
+      // If auto-confirmed (local dev), redirect to brand dashboard
+      if (data.autoConfirmed) {
+        router.push('/brand/profile?complete=1');
+      } else {
+        // Production: redirect to confirmation page
+        router.push('/brand/confirmation');
+      }
     } catch (e) {
       setFormError('Signup failed');
     }
