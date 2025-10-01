@@ -27,7 +27,7 @@ export interface ApiResponse<T> {
 export interface ApiError {
   message: string;
   code?: string;
-  details?: any;
+  details?: unknown;
 }
 
 export interface SearchResults<T> {
@@ -74,7 +74,7 @@ export interface TableColumn<T> {
   key: keyof T;
   label: string;
   sortable?: boolean;
-  render?: (value: any, row: T) => React.ReactNode;
+  render?: (value: T[keyof T], row: T) => React.ReactNode;
 }
 
 export interface SortConfig {
@@ -85,7 +85,7 @@ export interface SortConfig {
 export interface FilterConfig {
   field: string;
   operator: 'equals' | 'contains' | 'gt' | 'lt' | 'gte' | 'lte' | 'in';
-  value: any;
+  value: string | number | boolean | string[] | number[];
 }
 
 export interface ProductGridProps {

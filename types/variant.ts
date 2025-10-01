@@ -5,7 +5,7 @@ export type Variant = PrismaVariant;
 
 // Variant with parsed attributes (for app use)
 export type VariantWithParsedAttributes = Variant & {
-  attributes: Record<string, any>;
+  attributes: Record<string, string | number | boolean>;
 };
 
 // Input type for creating variants (matches Prisma fields)
