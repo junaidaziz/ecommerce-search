@@ -140,19 +140,21 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
       >
         <div className="flex items-center justify-between h-20">
           {/* Left: Logo */}
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-8 min-w-0">
             <Logo />
-          </div>
-          {/* Center: Categories + Search + NavLinks (desktop) */}
-          <div className="hidden lg:flex flex-1 items-center justify-center gap-6">
+            {/* Categories with spacing from logo */}
+            <div className="hidden lg:block">
               <CategoryDropdown categories={categories} />
-              <div className="w-[1px] h-6 bg-gray-300 dark:bg-gray-700 mx-2" />
-              {/* Search input with increased width and modern style */}
-              <HeaderSearchInput categories={categories} className="w-full" />
-              <NavLinks />
+            </div>
           </div>
-          {/* Right: Cart, Theme, User, Auth (desktop) */}
-          <div className="hidden lg:flex items-center gap-2 ml-auto">
+          {/* Center: Search with increased width (desktop) */}
+          <div className="hidden lg:flex flex-1 items-center justify-center max-w-3xl mx-auto">
+              {/* Search input with increased width and modern style */}
+              <HeaderSearchInput categories={categories} className="w-full max-w-3xl" />
+          </div>
+          {/* Right: NavLinks + Cart, Theme, User, Auth (desktop) */}
+          <div className="hidden lg:flex items-center gap-6 ml-auto">
+            <NavLinks />
             {/* Cart icon with badge, grouped with theme and auth */}
             <div className="flex items-center gap-2">
               <MenuItems
