@@ -37,7 +37,7 @@ const DropdownMenu: FC<DropdownMenuProps> = ({ items, onItemClick }) => {
           <li key={index}>
             <button
               onClick={handleClick(item.onClick)}
-              className="w-full text-left px-4 py-2 rounded-md transition-colors duration-150 hover:bg-base-200 focus:bg-base-200 focus:outline-none"
+              className="w-full text-left px-4 py-2 rounded-md text-gray-700 dark:text-gray-200 transition-colors duration-150 hover:bg-base-200 hover:text-gray-900 dark:hover:text-white focus:bg-base-200 focus:outline-none"
               role="menuitem"
             >
               {item.label}
@@ -48,7 +48,7 @@ const DropdownMenu: FC<DropdownMenuProps> = ({ items, onItemClick }) => {
             <Link
               href={item.href || '#'}
               onClick={onItemClick}
-              className="block px-4 py-2 rounded-md transition-colors duration-150 hover:bg-base-200 focus:bg-base-200 focus:outline-none"
+              className="block px-4 py-2 rounded-md text-gray-700 dark:text-gray-200 transition-colors duration-150 hover:bg-base-200 hover:text-gray-900 dark:hover:text-white focus:bg-base-200 focus:outline-none"
               role="menuitem"
             >
               {item.label}

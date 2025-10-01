@@ -46,13 +46,13 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     if (user) {
       if (onLoginSuccess) onLoginSuccess(user);
       if (user.role === USER_ROLES.BRAND) {
-        if (!user.brandName) router.push('/brand/profile?complete=1');
-        else router.push('/brand/dashboard');
+        if (!user.brandName) router.replace('/brand/profile?complete=1');
+        else router.replace('/brand/dashboard');
       } else if (user.role === USER_ROLES.SUPER_ADMIN) {
-        router.push('/admin');
+        router.replace('/admin');
       } else {
-        if (!user.lastName) router.push('/user/profile?complete=1');
-        else router.push('/');
+        if (!user.lastName) router.replace('/user/profile?complete=1');
+        else router.replace('/');
       }
     }
   }, [user, router, onLoginSuccess]);
@@ -77,62 +77,71 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       <Head>
         <title>{getPageTitle('Login')}</title>
       </Head>
-      <AuthCard
-        icon={<UserIcon className="w-8 h-8 text-blue-600" />}
-        title={AUTH_TITLES.login.title}
-        subtitle={AUTH_TITLES.login.subtitle}
-        iconBgClass="bg-blue-100"
-      >
-        <AuthSocialLogin />
-        <AuthDivider />
-        
-        <FormError message={formError} align="left" className="mb-4" />
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <AuthInput
-            type="email"
-            name="email"
-            placeholder={AUTH_PLACEHOLDERS.email}
-            register={register}
-            rules={getEmailValidation()}
-            error={errors.email?.message as string}
-            required
-          />
-
-          <AuthInput
-            type="password"
-            name="password"
-            placeholder={AUTH_PLACEHOLDERS.password}
-            register={register}
-            rules={getPasswordValidation()}
-            error={errors.password?.message as string}
-            required
-          />
-
-          <div className="flex justify-end mt-1">
-            <Link href="/auth/forgot-password" className="text-sm font-medium text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
-              {AUTH_BUTTONS.forgotPassword}
-            </Link>
+      {user ? (
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Redirecting...</p>
           </div>
+        </div>
+      ) : (
+        <AuthCard
+          icon={<UserIcon className="w-8 h-8 text-blue-600" />}
+          title={AUTH_TITLES.login.title}
+          subtitle={AUTH_TITLES.login.subtitle}
+          iconBgClass="bg-blue-100"
+        >
+          <AuthSocialLogin />
+          <AuthDivider />
+          
+          <FormError message={formError} align="left" className="mb-4" />
 
-          <AuthButton loading={loading}>
-            {AUTH_BUTTONS.login}
-          </AuthButton>
-        </form>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <AuthInput
+              type="email"
+              name="email"
+              placeholder={AUTH_PLACEHOLDERS.email}
+              register={register}
+              rules={getEmailValidation()}
+              error={errors.email?.message as string}
+              required
+            />
 
-        <p className="text-center mt-6 text-gray-700 dark:text-gray-300">
-          {AUTH_LINKS.noAccount}{' '}
-          <Link href="/signup" className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
-            {AUTH_LINKS.signupLink}
-          </Link>
-        </p>
-        <p className="text-sm text-center mt-2 text-gray-500 dark:text-gray-400">
-          {AUTH_LINKS.brandSignupPrompt}{' '}
-          <Link href="/signup/brand" className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
-            {AUTH_LINKS.brandSignupLink}
-          </Link>
-        </p>
-      </AuthCard>
+            <AuthInput
+              type="password"
+              name="password"
+              placeholder={AUTH_PLACEHOLDERS.password}
+              register={register}
+              rules={getPasswordValidation()}
+              error={errors.password?.message as string}
+              required
+            />
+
+            <div className="flex justify-end mt-1">
+              <Link href="/auth/forgot-password" className="text-sm font-medium text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
+                {AUTH_BUTTONS.forgotPassword}
+              </Link>
+            </div>
+
+            <AuthButton loading={loading}>
+              {AUTH_BUTTONS.login}
+            </AuthButton>
+          </form>
+
+          <p className="text-center mt-6 text-gray-700 dark:text-gray-300">
+            {AUTH_LINKS.noAccount}{' '}
+            <Link href="/signup" className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
+              {AUTH_LINKS.signupLink}
+            </Link>
+          </p>
+          <p className="text-sm text-center mt-2 text-gray-500 dark:text-gray-400">
+            {AUTH_LINKS.brandSignupPrompt}{' '}
+            <Link href="/signup/brand" className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary">
+              {AUTH_LINKS.brandSignupLink}
+            </Link>
+          </p>
+        </AuthCard>
+      )}
     </>
   );
 };

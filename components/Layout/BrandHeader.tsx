@@ -152,7 +152,7 @@ const BrandHeader: FC<HeaderProps> = ({
                 <li>
                   <Link
                     href="/brand/profile"
-                    className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-t-lg transition-colors duration-200"
+                    className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white rounded-t-lg transition-colors duration-200"
                   >
                     Profile
                   </Link>
@@ -160,7 +160,7 @@ const BrandHeader: FC<HeaderProps> = ({
                 <li>
                   <button
                     onClick={logout}
-                    className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-b-lg transition-colors duration-200"
+                    className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white rounded-b-lg transition-colors duration-200"
                   >
                     Logout
                   </button>
