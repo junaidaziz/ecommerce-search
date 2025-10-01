@@ -13,7 +13,7 @@ export function withRole(roles: (string | keyof typeof USER_ROLES)[]) {
     async (req: AuthedNextApiRequest, res: NextApiResponse) => {
       const session = await getServerSession(req, res, authOptions(req, res));
       const role = session?.user?.role as string | undefined;
-      if (!session || !role || !roles.includes(role as any)) {
+      if (!session || !role || !roles.includes(role)) {
         return res.status(403).json({ message: 'Forbidden' });
       }
       req.user = session.user;

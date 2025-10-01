@@ -252,5 +252,5 @@ export async function getBestSellingProducts(limit = 8): Promise<Product[]> {
     where: { id: { in: variantIds } },
     include: { product: { include: { category: true, vendor: true } } },
   });
-  return variants.map((v: any) => mapDbRowToProduct(v.product));
+  return variants.map((v) => mapDbRowToProduct(v.product));
 }

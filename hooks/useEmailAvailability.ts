@@ -4,15 +4,16 @@ import type {
   UseFormGetValues,
   UseFormSetError,
   UseFormWatch,
+  FieldValues,
 } from 'react-hook-form';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function useEmailAvailability(
-  watch: UseFormWatch<any>,
-  getValues: UseFormGetValues<any>,
-  setError: UseFormSetError<any>,
-  clearErrors: UseFormClearErrors<any>
+export default function useEmailAvailability<T extends FieldValues>(
+  watch: UseFormWatch<T>,
+  getValues: UseFormGetValues<T>,
+  setError: UseFormSetError<T>,
+  clearErrors: UseFormClearErrors<T>
 ) {
   const [checkingEmail, setCheckingEmail] = useState(false);
   const emailValue = watch('email');
