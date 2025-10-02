@@ -199,7 +199,7 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
             <CategoryDropdown categories={categories} />
             <HeaderSearchInput categories={categories} />
 
-            <NavLinks />
+            <NavLinks onLinkClick={() => setMobileMenuOpen(false)} />
             <MenuItems
               theme={theme}
               setTheme={setTheme}
