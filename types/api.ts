@@ -9,6 +9,12 @@ export interface SearchResults {
   results: Product[];
 }
 
+// Products response interface
+export interface ProductsResponse {
+  products: Product[];
+  total: number;
+}
+
 // Suggestions response interface
 export interface SuggestionsResponse {
   suggestions: string[];

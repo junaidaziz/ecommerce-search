@@ -1,15 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getBestSellingProducts } from '@lib/orders';
 import { getDb } from '@lib/db';
-import type { Product } from '@/types';
-import type { ApiMessage } from '@/types';
+import type { Product, ApiMessage, SearchApiResponse } from '@/types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import client from '@lib/typesenseClient';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
-import { SearchApiResponse } from 'types/api';
 
 interface SearchParams {
   q: string;
