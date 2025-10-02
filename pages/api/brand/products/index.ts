@@ -208,11 +208,7 @@ async function handler(
         description: String(description || ''),
         productType: String(product_type || ''),
         tags: String(tags || ''),
-        category: {
-          id: parseInt(String(category_id || '0'), 10),
-          name: '',
-          slug: ''
-        },
+        categoryId: parseInt(String(category_id || '0'), 10),
         quantity: quantity ? parseInt(String(quantity), 10) : 0,
         minPrice: parseFloat(String(min_price || '0')),
         maxPrice: parseFloat(String(max_price || '0')),
@@ -220,7 +216,7 @@ async function handler(
         discountType: parsedDiscountType,
         discountValue: parsedDiscountValue,
         status: 'approved',
-        images: imagePaths.map((p) => ({ url: p })),
+        images: imagePaths,
       };
       await addProduct(payload);
       await loadAndIndexProducts();
