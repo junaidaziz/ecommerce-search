@@ -16,6 +16,7 @@ export * from './context';
 export * from './wishlist';
 export * from './variant';
 export * from './coupon';
+export * from './shared';
 
 // Explicitly re-export only one version of each conflicting type
 export type { Category } from './category';

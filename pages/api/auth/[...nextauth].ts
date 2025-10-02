@@ -8,6 +8,7 @@ import { findUser, addUser } from '@lib/users';
 import { assignUserRoleIfMissing } from '@lib/db/user';
 import type { Role } from '@prisma/client';
 import type { User as AppUser } from '@/types';
+import { USER_ROLES } from '@/types';
 
 // Extend the User type to include 'role'
 declare module 'next-auth' {
@@ -55,7 +56,13 @@ export function authOptions(req: NextApiRequest, res: NextApiResponse): AuthOpti
           !user.disabled &&
           (await bcrypt.compare(credentials.password, user.password))
         ) {
-          const { id, firstName, lastName, brandName, gender, role } = user;
+          // Check if brand account needs verification (only when AUTO_CONFIRM_BRANDS is not true)
+          const needsVerification = process.env.AUTO_CONFIRM_BRANDS !== 'true';
+          if (needsVerification && user.role === USER_ROLES.BRAND && !user.verified) {
+            return null; // Prevent login for unverified brands
+          }
+          
+          const { id, firstName, lastName, brandName, gender, role, verified } = user;
           return {
             id: user.email,
             email: user.email,
@@ -64,6 +71,7 @@ export function authOptions(req: NextApiRequest, res: NextApiResponse): AuthOpti
             gender,
             role,
             brandId: id,
+            verified,
           };
         }
         return null;
@@ -111,12 +119,14 @@ export function authOptions(req: NextApiRequest, res: NextApiResponse): AuthOpti
    async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
+        token.verified = (user as any).verified;
         if ('brandId' in user && typeof (user as any).brandId === 'number') {
           token.brandId = (user as any).brandId;
         } else if (typeof user.email === 'string') {
           const dbUser = await findUser(user.email);
           if (dbUser) token.brandId = dbUser.id;
           if (dbUser) token.profileImage = dbUser.profileImage;
+          if (dbUser) token.verified = dbUser.verified;
         }
       } else {
         if (token.brandId === undefined && typeof token.email === 'string') {
@@ -125,6 +135,7 @@ export function authOptions(req: NextApiRequest, res: NextApiResponse): AuthOpti
             token.brandId = dbUser.id;
             if (!token.role) token.role = dbUser.role;
             token.profileImage = dbUser.profileImage;
+            token.verified = dbUser.verified;
           }
         }
       }
@@ -133,6 +144,7 @@ export function authOptions(req: NextApiRequest, res: NextApiResponse): AuthOpti
     session({ session, token }) {
       if (token && session.user) {
         session.user.role = token.role;
+        (session.user as any).verified = token.verified;
         if (typeof token.brandId === 'number') {
           (session.user as { brandId?: number }).brandId = token.brandId;
         }

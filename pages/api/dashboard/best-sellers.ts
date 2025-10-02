@@ -28,29 +28,46 @@ async function handler(
       return res.status(401).json({ message: UNAUTHORIZED });
     }
     const where: Prisma.OrderWhereInput = {};
-    if (vendorId) where.product = { vendorId };
+    if (vendorId) {
+      where.variant = {
+        product: {
+          vendorId
+        }
+      };
+    }
     const grouped = await db.order.groupBy({
-      by: ['productId'],
+      by: ['variantId'],
       where,
       _sum: { quantity: true },
       orderBy: { _sum: { quantity: 'desc' } },
       take: 5,
     });
-    const ids = grouped.map((g: { productId: string }) => g.productId);
-    const products = await db.product.findMany({
-      where: { id: { in: ids } },
-      select: { id: true, title: true },
+    const variantIds = grouped.map((g: { variantId: number }) => g.variantId);
+    const variants = await db.variant.findMany({
+      where: { id: { in: variantIds } },
+      include: { product: { select: { id: true, title: true } } }
     });
-    const map = new Map(
-      products.map((p: Pick<Product, 'id' | 'title'>) => [p.id, p.title])
-    );
-    const result = grouped.map(
-      (g: { productId: string; _sum: { quantity: number | null } }) => ({
-        id: String(g.productId),
-        title: map.get(g.productId) || '',
-        quantity: g._sum.quantity || 0,
-      })
-    );
+    const productMap = new Map();
+    variants.forEach(variant => {
+      const productId = variant.product.id;
+      const quantity = grouped.find(g => g.variantId === variant.id)?._sum.quantity || 0;
+      if (productMap.has(productId)) {
+        productMap.set(productId, {
+          ...productMap.get(productId),
+          quantity: productMap.get(productId).quantity + quantity
+        });
+      } else {
+        productMap.set(productId, {
+          id: String(productId),
+          title: variant.product.title,
+          quantity
+        });
+      }
+    });
+    const result = Array.from(productMap.values())
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 5);
+
     return res.status(200).json({ products: result });
   } catch (error) {
     return handleApiError(res, error, 'Failed to load best sellers');

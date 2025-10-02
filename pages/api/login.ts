@@ -2,7 +2,20 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { findUser } from '@lib/users';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '@utils/handleApiError';
-type LoginResponse = { success: boolean; redirect?: string };
+type LoginResponse = { 
+  success?: boolean; 
+  redirect?: string; 
+  message?: string;
+  user?: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    brandName: string;
+    gender: string;
+    role: string;
+    verified: boolean;
+  };
+};
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export default async function handler(
@@ -28,7 +41,7 @@ export default async function handler(
     ) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
-    const { firstName, lastName, brandName, gender, role } = user;
+    const { firstName, lastName, brandName, gender, role, verified } = user;
     return res.status(200).json({
       message: 'Login successful',
       user: {
@@ -38,6 +51,7 @@ export default async function handler(
         brandName,
         gender,
         role,
+        verified,
       },
     });
   } catch (error) {

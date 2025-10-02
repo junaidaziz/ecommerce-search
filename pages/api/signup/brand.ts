@@ -35,14 +35,14 @@ export default async function handler(
     
     const hashed = await bcrypt.hash(password, 10);
     
-    // Check if we're in production environment
-    const isProduction = process.env.NODE_ENV === 'production';
+    // Check AUTO_CONFIRM_BRANDS environment variable
+    const autoConfirm = process.env.AUTO_CONFIRM_BRANDS === 'true';
     
-    // Generate token only in production
-    const token = isProduction ? crypto.randomBytes(20).toString('hex') : null;
+    // Generate token only when email verification is required
+    const token = autoConfirm ? null : crypto.randomBytes(20).toString('hex');
     
-    // In local/dev, auto-confirm by setting verified to true
-    const verified = !isProduction;
+    // Auto-confirm in local/dev, require verification in production
+    const verified = autoConfirm;
     
     await addUser({
       email,
@@ -55,8 +55,11 @@ export default async function handler(
       verified,
     });
     
-    // Return token only in production (for email confirmation flow)
-    return res.status(201).json({ token: token || '' });
+    // Return response with autoConfirmed flag for frontend logic
+    return res.status(201).json({ 
+      token: token || '', 
+      autoConfirmed: autoConfirm 
+    });
   } catch (error) {
     return handleApiError(res, error, 'Failed to sign up brand');
   }

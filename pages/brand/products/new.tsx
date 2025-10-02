@@ -9,6 +9,7 @@ import { AppContext } from '@contexts/AppContext';
 import { NotificationContext } from '@contexts/NotificationContext';
 import type { User } from '@/types';
 import type { Product, ProductFormValues } from '@/types';
+import { USER_ROLES } from '@/types';
 import { UserRole } from '@/types';
 import { getPageTitle } from '@lib/pageTitle';
 import PageContainer from '@components/Layout/PageContainer';
@@ -163,7 +164,7 @@ const NewProductPage: React.FC = () => {
     );
   }
   
-  if (user.role !== 'brand' && user.role !== 'SUPER_ADMIN') {
+  if (user.role !== USER_ROLES.BRAND && user.role !== USER_ROLES.SUPER_ADMIN) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center">
         <div className="text-center">

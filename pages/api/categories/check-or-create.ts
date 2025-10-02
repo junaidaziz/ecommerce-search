@@ -26,8 +26,8 @@ export default async function handler(
       return res.status(405).json({ message: METHOD_NOT_ALLOWED });
     }
     const session = await getServerSession(req, res, authOptions(req, res));
-    if (!session?.user || session.user.role !== 'BRAND') {
-      return res.status(401).json({ message: UNAUTHORIZED });
+    if (!session?.user || session.user.role !== USER_ROLES.BRAND) {
+      return res.status(403).json({ message: 'Brand access required' });
     }
     const { name, slug } = req.body || {};
     if (!name) return res.status(400).json({ message: NAME_REQUIRED });

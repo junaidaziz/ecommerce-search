@@ -22,7 +22,11 @@ export async function getSalesMetrics(
     if (end) (where.createdAt as Prisma.DateTimeFilter).lte = end;
   }
   if (vendorId) {
-    where.product = { vendorId } as unknown as Prisma.ProductWhereInput;
+    where.variant = {
+      product: {
+        vendorId
+      }
+    };
   }
   const count = await db.order.count({ where });
   const agg = await db.order.aggregate({ where, _sum: { total: true } });

@@ -22,7 +22,7 @@ export default async function handler(
         : undefined;
     if (
       !session?.user ||
-      (session.user.role !== 'BRAND' && session.user.role !== USER_ROLES.SUPER_ADMIN) ||
+      (session.user.role !== USER_ROLES.BRAND && session.user.role !== USER_ROLES.SUPER_ADMIN) ||
       !brandId
     ) {
       return res.status(401).json({ message: UNAUTHORIZED });
