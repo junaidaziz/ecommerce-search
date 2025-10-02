@@ -81,8 +81,9 @@ function processProductRow(row: DbProductRow): Product {
   }
   // Fix vendor.paymentMethods
   if (processed.vendor) {
-    processed.vendor.paymentMethods = Array.isArray(processed.vendor.paymentMethods)
-      ? processed.vendor.paymentMethods
+    const vendor = processed.vendor as any;
+    vendor.paymentMethods = Array.isArray(vendor.paymentMethods)
+      ? vendor.paymentMethods
       : null;
   }
   return processed as Product;

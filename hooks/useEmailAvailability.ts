@@ -9,23 +9,23 @@ import type {
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function useEmailAvailability<T extends FieldValues>(
+export default function useEmailAvailability<T extends FieldValues & { email: string }>(
   watch: UseFormWatch<T>,
   getValues: UseFormGetValues<T>,
   setError: UseFormSetError<T>,
   clearErrors: UseFormClearErrors<T>
 ) {
   const [checkingEmail, setCheckingEmail] = useState(false);
-  const emailValue = watch('email');
+  const emailValue = watch('email' as any);
 
   const checkEmail = useCallback(
     async (value: string) => {
       if (!value) {
-        clearErrors('email');
+        clearErrors('email' as any);
         return;
       }
       if (!emailRegex.test(value)) {
-        setError('email', { type: 'pattern', message: 'Invalid email format' });
+        setError('email' as any, { type: 'pattern', message: 'Invalid email format' });
         return;
       }
       setCheckingEmail(true);
@@ -36,12 +36,12 @@ export default function useEmailAvailability<T extends FieldValues>(
         if (res.ok) {
           const data = await res.json();
           if (data.exists) {
-            setError('email', {
+            setError('email' as any, {
               type: 'manual',
               message: 'Email already registered',
             });
           } else {
-            clearErrors('email');
+            clearErrors('email' as any);
           }
         }
       } catch (_) {
@@ -62,7 +62,7 @@ export default function useEmailAvailability<T extends FieldValues>(
   }, [emailValue, checkEmail]);
 
   const handleEmailBlur = async () => {
-    const value = getValues('email');
+    const value = getValues('email' as any);
     await checkEmail(value as unknown as string);
   };
 

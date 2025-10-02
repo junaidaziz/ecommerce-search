@@ -30,7 +30,7 @@ export type {
   OrdersThisMonth,
   ChartConfig
 } from './dashboard';
-export type { User, UserRole } from './user';
+export type { User, UserRole, UserInput } from './user';
 export { USER_ROLES, getUserRoles } from './user';
 
 // Export all admin types

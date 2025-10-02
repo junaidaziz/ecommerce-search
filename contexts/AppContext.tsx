@@ -342,12 +342,12 @@ export function AppProvider({ children }: AppProviderProps) {
     <AppContext.Provider
       value={{
         user,
-        cart,
+        cart: cart as CartItem[],
         wishlist,
         login,
         signup,
         logout,
-        addToCart,
+        addToCart: addToCart as any,
         changeQty,
         removeFromCart,
         clearCart,
@@ -356,6 +356,7 @@ export function AppProvider({ children }: AppProviderProps) {
         placeOrder,
         isInCart,
         getCartItemQuantity,
+        mergeCarts: () => {}, // placeholder
       }}
     >
       {children}

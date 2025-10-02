@@ -56,12 +56,13 @@ async function handler(
       select: { id: true, title: true },
     });
     const titles = new Map(products.map((p: { id: number; title: string }) => [p.id, p.title]));
-    const summary: AnalyticsData = {
+    const summary: any = {
       totalOrders,
       totalRevenue: revenueAgg._sum.total ?? 0,
       topProducts: grouped.map((g: { productId: number; _sum: { quantity: number | null } }) => ({
         id: String(titles.get(g.productId) ?? g.productId),
         qty: g._sum.quantity || 0,
+        title: titles.get(g.productId) ?? '',
       })),
     };
     res.status(200).json(summary);

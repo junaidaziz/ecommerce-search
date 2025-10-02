@@ -67,7 +67,7 @@ export interface SearchAnalyticsResponse {
 }
 
 // Analytics data interface
-export interface AnalyticsData {
+export interface AdminAnalyticsData {
   totalOrders: number;
   totalRevenue: number;
   topProducts: { id: number; qty: number; title: string }[];

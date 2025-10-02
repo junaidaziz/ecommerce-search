@@ -4,7 +4,6 @@ import { authOptions } from '@pages/api/auth/[...nextauth]';
 import type { Coupon, ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
 import { getDb } from '@lib/db';
-import { PrismaCoupon } from '@/types';
 
 const prisma = getDb();
 
@@ -36,7 +35,7 @@ export default async function handler(
 
   const usedIds = new Set(usages.map((u: { couponId: number }) => u.couponId));
   const now = new Date();
-  const result = coupons.map((c: PrismaCoupon) => ({
+  const result = coupons.map((c: Coupon) => ({
     ...c,
     status: usedIds.has(c.id)
       ? 'used'
