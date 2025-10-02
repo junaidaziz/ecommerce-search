@@ -12,6 +12,9 @@ export interface Review {
   comment: string;
   createdAt: Date;
   updatedAt: Date;
+  // Computed fields that may be included in API responses
+  userEmail?: string;
+  productId?: number;
 }
 
 // Review with relations (for app use)

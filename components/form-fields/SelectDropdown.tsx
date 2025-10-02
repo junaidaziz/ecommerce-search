@@ -64,7 +64,7 @@ const SelectDropdown = <T extends FieldValues>(
   // Custom noOptionsMessage and menuList for add new
   const customComponents = {
     ...selectComponents,
-    NoOptionsMessage: (noOptionsProps: NoticeProps<OptionType, false, GroupBase<OptionType>>) => (
+    NoOptionsMessage: (noOptionsProps: NoticeProps<SelectOption, false, GroupBase<SelectOption>>) => (
       <div className="bg-gray-800 text-white rounded-lg shadow-lg p-0 overflow-hidden min-w-[220px]">
         <div className="px-4 py-3 text-gray-300 text-sm">No options found.</div>
         {onAddNew && noOptionsProps.selectProps.inputValue ? (

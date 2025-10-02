@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getCategoriesFlat, createCategory } from '@lib/products';
 import { handleApiError } from '@utils/handleApiError';
 import type { ApiMessage, Category } from '@/types';
+import { USER_ROLES } from '@/types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@pages/api/auth/[...nextauth]';
 import {

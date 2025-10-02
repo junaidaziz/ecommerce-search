@@ -77,8 +77,10 @@ export function ChatProvider({ children }: ProviderProps) {
   useEffect(() => {
     if (isOpen && messages.length === 0 && !isLoadingHistory) {
       setIsLoadingHistory(true);
-      apiFetch<{ sessionId: number; messages: any[] }>('/api/chat/history')
-        .then((data) => {
+      apiFetch('/api/chat/history')
+        .then(async (res) => {
+          if (!res.ok) throw new Error('Failed to load history');
+          const data = await res.json() as { sessionId: number; messages: any[] };
           setSessionId(data.sessionId);
           setMessages(data.messages.map((m: any) => ({
             ...m,

@@ -6,6 +6,7 @@ import type { Order } from '@/types';
 import { UserRole, USER_ROLES } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import { Cog8ToothIcon as CogIcon } from '@heroicons/react/24/outline';
 
 export default function VendorOrders() {
   const { user } = useContext(AppContext)!;

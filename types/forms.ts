@@ -83,14 +83,15 @@ export const defaultSelectFieldProps: Partial<SelectFieldProps> = {
 };
 
 export interface ProductFormValues {
-  id?: number;
+  id?: number | string;
   vendorId: number;
+  vendor?: string;
   sku: string;
   title: string;
   description: string;
   productType: string;
   tags: string[];
-  categoryId: number;
+  categoryId: number | string;
   quantity: number;
   minPrice: number;
   maxPrice: number;
@@ -99,6 +100,7 @@ export interface ProductFormValues {
   discountValue?: number;
   status: 'draft' | 'published' | 'archived';
   images?: string[];
+  available?: boolean;
 }
 
 export interface UserFormValues {
