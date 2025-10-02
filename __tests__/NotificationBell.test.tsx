@@ -100,4 +100,42 @@ describe('NotificationBell', () => {
     fireEvent.click(button);
     expect(screen.queryByText('Notifications')).not.toBeInTheDocument();
   });
+
+  test('does not cause infinite re-renders with default notifications prop', () => {
+    // This test verifies the fix for the infinite re-render issue
+    // If the component has an infinite loop, this test will timeout/fail
+    const { rerender } = render(<NotificationBell />);
+    
+    // Force a re-render with a new default array (simulating parent re-render)
+    rerender(<NotificationBell notifications={[]} />);
+    
+    // If we got here without errors, the infinite loop is fixed
+    const button = screen.getByRole('button', { name: /notifications/i });
+    expect(button).toBeInTheDocument();
+  });
+
+  test('initializes with provided notifications but manages its own state', () => {
+    const initialNotifications = [
+      { id: 1, message: 'Initial notification', read: false, createdAt: new Date() },
+    ];
+    
+    const { rerender } = render(<NotificationBell notifications={initialNotifications} />);
+    
+    // Open dropdown to see initial notification
+    const button = screen.getByRole('button', { name: /notifications/i });
+    fireEvent.click(button);
+    expect(screen.getByText('Initial notification')).toBeInTheDocument();
+    
+    // Re-render with different notifications prop
+    // The component should NOT update its internal state from this prop change
+    const newNotifications = [
+      { id: 2, message: 'New notification', read: false, createdAt: new Date() },
+    ];
+    rerender(<NotificationBell notifications={newNotifications} />);
+    
+    // Should still show the initial notification, not the new one
+    // because the component manages its own state after initialization
+    expect(screen.getByText('Initial notification')).toBeInTheDocument();
+    expect(screen.queryByText('New notification')).not.toBeInTheDocument();
+  });
 });
