@@ -8,6 +8,7 @@ import { getPageTitle } from '@lib/pageTitle';
 import BuildingIcon from '@components/icons/BuildingIcon';
 import { PasswordInput } from '@components/form-fields';
 import useEmailAvailability from '@hooks/useEmailAvailability';
+import useBrandNameAvailability from '@hooks/useBrandNameAvailability';
 import { USER_ROLES } from '@/types';
 import { AuthCard, AuthInput, AuthButton, AuthSocialLogin, AuthDivider, FormError, AuthMessage } from '@components/Auth';
 import {
@@ -51,6 +52,13 @@ export default function BrandSignup() {
   }, [user, router]);
 
   const { checkingEmail, handleEmailBlur } = useEmailAvailability(
+    watch,
+    getValues,
+    setError,
+    clearErrors
+  );
+
+  const { checkingBrandName, handleBrandNameBlur } = useBrandNameAvailability(
     watch,
     getValues,
     setError,
@@ -126,6 +134,7 @@ export default function BrandSignup() {
             name="brandName"
             placeholder={AUTH_PLACEHOLDERS.brandName}
             register={register}
+            onBlur={handleBrandNameBlur}
             rules={getBrandNameValidation()}
             error={errors.brandName?.message as string}
           />
@@ -171,7 +180,7 @@ export default function BrandSignup() {
             <AuthMessage message={AUTH_INFO.passwordHint} type="info" />
           )}
           
-          <AuthButton loading={checkingEmail} disabled={checkingEmail || !!errors.email}>
+          <AuthButton loading={checkingEmail || checkingBrandName} disabled={checkingEmail || checkingBrandName || !!errors.email || !!errors.brandName}>
             {AUTH_BUTTONS.signup}
           </AuthButton>
         </form>
