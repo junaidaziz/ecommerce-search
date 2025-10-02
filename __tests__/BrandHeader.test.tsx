@@ -13,7 +13,7 @@ jest.mock('next/router', () => ({
 
 jest.mock('next-auth/react', () => ({
   __esModule: true,
-  useSession: () => ({ data: null }),
+  useSession: jest.fn(() => ({ data: null })),
   signOut: jest.fn(),
 }));
 
@@ -108,5 +108,24 @@ describe('BrandHeader', () => {
     renderWithContext(<BrandHeader theme="light" setTheme={() => {}} />);
     
     expect(screen.getByTestId('notification-bell')).toBeInTheDocument();
+  });
+
+  test('Products navigation link is present for brand users', () => {
+    const { useSession } = require('next-auth/react');
+    useSession.mockReturnValue({
+      data: {
+        user: {
+          role: 'BRAND',
+          email: 'brand@test.com',
+          name: 'Test Brand',
+        },
+      },
+    });
+
+    renderWithContext(<BrandHeader theme="light" setTheme={() => {}} />);
+    
+    const productsLink = screen.getByText('Products');
+    expect(productsLink).toBeInTheDocument();
+    expect(productsLink.getAttribute('href')).toBe('/brand/products');
   });
 });
