@@ -10,7 +10,7 @@ const NavLinks: React.FC = () => {
     { href: '/contact', label: 'Contact' },
   ];
   return (
-    <nav className="hidden lg:flex gap-6">
+    <nav className="flex flex-col lg:flex-row gap-4 lg:gap-6">
       {links.map(({ href, label }) => (
         <Link
           key={href}
