@@ -340,6 +340,8 @@ export interface PaginatedOptions {
   minPrice?: number;
   maxPrice?: number;
   sort?: 'price_asc' | 'price_desc' | 'popularity' | 'newest';
+  vendorId?: number;
+  vendorIds?: number[];
 }
 
 export interface PaginatedResult {
@@ -375,6 +377,12 @@ export async function getProductsPaginated(
   if (typeof options.maxPrice === 'number') {
     const current = typeof where.minPrice === 'object' ? where.minPrice : {};
     where.minPrice = { ...current, lte: options.maxPrice };
+  }
+  if (typeof options.vendorId === 'number') {
+    where.vendorId = options.vendorId;
+  }
+  if (options.vendorIds && options.vendorIds.length > 0) {
+    where.vendorId = { in: options.vendorIds };
   }
   const orderBy = (() => {
     switch (options.sort) {
