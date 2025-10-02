@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import type { AdminAnalyticsData } from '../../types/dashboard';
-import type { LowStockProduct } from '@/types';
+import type { AdminAnalyticsData, LowStockProduct } from '@/types';
 import { USER_ROLES } from '@/types';
 import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';

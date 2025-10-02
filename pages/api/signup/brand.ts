@@ -3,13 +3,12 @@ import { addUser, findUser } from '@lib/users';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '@utils/handleApiError';
-import type { ApiMessage } from '@/types';
+import type { ApiMessage, SignupTokenResponse } from '@/types';
 import {
   METHOD_NOT_ALLOWED,
   MISSING_REQUIRED_FIELDS,
   USER_EXISTS,
 } from '@/constants/messages';
-import { SignupTokenResponse } from 'types/api';
 
 export default async function handler(
   req: NextApiRequest,

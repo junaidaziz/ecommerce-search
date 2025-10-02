@@ -2,8 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getProductsPaginated } from '@lib/products';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { Product } from '@/types';
-import type { ApiMessage } from '@/types';
+import type { ProductsResponse, ApiMessage } from '@/types';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 export interface ProductsQuery {
@@ -17,11 +16,6 @@ export interface ProductsQuery {
   limit?: string | string[];
   offset?: string | string[];
   sort?: string | string[];
-}
-
-export interface ProductsResponse {
-  products: Product[];
-  total: number;
 }
 
 export default async function handler(
