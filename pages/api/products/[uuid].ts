@@ -29,7 +29,7 @@ export default async function handler(
       return res.status(404).json({ message: NOT_FOUND });
     }
     const product = mapDbRowToProduct(row) as Product;
-    const stats = getAverageRating(String(uuid));
+    const stats = getAverageRating(String(row.id));
     res.status(200).json({
       ...product,
       AVERAGE_RATING: stats.average,
