@@ -238,11 +238,11 @@ export default function ManageUsers() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
-                        user.role === 'SUPER_ADMIN' 
+                        user.role === USER_ROLES.SUPER_ADMIN 
                           ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300'
                           : user.role === 'ADMIN'
                           ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                          : user.role === 'BRAND'
+                          : user.role === USER_ROLES.BRAND
                           ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
                           : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200'
                       }`}>

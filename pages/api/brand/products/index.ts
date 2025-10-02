@@ -56,7 +56,7 @@ async function handler(
       const session = await getServerSession(req, res, authOptions(req, res));
       if (
         !session?.user ||
-        (session.user.role !== 'BRAND' && session.user.role !== USER_ROLES.SUPER_ADMIN)
+        (session.user.role !== USER_ROLES.BRAND && session.user.role !== USER_ROLES.SUPER_ADMIN)
       ) {
         return res.status(401).json({ message: UNAUTHORIZED });
       }

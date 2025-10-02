@@ -1,4 +1,7 @@
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { signIn } from 'next-auth/react';
+import { USER_ROLES } from '@/types';
 
 export default function SelectRole() {
   const router = useRouter();
@@ -9,7 +12,7 @@ export default function SelectRole() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role }),
     });
-    router.replace(role === 'BRAND' ? '/brand/profile?complete=1' : '/user/profile?complete=1');
+    router.replace(role === USER_ROLES.BRAND ? '/brand/profile?complete=1' : '/user/profile?complete=1');
   }
 
   return (

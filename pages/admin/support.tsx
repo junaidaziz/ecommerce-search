@@ -4,6 +4,7 @@ import { AppContext } from '@contexts/AppContext';
 import { getPageTitle } from '@lib/pageTitle';
 import PageHero from '@components/UI/PageHero';
 import AdminPanelLayout from '@components/Layout/AdminPanelLayout';
+import { USER_ROLES } from '@/types';
 
 export default function SupportTickets() {
   const { user } = useContext(AppContext)!;
@@ -17,8 +18,8 @@ export default function SupportTickets() {
   }, [status]);
 
   if (!user) return <div className="p-4">Please log in to view support tickets.</div>;
-  if (user.role.toUpperCase() !== 'SUPER_ADMIN')
-    return <div className="p-4">Admin access required.</div>;
+  if (user.role.toUpperCase() !== USER_ROLES.SUPER_ADMIN)
+    return <div className="p-4">Super admin access required.</div>;
 
   return (
     <AdminPanelLayout>

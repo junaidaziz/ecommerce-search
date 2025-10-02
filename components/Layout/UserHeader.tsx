@@ -55,7 +55,7 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
       );
 
     apiFetch('/api/categories')
-      .then((res) => res.json())
+      .then((res) => (res as Response).json())
       .then((data) => {
         const catsRaw: Category[] =
           data.categories || data || DEFAULT_CATEGORIES;
@@ -134,23 +134,27 @@ const Header: FC<HeaderProps> = ({ theme, setTheme, maxWidthClass }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white/95 dark:bg-gray-950/95 shadow-sm border-b border-gray-200 dark:border-gray-800">
+    <header className="sticky top-0 z-30 bg-white/95 dark:bg-gray-950/95 shadow-sm border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm transition-colors duration-300">
       <div
-        className={`w-full px-2 sm:px-4 lg:px-8 mx-auto ${maxWidthClass || 'max-w-screen-2xl'}`}
+        className={`w-full px-4 sm:px-6 lg:px-8 mx-auto ${maxWidthClass || 'max-w-screen-2xl'}`}
       >
         <div className="flex items-center justify-between h-20">
           {/* Left: Logo */}
-          <div className="flex items-center gap-8 min-w-0">
+          <div className="flex items-center min-w-0">
             <Logo />
-            {/* Categories with spacing from logo */}
-            <div className="hidden lg:block">
-              <CategoryDropdown categories={categories} />
-            </div>
           </div>
-          {/* Center: Search with increased width (desktop) */}
-          <div className="hidden lg:flex flex-1 items-center justify-center max-w-3xl mx-auto">
-              {/* Search input with increased width and modern style */}
-              <HeaderSearchInput categories={categories} className="w-full max-w-3xl" />
+          {/* Center: Categories + Search with balanced spacing (desktop) */}
+          <div className="hidden lg:flex flex-1 items-center justify-center max-w-4xl mx-auto">
+            <div className="flex items-center gap-6 w-full max-w-4xl">
+              {/* Categories button with balanced spacing */}
+              <div className="flex-shrink-0">
+                <CategoryDropdown categories={categories} maxWidthClass={maxWidthClass} />
+              </div>
+              {/* Search input with proper spacing from categories */}
+              <div className="flex-1">
+                <HeaderSearchInput categories={categories} className="w-full" />
+              </div>
+            </div>
           </div>
           {/* Right: NavLinks + Cart, Theme, User, Auth (desktop) */}
           <div className="hidden lg:flex items-center gap-6 ml-auto">

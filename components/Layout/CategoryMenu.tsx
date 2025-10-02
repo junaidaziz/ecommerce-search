@@ -102,7 +102,7 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
       );
 
     apiFetch('/api/categories')
-      .then((res) => res.json())
+      .then((res) => (res as Response).json())
       .then((data) => {
         const catsRaw: Category[] =
           data.categories || data || DEFAULT_CATEGORIES;
@@ -193,7 +193,7 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
           <button
             type="button"
             aria-label="Categories menu"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-700"
             onClick={() => setMenuOpen((prev) => !prev)}
             onMouseEnter={handleMenuEnter}
           >
@@ -301,14 +301,14 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({ isSuperAdmin }) => {
           <div className="space-y-2">
             {categories.map((cat) => (
               <details key={cat.name} className="group">
-                <summary className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer list-none transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-zinc-800 group-open:bg-gray-100 dark:group-open:bg-zinc-800/70 text-gray-700 dark:text-gray-300 group-open:text-gray-900 dark:group-open:text-white">
+                <summary className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer list-none transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-zinc-800 group-open:bg-gray-100 dark:group-open:bg-zinc-800/70 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white group-open:text-gray-900 dark:group-open:text-white">
                   {iconMap[cat.name] || <div className="w-5 h-5" />}
                   <span className="flex-1 capitalize font-medium">{cat.name}</span>
                   <ChevronDownIcon className="w-4 h-4 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 {cat.subcategories?.length && (
                   <div className="pl-8 pr-4 py-2 space-y-1">
-                    {cat.subcategories.map((sub) => (
+                    {cat.subcategories.map((sub: { name: string; slug?: string }) => (
                       <Link
                         key={sub.name}
                         href={`/categories/${encodeURIComponent(cat.name)}?type=${encodeURIComponent(sub.name)}`}

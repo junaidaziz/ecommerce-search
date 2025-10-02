@@ -66,7 +66,7 @@ export default function BrandConfirmation() {
               Please check your email inbox for a confirmation link to activate your brand account.
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don't forget to check your spam folder if you don't see it in your inbox.
+              Don&apos;t forget to check your spam folder if you don&apos;t see it in your inbox.
             </p>
           </div>
 

@@ -50,8 +50,18 @@ export default function VendorOrders() {
   if (!user) {
     return <div className="p-4">Please log in to view orders.</div>;
   }
-  if (user.role !== 'brand' && user.role !== USER_ROLES.SUPER_ADMIN) {
-    return <div className="p-4">Brand access required.</div>;
+  if (user.role !== USER_ROLES.BRAND && user.role !== USER_ROLES.SUPER_ADMIN) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="bg-red-100 rounded-full p-4 mx-auto mb-4 w-16 h-16 flex items-center justify-center">
+            <CogIcon className="w-8 h-8 text-red-600" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Access Denied</h2>
+          <p className="text-gray-600">Brand access required.</p>
+        </div>
+      </div>
+    );
   }
 
   return (

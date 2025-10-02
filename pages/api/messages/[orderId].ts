@@ -12,6 +12,7 @@ import {
   UNAUTHORIZED,
   USER_NOT_FOUND,
 } from '@/constants/messages';
+import { USER_ROLES } from '@/types';
 
 export default async function handler(
   req: NextApiRequest,
@@ -34,8 +35,8 @@ export default async function handler(
 
     const isBuyer = order.userId === user.id;
     const isVendor = order.product.vendor.id === user.id;
-    if (!isBuyer && !isVendor && user.role !== 'SUPER_ADMIN') {
-      return res.status(403).json({ message: 'Forbidden' });
+    if (!isBuyer && !isVendor && user.role !== USER_ROLES.SUPER_ADMIN) {
+      return res.status(403).json({ message: 'Unauthorized' });
     }
 
     if (req.method === 'GET') {

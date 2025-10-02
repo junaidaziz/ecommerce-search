@@ -1,12 +1,12 @@
-import brandHandler from '@pages/api/signup/brand';
-import userHandler from '@pages/api/signup/user';
-import { addUser, findUser } from '@lib/users';
+import brandHandler from '../pages/api/signup/brand';
+import userHandler from '../pages/api/signup/user';
+import { addUser, findUser } from '../lib/users';
 import bcrypt from 'bcryptjs';
 import {
   METHOD_NOT_ALLOWED,
   MISSING_REQUIRED_FIELDS,
   USER_EXISTS,
-} from '@/constants/messages';
+} from '../constants/messages';
 
 jest.mock('@lib/users', () => ({
   addUser: jest.fn(),
@@ -24,11 +24,21 @@ function mockRes() {
 }
 
 describe('Brand Signup API', () => {
-  const originalEnv = process.env.NODE_ENV;
+  let originalEnv: string | undefined;
+
+  beforeAll(() => {
+    originalEnv = process.env.NODE_ENV;
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
-    process.env.NODE_ENV = originalEnv;
+    if (originalEnv !== undefined) {
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: originalEnv,
+        writable: true,
+        configurable: true,
+      });
+    }
   });
 
   test('requires POST method', async () => {
@@ -65,8 +75,8 @@ describe('Brand Signup API', () => {
     });
   });
 
-  test('creates brand with token in production', async () => {
-    process.env.NODE_ENV = 'production';
+  test('creates brand with token when AUTO_CONFIRM_BRANDS=false', async () => {
+    process.env.AUTO_CONFIRM_BRANDS = 'false';
     (findUser as jest.Mock).mockResolvedValue(null);
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed');
     (addUser as jest.Mock).mockResolvedValue(undefined);
@@ -91,14 +101,17 @@ describe('Brand Signup API', () => {
     );
     expect(res.status).toHaveBeenCalledWith(201);
     const jsonCall = res.status.mock.results[0].value.json;
-    expect(jsonCall).toHaveBeenCalledWith({ token: expect.any(String) });
+    expect(jsonCall).toHaveBeenCalledWith({ 
+      token: expect.any(String),
+      autoConfirmed: false
+    });
     const tokenValue = jsonCall.mock.calls[0][0].token;
     expect(tokenValue).toBeTruthy();
     expect(tokenValue.length).toBeGreaterThan(0);
   });
 
-  test('creates brand without token in local/dev', async () => {
-    process.env.NODE_ENV = 'development';
+  test('creates brand without token when AUTO_CONFIRM_BRANDS=true', async () => {
+    process.env.AUTO_CONFIRM_BRANDS = 'true';
     (findUser as jest.Mock).mockResolvedValue(null);
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed');
     (addUser as jest.Mock).mockResolvedValue(undefined);
@@ -121,6 +134,7 @@ describe('Brand Signup API', () => {
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.status.mock.results[0].value.json).toHaveBeenCalledWith({
       token: '',
+      autoConfirmed: true
     });
   });
 });
@@ -130,11 +144,19 @@ describe('User Signup API', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: originalEnv,
+      writable: true,
+      configurable: true,
+    });
   });
 
-  test('creates user with token in production', async () => {
-    process.env.NODE_ENV = 'production';
+    test('creates user with token in production', async () => {
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'production',
+      writable: true,
+      configurable: true,
+    });
     (findUser as jest.Mock).mockResolvedValue(null);
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed');
     (addUser as jest.Mock).mockResolvedValue(undefined);
@@ -158,7 +180,11 @@ describe('User Signup API', () => {
   });
 
   test('creates user without token in local/dev', async () => {
-    process.env.NODE_ENV = 'development';
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'development',
+      writable: true,
+      configurable: true,
+    });
     (findUser as jest.Mock).mockResolvedValue(null);
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed');
     (addUser as jest.Mock).mockResolvedValue(undefined);

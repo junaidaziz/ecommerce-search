@@ -101,7 +101,7 @@ const BrandAnalytics: React.FC = () => {
   }, [user]);
 
   if (!user) return <div className="p-4">Please log in.</div>;
-  if (user.role !== 'brand' && user.role !== USER_ROLES.SUPER_ADMIN)
+  if (user.role !== USER_ROLES.BRAND && user.role !== USER_ROLES.SUPER_ADMIN)
     return <div className="p-4">Brand access required.</div>;
 
   if (loading || data === null) return <div className="p-4">Loading...</div>;

@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import EnvelopeIcon from '@components/icons/EnvelopeIcon';
 import CheckCircleIcon from '@components/icons/CheckCircleIcon';
 import XCircleIcon from '@components/icons/XCircleIcon';
@@ -93,12 +94,12 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
                   </Button>
                   <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
                     or{' '}
-                    <a
+                    <Link
                       href="/login"
                       className="text-primary font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
                     >
                       return to login
-                    </a>
+                    </Link>
                   </p>
                 </div>
               )}

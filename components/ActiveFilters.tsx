@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ActiveFilter } from '@/types/shared';
+import type { ActiveFilter } from '@/types';
 import XMarkIcon from '@components/icons/XMarkIcon';
 
 interface ActiveFiltersProps {

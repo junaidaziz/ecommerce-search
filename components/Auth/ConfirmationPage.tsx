@@ -35,7 +35,7 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
             
             {/* Message */}
             <p className="text-gray-600 dark:text-gray-300 text-base mb-2">
-              We've sent a confirmation email to:
+              We&apos;ve sent a confirmation email to:
             </p>
             
             {email && (
@@ -63,7 +63,7 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
             
             {/* Additional Info */}
             <div className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              <p>Didn't receive the email? Check your spam folder.</p>
+              <p>Didn&apos;t receive the email? Check your spam folder.</p>
             </div>
             
             {/* Back to Login */}
