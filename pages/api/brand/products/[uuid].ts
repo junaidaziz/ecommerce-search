@@ -18,7 +18,12 @@ import {
   UUID_REQUIRED,
   CANNOT_DELETE_PRODUCT_WITH_ORDERS,
   PERCENTAGE_DISCOUNT_BETWEEN_1_AND_99,
+  UNAUTHORIZED,
 } from '@/constants/messages';
+import { withRole, type AuthedNextApiRequest } from '@lib/withRole';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@pages/api/auth/[...nextauth]';
+import { USER_ROLES } from '@/types';
 
 export const config = {
   api: {
@@ -45,13 +50,30 @@ async function parseBody(
   });
 }
 
-export default async function handler(
-  req: NextApiRequest,
+async function handler(
+  req: AuthedNextApiRequest,
   res: NextApiResponse<ApiMessage>
 ): Promise<void> {
   try {
     const uuid = getQueryParam(req.query.uuid);
     if (!uuid) return res.status(400).json({ message: UUID_REQUIRED });
+
+    const session = await getServerSession(req, res, authOptions(req, res));
+    if (!session?.user) {
+      return res.status(401).json({ message: UNAUTHORIZED });
+    }
+
+    const existing = await getProductByUuid(String(uuid));
+    if (!existing) return res.status(404).json({ message: NOT_FOUND });
+
+    // Verify ownership (unless super admin)
+    const vendorId = (session.user as { brandId?: number }).brandId;
+    if (
+      session.user.role !== USER_ROLES.SUPER_ADMIN &&
+      existing.vendorId !== vendorId
+    ) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
 
     if (req.method === 'PATCH') {
       const { fields } = await parseBody(req);
@@ -68,8 +90,6 @@ export default async function handler(
     }
 
     if (req.method === 'PUT') {
-      const existing = await getProductByUuid(String(uuid));
-      if (!existing) return res.status(404).json({ message: NOT_FOUND });
       const { fields, files } = await parseBody(req);
       const {
         title,
@@ -172,8 +192,6 @@ export default async function handler(
     }
 
     if (req.method === 'DELETE') {
-      const existing = await getProductByUuid(String(uuid));
-      if (!existing) return res.status(404).json({ message: NOT_FOUND });
       if (await hasOrdersForProduct(String(uuid))) {
         return res
           .status(409)
@@ -189,3 +207,5 @@ export default async function handler(
     return handleApiError(res, error, 'Failed to process product');
   }
 }
+
+export default withRole(['BRAND', 'SUPER_ADMIN'])(handler);
