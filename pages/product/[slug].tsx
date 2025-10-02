@@ -155,14 +155,14 @@ export default function ProductDetail({
             {/* Wishlist Icon */}
             <button
               onClick={() => isInWishlist ? removeFromWishlist(product.id) : addToWishlist(product)}
-              className={`absolute top-6 right-6 z-10 btn btn-circle btn-sm transition-all duration-200 border border-base-300 ${
+              className={`absolute top-6 right-6 z-10 btn btn-circle btn-sm transition-all duration-200 ${
                 isInWishlist 
-                  ? 'bg-primary text-primary-content hover:bg-primary/80' 
-                  : 'bg-base-100 hover:bg-primary hover:text-primary-content'
+                  ? 'bg-primary/10 text-primary border-2 border-primary hover:bg-primary/20 hover:border-primary' 
+                  : 'bg-base-100 text-base-content/60 border-2 border-base-300 hover:bg-base-200 hover:border-base-400'
               }`}
               aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
             >
-              <HeartIcon className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+              <HeartIcon className={`w-5 h-5 transition-colors ${isInWishlist ? 'fill-current' : ''}`} />
             </button>
 
             {/* Product Header */}
