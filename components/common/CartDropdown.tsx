@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import TrashIcon from '../icons/TrashIcon';
 import CartIcon from '../icons/CartIcon';
-import type { CartItem } from '../../types/cart';
+import type { CartItem } from '@/types';
 import React, { useRef, useState } from 'react';
 
 interface CartDropdownProps {

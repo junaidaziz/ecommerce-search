@@ -19,10 +19,17 @@ export * from './coupon';
 export * from './shared';
 
 // Explicitly re-export only one version of each conflicting type
-export type { Category } from './category';
+export type { Category, CategoryInput, CategoryUpdate, CategorySummary } from './category';
 export type { Notification } from './notification';
 export type { PaymentMethod } from './paymentMethod';
-export type { AnalyticsData } from './dashboard';
+export type { 
+  AnalyticsData, 
+  AdminAnalyticsData, 
+  DashboardMetrics, 
+  DashboardProduct,
+  OrdersThisMonth,
+  ChartConfig
+} from './dashboard';
 export type { User, UserRole } from './user';
 export { USER_ROLES, getUserRoles } from './user';
 
