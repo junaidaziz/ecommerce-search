@@ -183,31 +183,17 @@ const BrandDashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
-            <TotalProductsCard />
-          </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
-            <TotalSalesCard />
-          </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
-            <OrdersThisMonthCard />
-          </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
-            <InventoryAlertsCard />
-          </div>
+          <TotalProductsCard />
+          <TotalSalesCard />
+          <OrdersThisMonthCard />
+          <InventoryAlertsCard />
         </div>
 
         {/* Charts Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
-            <BestSellersCard />
-          </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
-            <ExistingProductsCard />
-          </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
-            <WeeklySummaryCard />
-          </div>
+          <BestSellersCard />
+          <ExistingProductsCard />
+          <WeeklySummaryCard />
         </div>
 
         {/* Recent Activity */}
