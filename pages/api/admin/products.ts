@@ -115,8 +115,8 @@ async function handler(
           res.status(404).json({ message: NOT_FOUND });
           return;
         }
-        const existingImages = existing.images
-          ? JSON.parse(existing.images)
+        const existingImages = Array.isArray(existing.images)
+          ? existing.images
           : [];
         imagePaths.push(...existingImages);
       }
@@ -135,7 +135,7 @@ async function handler(
         maxPrice: parseFloat(String(max_price || 0)),
         currency: (currency as string) || 'USD',
         status: 'approved',
-        images: JSON.stringify(imagePaths),
+        images: imagePaths,
       };
 
       if (vendor) {

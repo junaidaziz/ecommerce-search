@@ -127,11 +127,7 @@ export default async function handler(
         description: String(description ?? existing.description),
         productType: String(product_type ?? existing.productType),
         tags: String(tags ?? existing.tags),
-        category: {
-          id: parseInt(String(category_id ?? existing.categoryId ?? '0'), 10),
-          name: '',
-          slug: '',
-        },
+        categoryId: parseInt(String(category_id ?? existing.categoryId ?? '0'), 10),
         quantity:
           typeof quantity !== 'undefined'
             ? parseInt(String(quantity), 10)
@@ -153,7 +149,7 @@ export default async function handler(
         status: existing.status,
         images:
           imagePaths.length > 0
-            ? imagePaths.map((p) => ({ url: p }))
+            ? imagePaths
             : undefined,
       };
       await updateProduct(payload);
