@@ -17,7 +17,7 @@ const FeaturedProducts: React.FC = () => {
 
   return (
     <section className="py-12 bg-gray-50">
-      <div className="max-w-screen-2xl mx-auto px-4">
+      <div className="max-w-10xl mx-auto px-4">
         <h2 className="text-5xl font-bold mb-6 text-center">
           Featured Products
         </h2>

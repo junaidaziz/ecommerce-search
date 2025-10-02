@@ -25,7 +25,7 @@ const banners = [
 
 const PromoBanner: FC = () => (
   <section className="py-8 bg-base-200">
-    <div className="max-w-screen-2xl mx-auto px-4 grid gap-4 md:grid-cols-3">
+    <div className="max-w-10xl mx-auto px-4 grid gap-4 md:grid-cols-3">
       {banners.map((b, i) => (
         <Link
           key={i}
