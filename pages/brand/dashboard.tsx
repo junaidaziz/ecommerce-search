@@ -64,10 +64,10 @@ const BrandDashboard: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Please log in to manage products.</p>
+          <p className="text-gray-600 dark:text-gray-400">Please log in to manage products.</p>
         </div>
       </div>
     );
@@ -75,13 +75,13 @@ const BrandDashboard: React.FC = () => {
   
   if (user.role !== USER_ROLES.BRAND && user.role !== USER_ROLES.SUPER_ADMIN) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="bg-red-100 rounded-full p-4 mx-auto mb-4 w-16 h-16 flex items-center justify-center">
-            <CogIcon className="w-8 h-8 text-red-600" />
+          <div className="bg-red-100 dark:bg-red-900/20 rounded-full p-4 mx-auto mb-4 w-16 h-16 flex items-center justify-center">
+            <CogIcon className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Access Denied</h2>
-          <p className="text-gray-600">Brand access required.</p>
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Access Denied</h2>
+          <p className="text-gray-600 dark:text-gray-400">Brand access required.</p>
         </div>
       </div>
     );
@@ -124,7 +124,7 @@ const BrandDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
       <Head>
         <title>{getPageTitle('Brand Dashboard')}</title>
       </Head>
@@ -211,42 +211,42 @@ const BrandDashboard: React.FC = () => {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Recent Activity</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Activity</h2>
             <Link
               href="/brand/analytics"
-              className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm"
             >
               View All →
             </Link>
           </div>
           <div className="space-y-4">
-            <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <ShoppingBagIcon className="w-5 h-5 text-blue-600" />
+            <div className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <ShoppingBagIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="flex-1">
-                <p className="font-medium text-gray-900">New product added</p>
-                <p className="text-sm text-gray-500">2 hours ago</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">New product added</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">2 hours ago</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <CurrencyDollarIcon className="w-5 h-5 text-green-600" />
+            <div className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <CurrencyDollarIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
               </div>
               <div className="flex-1">
-                <p className="font-medium text-gray-900">Order completed</p>
-                <p className="text-sm text-gray-500">4 hours ago</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">Order completed</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">4 hours ago</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-              <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                <ChartBarIcon className="w-5 h-5 text-yellow-600" />
+            <div className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+              <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+                <ChartBarIcon className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
               </div>
               <div className="flex-1">
-                <p className="font-medium text-gray-900">Analytics updated</p>
-                <p className="text-sm text-gray-500">1 day ago</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">Analytics updated</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">1 day ago</p>
               </div>
             </div>
           </div>
