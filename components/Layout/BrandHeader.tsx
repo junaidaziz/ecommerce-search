@@ -66,6 +66,12 @@ const BrandHeader: FC<HeaderProps> = ({
                 Dashboard
               </Link>
               <Link
+                href="/brand/products"
+                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-300 hover:text-primary hover:border-primary hover:scale-105 ${pathname.startsWith('/brand/products') ? 'font-semibold text-primary border-primary' : ''}`}
+              >
+                Products
+              </Link>
+              <Link
                 href="/brand/orders"
                 className={`border-b-2 border-transparent transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-300 hover:text-primary hover:border-primary hover:scale-105 ${pathname === '/brand/orders' ? 'font-semibold text-primary border-primary' : ''}`}
               >
