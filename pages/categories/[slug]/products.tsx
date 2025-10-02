@@ -82,7 +82,7 @@ export default function CategoryProductsPage({
   });
 
   return (
-    <div className="max-w-screen-2xl mx-auto min-h-screen px-4 sm:px-6 lg:px-8 py-6">
+    <div className="max-w-10xl mx-auto min-h-screen px-4 sm:px-6 lg:px-8 py-6">
       <Head>
         <title>{getPageTitle(`${category.name} Products`)}</title>
         <meta name="description" content={`Products for ${category.name}`} />

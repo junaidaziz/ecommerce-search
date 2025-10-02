@@ -10,6 +10,11 @@ module.exports = {
         '3xl': '1920px',
         '4xl': '2560px',
       },
+      maxWidth: {
+        '8xl': '90rem', // 1440px - better for ultra-wide displays
+        '9xl': '96rem', // 1536px 
+        '10xl': '108rem', // 1728px - optimal for ultra-wide (90% of 1920px)
+      },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       },
