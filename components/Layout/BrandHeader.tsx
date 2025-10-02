@@ -137,7 +137,7 @@ const BrandHeader: FC<HeaderProps> = ({
           {user ? (
             <div className="relative group">
               <button
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white transition-colors duration-200 cursor-pointer"
               >
                 {user.logo ? (
                   <img
