@@ -44,7 +44,7 @@ const HomePage: React.FC = () => {
       </Head>
       <main className="flex-1">
         {/* Hero Section - full width, visually impactful */}
-        <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 pt-8 md:pt-12 pb-8 md:pb-16">
+        <div className="w-full max-w-7xl mx-auto pt-8 md:pt-12 pb-8 md:pb-16">
           <Hero />
         </div>
 
