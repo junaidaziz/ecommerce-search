@@ -53,6 +53,20 @@ export default async function handler(
     const uuid = getQueryParam(req.query.uuid);
     if (!uuid) return res.status(400).json({ message: UUID_REQUIRED });
 
+    if (req.method === 'PATCH') {
+      const { fields } = await parseBody(req);
+      const { active } = fields as Record<string, unknown>;
+      
+      if (typeof active !== 'undefined') {
+        const { toggleProductActive } = await import('@lib/products');
+        await toggleProductActive(String(uuid), active === 'true' || active === true);
+        await loadAndIndexProducts();
+        return res.status(200).json({ message: 'product status updated' });
+      }
+      
+      return res.status(400).json({ message: 'active field is required' });
+    }
+
     if (req.method === 'PUT') {
       const existing = await getProductByUuid(String(uuid));
       if (!existing) return res.status(404).json({ message: NOT_FOUND });

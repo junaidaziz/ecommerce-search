@@ -105,6 +105,7 @@ model Product {
   discountType      String?
   discountValue     Float?
   status            String   @default("approved")
+  active            Boolean  @default(true)
   images            String[]
   vendorId          Int
   categoryId        Int

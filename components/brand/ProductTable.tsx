@@ -10,9 +10,10 @@ interface ProductTableProps {
   onSort: (field: 'title' | 'category' | 'status' | 'quantity') => void;
   onView: (product: Product) => void;
   onDelete: (id: string) => void;
+  onToggleActive: (id: string, active: boolean) => void;
 }
 
-const ProductTable: React.FC<ProductTableProps> = ({ products, sort, onSort, onView, onDelete }) => {
+const ProductTable: React.FC<ProductTableProps> = ({ products, sort, onSort, onView, onDelete, onToggleActive }) => {
   const headerClass = (field: string) =>
     'px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer';
   const headerAria = (field: string) => undefined;
@@ -63,6 +64,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sort, onSort, onV
               Qty {arrow(sort.startsWith('quantity_'), sort.endsWith('asc') ? 'asc' : 'desc')}
             </Button>
           </th>
+          <th className={headerClass('active')}>
+            <span className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Active
+            </span>
+          </th>
           <th></th>
         </tr>
       </thead>
@@ -86,6 +92,23 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sort, onSort, onV
               </Badge>
             </td>
             <td>{p.quantity ?? p.totalInventory ?? 0}</td>
+            <td className="text-center" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => onToggleActive(String(p.uuid || p.id), !(p.active ?? true))}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  p.active ?? true ? 'bg-green-500' : 'bg-gray-300'
+                }`}
+                role="switch"
+                aria-checked={p.active ?? true}
+                title={p.active ?? true ? 'Active (click to deactivate)' : 'Inactive (click to activate)'}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    p.active ?? true ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </td>
             <td className="space-x-2 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
               <Button size="sm" variant="info" onClick={() => onView(p)}>
                 View

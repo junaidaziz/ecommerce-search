@@ -93,7 +93,7 @@ async function loadProductsData(): Promise<Product[]> {
   const db = getDb();
   try {
     const rows = await db.product.findMany({
-      where: { status: 'approved', vendor: { active: true } },
+      where: { status: 'approved', active: true, vendor: { active: true } },
       include: { category: true, vendor: true, variants: true },
     });
 
@@ -282,7 +282,7 @@ export async function getProductsByCategorySlug(
 ): Promise<Product[]> {
   const db = getDb();
   const rows = await db.product.findMany({
-    where: { status: 'approved', category: { slug }, vendor: { active: true } },
+    where: { status: 'approved', active: true, category: { slug }, vendor: { active: true } },
     include: { category: true, vendor: true, variants: true },
   });
   return rows.map(mapDbRowToProduct);
@@ -295,7 +295,7 @@ export async function getProductsByCategorySlugPaginated(
 ): Promise<Product[]> {
   const db = getDb();
   const rows = await db.product.findMany({
-    where: { status: 'approved', category: { slug }, vendor: { active: true } },
+    where: { status: 'approved', active: true, category: { slug }, vendor: { active: true } },
     include: { category: true, vendor: true, variants: true },
     take: limit,
     skip: offset,
@@ -310,7 +310,7 @@ export async function getApprovedProductsPaginated(
 ): Promise<Product[]> {
   const db = getDb();
   const rows = await db.product.findMany({
-    where: { status: 'approved', vendor: { active: true } },
+    where: { status: 'approved', active: true, vendor: { active: true } },
     include: { category: true, vendor: true, variants: true },
     take: limit,
     skip: offset,
@@ -324,7 +324,7 @@ export async function getProductsByVendorBrandName(
 ): Promise<Product[]> {
   const db = getDb();
   const rows = await db.product.findMany({
-    where: { status: 'approved', vendor: { brandName, active: true } },
+    where: { status: 'approved', active: true, vendor: { brandName, active: true } },
     include: { category: true, vendor: true, variants: true },
     orderBy: { id: 'asc' },
   });
@@ -353,7 +353,7 @@ export async function getProductsPaginated(
   options: PaginatedOptions
 ): Promise<PaginatedResult> {
   const db = getDb();
-  const where: Prisma.ProductWhereInput = { status: 'approved', vendor: { active: true } };
+  const where: Prisma.ProductWhereInput = { status: 'approved', active: true, vendor: { active: true } };
   if (options.categorySlugs && options.categorySlugs.length > 0) {
     where.category = {
       slug: { in: options.categorySlugs },
@@ -433,6 +433,11 @@ export async function approveProduct(uuid: string): Promise<void> {
 export async function rejectProduct(uuid: string): Promise<void> {
   const db = getDb();
   await db.product.update({ where: { uuid }, data: { status: 'rejected' } });
+}
+
+export async function toggleProductActive(uuid: string, active: boolean): Promise<void> {
+  const db = getDb();
+  await db.product.update({ where: { uuid }, data: { active } });
 }
 
 export async function getCategoriesFlat(): Promise<Category[]> {

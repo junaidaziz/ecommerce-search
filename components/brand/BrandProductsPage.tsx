@@ -147,6 +147,35 @@ const BrandProductsPage: React.FC = () => {
     setDeleteId(id);
   };
 
+  const handleToggleActive = async (id: string, active: boolean): Promise<void> => {
+    try {
+      const res = await apiFetch(
+        `/api/brand/products/${encodeURIComponent(id)}`,
+        {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ active }),
+        }
+      );
+      if (res.ok) {
+        setProducts((prev) =>
+          prev.map((p) =>
+            String(p.uuid || p.id) === id ? { ...p, active } : p
+          )
+        );
+        addNotification(
+          active ? 'Product activated' : 'Product deactivated',
+          'success'
+        );
+      } else {
+        addNotification('Failed to update product status', 'error');
+      }
+    } catch {
+      addNotification('Failed to update product status', 'error');
+    }
+  };
+
   const confirmDelete = async (): Promise<void> => {
     if (!deleteId) return;
     setDeleting(true);
@@ -316,6 +345,7 @@ const BrandProductsPage: React.FC = () => {
               }}
               onView={handleView}
               onDelete={handleDelete}
+              onToggleActive={handleToggleActive}
             />
           </div>
         )}
