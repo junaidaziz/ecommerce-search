@@ -16,7 +16,6 @@ interface ProfileFormValues {
 const UpdateProfileSection: React.FC = () => {
   const profileForm = useForm<ProfileFormValues>();
   const { addNotification } = useContext(NotificationContext);
-  const [role, setRole] = useState('');
   const [updatedAt, setUpdatedAt] = useState('');
 
   useEffect(() => {
@@ -30,7 +29,6 @@ const UpdateProfileSection: React.FC = () => {
           email: data.email || '',
           phoneNumber: data.phoneNumber || '',
         });
-        setRole(data.role || '');
         setUpdatedAt(
           data.updatedAt ? new Date(data.updatedAt).toLocaleString() : ''
         );
@@ -57,9 +55,6 @@ const UpdateProfileSection: React.FC = () => {
         <div className="relative">
           <ProfileAvatarUploader />
         </div>
-        <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light text-sm font-semibold uppercase tracking-wide">
-          {role}
-        </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
         <TextInput
@@ -101,7 +96,6 @@ const UpdateProfileSection: React.FC = () => {
           error={profileForm.formState.errors.phoneNumber?.message}
           className="md:col-span-2"
         />
-        <TextInput label="Role" name="role" value={role} readOnly className="md:col-span-2" />
         <TextInput
           label="Last Updated"
           name="updatedAt"

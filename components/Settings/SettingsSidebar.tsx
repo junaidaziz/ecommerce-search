@@ -1,8 +1,9 @@
-import { KeyIcon, HomeIcon, EnvelopeIcon, CreditCardIcon, TagIcon, UserIcon } from '@heroicons/react/24/outline';
+import { KeyIcon, HomeIcon, EnvelopeIcon, CreditCardIcon, TagIcon, UserIcon, BuildingStorefrontIcon } from '@heroicons/react/24/outline';
 
 interface SettingsSidebarProps {
-  active: 'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons';
+  active: 'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons' | 'brand';
   onSelect: (tab: SettingsSidebarProps['active']) => void;
+  userRole?: string;
 }
 
 const tabIcons = {
@@ -12,6 +13,7 @@ const tabIcons = {
   email: EnvelopeIcon,
   payments: CreditCardIcon,
   coupons: TagIcon,
+  brand: BuildingStorefrontIcon,
 };
 
 const tabLabels = {
@@ -21,10 +23,12 @@ const tabLabels = {
   email: 'Change Email',
   payments: 'Payment Methods',
   coupons: 'Coupons & Offers',
+  brand: 'Brand Settings',
 };
 
 const tabOrder = [
   'profile',
+  'brand',
   'password',
   'address',
   'email',
@@ -35,11 +39,17 @@ const tabOrder = [
 const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
   active,
   onSelect,
+  userRole,
 }) => {
   return (
     <aside className="md:w-64 w-full">
       <ul className="flex md:flex-col flex-row flex-wrap gap-2 md:gap-2 bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-lg border border-gray-200 dark:border-gray-800">
         {tabOrder.map((tab) => {
+          // Hide brand settings tab for non-brand users
+          if (tab === 'brand' && userRole !== 'BRAND') {
+            return null;
+          }
+          
           const typedTab = tab as keyof typeof tabIcons;
           const Icon = tabIcons[typedTab];
           return (
