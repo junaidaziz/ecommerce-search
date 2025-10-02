@@ -103,7 +103,7 @@ export default function ProductDetail({
     user 
   } = appCtx;
   const selectedVariant = product.variants?.find(
-    (v) => String(v.id) === variantId
+    (v: any) => String(v.id) === variantId
   );
 
   const isInWishlist = wishlist?.some((w) => w.product.id === product.id);

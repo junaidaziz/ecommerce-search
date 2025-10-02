@@ -127,7 +127,7 @@ async function handler(
         db.product.count({ where }),
       ]);
 
-      const products = rows.map((row) => mapDbRowToProduct(row));
+      const products = rows.map((row: any) => mapDbRowToProduct(row));
 
       return res.status(200).json({ products, total });
     }
