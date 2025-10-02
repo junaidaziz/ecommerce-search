@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
@@ -11,12 +11,16 @@ import ChangeEmailSection from '@components/Settings/ChangeEmailSection';
 import PaymentMethodsSection from '@components/Settings/PaymentMethodsSection';
 import SettingsSidebar from '@components/Settings/SettingsSidebar';
 import CouponsSection from '@components/Settings/CouponsSection';
+import BrandSettingsSection from '@components/Settings/BrandSettingsSection';
+import { AppContext } from '@contexts/AppContext';
+import type { User } from '@/types';
 
 const SettingsPage: React.FC = () => {
   const user = useRequireAuth();
+  const { user: contextUser } = useContext(AppContext) as { user: User | null };
   const router = useRouter();
   const [active, setActive] = useState<
-    'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons'
+    'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons' | 'brand'
   >('profile');
 
   useEffect(() => {
@@ -27,7 +31,8 @@ const SettingsPage: React.FC = () => {
       tab === 'address' ||
       tab === 'email' ||
       tab === 'payments' ||
-      tab === 'coupons'
+      tab === 'coupons' ||
+      tab === 'brand'
     ) {
       setActive(tab);
     }
@@ -54,9 +59,10 @@ const SettingsPage: React.FC = () => {
             <p className="text-gray-600 dark:text-gray-400">Manage your account settings and preferences</p>
           </div>
           <div className="flex flex-col lg:flex-row gap-6 items-start">
-            <SettingsSidebar active={active} onSelect={handleSelect} />
+            <SettingsSidebar active={active} onSelect={handleSelect} userRole={contextUser?.role} />
             <div className="flex-1 w-full">
               {active === 'profile' && <UpdateProfileSection />}
+              {active === 'brand' && <BrandSettingsSection />}
               {active === 'password' && <ChangePasswordSection />}
               {active === 'address' && <ManageAddressSection />}
               {active === 'email' && <ChangeEmailSection />}
