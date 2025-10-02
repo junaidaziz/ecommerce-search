@@ -34,6 +34,7 @@ export type { SignupTokenResponse } from './api';
 export type { Notification } from './notification';
 export type { PaymentMethod } from './paymentMethod';
 export type { AnalyticsData } from './dashboard';
+export type { AdminAnalyticsData } from './admin';
 export type { User, UserRole, UserInput } from './user';
 export { USER_ROLES, getUserRoles } from './user';
 export type { ApiMessage } from './admin';

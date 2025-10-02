@@ -28,7 +28,7 @@ export default async function handler(
       return res.status(401).json({ message: UNAUTHORIZED });
     }
     const orders = await getOrdersForVendorId(brandId);
-    const summary: AnalyticsData = {
+    const summary: any = {
       totalOrders: orders.length,
       totalRevenue: 0,
       topProducts: [],
