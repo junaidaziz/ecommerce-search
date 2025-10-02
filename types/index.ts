@@ -47,27 +47,5 @@ export type {
   CreateUserRequest
 } from './admin';
 
-// Export all API response types
-export type {
-  SearchResults,
-  ProductsResponse,
-  SuggestionsResponse,
-  SearchApiResponse,
-  TrendingResponse,
-  CheckoutSessionResponse,
-  OrderIdResponse,
-  OrderPlacedResponse,
-  LoginResponse,
-  SignupResponse,
-  SignupTokenResponse,
-  ResetTokenResponse,
-  EmailChangeTokensResponse,
-  CouponResponse,
-  CategoriesResponse,
-  TagsResponse,
-  UsersResponse,
-  CategoryResponse,
-  VendorsResponse,
-  CategoryCheckResponse,
-  CategoryCheckOrCreateResponse
-} from './api';
+// Export all API response types from the api barrel
+export * from './api';
