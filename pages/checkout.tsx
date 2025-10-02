@@ -52,6 +52,8 @@ const Checkout: React.FC = () => {
   const [error, setError] = useState('');
   const [coupon, setCoupon] = useState('');
   const [discount, setDiscount] = useState(0);
+  const [couponMessage, setCouponMessage] = useState('');
+  const [couponStatus, setCouponStatus] = useState<'idle' | 'valid' | 'invalid'>('idle');
   const [availableMethods, setAvailableMethods] = useState<
     { type: string; details?: string }[]
   >([]);
@@ -311,55 +313,110 @@ const Checkout: React.FC = () => {
             <p className="font-semibold">Items: {itemCount}</p>
             <p className="font-semibold">Subtotal: £{totalPrice.toFixed(2)}</p>
           </div>
-          <div>
-            <label className="label" htmlFor="coupon">
-              Coupon Code
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="coupon">
+              Have a Coupon Code?
             </label>
             <div className="flex gap-2">
-              <TextInput
-                name="coupon"
-                id="coupon"
-                className="flex-1"
-                value={coupon}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setCoupon(e.target.value)
-                }
-              />
+              <div className="flex-1 relative">
+                <TextInput
+                  name="coupon"
+                  id="coupon"
+                  className={`w-full ${
+                    couponStatus === 'valid'
+                      ? 'border-green-500 focus:ring-green-500'
+                      : couponStatus === 'invalid'
+                        ? 'border-red-500 focus:ring-red-500'
+                        : ''
+                  }`}
+                  value={coupon}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    setCoupon(e.target.value.toUpperCase());
+                    setCouponStatus('idle');
+                    setCouponMessage('');
+                  }}
+                  placeholder="Enter coupon code"
+                />
+                {couponStatus === 'valid' && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+                {couponStatus === 'invalid' && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+              </div>
               <button
                 type="button"
-                className="btn"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+                disabled={!coupon.trim()}
                 onClick={async () => {
-                  if (!coupon) return;
-                  const res = await apiFetch(
-                    `/api/coupons/${encodeURIComponent(coupon)}`
-                  );
-                  if (res.ok) {
-                    const data: Coupon = await parseJsonSafe(res);
-                    if (data.discountType === 'percent') {
-                      setDiscount(data.discountValue);
-                    } else if (data.discountType === 'bogo') {
-                      if (cart.length >= 2) {
-                        const cheapest = Math.min(
-                          ...cart.map((item) =>
-                            parseFloat(
-                              typeof item.minPrice === 'number'
-                                ? item.minPrice.toString()
-                                : item.minPrice || '0'
-                            )
-                          )
-                        );
-                        setDiscount((cheapest / totalPrice) * 100);
-                      } else {
+                  if (!coupon.trim()) return;
+                  setCouponMessage('');
+                  setCouponStatus('idle');
+                  
+                  try {
+                    const res = await apiFetch(
+                      `/api/coupons/${encodeURIComponent(coupon)}`
+                    );
+                    
+                    if (res.ok) {
+                      const data: Coupon = await parseJsonSafe(res);
+                      
+                      // Check minimum order value
+                      if (data.minOrderValue && totalPrice < data.minOrderValue) {
+                        setCouponStatus('invalid');
+                        setCouponMessage(`Minimum order value of £${data.minOrderValue.toFixed(2)} required`);
                         setDiscount(0);
+                        return;
+                      }
+                      
+                      if (data.discountType === 'percent') {
+                        setDiscount(data.discountValue);
+                        setCouponStatus('valid');
+                        setCouponMessage(`${data.discountValue}% discount applied!`);
+                      } else if (data.discountType === 'bogo') {
+                        if (cart.length >= 2) {
+                          const cheapest = Math.min(
+                            ...cart.map((item) =>
+                              parseFloat(
+                                typeof item.minPrice === 'number'
+                                  ? item.minPrice.toString()
+                                  : item.minPrice || '0'
+                              )
+                            )
+                          );
+                          setDiscount((cheapest / totalPrice) * 100);
+                          setCouponStatus('valid');
+                          setCouponMessage('Buy one get one discount applied!');
+                        } else {
+                          setCouponStatus('invalid');
+                          setCouponMessage('This coupon requires at least 2 items in cart');
+                          setDiscount(0);
+                        }
+                      } else {
+                        const discountPercent = totalPrice > 0
+                          ? (data.discountValue / totalPrice) * 100
+                          : 0;
+                        setDiscount(discountPercent);
+                        setCouponStatus('valid');
+                        setCouponMessage(`£${data.discountValue.toFixed(2)} discount applied!`);
                       }
                     } else {
-                      setDiscount(
-                        totalPrice > 0
-                          ? (data.discountValue / totalPrice) * 100
-                          : 0
-                      );
+                      const errorData = await res.json().catch(() => ({}));
+                      setCouponStatus('invalid');
+                      setCouponMessage(errorData.message || 'Invalid or expired coupon code');
+                      setDiscount(0);
                     }
-                  } else {
+                  } catch (err) {
+                    setCouponStatus('invalid');
+                    setCouponMessage('Failed to validate coupon. Please try again.');
                     setDiscount(0);
                   }
                 }}
@@ -367,10 +424,14 @@ const Checkout: React.FC = () => {
                 Apply
               </button>
             </div>
-            {discount > 0 && (
-              <p className="text-sm text-green-600">
-                Discount {discount}% applied
-              </p>
+            {couponMessage && (
+              <div className={`mt-2 p-2 rounded-md text-sm ${
+                couponStatus === 'valid'
+                  ? 'bg-green-50 text-green-700 border border-green-200'
+                  : 'bg-red-50 text-red-700 border border-red-200'
+              }`}>
+                {couponMessage}
+              </div>
             )}
           </div>
           <div>
