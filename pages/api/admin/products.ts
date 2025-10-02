@@ -17,7 +17,7 @@ import {
 } from '@/constants/messages';
 import { hasOrdersForProduct } from '@lib/orders';
 import { Prisma } from '@prisma/client';
-import formidable, { Fields, Files } from 'formidable';
+import formidable, { Fields, Files, File as FormidableFile } from 'formidable';
 
 export interface AuthedNextApiRequest extends NextApiRequest {
   user?: User;
@@ -92,10 +92,10 @@ async function handler(
         res.status(400).json({ message: 'id, sku and title are required' });
         return;
       }
-      const photos: File[] = files.photos
+      const photos: FormidableFile[] = files.photos
         ? Array.isArray(files.photos)
-          ? (files.photos as File[])
-          : [files.photos as File]
+          ? (files.photos as FormidableFile[])
+          : [files.photos as FormidableFile]
         : [];
       const imagePaths: string[] = [];
       for (const file of photos) {
@@ -292,7 +292,7 @@ async function handler(
         take: limit,
       });
       
-      const data: Product[] = rows.map((p) => mapDbRowToProduct(p));
+      const data: Product[] = rows.map((p: any) => mapDbRowToProduct(p));
       res.status(200).json({ products: data, total });
       return;
     }
