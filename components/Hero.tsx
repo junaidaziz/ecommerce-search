@@ -28,7 +28,7 @@ const slides = [
 
 const Hero: FC = () => (
   <section className="w-full mb-12">
-    <div className="w-full max-w-screen-2xl mx-auto px-4 md:px-8 rounded-xl md:rounded-2xl overflow-hidden shadow-xl">
+    <div className="w-full max-w-10xl mx-auto px-4 md:px-8 rounded-xl md:rounded-2xl overflow-hidden shadow-xl">
       <Swiper
         modules={[Autoplay, Pagination, Navigation]}
         autoplay={{ delay: 5000, disableOnInteraction: false }}

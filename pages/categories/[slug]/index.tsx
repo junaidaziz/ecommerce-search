@@ -36,7 +36,7 @@ const CategoryPage: React.FC = () => {
     return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="max-w-screen-2xl mx-auto min-h-screen p-4">
+    <div className="max-w-10xl mx-auto min-h-screen p-4">
       <Head>
         <title>
           {getPageTitle(
