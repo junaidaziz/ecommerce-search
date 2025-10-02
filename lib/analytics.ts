@@ -1,5 +1,4 @@
 import { getDb } from './db';
-import type { Prisma } from '@prisma/client';
 
 export const ORDER_SUCCESS_STATUSES = ['shipped', 'delivered', 'completed'] as const;
 
@@ -13,13 +12,13 @@ export async function getSalesMetrics(
   { start, end, vendorId }: SalesMetricsParams = {}
 ): Promise<{ count: number; revenue: number }> {
   const db = getDb();
-  const where: Prisma.OrderWhereInput = {
+  const where: any = {
     status: { in: ORDER_SUCCESS_STATUSES },
   };
   if (start || end) {
     where.createdAt = {};
-    if (start) (where.createdAt as Prisma.DateTimeFilter).gte = start;
-    if (end) (where.createdAt as Prisma.DateTimeFilter).lte = end;
+    if (start) where.createdAt.gte = start;
+    if (end) where.createdAt.lte = end;
   }
   if (vendorId) {
     where.variant = {

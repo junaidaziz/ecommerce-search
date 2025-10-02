@@ -5,7 +5,6 @@ import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { UserRole, type ApiMessage, type Product, USER_ROLES } from '@/types';
 import { METHOD_NOT_ALLOWED, UNAUTHORIZED } from '@/constants/messages';
-import { Prisma } from '@prisma/client';
 
 async function handler(
   req: AuthedNextApiRequest,
@@ -27,7 +26,7 @@ async function handler(
     if (!user?.brandId && user?.role !== USER_ROLES.SUPER_ADMIN) {
       return res.status(401).json({ message: UNAUTHORIZED });
     }
-    const where: Prisma.OrderWhereInput = {};
+    const where: any = {};
     if (vendorId) {
       where.variant = {
         product: {
@@ -42,15 +41,15 @@ async function handler(
       orderBy: { _sum: { quantity: 'desc' } },
       take: 5,
     });
-    const variantIds = grouped.map((g: { variantId: number }) => g.variantId);
+    const variantIds = grouped.map((g: any) => g.variantId);
     const variants = await db.variant.findMany({
       where: { id: { in: variantIds } },
       include: { product: { select: { id: true, title: true } } }
     });
     const productMap = new Map();
-    variants.forEach(variant => {
+    variants.forEach((variant: any) => {
       const productId = variant.product.id;
-      const quantity = grouped.find(g => g.variantId === variant.id)?._sum.quantity || 0;
+      const quantity = grouped.find((g: any) => g.variantId === variant.id)?._sum.quantity || 0;
       if (productMap.has(productId)) {
         productMap.set(productId, {
           ...productMap.get(productId),
@@ -65,7 +64,7 @@ async function handler(
       }
     });
     const result = Array.from(productMap.values())
-      .sort((a, b) => b.quantity - a.quantity)
+      .sort((a: any, b: any) => b.quantity - a.quantity)
       .slice(0, 5);
 
     return res.status(200).json({ products: result });
