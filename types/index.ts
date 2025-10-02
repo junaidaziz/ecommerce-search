@@ -21,6 +21,7 @@ export * from './shared';
 // Explicitly re-export only one version of each conflicting type
 export type { Category } from './category';
 export type { CategoryResponse } from './api';
+export type { CategoriesResponse } from './api';
 export type { CouponResponse } from './api';
 export type { SearchResults } from './api';
 export type { TrendingResponse } from './api';
