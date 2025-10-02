@@ -30,4 +30,10 @@ declare module '@prisma/client' {
   export interface PolicyDocument extends Record<string, any> {}
   export interface SupportTicket extends Record<string, any> {}
   export interface WishlistItem extends Record<string, any> {}
+  export interface Variant extends Record<string, any> {}
+  export interface Notification extends Record<string, any> {}
+  export interface Message extends Record<string, any> {}
+  export interface Coupon extends Record<string, any> {}
+  export interface CouponUsage extends Record<string, any> {}
+  export interface Review extends Record<string, any> {}
 }
