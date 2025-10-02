@@ -156,7 +156,7 @@ export default function VendorDashboard() {
       currency: p.currency || 'USD',
     });
     setVariants(
-      p.variants?.map((v) => ({
+      p.variants?.map((v: any) => ({
         id: v.id,
         size: v.attributes.size || '',
         color: v.attributes.color || '',

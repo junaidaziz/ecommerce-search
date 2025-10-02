@@ -195,7 +195,7 @@ export async function hasOrdersForProduct(
   if (!product) return false;
   const variants = await db.variant.findMany({ where: { productId: product.id }, select: { id: true } });
   if (!variants.length) return false;
-  const count = await db.order.count({ where: { variantId: { in: variants.map(v => v.id) } } });
+  const count = await db.order.count({ where: { variantId: { in: variants.map((v: any) => v.id) } } });
   return count > 0;
 }
 
@@ -252,5 +252,5 @@ export async function getBestSellingProducts(limit = 8): Promise<Product[]> {
     where: { id: { in: variantIds } },
     include: { product: { include: { category: true, vendor: true } } },
   });
-  return variants.map((v) => mapDbRowToProduct(v.product));
+  return variants.map((v: any) => mapDbRowToProduct(v.product));
 }

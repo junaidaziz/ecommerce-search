@@ -11,6 +11,10 @@ declare module '@prisma/client' {
     export type ProductUpdateInput = any;
     export type UserUpdateInput = any;
     export type ProductOrderByWithRelationInput = any;
+    export type UserWhereInput = any;
+    export type UserOrderByWithRelationInput = any;
+    export type CouponCreateInput = any;
+    export type CouponUpdateInput = any;
     export interface User {
       [key: string]: any;
     }
