@@ -1,24 +1,23 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getProductByUuid, getAverageRating } from '@lib/db';
 import { mapDbRowToProduct } from '@lib/products';
-import { Product } from '@/types';
+import { Product, ApiMessage } from '@/types';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
-import type { ApiMessage } from '@/types';
 import { NOT_FOUND, UUID_REQUIRED } from '@/constants/messages';
 
 export interface ProductParams {
   uuid?: string | string[];
 }
 
-export type ProductResponse = Product & {
+export type ProductDetailResponse = Product & {
   AVERAGE_RATING: number;
   REVIEW_COUNT: number;
 };
 
 export default async function handler(
   req: NextApiRequest & { query: ProductParams },
-  res: NextApiResponse<ProductResponse | ApiMessage>
+  res: NextApiResponse<ProductDetailResponse | ApiMessage>
 ): Promise<void> {
   const uuid = getQueryParam(req.query.uuid);
   if (!uuid) {
