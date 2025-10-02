@@ -86,10 +86,10 @@ const BrandOrders: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Please log in to view orders.</p>
+          <p className="text-gray-600 dark:text-gray-400">Please log in to view orders.</p>
         </div>
       </div>
     );
@@ -97,13 +97,13 @@ const BrandOrders: React.FC = () => {
   
   if (user.role !== USER_ROLES.BRAND && user.role !== USER_ROLES.SUPER_ADMIN) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="bg-red-100 rounded-full p-4 mx-auto mb-4 w-16 h-16 flex items-center justify-center">
-            <XMarkIcon className="w-8 h-8 text-red-600" />
+          <div className="bg-red-100 dark:bg-red-900/20 rounded-full p-4 mx-auto mb-4 w-16 h-16 flex items-center justify-center">
+            <XMarkIcon className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Access Denied</h2>
-          <p className="text-gray-600">Brand access required.</p>
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Access Denied</h2>
+          <p className="text-gray-600 dark:text-gray-400">Brand access required.</p>
         </div>
       </div>
     );
@@ -131,7 +131,7 @@ const BrandOrders: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
       <Head>
         <title>{getPageTitle('Brand Orders')}</title>
       </Head>
@@ -154,13 +154,13 @@ const BrandOrders: React.FC = () => {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
+          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
             <div className="flex">
               <div className="flex-shrink-0">
                 <XMarkIcon className="w-5 h-5 text-red-400" />
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-800">{error}</p>
+                <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
               </div>
             </div>
           </div>
@@ -173,45 +173,45 @@ const BrandOrders: React.FC = () => {
         )}
         
         {groupedOrders.length > 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Order #
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Items
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Customer
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Total
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
                   {groupedOrders.map((g, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50 transition-colors duration-150">
+                    <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">#{g.order.id}</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">#{g.order.id}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{g.items.length} item{g.items.length !== 1 ? 's' : ''}</div>
+                        <div className="text-sm text-gray-900 dark:text-gray-100">{g.items.length} item{g.items.length !== 1 ? 's' : ''}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-gray-900 dark:text-gray-100">
                           {g.order.user
                             ? `${g.order.user.firstName || ''} ${
                                 g.order.user.lastName || ''
@@ -223,10 +223,10 @@ const BrandOrders: React.FC = () => {
                         {getStatusBadge(g.order.status)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-semibold text-gray-900">£{g.order.total}</div>
+                        <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">£{g.order.total}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
                           {new Date(g.order.createdAt).toLocaleDateString()}
                         </div>
                       </td>
@@ -277,12 +277,12 @@ const BrandOrders: React.FC = () => {
           </div>
         ) : (
           !loading && (
-            <div className="text-center py-12">
-              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+              <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                 <TruckIcon className="w-12 h-12 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No orders found</h3>
-              <p className="text-gray-500">Orders will appear here once customers start placing them.</p>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No orders found</h3>
+              <p className="text-gray-500 dark:text-gray-400">Orders will appear here once customers start placing them.</p>
             </div>
           )
         )}
