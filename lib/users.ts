@@ -203,7 +203,14 @@ export function updateBrand(id: number, data: Prisma.UserUpdateInput) {
 
 export function findVendorByName(brandName: string) {
   return prisma.user.findFirst({
-    where: { role: 'BRAND', brandName, active: true },
+    where: { 
+      role: 'BRAND', 
+      brandName: { 
+        equals: brandName, 
+        mode: 'insensitive' 
+      }, 
+      active: true 
+    },
     select: { id: true, brandName: true, email: true, active: true },
   });
 }

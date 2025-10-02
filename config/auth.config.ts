@@ -25,6 +25,7 @@ export const AUTH_ERRORS = {
   passwordsNoMatch: 'Passwords do not match',
   firstNameRequired: 'First name is required',
   brandNameRequired: 'Brand name is required',
+  brandNameTaken: 'Brand name already taken',
   invalidCredentials: 'Invalid credentials',
   signupFailed: 'Signup failed',
   loginFailed: 'Login failed',

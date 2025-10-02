@@ -40,6 +40,10 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
   const categorySlugs = categoryParam
     ? categoryParam.split(',').filter(Boolean)
     : [];
+  const vendorParam = context.query.vendor as string | undefined;
+  const vendorIds = vendorParam 
+    ? vendorParam.split(',').map(id => parseInt(id, 10)).filter(id => !isNaN(id))
+    : undefined;
   const q = context.query.q as string | undefined;
   const minPrice = context.query.minPrice
     ? parseFloat(context.query.minPrice as string)
@@ -59,6 +63,7 @@ export const getServerSideProps: GetServerSideProps<ProductsProps> = async (
     inStock,
     minPrice,
     maxPrice,
+    vendorIds,
     sort: sort as import('@lib/products').PaginatedOptions['sort'],
   });
 
@@ -80,6 +85,11 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     typeof router.query.category === 'string' && router.query.category
       ? router.query.category.split(',')
+      : []
+  );
+  const [selectedBrands, setSelectedBrands] = useState<number[]>(
+    typeof router.query.vendor === 'string' && router.query.vendor
+      ? router.query.vendor.split(',').map(id => parseInt(id, 10)).filter(id => !isNaN(id))
       : []
   );
   const [minPrice, setMinPrice] = useState(
@@ -114,6 +124,8 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       if (keyword) query.q = keyword;
       if (selectedCategories.length > 0)
         query.category = selectedCategories.join(',');
+      if (selectedBrands.length > 0)
+        query.vendor = selectedBrands.join(',');
       if (minPrice) query.minPrice = minPrice;
       if (maxPrice) query.maxPrice = maxPrice;
       if (inStock) query.inStock = 'true';
@@ -122,19 +134,20 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       params.set('page', String(p));
       return params;
     },
-    [keyword, selectedCategories, minPrice, maxPrice, inStock, sort]
+    [keyword, selectedCategories, selectedBrands, minPrice, maxPrice, inStock, sort]
   );
 
   const getFilterSnapshot = useCallback(() => {
     return JSON.stringify({
       keyword,
       categories: selectedCategories,
+      brands: selectedBrands,
       minPrice,
       maxPrice,
       inStock,
       sort,
     });
-  }, [keyword, selectedCategories, minPrice, maxPrice, inStock, sort]);
+  }, [keyword, selectedCategories, selectedBrands, minPrice, maxPrice, inStock, sort]);
 
   const loadProductsFn = useCallback(
     async (p: number, mode: 'reset' | 'append') => {
@@ -198,6 +211,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
       hasMore,
       keyword,
       selectedCategories,
+      selectedBrands,
       minPrice,
       maxPrice,
       inStock,
@@ -239,7 +253,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
-  }, [keyword, selectedCategories, minPrice, maxPrice, inStock, sort]);
+  }, [keyword, selectedCategories, selectedBrands, minPrice, maxPrice, inStock, sort]);
 
   const toggleInStock = useCallback(() => {
     setInStock((prev) => !prev);
@@ -252,6 +266,14 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         label: categories.find((c) => c.slug === sc)?.name || sc,
         clear: () =>
           setSelectedCategories((prev) => prev.filter((s) => s !== sc)),
+      })
+    );
+  if (selectedBrands.length > 0)
+    selectedBrands.forEach((brandId) =>
+      activeFilters.push({
+        label: `Brand #${brandId}`,
+        clear: () =>
+          setSelectedBrands((prev) => prev.filter((id) => id !== brandId)),
       })
     );
   if (inStock) activeFilters.push({ label: 'In Stock', clear: toggleInStock });
@@ -275,6 +297,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const clearAll = useCallback(() => {
     setKeyword('');
     setSelectedCategories([]);
+    setSelectedBrands([]);
     setMinPrice('');
     setMaxPrice('');
     setInStock(false);
@@ -320,6 +343,8 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
                 setKeyword={setKeyword}
                 selectedCategories={selectedCategories}
                 setSelectedCategories={setSelectedCategories}
+                selectedBrands={selectedBrands}
+                setSelectedBrands={setSelectedBrands}
                 minPrice={minPrice}
                 setMinPrice={setMinPrice}
                 maxPrice={maxPrice}

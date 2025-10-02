@@ -5,6 +5,7 @@ import XMarkIcon from '../icons/XMarkIcon';
 import SearchFilter from './SearchFilter';
 import AvailabilityFilter from './AvailabilityFilter';
 import CategoryFilter from './CategoryFilter';
+import BrandFilter from './BrandFilter';
 import PriceRangeFilter from './PriceRangeFilter';
 
 interface ProductFiltersProps {
@@ -12,6 +13,8 @@ interface ProductFiltersProps {
   setKeyword: React.Dispatch<React.SetStateAction<string>>;
   selectedCategories: string[];
   setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedBrands: number[];
+  setSelectedBrands: React.Dispatch<React.SetStateAction<number[]>>;
   minPrice: string;
   setMinPrice: React.Dispatch<React.SetStateAction<string>>;
   maxPrice: string;
@@ -27,6 +30,8 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   setKeyword,
   selectedCategories,
   setSelectedCategories,
+  selectedBrands,
+  setSelectedBrands,
   minPrice,
   setMinPrice,
   maxPrice,
@@ -52,6 +57,12 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
         categories={categories} 
         selectedCategories={selectedCategories} 
         setSelectedCategories={setSelectedCategories} 
+      />
+
+      {/* Brands */}
+      <BrandFilter 
+        selectedBrands={selectedBrands} 
+        setSelectedBrands={setSelectedBrands} 
       />
 
       {/* Price Range */}

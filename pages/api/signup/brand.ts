@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { addUser, findUser } from '@lib/users';
+import { addUser, findUser, findVendorByName } from '@lib/users';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { handleApiError } from '@utils/handleApiError';
@@ -30,6 +30,11 @@ export default async function handler(
     }
     if (await findUser(email)) {
       return res.status(409).json({ message: USER_EXISTS });
+    }
+    
+    // Check if brand name is already taken
+    if (await findVendorByName(firstName.trim())) {
+      return res.status(409).json({ message: 'Brand name already taken' });
     }
     
     const hashed = await bcrypt.hash(password, 10);
