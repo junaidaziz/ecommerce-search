@@ -16,10 +16,6 @@ export default function NotificationBell({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setItems(notifications);
-  }, [notifications]);
-
   const fetchNotifications = () => {
     apiFetch('/api/brand/notifications')
       .then((res) => (res.ok ? res.json() : []))
