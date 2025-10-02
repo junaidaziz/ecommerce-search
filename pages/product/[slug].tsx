@@ -42,21 +42,28 @@ export const getServerSideProps: GetServerSideProps<
   if (!params || typeof params.slug !== 'string') {
     return { notFound: true };
   }
-  const row = await getProductBySlug(params.slug);
-  if (!row) {
+  
+  try {
+    const row = await getProductBySlug(params.slug);
+    if (!row) {
+      return { notFound: true };
+    }
+    const product = mapDbRowToProduct(row);
+    const reviews = await getReviewsForProduct(String(row.id));
+    const stats = await getAverageRating(String(row.id));
+    return {
+      props: {
+        product: serializeDates(product),
+        initialReviews: reviews,
+        initialAverage: stats.average,
+        initialCount: stats.count,
+      },
+    };
+  } catch (error) {
+    console.error('Error loading product:', error);
+    // Return 404 for any database errors to avoid exposing internal errors
     return { notFound: true };
   }
-  const product = mapDbRowToProduct(row);
-  const reviews = await getReviewsForProduct(String(row.id));
-  const stats = await getAverageRating(String(row.id));
-  return {
-    props: {
-      product: serializeDates(product),
-      initialReviews: reviews,
-      initialAverage: stats.average,
-      initialCount: stats.count,
-    },
-  };
 };
 
 // --- Component ---

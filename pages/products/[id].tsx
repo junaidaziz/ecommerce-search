@@ -12,6 +12,7 @@ import type { Product } from '@/types';
 import type { Review, ReviewsResponse, ReviewAddedResponse } from '@/types';
 import { SelectDropdown, Textarea } from '@components/form-fields';
 import type { SelectOption } from '@components/form-fields/SelectDropdown';
+import ProductError from '@components/Product/ProductError';
 
 interface ProductDetailProps {}
 
@@ -22,6 +23,7 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<'not-found' | 'api-error'>('api-error');
   const [reviews, setReviews] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [reviewCount, setReviewCount] = useState<number>(0);
@@ -42,12 +44,18 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
       try {
         const res = await apiFetch(`/api/products/${id}`);
         if (res.status === 404) {
+          setErrorType('not-found');
           setError('Product not found');
           return;
         }
-        if (!res.ok) throw new Error('Failed');
+        if (!res.ok) {
+          setErrorType('api-error');
+          setError('Failed to load product');
+          return;
+        }
         const data: Product = await res.json();
         if (!data) {
+          setErrorType('not-found');
           setError('Product not found');
           return;
         }
@@ -60,13 +68,23 @@ const ProductDetail: React.FC<ProductDetailProps> = () => {
           setReviewCount(rdata.reviewCount);
         }
       } catch (e) {
+        setErrorType('api-error');
         setError('Failed to load product');
       }
     }
     load();
   }, [id]);
 
-  if (error) return <div className="p-4">{error}</div>;
+  if (error) {
+    return (
+      <>
+        <Head>
+          <title>{getPageTitle(errorType === 'not-found' ? 'Product Not Found' : 'Error')}</title>
+        </Head>
+        <ProductError type={errorType} message={error} />
+      </>
+    );
+  }
   if (!product) return <div className="p-4">Loading...</div>;
 
   return (
