@@ -36,4 +36,6 @@ declare module '@prisma/client' {
   export interface Coupon extends Record<string, any> {}
   export interface CouponUsage extends Record<string, any> {}
   export interface Review extends Record<string, any> {}
+  export interface ChatSession extends Record<string, any> {}
+  export interface ChatMessage extends Record<string, any> {}
 }

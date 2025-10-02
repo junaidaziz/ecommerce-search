@@ -15,6 +15,7 @@ import { UserRole, USER_ROLES } from '@/types';
 import { TextInput } from '@components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import { Cog8ToothIcon as CogIcon } from '@heroicons/react/24/outline';
 
 export default function VendorDashboard() {
   const { user } = useContext(AppContext)!;
