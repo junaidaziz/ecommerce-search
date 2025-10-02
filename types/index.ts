@@ -15,8 +15,25 @@ export * from './message';
 export * from './context';
 export * from './wishlist';
 export * from './variant';
-export * from './coupon';
-export * from './shared';
+// Export all types from coupon except CouponResponse (use API version instead)
+export type { Coupon, CouponWithRelations, CouponInput, CouponUpdate, CouponSummary } from './coupon';
+// Export all types from shared except SearchResults (use API version instead)
+export type {
+  FilterState,
+  ActiveFilter,
+  PaginationInfo,
+  ApiResponse,
+  ApiError,
+  ValidationError,
+  FileUploadResponse,
+  BreadcrumbItem,
+  DropdownItem,
+  TableColumn,
+  SortConfig,
+  FilterConfig,
+  ProductGridProps,
+  InfiniteLoaderProps
+} from './shared';
 
 // Explicitly re-export only one version of each conflicting type
 export type { Category, CategoryInput, CategoryUpdate, CategorySummary } from './category';
@@ -47,5 +64,34 @@ export type {
   CreateUserRequest
 } from './admin';
 
-// Export all API response types from the api barrel
-export * from './api';
+// Export all API response types (explicitly to avoid conflicts with shared types)
+export type {
+  // Products domain
+  SearchResults,
+  ProductsResponse,
+  SuggestionsResponse,
+  SearchApiResponse,
+  TrendingResponse,
+  TagsResponse,
+  // Orders domain
+  CheckoutSessionResponse,
+  OrderIdResponse,
+  OrderPlacedResponse,
+  // Auth domain
+  LoginResponse,
+  SignupResponse,
+  SignupTokenResponse,
+  ResetTokenResponse,
+  EmailChangeTokensResponse,
+  // Users domain
+  UsersResponse,
+  // Categories domain
+  CategoriesResponse,
+  CategoryResponse,
+  CategoryCheckResponse,
+  CategoryCheckOrCreateResponse,
+  // Vendors domain
+  VendorsResponse,
+  // Coupons domain
+  CouponResponse,
+} from './api';
