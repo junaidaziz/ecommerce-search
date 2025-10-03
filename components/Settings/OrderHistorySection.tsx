@@ -82,7 +82,7 @@ const OrderHistorySection: React.FC = () => {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Orders Yet</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">You haven't placed any orders yet.</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">You haven&apos;t placed any orders yet.</p>
           <Link
             href="/products"
             className="inline-block px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"

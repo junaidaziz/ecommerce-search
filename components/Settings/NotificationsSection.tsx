@@ -92,7 +92,7 @@ const NotificationsSection: React.FC = () => {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Notifications</h3>
-          <p className="text-gray-600 dark:text-gray-400">You're all caught up!</p>
+          <p className="text-gray-600 dark:text-gray-400">You&apos;re all caught up!</p>
         </div>
       ) : (
         <div className="space-y-3">
