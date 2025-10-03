@@ -325,24 +325,24 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 xl:gap-10 items-start">
           {/* Filters Sidebar */}
           <aside className="w-full lg:w-72 xl:w-80 mb-6 lg:mb-0 lg:sticky lg:top-6">
-            <div className="bg-white/70 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 transition-all duration-300">
+            <div className="bg-white dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/80 dark:border-gray-700/60 transition-all duration-300">
               {/* Mobile Toggle */}
               <div className="lg:hidden px-5 pt-5">
                 <button
                   type="button"
                   onClick={() => setFiltersOpen(o => !o)}
                   aria-expanded={filtersOpen}
-                  className="w-full flex items-center justify-between gap-3 rounded-xl bg-base-200/60 dark:bg-base-200/20 px-4 py-3 text-base font-semibold text-base-content hover:bg-base-200 dark:hover:bg-base-200/40 transition-colors"
+                  className="w-full flex items-center justify-between gap-3 rounded-xl bg-gray-100 dark:bg-gray-700/60 px-4 py-3 text-base font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
                   <span>Filters</span>
                   <span className={`transition-transform duration-300 ${filtersOpen ? 'rotate-180' : ''}`}>▾</span>
                 </button>
               </div>
               <div className="hidden lg:flex items-center justify-between px-6 pt-6 mb-2">
-                <h2 className="text-2xl font-bold text-base-content tracking-tight">Filters</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Filters</h2>
                 <button
                   onClick={clearAll}
-                  className="btn btn-xs md:btn-sm btn-ghost text-primary hover:bg-primary/10"
+                  className="btn btn-xs md:btn-sm btn-ghost text-primary dark:text-primary-light hover:bg-primary/10 dark:hover:bg-primary/20"
                 >
                   Clear All
                 </button>
@@ -373,15 +373,15 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
           {/* Main Content */}
           <div className="flex-1 space-y-6">
             {/* Results Header */}
-            <div className="bg-base-100 rounded-2xl shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800/95 rounded-2xl shadow-lg border border-gray-200/80 dark:border-gray-700/60 p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex flex-wrap items-start sm:items-center gap-2 sm:space-x-4">
-                  <h2 className="text-2xl font-bold text-base-content">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {items.length} Products
                   </h2>
                   {activeFilters.length > 0 && (
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm text-base-content/60">Filtered by:</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Filtered by:</span>
                       <ActiveFilters filters={activeFilters} clearAll={clearAll} />
                     </div>
                   )}
@@ -394,10 +394,10 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
 
             {/* Products Grid */}
             <div className="relative">
-              <div className="bg-base-100 rounded-2xl shadow-lg p-6">
+              <div className="bg-white dark:bg-gray-800/95 rounded-2xl shadow-lg border border-gray-200/80 dark:border-gray-700/60 p-6">
                 <ProductGrid products={items} />
                 {loading && (
-                  <div className="absolute inset-0 bg-base-100/80 rounded-2xl flex items-center justify-center">
+                  <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/90 rounded-2xl flex items-center justify-center">
                     <Loader className="w-12 h-12" />
                   </div>
                 )}
