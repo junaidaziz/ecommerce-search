@@ -1,10 +1,9 @@
 import React, { useContext } from 'react';
 import { AppContext } from '@contexts/AppContext';
-import type { AppContextValue, WishlistItem } from '@/types';
+import type { AppContextValue } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import ProductCard from '@components/Product/ProductCard';
-import Link from 'next/link';
 
 const UserWishlist: React.FC = () => {
   const context = useContext<AppContextValue | undefined>(AppContext);
@@ -12,60 +11,33 @@ const UserWishlist: React.FC = () => {
     return <div className="p-4 text-gray-700 dark:text-gray-300">Please log in to view wishlist.</div>;
   }
 
-  const { wishlist, addToWishlist, removeFromWishlist, addToCart } = context;
+  const { wishlist, addToWishlist, removeFromWishlist } = context;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
+    <div className="container mx-auto px-4 py-8">
       <Head>
         <title>{getPageTitle('My Wishlist')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">My Wishlist</h1>
-      <ul className="space-y-2">
-        {wishlist.map((item: WishlistItem) => (
-          <li
-            key={item.id}
-            className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 flex justify-between items-center"
-          >
-            <div>
-              <Link
-                href={`/product/${item.product.slug}`}
-                className="font-semibold text-gray-900 dark:text-gray-100 hover:text-primary dark:hover:text-primary-light"
-              >
-                {item.product.title}
-              </Link>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {item.product.quantity > 0 ? 'In Stock' : 'Out of Stock'}
-              </div>
-              <label className="flex items-center gap-1 mt-1 text-sm text-gray-700 dark:text-gray-300">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300 dark:border-gray-700 text-primary focus:ring-primary"
-                  checked={item.notifyOnStock}
-                  onChange={() =>
-                    addToWishlist(item.product, !item.notifyOnStock)
-                  }
-                />
-                Notify when in stock
-              </label>
-            </div>
-            <div className="flex gap-2">
-              <button
-                className="px-3 py-1 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors"
-                onClick={() => addToCart(item.product)}
-              >
-                Add to Cart
-              </button>
-              <button
-                className="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                onClick={() => removeFromWishlist(item.product.id)}
-              >
-                Remove
-              </button>
-            </div>
-          </li>
-        ))}
-        {wishlist.length === 0 && <li className="text-gray-500 dark:text-gray-400">No items in wishlist.</li>}
-      </ul>
+      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">My Wishlist</h1>
+      
+      {wishlist.length === 0 ? (
+        <div className="text-center py-16">
+          <p className="text-lg text-gray-600 dark:text-gray-400">No items in wishlist.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5 lg:gap-6">
+          {wishlist.map((item) => (
+            <ProductCard
+              key={item.id}
+              product={item.product}
+              className="w-full h-full transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl"
+              inWishlist={true}
+              addToWish={addToWishlist}
+              removeFromWish={(id) => removeFromWishlist(Number(id))}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

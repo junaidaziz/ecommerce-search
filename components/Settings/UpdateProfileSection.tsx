@@ -56,22 +56,26 @@ const UpdateProfileSection: React.FC = () => {
           <ProfileAvatarUploader />
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-        <TextInput
-          label="First Name"
-          register={profileForm.register}
-          name="firstName"
-          rules={{ required: 'Required' }}
-          error={profileForm.formState.errors.firstName?.message}
-        />
-        <TextInput
-          label="Last Name"
-          register={profileForm.register}
-          name="lastName"
-          rules={{ required: 'Required' }}
-          error={profileForm.formState.errors.lastName?.message}
-        />
-        <div className="md:col-span-2 flex gap-2 items-end">
+      <div className="space-y-4 md:space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+          <TextInput
+            label="First Name"
+            register={profileForm.register}
+            name="firstName"
+            placeholder="John"
+            rules={{ required: 'Required' }}
+            error={profileForm.formState.errors.firstName?.message}
+          />
+          <TextInput
+            label="Last Name"
+            register={profileForm.register}
+            name="lastName"
+            placeholder="Doe"
+            rules={{ required: 'Required' }}
+            error={profileForm.formState.errors.lastName?.message}
+          />
+        </div>
+        <div className="flex gap-2 items-end">
           <div className="flex-1">
             <EmailInput
               label="Email"
@@ -93,15 +97,14 @@ const UpdateProfileSection: React.FC = () => {
           label="Phone Number"
           register={profileForm.register}
           name="phoneNumber"
+          placeholder="+1 234 567 8900"
           error={profileForm.formState.errors.phoneNumber?.message}
-          className="md:col-span-2"
         />
         <TextInput
           label="Last Updated"
           name="updatedAt"
           value={updatedAt}
           readOnly
-          className="md:col-span-2"
         />
       </div>
       <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-800">

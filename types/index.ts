@@ -15,6 +15,7 @@ export * from './message';
 export * from './context';
 export * from './wishlist';
 export * from './variant';
+export * from './address';
 // Export all types from coupon except CouponResponse (use API version instead)
 export type { Coupon, CouponWithRelations, CouponInput, CouponUpdate, CouponSummary } from './coupon';
 // Export all types from shared except SearchResults (use API version instead)
