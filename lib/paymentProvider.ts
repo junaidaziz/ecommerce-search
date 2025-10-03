@@ -6,6 +6,11 @@ export interface TokenizedCard {
   expYear: number;
 }
 
+export interface TokenizedPayPal {
+  token: string;
+  email: string;
+}
+
 export interface PaymentCharge {
   transactionId: string;
   status: 'succeeded' | 'failed';
@@ -19,6 +24,8 @@ export interface PaymentProvider {
     cvc: string;
   }): Promise<TokenizedCard>;
 
+  tokenizePayPal(paypal: { email: string }): Promise<TokenizedPayPal>;
+
   charge(token: string, amount: number): Promise<PaymentCharge>;
 }
 
@@ -31,11 +38,19 @@ export class MockPaymentProvider implements PaymentProvider {
     cvc: string;
   }): Promise<TokenizedCard> {
     return {
-      token: 'tok_' + Math.random().toString(36).substring(2),
+      token: 'tok_card_' + Math.random().toString(36).substring(2),
       cardLast4: card.number.slice(-4),
       cardBrand: 'mock',
       expMonth: card.expMonth,
       expYear: card.expYear,
+    };
+  }
+
+  async tokenizePayPal(paypal: { email: string }): Promise<TokenizedPayPal> {
+    // In a real implementation, this would integrate with PayPal's API
+    return {
+      token: 'tok_paypal_' + Math.random().toString(36).substring(2),
+      email: paypal.email,
     };
   }
 

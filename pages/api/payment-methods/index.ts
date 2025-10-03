@@ -28,24 +28,50 @@ export default async function handler(
       return res.status(200).json(methods);
     }
     if (req.method === 'POST') {
-      const { number, expMonth, expYear, cvc, setDefault } = req.body || {};
-      if (!number || !expMonth || !expYear || !cvc)
-        return res.status(400).json({ message: 'card details required' });
-      const tokenized = await paymentProvider.tokenizeCard({
-        number,
-        expMonth: Number(expMonth),
-        expYear: Number(expYear),
-        cvc,
-      });
-      const method = await addPaymentMethod(userId, {
-        provider: 'mock',
-        cardLast4: tokenized.cardLast4,
-        cardBrand: tokenized.cardBrand,
-        expMonth: tokenized.expMonth,
-        expYear: tokenized.expYear,
-        token: tokenized.token,
-        isDefault: !!setDefault,
-      });
+      const { number, expMonth, expYear, cvc, setDefault, paypalEmail, provider } = req.body || {};
+      
+      let method;
+      
+      if (provider === 'paypal') {
+        // Handle PayPal payment method
+        if (!paypalEmail) {
+          return res.status(400).json({ message: 'PayPal email required' });
+        }
+        
+        const tokenized = await paymentProvider.tokenizePayPal({
+          email: paypalEmail,
+        });
+        
+        method = await addPaymentMethod(userId, {
+          provider: 'paypal',
+          paypalEmail: tokenized.email,
+          token: tokenized.token,
+          isDefault: !!setDefault,
+        });
+      } else {
+        // Handle card payment method
+        if (!number || !expMonth || !expYear || !cvc) {
+          return res.status(400).json({ message: 'card details required' });
+        }
+        
+        const tokenized = await paymentProvider.tokenizeCard({
+          number,
+          expMonth: Number(expMonth),
+          expYear: Number(expYear),
+          cvc,
+        });
+        
+        method = await addPaymentMethod(userId, {
+          provider: 'card',
+          cardLast4: tokenized.cardLast4,
+          cardBrand: tokenized.cardBrand,
+          expMonth: tokenized.expMonth,
+          expYear: tokenized.expYear,
+          token: tokenized.token,
+          isDefault: !!setDefault,
+        });
+      }
+      
       return res.status(200).json(method);
     }
     return res.status(405).json({ message: METHOD_NOT_ALLOWED });

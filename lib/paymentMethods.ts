@@ -4,10 +4,11 @@ export async function addPaymentMethod(
   userId: number,
   data: {
     provider: string;
-    cardLast4: string;
-    cardBrand: string;
-    expMonth: number;
-    expYear: number;
+    cardLast4?: string;
+    cardBrand?: string;
+    expMonth?: number;
+    expYear?: number;
+    paypalEmail?: string;
     token: string;
     isDefault?: boolean;
   }
@@ -20,7 +21,17 @@ export async function addPaymentMethod(
     });
   }
   return db.paymentMethod.create({
-    data: { ...data, userId, isDefault: data.isDefault || false },
+    data: { 
+      userId, 
+      provider: data.provider,
+      cardLast4: data.cardLast4 || null,
+      cardBrand: data.cardBrand || null,
+      expMonth: data.expMonth || null,
+      expYear: data.expYear || null,
+      paypalEmail: data.paypalEmail || null,
+      token: data.token,
+      isDefault: data.isDefault || false 
+    },
   });
 }
 
