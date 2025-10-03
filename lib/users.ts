@@ -158,10 +158,11 @@ export function setResetToken(
   });
 }
 
-export function resetPassword(token: string, password: string) {
+export async function resetPassword(token: string, password: string) {
+  const hashedPassword = await bcrypt.hash(password, 10);
   return prisma.user.updateMany({
     where: { resetToken: token, resetExpires: { gt: new Date() } },
-    data: { password, resetToken: null, resetExpires: null },
+    data: { password: hashedPassword, resetToken: null, resetExpires: null },
   });
 }
 
