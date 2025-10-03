@@ -5,11 +5,11 @@ import { fetchJson } from '@utils/fetchJson';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import PageHero from '@components/UI/PageHero';
+import { toast } from 'sonner';
 
 export default function Approvals() {
   const { user } = useContext(AppContext)!;
   const [pending, setPending] = useState<PendingProduct[]>([]);
-  const [message, setMessage] = useState<string>('');
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -24,13 +24,17 @@ export default function Approvals() {
   }, [load]);
 
   const act = async (id: string, action: 'approve' | 'reject') => {
-    await fetchJson<ApiMessage>('/api/admin/vendor-products', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, action }),
-    });
-    setMessage('Updated');
-    load();
+    try {
+      await fetchJson<ApiMessage>('/api/admin/vendor-products', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action }),
+      });
+      toast.success(`Product ${action === 'approve' ? 'approved' : 'rejected'} successfully`);
+      load();
+    } catch (error) {
+      toast.error(`Failed to ${action} product`);
+    }
   };
 
   if (!user)
@@ -44,7 +48,6 @@ export default function Approvals() {
         <title>{getPageTitle('Vendor Approvals')}</title>
       </Head>
       <PageHero heading="Vendor Product Approvals" />
-      {message && <div className="mb-4 text-green-600 dark:text-green-400 px-4 sm:px-6 lg:px-8">{message}</div>}
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <ul className="space-y-2">
         {pending.map((p) => (

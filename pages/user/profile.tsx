@@ -7,6 +7,7 @@ import { AppContext } from '@contexts/AppContext';
 import { USER_ROLES, type User } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import { toast } from 'sonner';
 
 export const UserProfile: React.FC = () => {
   const { user } = useContext(AppContext) as { user: User | null };
@@ -36,7 +37,6 @@ export const UserProfile: React.FC = () => {
       country: '',
     },
   });
-  const [message, setMessage] = React.useState<string>('');
 
   useEffect(() => {
     if (user) {
@@ -52,12 +52,11 @@ export const UserProfile: React.FC = () => {
   }, [user, reset]);
 
   const submit: SubmitHandler<ProfileForm> = async (data) => {
-    setMessage('');
     try {
       await updateUserProfile(data);
-      setMessage('Profile updated');
+      toast.success('Profile updated successfully');
     } catch {
-      setMessage('Update failed');
+      toast.error('Failed to update profile');
     }
   };
 
@@ -76,7 +75,6 @@ export const UserProfile: React.FC = () => {
           Please complete your profile.
         </div>
       )}
-      {message && <div className="mb-2 text-green-600 dark:text-green-400">{message}</div>}
       <form onSubmit={handleSubmit(submit)} className="space-y-2">
         <input
           className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-transparent"

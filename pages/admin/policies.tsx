@@ -6,6 +6,7 @@ import { fetchJson } from '@utils/fetchJson';
 import { getPageTitle } from '@lib/pageTitle';
 import { USER_ROLES } from '@/types';
 import PageHero from '@components/UI/PageHero';
+import { toast } from 'sonner';
 
 const TYPES = [
   { value: 'terms', label: 'Terms & Conditions' },
@@ -17,7 +18,6 @@ export default function ManagePolicies() {
   const { user } = useContext(AppContext)!;
   const [type, setType] = useState('terms');
   const [content, setContent] = useState('');
-  const [message, setMessage] = useState('');
 
   useEffect(() => {
     fetchJson<{ content?: string }>(`/api/admin/policies?type=${type}`)
@@ -25,17 +25,21 @@ export default function ManagePolicies() {
       .catch(() => setContent(''));
   }, [type]);
 
-  if (!user) return <div className="p-4">Please log in to view policies.</div>;
+  if (!user) return <div className="p-4 text-gray-700 dark:text-gray-300">Please log in to view policies.</div>;
   if (user.role !== USER_ROLES.SUPER_ADMIN)
-    return <div className="p-4">Admin access required.</div>;
+    return <div className="p-4 text-gray-700 dark:text-gray-300">Admin access required.</div>;
 
   const save = async () => {
-    await fetchJson('/api/admin/policies', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, content }),
-    });
-    setMessage('Policy saved');
+    try {
+      await fetchJson('/api/admin/policies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, content }),
+      });
+      toast.success('Policy saved successfully');
+    } catch (error) {
+      toast.error('Failed to save policy');
+    }
   };
 
   return (
@@ -45,7 +49,6 @@ export default function ManagePolicies() {
       </Head>
       <PageHero heading="Manage Policies" />
       <div className="w-full px-4 sm:px-6 lg:px-8 space-y-4">
-        {message && <div className="text-green-600 dark:text-green-400">{message}</div>}
         <div className="form-control w-full max-w-xs">
         <label className="label">
           <span className="label-text text-gray-700 dark:text-gray-300">Policy Type</span>

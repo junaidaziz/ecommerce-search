@@ -7,6 +7,7 @@ import { TextInput } from '@components/form-fields';
 import { Coupon, UserRole, USER_ROLES } from '@/types';
 import { getPageTitle } from '@lib/pageTitle';
 import PageHero from '@components/UI/PageHero';
+import { toast } from 'sonner';
 
 export default function AdminCoupons() {
   const { user } = useContext(AppContext)!;
@@ -18,7 +19,6 @@ export default function AdminCoupons() {
     minOrderValue: undefined,
   });
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [message, setMessage] = useState('');
 
   const fetchCoupons = () => {
     fetchJsonSafe<Coupon[]>('/api/admin/coupons', [])
@@ -33,23 +33,27 @@ export default function AdminCoupons() {
     e.preventDefault();
     const method = editingId ? 'PUT' : 'POST';
     const body = { ...form, id: editingId ?? undefined };
-    const res = await apiFetch('/api/admin/coupons', {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (res.ok) {
-      setMessage(editingId ? 'Coupon updated' : 'Coupon created');
-      setForm({
-        code: '',
-        discountType: 'percent',
-        discountValue: 0,
-        minOrderValue: undefined,
+    try {
+      const res = await apiFetch('/api/admin/coupons', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
       });
-      setEditingId(null);
-      fetchCoupons();
-    } else {
-      setMessage('Error saving coupon');
+      if (res.ok) {
+        toast.success(editingId ? 'Coupon updated successfully' : 'Coupon created successfully');
+        setForm({
+          code: '',
+          discountType: 'percent',
+          discountValue: 0,
+          minOrderValue: undefined,
+        });
+        setEditingId(null);
+        fetchCoupons();
+      } else {
+        toast.error('Failed to save coupon');
+      }
+    } catch (error) {
+      toast.error('Failed to save coupon');
     }
   };
 
@@ -64,7 +68,6 @@ export default function AdminCoupons() {
       </Head>
       <PageHero heading="Coupons" />
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        {message && <div className="mb-2 text-green-600 dark:text-green-400">{message}</div>}
         <form onSubmit={submit} className="space-y-2 max-w-md bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-800">
         <TextInput
           name="code"
