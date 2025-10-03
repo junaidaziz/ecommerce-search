@@ -71,6 +71,7 @@ model User {
   coupon           Coupon[]
   reviews          Review[]          @relation("UserReviews")
   addresses        Address[]
+  loginSessions    LoginSession[]    @relation("UserLoginSessions")
 
   @@index([phoneNumber])
 }
@@ -217,17 +218,18 @@ model CouponUsage {
 }
 
 model PaymentMethod {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  provider  String
-  cardLast4 String
-  cardBrand String
-  expMonth  Int
-  expYear   Int
-  token     String
-  isDefault Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  provider     String
+  cardLast4    String?
+  cardBrand    String?
+  expMonth     Int?
+  expYear      Int?
+  paypalEmail  String?
+  token        String
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   user     User      @relation(fields: [userId], references: [id])
   payments Payment[]
@@ -380,4 +382,23 @@ model Address {
 
   @@index([userId])
   @@index([type])
+}
+
+model LoginSession {
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(uuid())
+  userId       Int
+  sessionToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  deviceInfo   String?
+  lastActivity DateTime @default(now())
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+
+  user User @relation("UserLoginSessions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([expiresAt])
 }
