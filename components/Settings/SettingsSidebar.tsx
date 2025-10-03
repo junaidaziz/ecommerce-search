@@ -1,7 +1,18 @@
-import { KeyIcon, HomeIcon, EnvelopeIcon, CreditCardIcon, TagIcon, UserIcon, BuildingStorefrontIcon } from '@heroicons/react/24/outline';
+import { 
+  KeyIcon, 
+  HomeIcon, 
+  EnvelopeIcon, 
+  CreditCardIcon, 
+  TagIcon, 
+  UserIcon, 
+  BuildingStorefrontIcon,
+  ShoppingBagIcon,
+  HeartIcon,
+  BellIcon
+} from '@heroicons/react/24/outline';
 
 interface SettingsSidebarProps {
-  active: 'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons' | 'brand';
+  active: 'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons' | 'brand' | 'orders' | 'wishlist' | 'notifications';
   onSelect: (tab: SettingsSidebarProps['active']) => void;
   userRole?: string;
 }
@@ -12,6 +23,9 @@ const tabIcons = {
   address: HomeIcon,
   email: EnvelopeIcon,
   payments: CreditCardIcon,
+  orders: ShoppingBagIcon,
+  wishlist: HeartIcon,
+  notifications: BellIcon,
   coupons: TagIcon,
   brand: BuildingStorefrontIcon,
 };
@@ -22,6 +36,9 @@ const tabLabels = {
   address: 'Manage Address',
   email: 'Change Email',
   payments: 'Payment Methods',
+  orders: 'Order History',
+  wishlist: 'My Wishlist',
+  notifications: 'Notifications',
   coupons: 'Coupons & Offers',
   brand: 'Brand Settings',
 };
@@ -29,6 +46,9 @@ const tabLabels = {
 const tabOrder = [
   'profile',
   'brand',
+  'orders',
+  'wishlist',
+  'notifications',
   'password',
   'address',
   'email',

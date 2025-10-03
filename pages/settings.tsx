@@ -12,6 +12,9 @@ import PaymentMethodsSection from '@components/Settings/PaymentMethodsSection';
 import SettingsSidebar from '@components/Settings/SettingsSidebar';
 import CouponsSection from '@components/Settings/CouponsSection';
 import BrandSettingsSection from '@components/Settings/BrandSettingsSection';
+import OrderHistorySection from '@components/Settings/OrderHistorySection';
+import WishlistSection from '@components/Settings/WishlistSection';
+import NotificationsSection from '@components/Settings/NotificationsSection';
 import { AppContext } from '@contexts/AppContext';
 import type { User } from '@/types';
 
@@ -20,7 +23,7 @@ const SettingsPage: React.FC = () => {
   const { user: contextUser } = useContext(AppContext) as { user: User | null };
   const router = useRouter();
   const [active, setActive] = useState<
-    'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons' | 'brand'
+    'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons' | 'brand' | 'orders' | 'wishlist' | 'notifications'
   >('profile');
 
   useEffect(() => {
@@ -32,7 +35,10 @@ const SettingsPage: React.FC = () => {
       tab === 'email' ||
       tab === 'payments' ||
       tab === 'coupons' ||
-      tab === 'brand'
+      tab === 'brand' ||
+      tab === 'orders' ||
+      tab === 'wishlist' ||
+      tab === 'notifications'
     ) {
       setActive(tab);
     }
@@ -63,6 +69,9 @@ const SettingsPage: React.FC = () => {
             <div className="flex-1 w-full">
               {active === 'profile' && <UpdateProfileSection />}
               {active === 'brand' && <BrandSettingsSection />}
+              {active === 'orders' && <OrderHistorySection />}
+              {active === 'wishlist' && <WishlistSection />}
+              {active === 'notifications' && <NotificationsSection />}
               {active === 'password' && <ChangePasswordSection />}
               {active === 'address' && <ManageAddressSection />}
               {active === 'email' && <ChangeEmailSection />}
