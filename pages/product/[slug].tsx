@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { AppContext } from '@contexts/AppContext';
 import ProductImageSlider from '@components/Product/ProductImageSlider';
+import { parseProductImages } from '@utils/productImageUtils';
 import RecommendedProducts from '@components/Product/RecommendedProducts';
 import HeartIcon from '@components/icons/HeartIcon';
 import {
@@ -143,18 +144,27 @@ export default function ProductDetail({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-start">
           {/* Product Images */}
           <div className="bg-base-100 rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center">
-            <ProductImageSlider
-              className="w-full aspect-[4/3] max-w-lg"
-              images={
-                product.images && product.images.length > 0
-                  ? product.images
-                  : product.featuredImage
-                  ? [product.featuredImage]
-                  : []
-              }
-              imgClass="object-cover rounded-xl border border-base-300 bg-white dark:bg-gray-900"
-              aspectRatioClass="aspect-[4/3]"
-            />
+            {(() => {
+              // Normalize any incoming image data (could be malformed objects without url)
+              const rawImages = (product.images && product.images.length > 0)
+                ? product.images
+                : product.featuredImage
+                ? [product.featuredImage]
+                : [];
+              const normalized = parseProductImages(
+                rawImages,
+                product.id,
+                product.productType || product.category?.name
+              );
+              return (
+                <ProductImageSlider
+                  className="w-full aspect-[4/3] max-w-lg"
+                  images={normalized}
+                  imgClass="object-cover rounded-xl border border-base-300 bg-white dark:bg-gray-900"
+                  aspectRatioClass="aspect-[4/3]"
+                />
+              );
+            })()}
           </div>
 
           {/* Product Information */}
@@ -174,13 +184,23 @@ export default function ProductDetail({
 
             {/* Product Header */}
             <ProductHeader
-              product={product}
+              product={{
+                title: product.title || 'Untitled',
+                vendor: product.vendor ? { brandName: (product.vendor as any).brandName } : undefined,
+                sku: (product as any).sku || (product as any).id?.toString?.() || ''
+              }}
               averageRating={averageRating}
               reviewCount={reviewCount}
             />
 
             {/* Price and Stock */}
-            <ProductPriceStock product={product} />
+            <ProductPriceStock
+              product={{
+                currency: (product as any).currency || '$',
+                minPrice: (product as any).minPrice ?? (product as any).price ?? 0,
+                totalInventory: (product as any).totalInventory
+              }}
+            />
 
             {/* Variants */}
             <ProductVariants
@@ -191,13 +211,20 @@ export default function ProductDetail({
 
             {/* Cart Actions */}
             <ProductCartActions
-              product={product}
-              selectedVariant={selectedVariant}
+              product={product as any}
+              selectedVariant={selectedVariant as any}
               quantity={quantity}
               onQuantityChange={setQuantity}
-              onAddToCart={addToCart}
-              onRemoveFromCart={removeFromCart}
-              onChangeQty={changeQty}
+              onAddToCart={(p, variant) => {
+                // context addToCart expects (product, qty?, variantId?)
+                addToCart(p as any, quantity, variant ? String(variant.id) : undefined);
+              }}
+              onRemoveFromCart={(productId, variantId) => {
+                removeFromCart(productId, variantId ? Number(variantId) : undefined);
+              }}
+              onChangeQty={(productId, change, variantId) => {
+                changeQty(productId, change, variantId ? Number(variantId) : undefined);
+              }}
               isInCart={isProductInCart}
               cartItemQuantity={cartItemQuantity}
               stockStatus={stockStatus}
@@ -227,7 +254,7 @@ export default function ProductDetail({
           reviews={reviews}
           averageRating={averageRating}
           reviewCount={reviewCount}
-          user={user}
+          user={user || undefined}
           onReviewsUpdate={(newReviews, newAverage, newCount) => {
             setReviews(newReviews);
             setAverageRating(newAverage);
