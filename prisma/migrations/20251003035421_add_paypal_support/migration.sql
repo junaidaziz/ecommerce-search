@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "PaymentMethod" ALTER COLUMN "cardLast4" DROP NOT NULL,
+ALTER COLUMN "cardBrand" DROP NOT NULL,
+ALTER COLUMN "expMonth" DROP NOT NULL,
+ALTER COLUMN "expYear" DROP NOT NULL,
+ADD COLUMN "paypalEmail" TEXT;
