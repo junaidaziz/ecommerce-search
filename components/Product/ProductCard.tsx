@@ -104,11 +104,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
             size="md"
             fullWidth
             rounded
-            className="py-2.5 px-4 flex items-center justify-center gap-2 font-semibold tracking-wide shadow-sm hover:shadow-md bg-primary text-white hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 disabled:cursor-not-allowed"
+            shadow
+            className="relative py-2.5 px-4 flex items-center justify-center gap-2 font-semibold tracking-wide animate-[cartEnter_.6s_ease] disabled:opacity-60 disabled:cursor-not-allowed group/cart overflow-hidden bg-gradient-to-r from-teal-600 via-teal-500 to-indigo-500 hover:from-teal-500 hover:to-indigo-500 focus-visible:ring-teal-500"
             onClick={handleAddToCart}
           >
-            <CartIcon className="w-4 h-4 flex-shrink-0" />
-            <span className="whitespace-nowrap">Add to Cart</span>
+            <span className="absolute inset-0 opacity-0 group-hover/cart:opacity-60 transition-opacity duration-300 pointer-events-none bg-[radial-gradient(circle_at_75%_25%,rgba(255,255,255,0.35),transparent_60%)]" />
+            <CartIcon className="w-4 h-4 flex-shrink-0 transition-transform duration-500 group-hover/cart:scale-110 group-active/cart:scale-90 cart-bounce" />
+            <span className="whitespace-nowrap relative z-10 group-hover/cart:translate-y-[-1px] transition-transform">Add to Cart</span>
           </Button>
         </div>
       </div>

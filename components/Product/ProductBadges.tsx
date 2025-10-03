@@ -24,15 +24,24 @@ const ProductBadges: React.FC<ProductBadgesProps> = ({ isNew, rating = 0, stockS
         )}
       </div>
       <div
-        className={`text-xs font-semibold px-2.5 py-1 rounded-full border shadow-sm ${
-          stockStatus === 'In Stock'
-            ? 'bg-emerald-500/10 dark:bg-emerald-400/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/20 dark:border-emerald-400/30'
+        className={`relative text-xs font-semibold px-2.5 py-1 rounded-full border shadow-sm overflow-hidden
+          ${stockStatus === 'In Stock'
+            ? 'bg-emerald-500/10 dark:bg-emerald-400/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/20 dark:border-emerald-400/30 in-stock-badge'
             : stockStatus === 'Low Stock'
-              ? 'bg-amber-500/10 dark:bg-amber-400/20 text-amber-700 dark:text-amber-300 border-amber-500/20 dark:border-amber-400/30'
-              : 'bg-rose-500/10 dark:bg-rose-400/20 text-rose-700 dark:text-rose-300 border-rose-500/20 dark:border-rose-400/30'
-        }`}
+              ? 'bg-amber-500/10 dark:bg-amber-400/20 text-amber-700 dark:text-amber-300 border-amber-500/20 dark:border-amber-400/30 low-stock-badge'
+              : 'bg-rose-500/10 dark:bg-rose-400/20 text-rose-700 dark:text-rose-300 border-rose-500/20 dark:border-rose-400/30 out-stock-badge'
+          }`}
       >
-        {stockStatus}
+        <span className="relative z-10">{stockStatus}</span>
+        {stockStatus === 'In Stock' && (
+          <span className="absolute inset-0 animate-[stockGlow_3s_ease-in-out_infinite] bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.25),transparent_70%)]" />
+        )}
+        {stockStatus === 'Low Stock' && (
+          <span className="absolute inset-0 animate-[stockPulse_1.6s_ease-in-out_infinite] bg-[radial-gradient(circle_at_30%_30%,rgba(245,158,11,0.22),transparent_70%)]" />
+        )}
+        {stockStatus === 'Out of Stock' && (
+          <span className="absolute inset-0 animate-[stockPulse_1.2s_ease-in-out_infinite] bg-[radial-gradient(circle_at_30%_30%,rgba(244,63,94,0.25),transparent_75%)]" />
+        )}
       </div>
     </div>
   );

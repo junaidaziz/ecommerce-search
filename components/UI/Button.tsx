@@ -10,7 +10,8 @@ type ButtonVariant =
   | 'info'
   | 'outline'
   | 'ghost'
-  | 'gradient';
+  | 'gradient'
+  | 'accent';
 
 type ButtonSize = 'sm' | 'md' | 'lg';
 
@@ -45,6 +46,8 @@ const variantStyles: Record<ButtonVariant, string> = {
     'bg-transparent text-primary hover:bg-primary-light/10 dark:text-primary-light dark:hover:bg-primary-dark/20 focus:ring-primary',
   gradient:
     'bg-gradient-to-r from-primary via-secondary to-info text-white hover:from-primary-light hover:to-info-light focus:ring-primary',
+  accent:
+    'relative overflow-hidden bg-gradient-to-r from-fuchsia-600 via-pink-500 to-rose-500 text-white shadow-sm hover:brightness-110 hover:shadow-md focus:ring-fuchsia-500 focus-visible:ring-fuchsia-500 after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.35),transparent_60%)] after:opacity-40 after:transition-opacity hover:after:opacity-60'
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

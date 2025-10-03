@@ -95,12 +95,13 @@ const ProductCartActions: React.FC<ProductCartActionsProps> = ({
             </div>
           </div>
           <button
-            className="btn btn-primary btn-lg w-full transition-all duration-200 hover:scale-105"
+            className="relative group/cart btn btn-lg w-full overflow-hidden bg-gradient-to-r from-teal-600 via-teal-500 to-indigo-500 text-white font-semibold tracking-wide shadow-md hover:shadow-lg hover:brightness-110 transition-all duration-300 hover:scale-[1.02] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 disabled:opacity-60 disabled:cursor-not-allowed"
             onClick={() => onAddToCart(product, selectedVariant)}
             disabled={(product.variants && product.variants.length > 0 && !selectedVariant) || stockStatus === 'Out of Stock'}
           >
-            <CartIcon className="w-5 h-5 mr-2" />
-            Add to Cart
+            <span className="absolute inset-0 opacity-25 group-hover/cart:opacity-45 transition-opacity bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.4),transparent_60%)]" />
+            <CartIcon className="w-5 h-5 mr-2 relative z-10 transition-transform duration-500 group-hover/cart:scale-110 group-active/cart:scale-90 cart-bounce" />
+            <span className="relative z-10">Add to Cart</span>
           </button>
         </div>
       )}
