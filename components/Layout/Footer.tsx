@@ -2,23 +2,27 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { FC } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useContext } from 'react';
 import { NotificationContext } from '@contexts/NotificationContext';
 import VisaIcon from '../icons/VisaIcon';
 import MastercardIcon from '../icons/MastercardIcon';
 import PaypalIcon from '../icons/PaypalIcon';
+import { newsletterSchema, type NewsletterFormData } from '@/lib/validation';
 
 const Footer: FC = () => {
-  type NewsletterForm = { email: string };
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<NewsletterForm>();
+  } = useForm<NewsletterFormData>({
+    resolver: zodResolver(newsletterSchema),
+    mode: 'onBlur',
+  });
   const { addNotification } = useContext(NotificationContext);
 
-  const submit: SubmitHandler<NewsletterForm> = (data) => {
+  const submit: SubmitHandler<NewsletterFormData> = (data) => {
     // TODO: send to newsletter API
     console.log(data);
     addNotification('Thanks for subscribing!', 'success');
@@ -209,13 +213,7 @@ const Footer: FC = () => {
                   type="email"
                   placeholder="Enter your email"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                  {...register('email', { 
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Invalid email address'
-                    }
-                  })}
+                  {...register('email')}
                 />
                 {errors.email && (
                   <p className="text-red-600 text-xs mt-1">

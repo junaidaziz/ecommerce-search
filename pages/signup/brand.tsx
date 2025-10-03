@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { AppContext } from '@contexts/AppContext';
@@ -19,9 +20,8 @@ import {
   AUTH_LINKS,
   AUTH_INFO,
   PASSWORD_REGEX,
-  getEmailValidation,
-  getBrandNameValidation,
 } from '@/config/auth.config';
+import { brandSignupSchema, type BrandSignupFormData } from '@/lib/validation';
 
 export default function BrandSignup() {
   const router = useRouter();
@@ -34,12 +34,10 @@ export default function BrandSignup() {
     setError,
     clearErrors,
     formState: { errors },
-  } = useForm<{
-    brandName: string;
-    email: string;
-    password: string;
-    confirm: string;
-  }>({ mode: 'onBlur' });
+  } = useForm<BrandSignupFormData>({
+    resolver: zodResolver(brandSignupSchema),
+    mode: 'onBlur',
+  });
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -81,10 +79,7 @@ export default function BrandSignup() {
         type: 'manual',
         message: AUTH_ERRORS.passwordsNoMatch,
       });
-      return AUTH_ERRORS.passwordsNoMatch;
     }
-    clearErrors('confirm');
-    return true;
   };
 
   const submit = async (values: any) => {
@@ -135,7 +130,6 @@ export default function BrandSignup() {
             placeholder={AUTH_PLACEHOLDERS.brandName}
             register={register}
             onBlur={handleBrandNameBlur}
-            rules={getBrandNameValidation()}
             error={errors.brandName?.message as string}
           />
           
@@ -145,7 +139,6 @@ export default function BrandSignup() {
             placeholder={AUTH_PLACEHOLDERS.email}
             register={register}
             onBlur={handleEmailBlur}
-            rules={getEmailValidation()}
             error={errors.email?.message as string}
           />
           
@@ -154,15 +147,8 @@ export default function BrandSignup() {
               name="password"
               placeholder={AUTH_PLACEHOLDERS.password}
               register={register}
-              rules={{
-                required: AUTH_ERRORS.passwordRequired,
-                pattern: {
-                  value: PASSWORD_REGEX,
-                  message: AUTH_ERRORS.passwordInvalid,
-                },
-                onBlur: handlePasswordBlur,
-              }}
               onFocus={handlePasswordFocus}
+              onBlur={handlePasswordBlur}
               error={errors.password?.message as string}
               className={`w-full text-base px-4 py-3 rounded-lg border ${errors.password ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
             />
@@ -170,7 +156,7 @@ export default function BrandSignup() {
               name="confirm"
               placeholder={AUTH_PLACEHOLDERS.confirmPassword}
               register={register}
-              rules={{ validate: handleConfirmBlur }}
+              onBlur={handleConfirmBlur}
               error={errors.confirm?.message as string}
               className={`w-full text-base px-4 py-3 rounded-lg border ${errors.confirm ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
             />

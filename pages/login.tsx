@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AppContext } from '@contexts/AppContext';
 import type { AppContextValue } from '../types';
 import { useRouter } from 'next/router';
@@ -15,9 +16,8 @@ import {
   AUTH_TITLES, 
   AUTH_BUTTONS, 
   AUTH_LINKS,
-  getEmailValidation,
-  getPasswordValidation,
 } from '@/config/auth.config';
+import { loginSchema, type LoginFormData } from '@/lib/validation';
 
 export interface LoginFormInputs {
   email: string;
@@ -40,7 +40,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormInputs>();
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: 'onBlur',
+  });
 
   useEffect(() => {
     if (user) {
@@ -57,7 +60,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     }
   }, [user, router, onLoginSuccess]);
 
-  const onSubmit: SubmitHandler<LoginFormInputs> = async ({
+  const onSubmit: SubmitHandler<LoginFormData> = async ({
     email,
     password,
   }) => {
@@ -102,9 +105,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               name="email"
               placeholder={AUTH_PLACEHOLDERS.email}
               register={register}
-              rules={getEmailValidation()}
               error={errors.email?.message as string}
-              required
             />
 
             <AuthInput
@@ -112,9 +113,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               name="password"
               placeholder={AUTH_PLACEHOLDERS.password}
               register={register}
-              rules={getPasswordValidation()}
               error={errors.password?.message as string}
-              required
             />
 
             <div className="flex justify-end mt-1">
