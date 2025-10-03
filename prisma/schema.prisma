@@ -55,21 +55,23 @@ model User {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  products         Product[]
-  orders           Order[]
-  deletionRequests DeletionRequest[] @relation("brandDeletionRequests")
-  searchLogs       SearchLog[]
-  couponUsages     CouponUsage[]
-  paymentMethods   PaymentMethod[]
-  notifications    Notification[]
-  sentMessages     Message[]         @relation("sentMessages")
-  receivedMessages Message[]         @relation("receivedMessages")
-  updatedPolicies  PolicyDocument[]  @relation("userToPolicyDocuments")
-  supportTickets   SupportTicket[]
-  chatSessions     ChatSession[]
-  wishlistItems    WishlistItem[]
-  coupon           Coupon[]
-  reviews          Review[]          @relation("UserReviews")
+  products                Product[]
+  orders                  Order[]
+  deletionRequests        DeletionRequest[]       @relation("brandDeletionRequests")
+  searchLogs              SearchLog[]
+  couponUsages            CouponUsage[]
+  paymentMethods          PaymentMethod[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreference?
+  sentMessages            Message[]               @relation("sentMessages")
+  receivedMessages        Message[]               @relation("receivedMessages")
+  updatedPolicies         PolicyDocument[]        @relation("userToPolicyDocuments")
+  supportTickets          SupportTicket[]
+  chatSessions            ChatSession[]
+  wishlistItems           WishlistItem[]
+  coupon                  Coupon[]
+  reviews                 Review[]                @relation("UserReviews")
+  loginSessions           LoginSession[]          @relation("UserLoginSessions")
 
   @@index([phoneNumber])
 }
@@ -216,17 +218,18 @@ model CouponUsage {
 }
 
 model PaymentMethod {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  provider  String
-  cardLast4 String
-  cardBrand String
-  expMonth  Int
-  expYear   Int
-  token     String
-  isDefault Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  provider     String
+  cardLast4    String?
+  cardBrand    String?
+  expMonth     Int?
+  expYear      Int?
+  paypalEmail  String?
+  token        String
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   user     User      @relation(fields: [userId], references: [id])
   payments Payment[]
@@ -246,16 +249,38 @@ model Payment {
   paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
 }
 
-model Notification {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  orderId   Int
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
+enum NotificationType {
+  ORDER_UPDATE
+  PROMOTION
+  DISCOUNT
+  GENERAL
+}
 
-  user  User  @relation(fields: [userId], references: [id])
-  order Order @relation(fields: [orderId], references: [id])
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  orderId   Int?
+  message   String
+  type      NotificationType @default(GENERAL)
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user  User   @relation(fields: [userId], references: [id])
+  order Order? @relation(fields: [orderId], references: [id])
+}
+
+model NotificationPreference {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @unique
+  orderUpdates     Boolean  @default(true)
+  promotions       Boolean  @default(true)
+  discounts        Boolean  @default(true)
+  generalUpdates   Boolean  @default(true)
+  emailNotifications Boolean @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Message {
@@ -356,4 +381,23 @@ model Review {
   user User @relation("UserReviews", fields: [userId], references: [id])
 
   @@index([entityType, entityId])
+}
+
+model LoginSession {
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(uuid())
+  userId       Int
+  sessionToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  deviceInfo   String?
+  lastActivity DateTime @default(now())
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+
+  user User @relation("UserLoginSessions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([expiresAt])
 }

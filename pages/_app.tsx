@@ -4,6 +4,7 @@ import { NotificationProvider } from '@contexts/NotificationContext';
 import { ChatProvider } from '@contexts/ChatContext';
 import { AppProvider } from '@contexts/AppContext';
 import Layout from '@components/Layout/Layout';
+import { SessionTracker } from '@components/SessionTracker';
 import { Toaster } from 'sonner';
 import 'react-quill/dist/quill.snow.css';
 import '../styles/globals.css';
@@ -33,8 +34,10 @@ export default function App({
         <AppProvider>
           <ChatProvider>
             <ThemeProvider>
-              <Toaster position="top-right" richColors />
-              {getLayout(<Component {...pageProps} />)}
+              <SessionTracker>
+                <Toaster position="top-right" richColors />
+                {getLayout(<Component {...pageProps} />)}
+              </SessionTracker>
             </ThemeProvider>
           </ChatProvider>
         </AppProvider>

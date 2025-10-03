@@ -1,14 +1,34 @@
 import { fetchUserOrders, reorderOrder } from '@lib/api/user';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useMemo } from 'react';
 import { AppContext } from '@contexts/AppContext';
 import type { Order } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import TableHeader from '@components/common/TableHeader';
+import TableBody from '@components/common/TableBody';
+import { SelectOption } from '@components/form-fields/SelectDropdown';
+
 const UserOrders: React.FC = () => {
   const { user } = useContext(AppContext)!;
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<SelectOption>({
+    label: 'All Orders',
+    value: 'all',
+  });
+
+  const statusOptions: SelectOption[] = [
+    { label: 'All Orders', value: 'all' },
+    { label: 'Pending', value: 'pending' },
+    { label: 'Confirmed', value: 'confirmed' },
+    { label: 'Processing', value: 'processing' },
+    { label: 'Shipped', value: 'shipped' },
+    { label: 'Delivered', value: 'delivered' },
+    { label: 'Completed', value: 'completed' },
+    { label: 'Cancelled', value: 'cancelled' },
+  ];
 
   useEffect(() => {
     if (!user) return;
@@ -21,6 +41,78 @@ const UserOrders: React.FC = () => {
       .catch(() => setError('Failed to load orders'))
       .finally(() => setLoading(false));
   }, [user]);
+
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order) => {
+      const matchesSearch =
+        searchTerm === '' ||
+        order.id.toString().includes(searchTerm) ||
+        order.product?.title?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter.value === 'all' || order.status === statusFilter.value;
+      return matchesSearch && matchesStatus;
+    });
+  }, [orders, searchTerm, statusFilter]);
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      pending: { color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: '⏳' },
+      confirmed: { color: 'bg-blue-100 text-blue-800 border-blue-200', icon: '✓' },
+      processing: { color: 'bg-orange-100 text-orange-800 border-orange-200', icon: '⚙️' },
+      shipped: { color: 'bg-purple-100 text-purple-800 border-purple-200', icon: '🚚' },
+      delivered: { color: 'bg-green-100 text-green-800 border-green-200', icon: '📦' },
+      completed: { color: 'bg-green-100 text-green-800 border-green-200', icon: '✅' },
+      cancelled: { color: 'bg-red-100 text-red-800 border-red-200', icon: '❌' },
+      returned: { color: 'bg-gray-100 text-gray-800 border-gray-200', icon: '↩️' },
+    };
+
+    const config =
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+
+    return (
+      <span
+        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${config.color}`}
+      >
+        <span className="mr-1">{config.icon}</span>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
+    );
+  };
+
+  const getOrderTracking = (order: Order) => {
+    const statusSteps = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
+    const currentIndex = statusSteps.indexOf(order.status);
+    
+    if (currentIndex === -1 || ['cancelled', 'returned'].includes(order.status)) {
+      return null;
+    }
+
+    return (
+      <div className="flex items-center gap-1 mt-1">
+        {statusSteps.slice(0, 5).map((step, idx) => (
+          <div key={step} className="flex items-center">
+            <div
+              className={`w-2 h-2 rounded-full ${
+                idx <= currentIndex
+                  ? 'bg-green-500'
+                  : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+              title={step}
+            />
+            {idx < 4 && (
+              <div
+                className={`w-4 h-0.5 ${
+                  idx < currentIndex
+                    ? 'bg-green-500'
+                    : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   if (!user) {
     return <div className="p-4 text-gray-700 dark:text-gray-300">Please log in to view orders.</div>;

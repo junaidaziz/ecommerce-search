@@ -18,7 +18,7 @@ export interface AppContextValue {
   removeFromCart: (id: string, variantId?: number) => void;
   clearCart: () => void;
   addToWishlist: (product: Product, notifyOnStock?: boolean) => void;
-  removeFromWishlist: (productId: number) => void;
+  removeFromWishlist: (productId: string | number) => void;
   placeOrder: (shipping: ShippingInfo) => Promise<boolean>;
   isInCart: (productId: string | number, variantId?: number) => boolean;
   getCartItemQuantity: (productId: string | number, variantId?: number) => number;

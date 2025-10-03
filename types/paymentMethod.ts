@@ -14,8 +14,14 @@ export type PaymentMethodWithRelations = PaymentMethod & {
 // Payment method input for creating payment methods (matches Prisma fields)
 export type PaymentMethodInput = Pick<
   PrismaPaymentMethod,
-  'userId' | 'provider' | 'cardLast4' | 'cardBrand' | 'expMonth' | 'expYear' | 'token' | 'isDefault'
->;
+  'userId' | 'provider' | 'token' | 'isDefault'
+> & {
+  cardLast4?: string;
+  cardBrand?: string;
+  expMonth?: number;
+  expYear?: number;
+  paypalEmail?: string;
+};
 
 // Payment method update type
 export type PaymentMethodUpdate = Partial<Omit<PaymentMethodInput, 'userId'>>;
@@ -26,5 +32,11 @@ export type PaymentMethodResponse = PaymentMethodWithRelations;
 // Payment method summary for lists
 export type PaymentMethodSummary = Pick<
   PrismaPaymentMethod,
-  'id' | 'provider' | 'cardLast4' | 'cardBrand' | 'expMonth' | 'expYear' | 'isDefault'
->;
+  'id' | 'provider' | 'isDefault'
+> & {
+  cardLast4?: string;
+  cardBrand?: string;
+  expMonth?: number;
+  expYear?: number;
+  paypalEmail?: string;
+};

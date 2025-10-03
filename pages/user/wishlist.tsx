@@ -1,18 +1,18 @@
 import React, { useContext } from 'react';
-import Link from 'next/link';
 import { AppContext } from '@contexts/AppContext';
 import type { AppContextValue, WishlistItem } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import ProductCard from '@components/Product/ProductCard';
+import Link from 'next/link';
 
 const UserWishlist: React.FC = () => {
   const context = useContext<AppContextValue | undefined>(AppContext);
-
   if (!context || !context.user) {
     return <div className="p-4 text-gray-700 dark:text-gray-300">Please log in to view wishlist.</div>;
   }
 
-  const { wishlist, addToCart, removeFromWishlist, addToWishlist } = context;
+  const { wishlist, addToWishlist, removeFromWishlist, addToCart } = context;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
