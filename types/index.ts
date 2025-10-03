@@ -38,7 +38,8 @@ export type {
 
 // Explicitly re-export only one version of each conflicting type
 export type { Category, CategoryInput, CategoryUpdate, CategorySummary } from './category';
-export type { Notification } from './notification';
+export type { Notification, NotificationPreference } from './notification';
+export { NotificationType } from './notification';
 export type { PaymentMethod } from './paymentMethod';
 export type { 
   AnalyticsData, 

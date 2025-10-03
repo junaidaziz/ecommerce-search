@@ -115,7 +115,7 @@ const UserOrders: React.FC = () => {
   };
 
   if (!user) {
-    return <div className="p-4">Please log in to view orders.</div>;
+    return <div className="p-4 text-gray-700 dark:text-gray-300">Please log in to view orders.</div>;
   }
 
   return (

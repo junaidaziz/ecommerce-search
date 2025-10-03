@@ -7,9 +7,8 @@ import ProductCard from '@components/Product/ProductCard';
 
 const UserWishlist: React.FC = () => {
   const context = useContext<AppContextValue | undefined>(AppContext);
-
   if (!context || !context.user) {
-    return <div className="p-4">Please log in to view wishlist.</div>;
+    return <div className="p-4 text-gray-700 dark:text-gray-300">Please log in to view wishlist.</div>;
   }
 
   const { wishlist, addToWishlist, removeFromWishlist } = context;

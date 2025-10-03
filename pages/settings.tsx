@@ -12,6 +12,7 @@ import PaymentMethodsSection from '@components/Settings/PaymentMethodsSection';
 import SettingsSidebar from '@components/Settings/SettingsSidebar';
 import CouponsSection from '@components/Settings/CouponsSection';
 import BrandSettingsSection from '@components/Settings/BrandSettingsSection';
+import NotificationPreferencesSection from '@components/Settings/NotificationPreferencesSection';
 import AccountSecuritySection from '@components/Settings/AccountSecuritySection';
 import { AppContext } from '@contexts/AppContext';
 import type { User } from '@/types';
@@ -21,7 +22,7 @@ const SettingsPage: React.FC = () => {
   const { user: contextUser } = useContext(AppContext) as { user: User | null };
   const router = useRouter();
   const [active, setActive] = useState<
-    'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons' | 'brand' | 'security'
+    'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons' | 'brand' | 'notifications' | 'security'
   >('profile');
 
   useEffect(() => {
@@ -34,6 +35,7 @@ const SettingsPage: React.FC = () => {
       tab === 'payments' ||
       tab === 'coupons' ||
       tab === 'brand' ||
+      tab === 'notifications' ||
       tab === 'security'
     ) {
       setActive(tab);
@@ -71,6 +73,7 @@ const SettingsPage: React.FC = () => {
               {active === 'email' && <ChangeEmailSection />}
               {active === 'payments' && <PaymentMethodsSection />}
               {active === 'coupons' && <CouponsSection />}
+              {active === 'notifications' && <NotificationPreferencesSection />}
             </div>
           </div>
         </div>
