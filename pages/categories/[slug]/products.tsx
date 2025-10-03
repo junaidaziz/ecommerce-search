@@ -90,10 +90,10 @@ export default function CategoryProductsPage({
       <h1 className="text-2xl font-bold mb-4">
         {category.name} ({filtered.length})
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
-        <aside className="rounded-2xl border border-base-200/70 dark:border-gray-700/70 bg-white/70 dark:bg-gray-800/80 backdrop-blur-sm p-5 space-y-6 shadow-lg transition-colors">
+      <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
+        <aside className="rounded-2xl border border-gray-200/80 dark:border-gray-700/60 bg-white dark:bg-gray-800/95 backdrop-blur-sm p-6 space-y-6 shadow-lg dark:shadow-xl transition-colors h-fit">
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-base-content/70 mb-3">Price</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-4">Price</h3>
             <div className="flex gap-3">
               <input
                 type="number"
@@ -103,7 +103,7 @@ export default function CategoryProductsPage({
                   updateQuery('min', e.target.value);
                 }}
                 placeholder="Min"
-                className="input input-bordered w-full focus:input-primary"
+                className="input input-bordered w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
               <input
                 type="number"
@@ -113,18 +113,18 @@ export default function CategoryProductsPage({
                   updateQuery('max', e.target.value);
                 }}
                 placeholder="Max"
-                className="input input-bordered w-full focus:input-primary"
+                className="input input-bordered w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-primary dark:focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
             </div>
           </div>
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-base-content/70 mb-3">Brand</h3>
-            <div className="space-y-2">
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-4">Brand</h3>
+            <div className="space-y-3">
             {['BrandA', 'BrandB', 'BrandC'].map((b) => (
-              <label key={b} className="flex items-center gap-3 text-sm">
+              <label key={b} className="flex items-center gap-3 text-sm text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded-lg transition-colors">
                 <input
                   type="checkbox"
-                  className="checkbox checkbox-sm"
+                  className="checkbox checkbox-sm checkbox-primary border-2"
                   checked={brand === b}
                   onChange={() => {
                     const v = brand === b ? '' : b;
@@ -132,19 +132,19 @@ export default function CategoryProductsPage({
                     updateQuery('brand', v);
                   }}
                 />
-                <span>{b}</span>
+                <span className="font-medium">{b}</span>
               </label>
             ))}
             </div>
           </div>
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-base-content/70 mb-3">Rating</h3>
-            <div className="space-y-2">
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-4">Rating</h3>
+            <div className="space-y-3">
             {[5, 4, 3].map((r) => (
-              <label key={r} className="flex items-center gap-3 text-sm">
+              <label key={r} className="flex items-center gap-3 text-sm text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded-lg transition-colors">
                 <input
                   type="checkbox"
-                  className="checkbox checkbox-sm"
+                  className="checkbox checkbox-sm checkbox-primary border-2"
                   checked={rating === String(r)}
                   onChange={() => {
                     const v = rating === String(r) ? '' : String(r);
@@ -152,7 +152,7 @@ export default function CategoryProductsPage({
                     updateQuery('rating', v);
                   }}
                 />
-                <span>{r}★ & up</span>
+                <span className="font-medium">{r}★ & up</span>
               </label>
             ))}
             </div>
@@ -160,11 +160,11 @@ export default function CategoryProductsPage({
         </aside>
         <section>
           {filtered.length === 0 ? (
-            <div className="text-center py-10 text-gray-500">
+            <div className="text-center py-10 text-gray-500 dark:text-gray-400">
               No products found.
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
               {filtered.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

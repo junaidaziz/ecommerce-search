@@ -20,7 +20,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
 
   return (
     <div
-      className={`min-h-[400px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5 lg:gap-6 py-6 justify-items-center ${className}`}
+      className={`min-h-[400px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 lg:gap-6 py-4 ${className}`}
     >
       {products.length === 0
         ? Array.from({ length: 8 }).map((_, i) => (
@@ -32,7 +32,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
             <ProductCard
               key={p.id}
               product={p}
-              className="w-full h-full transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl"
+              className="w-full"
               inWishlist={wishlist.some((w) => w.product.id === p.id)}
               addToWish={addToWish}
               removeFromWish={

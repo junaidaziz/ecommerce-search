@@ -15,16 +15,16 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({ filters, clearAll }) => {
       {filters.map((f, i) => (
         <span
           key={i}
-          className="inline-flex items-center px-3 py-1 bg-zinc-200 dark:bg-zinc-700 rounded-full text-sm text-zinc-800 dark:text-zinc-100"
+          className="inline-flex items-center px-3 py-1.5 bg-primary/10 dark:bg-primary/20 border border-primary/20 dark:border-primary/30 rounded-full text-sm font-medium text-gray-900 dark:text-gray-100"
         >
           <span>{f.label}</span>
           <button
             type="button"
             onClick={() => f.clear()}
-            className="ml-2 p-1 rounded-full hover:bg-red-600 hover:text-white transition-colors"
+            className="ml-2 p-0.5 rounded-full hover:bg-rose-500 hover:text-white transition-colors"
             aria-label={`Remove ${f.label} filter`}
           >
-            <XMarkIcon className="w-3 h-3" />
+            <XMarkIcon className="w-3.5 h-3.5" />
           </button>
         </span>
       ))}
@@ -32,9 +32,9 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({ filters, clearAll }) => {
         <button
           type="button"
           onClick={clearAll}
-          className="ml-2 inline-flex items-center gap-1 px-3 py-1 text-sm text-blue-600 dark:text-blue-400 rounded-full hover:bg-blue-50 dark:hover:bg-zinc-600 transition-colors"
+          className="ml-2 inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary dark:text-primary-light rounded-full hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors border border-primary/20 dark:border-primary/30"
         >
-          <XMarkIcon className="w-3 h-3" />
+          <XMarkIcon className="w-3.5 h-3.5" />
           Clear All
         </button>
       )}

@@ -7,46 +7,28 @@ interface WishlistButtonProps {
 }
 
 const WishlistButton: React.FC<WishlistButtonProps> = ({ inWishlist, onToggle }) => {
-  /*
-    Visual revamp goals:
-    - Distinct default (subtle) vs active (vibrant gradient) states
-    - Smooth scale & subtle ring on hover/focus for accessibility
-    - aria-pressed to convey toggle state to assistive tech
-    - Better dark mode contrast (avoid low contrast gray on gray)
-    - Reduced border noise in default state; elevated glassy feel
-  */
   return (
     <button
       type="button"
       onClick={onToggle}
       aria-pressed={inWishlist}
       aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-      className={`absolute top-4 right-4 z-20 w-11 h-11 flex items-center justify-center rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/70 shadow-md backdrop-blur-sm
+      className={`absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 shadow-md backdrop-blur-sm
         ${inWishlist
-          ? 'bg-gradient-to-br from-primary/90 via-primary to-primary/90 text-white ring-1 ring-primary/40 hover:shadow-primary/30'
-          : 'bg-base-200/70 dark:bg-base-200/40 border border-base-300/60 dark:border-base-300/40 text-base-content/60 hover:text-base-content/80 hover:bg-base-200/90 dark:hover:bg-base-200/60'
+          ? 'bg-rose-500/90 dark:bg-rose-500/80 text-white ring-1 ring-rose-400/40 hover:bg-rose-600 dark:hover:bg-rose-600 hover:shadow-lg hover:shadow-rose-500/30 focus-visible:ring-rose-500'
+          : 'bg-white/80 dark:bg-gray-800/80 border border-gray-300/60 dark:border-gray-600/60 text-gray-600 dark:text-gray-300 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-white dark:hover:bg-gray-800 hover:border-rose-300 dark:hover:border-rose-500/50 focus-visible:ring-primary'
         }
-        hover:scale-105 active:scale-95`}
+        hover:scale-110 active:scale-95`}
     >
       <HeartIcon
-        className={`w-5 h-5 drop-shadow-sm transition-colors duration-300 ${
+        className={`w-5 h-5 transition-all duration-300 ${
           inWishlist
-            ? 'text-white fill-white'
-            : 'text-base-content/60 fill-base-content/40'
+            ? 'text-white fill-white drop-shadow-sm'
+            : 'text-gray-600 dark:text-gray-300 fill-none stroke-current stroke-2'
         }`}
       />
-      {/* Decorative pulse for active state */}
-      {inWishlist && (
-        <span
-          className="absolute inset-0 rounded-full animate-ping-slower bg-primary/30 pointer-events-none"
-          aria-hidden="true"
-        />
-      )}
     </button>
   );
 };
-
-// Custom slower ping animation via Tailwind arbitrary keyframes (fallback if not in config)
-// If project tailwind config doesn't define 'ping-slower', the class below can be added globally.
 
 export default WishlistButton;
