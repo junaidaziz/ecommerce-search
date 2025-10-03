@@ -3,6 +3,7 @@ import { getVendors, getVendorsCount, setBrandActive, setBrandVerified, updateBr
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import type { Vendor, ApiMessage } from '@/types';
+import { USER_ROLES } from '@/types';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 async function handler(
@@ -58,4 +59,4 @@ async function handler(
   }
 }
 
-export default withRole(['SUPER_ADMIN'])(handler);
+export default withRole([USER_ROLES.SUPER_ADMIN])(handler);

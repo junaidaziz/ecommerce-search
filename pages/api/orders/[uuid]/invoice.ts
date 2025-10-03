@@ -4,6 +4,7 @@ import { generateInvoice } from '@lib/invoice';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { withRole } from '@lib/withRole';
+import { USER_ROLES } from '@/types';
 import { NOT_FOUND, UUID_REQUIRED } from '@/constants/messages';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -24,4 +25,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withRole(['USER', 'BRAND', 'SUPER_ADMIN'])(handler);
+export default withRole([USER_ROLES.USER, USER_ROLES.BRAND, USER_ROLES.SUPER_ADMIN])(handler);

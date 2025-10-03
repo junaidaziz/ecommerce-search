@@ -229,4 +229,4 @@ async function handler(
   }
 }
 
-export default withRole(['BRAND', 'SUPER_ADMIN'])(handler);
+export default withRole([USER_ROLES.BRAND, USER_ROLES.SUPER_ADMIN])(handler);

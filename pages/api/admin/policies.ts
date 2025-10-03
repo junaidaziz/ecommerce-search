@@ -2,6 +2,7 @@ import type { NextApiResponse } from 'next';
 import { withRole, AuthedNextApiRequest } from '@lib/withRole';
 import { getDb } from '@lib/db';
 import { handleApiError } from '@utils/handleApiError';
+import { USER_ROLES } from '@/types';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
 async function handler(req: AuthedNextApiRequest, res: NextApiResponse) {
@@ -57,4 +58,4 @@ async function handler(req: AuthedNextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withRole(['SUPER_ADMIN'])(handler);
+export default withRole([USER_ROLES.SUPER_ADMIN])(handler);

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { withRole } from '@lib/withRole';
 import type { ApiMessage } from '@/types';
+import { USER_ROLES } from '@/types';
 import updateUserDisabledHandler from '@lib/api/admin/users/updateUserDisabled';
 import { handleApiError } from '@utils/handleApiError';
 
@@ -16,4 +17,4 @@ async function handler(
   }
 }
 
-export default withRole(['SUPER_ADMIN'])(handler); 
+export default withRole([USER_ROLES.SUPER_ADMIN])(handler);

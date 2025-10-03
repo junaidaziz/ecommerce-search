@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { SearchAnalyticsResponse, ApiMessage } from '@/types';
+import { SearchAnalyticsResponse, ApiMessage, USER_ROLES } from '@/types';
 import { getDb } from '@lib/db';
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
@@ -52,4 +52,4 @@ async function handler(
   }
 }
 
-export default withRole(['SUPER_ADMIN'])(handler);
+export default withRole([USER_ROLES.SUPER_ADMIN])(handler);

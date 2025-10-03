@@ -3,6 +3,7 @@ import { getDb } from '@lib/db';
 import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import type { ApiMessage, LowStockProduct } from '@/types';
+import { USER_ROLES } from '@/types';
 import { DEFAULT_LOW_STOCK_THRESHOLD } from '@lib/config';
 import { METHOD_NOT_ALLOWED } from '@/constants/messages';
 
@@ -50,4 +51,4 @@ async function handler(
   }
 }
 
-export default withRole(['SUPER_ADMIN'])(handler);
+export default withRole([USER_ROLES.SUPER_ADMIN])(handler);

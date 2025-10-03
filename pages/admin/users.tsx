@@ -240,8 +240,6 @@ export default function ManageUsers() {
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
                         user.role === USER_ROLES.SUPER_ADMIN 
                           ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300'
-                          : user.role === USER_ROLES.SUPER_ADMIN
-                          ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
                           : user.role === USER_ROLES.BRAND
                           ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
                           : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200'
@@ -309,10 +307,10 @@ export default function ManageUsers() {
                   className="select select-bordered w-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-100 border-gray-300 dark:border-gray-700"
                   value={editModal.role}
                   onChange={(e) => setEditModal(prev => ({ ...prev, role: e.target.value }))}
-                  disabled={editModal.user.role === 'SUPER_ADMIN'}
+                  disabled={editModal.user.role === USER_ROLES.SUPER_ADMIN}
                 >
                   <option value="user">User</option>
-                  <option value="brand">Brand</option>
+                  <option value={USER_ROLES.BRAND.toLowerCase()}>{USER_ROLES.BRAND.charAt(0) + USER_ROLES.BRAND.slice(1).toLowerCase()}</option>
                 </select>
               </div>
               <div>

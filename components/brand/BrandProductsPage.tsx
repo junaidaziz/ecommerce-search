@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { AppContext } from '@contexts/AppContext';
 import type { User } from '@/types';
 import type { Product } from '@/types';
-import { UserRole } from '@/types';
+import { UserRole, USER_ROLES } from '@/types';
 import { getPageTitle } from '@lib/pageTitle';
 import ProductTable from './ProductTable';
 import ProductDetailsModal from './ProductDetailsModal';
@@ -129,7 +129,7 @@ const BrandProductsPage: React.FC = () => {
     );
   }
   
-  if (user.role !== 'BRAND' && user.role !== 'SUPER_ADMIN') {
+  if (user.role !== USER_ROLES.BRAND && user.role !== USER_ROLES.SUPER_ADMIN) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">

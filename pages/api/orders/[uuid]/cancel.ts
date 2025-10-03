@@ -5,13 +5,13 @@ import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { getQueryParam } from '@utils/getQueryParam';
 import { logAudit } from '@lib/audit';
-import type { ApiMessage } from '@/types';
+import type { Order, ApiMessage } from '@/types';
+import { USER_ROLES } from '@/types';
+import { orderStatusLabels } from '@lib/constants/orderStatus';
 import {
   METHOD_NOT_ALLOWED,
-  NOT_FOUND,
-  UUID_REQUIRED,
-  CANCELLED,
-  CANNOT_CANCEL_THIS_ORDER,
+  ORDER_NOT_FOUND,
+  CANNOT_CANCEL_ORDER,
 } from '@/constants/messages';
 
 type NextApiRequestWithUser = NextApiRequest & { user?: { email?: string } };
@@ -43,4 +43,4 @@ async function handler(
   }
 }
 
-export default withRole(['BRAND', 'SUPER_ADMIN'])(handler);
+export default withRole([USER_ROLES.BRAND, USER_ROLES.SUPER_ADMIN])(handler);

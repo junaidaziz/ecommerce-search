@@ -3,6 +3,7 @@ import { withRole } from '@lib/withRole';
 import { handleApiError } from '@utils/handleApiError';
 import { createCoupon, updateCoupon } from '@lib/coupons';
 import type { Coupon, ApiMessage } from '@/types';
+import { USER_ROLES } from '@/types';
 import { METHOD_NOT_ALLOWED, ID_REQUIRED } from '@/constants/messages';
 import { getDb } from '@lib/db';
 
@@ -84,4 +85,4 @@ async function handler(
   }
 }
 
-export default withRole(['BRAND', 'SUPER_ADMIN'])(handler);
+export default withRole([USER_ROLES.BRAND, USER_ROLES.SUPER_ADMIN])(handler);
