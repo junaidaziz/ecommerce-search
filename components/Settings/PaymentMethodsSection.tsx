@@ -8,10 +8,10 @@ import {
   isValidCardLength,
   isExpiryValid,
 } from '@utils/cardUtils';
-import { CreditCardIcon, TrashIcon, StarIcon } from '@heroicons/react/24/outline';
-import { FaPaypal } from 'react-icons/fa';
+import { CreditCardIcon, TrashIcon, StarIcon, BanknotesIcon } from '@heroicons/react/24/outline';
+import { FaPaypal, FaStripe } from 'react-icons/fa';
 
-type PaymentType = 'card' | 'paypal';
+type PaymentType = 'card' | 'paypal' | 'stripe' | 'bank';
 
 const PaymentMethodsSection: React.FC = () => {
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
@@ -25,8 +25,15 @@ const PaymentMethodsSection: React.FC = () => {
   const [cvcError, setCvcError] = useState('');
   const [paypalEmail, setPaypalEmail] = useState('');
   const [paypalError, setPaypalError] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [accountType, setAccountType] = useState('checking');
+  const [routingNumber, setRoutingNumber] = useState('');
+  const [bankError, setBankError] = useState('');
   const [isCardValid, setIsCardValid] = useState(false);
   const [isPayPalValid, setIsPayPalValid] = useState(false);
+  const [isStripeValid, setIsStripeValid] = useState(false);
+  const [isBankValid, setIsBankValid] = useState(false);
   const [loading, setLoading] = useState(false);
   const monthRef = useRef<HTMLInputElement>(null);
   const yearRef = useRef<HTMLInputElement>(null);
@@ -68,6 +75,33 @@ const PaymentMethodsSection: React.FC = () => {
     setIsPayPalValid(validEmail);
   }, [paypalEmail]);
 
+  useEffect(() => {
+    // Stripe validation (same as card)
+    const number = cardNumber.replace(/\s+/g, '');
+    const brand = detectCardBrand(number);
+    const validNumber = luhnCheck(number) && isValidCardLength(number, brand);
+    const expValid = isExpiryValid(expMonth, expYear);
+    const cvcLen = brand === 'amex' ? 4 : 3;
+    const cvcValid = /^\d+$/.test(cvc) && cvc.length === cvcLen;
+    setIsStripeValid(validNumber && expValid && cvcValid);
+  }, [cardNumber, expMonth, expYear, cvc, paymentType]);
+
+  useEffect(() => {
+    // Bank details validation
+    const validBankName = bankName.trim().length > 0;
+    const validAccountNumber = /^\d{6,17}$/.test(accountNumber);
+    const validRoutingNumber = /^\d{9}$/.test(routingNumber);
+    const validAccountType = ['checking', 'savings'].includes(accountType);
+    
+    const allValid = validBankName && validAccountNumber && validRoutingNumber && validAccountType;
+    setBankError(
+      allValid || (!bankName && !accountNumber && !routingNumber)
+        ? ''
+        : 'Please complete all bank details correctly'
+    );
+    setIsBankValid(allValid);
+  }, [bankName, accountNumber, accountType, routingNumber]);
+
   const handleMakeDefault = async (methodId: string) => {
     setLoading(true);
     await apiFetch(`/api/payment-methods/${methodId}`, {
@@ -107,6 +141,10 @@ const PaymentMethodsSection: React.FC = () => {
                 <div className="flex items-center gap-3">
                   {m.provider === 'paypal' ? (
                     <FaPaypal className="w-6 h-6 text-blue-600 flex-shrink-0" />
+                  ) : m.provider === 'stripe' ? (
+                    <FaStripe className="w-6 h-6 text-purple-600 flex-shrink-0" />
+                  ) : m.provider === 'bank' ? (
+                    <BanknotesIcon className="w-6 h-6 text-green-600 flex-shrink-0" />
                   ) : (
                     <CreditCardIcon className="w-6 h-6 text-primary flex-shrink-0" />
                   )}
@@ -118,6 +156,24 @@ const PaymentMethodsSection: React.FC = () => {
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                           {m.paypalEmail}
+                        </div>
+                      </>
+                    ) : m.provider === 'stripe' ? (
+                      <>
+                        <div className="font-semibold text-gray-900 dark:text-white">
+                          Stripe - {m.cardBrand} ****{m.cardLast4}
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Payment ID: {m.stripePaymentId?.slice(0, 12)}...
+                        </div>
+                      </>
+                    ) : m.provider === 'bank' ? (
+                      <>
+                        <div className="font-semibold text-gray-900 dark:text-white">
+                          {m.bankName} - {m.accountType}
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Account ****{m.accountLast4} | Routing: {m.routingNumber}
                         </div>
                       </>
                     ) : (
@@ -163,7 +219,7 @@ const PaymentMethodsSection: React.FC = () => {
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             <CreditCardIcon className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
             <p className="text-lg font-medium">No payment methods added yet</p>
-            <p className="text-sm">Add a card or PayPal account below to get started</p>
+            <p className="text-sm">Add a card, Stripe, PayPal, or bank account below to get started</p>
           </div>
         )}
       </div>
@@ -173,30 +229,54 @@ const PaymentMethodsSection: React.FC = () => {
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Add New Payment Method</h3>
         
         {/* Payment Type Selector */}
-        <div className="flex gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <button
             type="button"
             onClick={() => setPaymentType('card')}
-            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
               paymentType === 'card'
                 ? 'bg-primary text-white shadow-lg'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
             <CreditCardIcon className="w-5 h-5" />
-            Credit/Debit Card
+            <span className="hidden sm:inline">Card</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaymentType('stripe')}
+            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
+              paymentType === 'stripe'
+                ? 'bg-purple-600 text-white shadow-lg'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            <FaStripe className="w-5 h-5" />
+            <span className="hidden sm:inline">Stripe</span>
           </button>
           <button
             type="button"
             onClick={() => setPaymentType('paypal')}
-            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
               paymentType === 'paypal'
                 ? 'bg-blue-600 text-white shadow-lg'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
             <FaPaypal className="w-5 h-5" />
-            PayPal
+            <span className="hidden sm:inline">PayPal</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaymentType('bank')}
+            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
+              paymentType === 'bank'
+                ? 'bg-green-600 text-white shadow-lg'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            <BanknotesIcon className="w-5 h-5" />
+            <span className="hidden sm:inline">Bank</span>
           </button>
         </div>
 
@@ -207,6 +287,8 @@ const PaymentMethodsSection: React.FC = () => {
             
             if (paymentType === 'card' && !isCardValid) return;
             if (paymentType === 'paypal' && !isPayPalValid) return;
+            if (paymentType === 'stripe' && !isStripeValid) return;
+            if (paymentType === 'bank' && !isBankValid) return;
             
             const data: any = {
               provider: paymentType,
@@ -218,8 +300,18 @@ const PaymentMethodsSection: React.FC = () => {
               data.expMonth = expMonth.trim();
               data.expYear = expYear.trim();
               data.cvc = cvc.trim();
-            } else {
+            } else if (paymentType === 'stripe') {
+              data.number = cardNumber.replace(/\s+/g, '');
+              data.expMonth = expMonth.trim();
+              data.expYear = expYear.trim();
+              data.cvc = cvc.trim();
+            } else if (paymentType === 'paypal') {
               data.paypalEmail = paypalEmail.trim();
+            } else if (paymentType === 'bank') {
+              data.bankName = bankName.trim();
+              data.accountNumber = accountNumber.trim();
+              data.accountType = accountType;
+              data.routingNumber = routingNumber.trim();
             }
             
             apiFetch('/api/payment-methods', {
@@ -234,13 +326,17 @@ const PaymentMethodsSection: React.FC = () => {
                 setExpYear('');
                 setCvc('');
                 setPaypalEmail('');
+                setBankName('');
+                setAccountNumber('');
+                setAccountType('checking');
+                setRoutingNumber('');
                 loadMethods();
               })
               .catch(() => {});
           }}
           className="space-y-5"
         >
-          {paymentType === 'card' ? (
+          {paymentType === 'card' || paymentType === 'stripe' ? (
             <>
               <CardNumberInput
                 name="number"
@@ -315,7 +411,7 @@ const PaymentMethodsSection: React.FC = () => {
                 </div>
               )}
             </>
-          ) : (
+          ) : paymentType === 'paypal' ? (
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -334,6 +430,74 @@ const PaymentMethodsSection: React.FC = () => {
                 )}
               </div>
             </>
+          ) : (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Bank Name
+                </label>
+                <input
+                  type="text"
+                  name="bankName"
+                  value={bankName}
+                  onChange={(e) => setBankName(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                  placeholder="e.g., Chase Bank"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Account Number
+                  </label>
+                  <input
+                    type="text"
+                    name="accountNumber"
+                    value={accountNumber}
+                    onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                    placeholder="Account number"
+                    maxLength={17}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Account Type
+                  </label>
+                  <select
+                    name="accountType"
+                    value={accountType}
+                    onChange={(e) => setAccountType(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                  >
+                    <option value="checking">Checking</option>
+                    <option value="savings">Savings</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Routing Number
+                </label>
+                <input
+                  type="text"
+                  name="routingNumber"
+                  value={routingNumber}
+                  onChange={(e) => setRoutingNumber(e.target.value.replace(/\D/g, ''))}
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                  placeholder="9-digit routing number"
+                  maxLength={9}
+                />
+              </div>
+              
+              {bankError && (
+                <div className="text-sm text-red-600 dark:text-red-400">
+                  <p>{bankError}</p>
+                </div>
+              )}
+            </>
           )}
           
           <label className="flex items-center gap-3 cursor-pointer">
@@ -345,7 +509,12 @@ const PaymentMethodsSection: React.FC = () => {
             <button
               type="submit"
               className="px-8 py-3 text-base font-semibold text-white bg-success hover:bg-success-dark dark:bg-success dark:hover:bg-success-light rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={paymentType === 'card' ? !isCardValid : !isPayPalValid}
+              disabled={
+                (paymentType === 'card' && !isCardValid) ||
+                (paymentType === 'stripe' && !isStripeValid) ||
+                (paymentType === 'paypal' && !isPayPalValid) ||
+                (paymentType === 'bank' && !isBankValid)
+              }
             >
               Add Payment Method
             </button>

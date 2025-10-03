@@ -28,7 +28,7 @@ export default async function handler(
       return res.status(200).json(methods);
     }
     if (req.method === 'POST') {
-      const { number, expMonth, expYear, cvc, setDefault, paypalEmail, provider } = req.body || {};
+      const { number, expMonth, expYear, cvc, setDefault, paypalEmail, provider, bankName, accountNumber, accountType, routingNumber } = req.body || {};
       
       let method;
       
@@ -45,6 +45,49 @@ export default async function handler(
         method = await addPaymentMethod(userId, {
           provider: 'paypal',
           paypalEmail: tokenized.email,
+          token: tokenized.token,
+          isDefault: !!setDefault,
+        });
+      } else if (provider === 'stripe') {
+        // Handle Stripe payment method
+        if (!number || !expMonth || !expYear || !cvc) {
+          return res.status(400).json({ message: 'Card details required for Stripe' });
+        }
+        
+        const tokenized = await paymentProvider.tokenizeStripe({
+          number,
+          expMonth: Number(expMonth),
+          expYear: Number(expYear),
+          cvc,
+        });
+        
+        method = await addPaymentMethod(userId, {
+          provider: 'stripe',
+          stripePaymentId: tokenized.stripePaymentId,
+          cardLast4: tokenized.cardLast4,
+          cardBrand: tokenized.cardBrand,
+          token: tokenized.token,
+          isDefault: !!setDefault,
+        });
+      } else if (provider === 'bank') {
+        // Handle Bank Details payment method
+        if (!bankName || !accountNumber || !accountType || !routingNumber) {
+          return res.status(400).json({ message: 'All bank details required' });
+        }
+        
+        const tokenized = await paymentProvider.tokenizeBankDetails({
+          bankName,
+          accountNumber,
+          accountType,
+          routingNumber,
+        });
+        
+        method = await addPaymentMethod(userId, {
+          provider: 'bank',
+          bankName: tokenized.bankName,
+          accountLast4: tokenized.accountLast4,
+          accountType: tokenized.accountType,
+          routingNumber: tokenized.routingNumber,
           token: tokenized.token,
           isDefault: !!setDefault,
         });
