@@ -90,11 +90,11 @@ export default function CategoryProductsPage({
       <h1 className="text-2xl font-bold mb-4">
         {category.name} ({filtered.length})
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6">
-        <aside className="border rounded bg-base-100 p-4 space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
+        <aside className="rounded-2xl border border-base-200/70 dark:border-gray-700/70 bg-white/70 dark:bg-gray-800/80 backdrop-blur-sm p-5 space-y-6 shadow-lg transition-colors">
           <div>
-            <h3 className="font-semibold mb-2">Price</h3>
-            <div className="flex gap-2">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-base-content/70 mb-3">Price</h3>
+            <div className="flex gap-3">
               <input
                 type="number"
                 value={minPrice}
@@ -103,7 +103,7 @@ export default function CategoryProductsPage({
                   updateQuery('min', e.target.value);
                 }}
                 placeholder="Min"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full focus:input-primary"
               />
               <input
                 type="number"
@@ -113,17 +113,18 @@ export default function CategoryProductsPage({
                   updateQuery('max', e.target.value);
                 }}
                 placeholder="Max"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full focus:input-primary"
               />
             </div>
           </div>
           <div>
-            <h3 className="font-semibold mb-2">Brand</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-base-content/70 mb-3">Brand</h3>
+            <div className="space-y-2">
             {['BrandA', 'BrandB', 'BrandC'].map((b) => (
-              <label key={b} className="flex items-center gap-2 mb-1">
+              <label key={b} className="flex items-center gap-3 text-sm">
                 <input
                   type="checkbox"
-                  className="checkbox"
+                  className="checkbox checkbox-sm"
                   checked={brand === b}
                   onChange={() => {
                     const v = brand === b ? '' : b;
@@ -134,14 +135,16 @@ export default function CategoryProductsPage({
                 <span>{b}</span>
               </label>
             ))}
+            </div>
           </div>
           <div>
-            <h3 className="font-semibold mb-2">Rating</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-base-content/70 mb-3">Rating</h3>
+            <div className="space-y-2">
             {[5, 4, 3].map((r) => (
-              <label key={r} className="flex items-center gap-2 mb-1">
+              <label key={r} className="flex items-center gap-3 text-sm">
                 <input
                   type="checkbox"
-                  className="checkbox"
+                  className="checkbox checkbox-sm"
                   checked={rating === String(r)}
                   onChange={() => {
                     const v = rating === String(r) ? '' : String(r);
@@ -152,6 +155,7 @@ export default function CategoryProductsPage({
                 <span>{r}★ & up</span>
               </label>
             ))}
+            </div>
           </div>
         </aside>
         <section>

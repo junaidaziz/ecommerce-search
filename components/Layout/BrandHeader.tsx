@@ -109,27 +109,59 @@ const BrandHeader: FC<HeaderProps> = ({
             <>
               <Link
                 href="/brand/dashboard"
-                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-300 hover:text-primary hover:border-primary hover:scale-105 ${pathname === '/brand/dashboard' ? 'font-semibold text-primary border-primary' : ''}`}
+                aria-current={pathname === '/brand/dashboard' ? 'page' : undefined}
+                className={`relative px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-950
+                  ${pathname === '/brand/dashboard'
+                    ? 'text-primary dark:text-primary font-semibold bg-primary/5 dark:bg-primary/10 shadow-sm'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-primary'}
+                `}
               >
-                Dashboard
+                <span className="relative z-10">Dashboard</span>
+                {pathname === '/brand/dashboard' && (
+                  <span className="pointer-events-none absolute inset-x-2 -bottom-1 h-0.5 bg-gradient-to-r from-primary/0 via-primary/80 to-primary/0 rounded-full animate-pulse" />
+                )}
               </Link>
               <Link
                 href="/brand/products"
-                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-300 hover:text-primary hover:border-primary hover:scale-105 ${pathname.startsWith('/brand/products') ? 'font-semibold text-primary border-primary' : ''}`}
+                aria-current={pathname.startsWith('/brand/products') ? 'page' : undefined}
+                className={`relative px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-950
+                  ${pathname.startsWith('/brand/products')
+                    ? 'text-primary dark:text-primary font-semibold bg-primary/5 dark:bg-primary/10 shadow-sm'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-primary'}
+                `}
               >
-                Products
+                <span className="relative z-10">Products</span>
+                {pathname.startsWith('/brand/products') && (
+                  <span className="pointer-events-none absolute inset-x-2 -bottom-1 h-0.5 bg-gradient-to-r from-primary/0 via-primary/80 to-primary/0 rounded-full" />
+                )}
               </Link>
               <Link
                 href="/brand/orders"
-                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-300 hover:text-primary hover:border-primary hover:scale-105 ${pathname === '/brand/orders' ? 'font-semibold text-primary border-primary' : ''}`}
+                aria-current={pathname === '/brand/orders' ? 'page' : undefined}
+                className={`relative px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-950
+                  ${pathname === '/brand/orders'
+                    ? 'text-primary dark:text-primary font-semibold bg-primary/5 dark:bg-primary/10 shadow-sm'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-primary'}
+                `}
               >
-                Orders
+                <span className="relative z-10">Orders</span>
+                {pathname === '/brand/orders' && (
+                  <span className="pointer-events-none absolute inset-x-2 -bottom-1 h-0.5 bg-gradient-to-r from-primary/0 via-primary/80 to-primary/0 rounded-full" />
+                )}
               </Link>
               <Link
                 href="/brand/analytics"
-                className={`border-b-2 border-transparent transition-colors transition-transform duration-200 text-gray-700 dark:text-gray-300 hover:text-primary hover:border-primary hover:scale-105 ${pathname === '/brand/analytics' ? 'font-semibold text-primary border-primary' : ''}`}
+                aria-current={pathname === '/brand/analytics' ? 'page' : undefined}
+                className={`relative px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-950
+                  ${pathname === '/brand/analytics'
+                    ? 'text-primary dark:text-primary font-semibold bg-primary/5 dark:bg-primary/10 shadow-sm'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-primary'}
+                `}
               >
-                Analytics
+                <span className="relative z-10">Analytics</span>
+                {pathname === '/brand/analytics' && (
+                  <span className="pointer-events-none absolute inset-x-2 -bottom-1 h-0.5 bg-gradient-to-r from-primary/0 via-primary/80 to-primary/0 rounded-full" />
+                )}
               </Link>
             </>
           )}

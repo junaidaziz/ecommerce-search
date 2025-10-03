@@ -69,7 +69,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <div
-      className={`group relative flex flex-col h-full bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:border-primary dark:hover:border-primary transition-all duration-300 p-4 gap-4 ${className}`}
+      className={`group relative flex flex-col h-full rounded-2xl overflow-hidden p-4 gap-4
+        bg-gradient-to-br from-base-100 via-base-100 to-base-200 dark:from-gray-800 dark:via-gray-800 dark:to-gray-850
+        border border-base-200/80 dark:border-gray-700/70
+        shadow-sm hover:shadow-xl transition-all duration-400
+        hover:-translate-y-1 hover:border-primary/60 dark:hover:border-primary/60
+        focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-base-100
+        before:absolute before:inset-0 before:pointer-events-none before:rounded-2xl before:border before:border-transparent before:transition-[border-color,opacity] before:duration-300
+        hover:before:border-primary/30
+        ${className}`}
+      tabIndex={0}
+      aria-label={product.title}
     >
       {/* Wishlist Button */}
       <WishlistButton inWishlist={inWishlist} onToggle={handleWishlistToggle} />

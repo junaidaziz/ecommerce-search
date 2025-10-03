@@ -106,6 +106,7 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(products.length < total);
+  const [filtersOpen, setFiltersOpen] = useState(false); // mobile filters toggle
   const debounceTimerRef = useRef<NodeJS.Timeout>();
   const requestedRef = useRef<Set<string>>(new Set());
   const loadingRef = useRef(false);
@@ -205,18 +206,10 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         }
       }
     },
-    [
-      buildParams,
-      getFilterSnapshot,
-      hasMore,
-      keyword,
-      selectedCategories,
-      selectedBrands,
-      minPrice,
-      maxPrice,
-      inStock,
-      sort,
-    ]
+    // Intentionally depend only on buildParams & getFilterSnapshot & hasMore.
+    // Other filter primitives are captured via those helpers to avoid unnecessary re-creations.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [buildParams, getFilterSnapshot, hasMore]
   );
 
   useEffect(() => {
@@ -309,7 +302,11 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
   }, [router, addNotification]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative bg-base-200/40 dark:bg-gray-950/60">
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[1400px] h-[1400px] bg-radial from-primary/15 via-transparent to-transparent opacity-60 blur-3xl" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[900px] h-[900px] bg-gradient-to-br from-secondary/10 via-transparent to-transparent opacity-40 blur-2xl" />
+      </div>
       <Head>
         <title>{getPageTitle('Products')}</title>
         <meta name="description" content="Discover amazing products from top brands" />
@@ -328,32 +325,48 @@ const ProductsPage: React.FC<ProductsProps> & { maxWidthClass?: string } = ({
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 xl:gap-10 items-start">
           {/* Filters Sidebar */}
           <aside className="w-full lg:w-72 xl:w-80 mb-6 lg:mb-0 lg:sticky lg:top-6">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-100 dark:border-gray-700 transition-all duration-300">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold text-base-content">Filters</h2>
+            <div className="bg-white/70 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 transition-all duration-300">
+              {/* Mobile Toggle */}
+              <div className="lg:hidden px-5 pt-5">
+                <button
+                  type="button"
+                  onClick={() => setFiltersOpen(o => !o)}
+                  aria-expanded={filtersOpen}
+                  className="w-full flex items-center justify-between gap-3 rounded-xl bg-base-200/60 dark:bg-base-200/20 px-4 py-3 text-base font-semibold text-base-content hover:bg-base-200 dark:hover:bg-base-200/40 transition-colors"
+                >
+                  <span>Filters</span>
+                  <span className={`transition-transform duration-300 ${filtersOpen ? 'rotate-180' : ''}`}>▾</span>
+                </button>
+              </div>
+              <div className="hidden lg:flex items-center justify-between px-6 pt-6 mb-2">
+                <h2 className="text-2xl font-bold text-base-content tracking-tight">Filters</h2>
                 <button
                   onClick={clearAll}
-                  className="btn btn-sm btn-ghost text-primary hover:bg-primary/10"
+                  className="btn btn-xs md:btn-sm btn-ghost text-primary hover:bg-primary/10"
                 >
                   Clear All
                 </button>
               </div>
-              <ProductFilters
-                keyword={keyword}
-                setKeyword={setKeyword}
-                selectedCategories={selectedCategories}
-                setSelectedCategories={setSelectedCategories}
-                selectedBrands={selectedBrands}
-                setSelectedBrands={setSelectedBrands}
-                minPrice={minPrice}
-                setMinPrice={setMinPrice}
-                maxPrice={maxPrice}
-                setMaxPrice={setMaxPrice}
-                inStock={inStock}
-                setInStock={setInStock}
-                categories={categories}
-                clearAll={clearAll}
-              />
+              <div className={`px-1 lg:px-0 ${filtersOpen ? 'block' : 'hidden lg:block'}`}>
+                <div className="max-h-[70vh] lg:max-h-none overflow-y-auto pr-2 lg:pr-0 custom-scrollbar py-4 lg:py-0" data-testid="filters-container">
+                  <ProductFilters
+                    keyword={keyword}
+                    setKeyword={setKeyword}
+                    selectedCategories={selectedCategories}
+                    setSelectedCategories={setSelectedCategories}
+                    selectedBrands={selectedBrands}
+                    setSelectedBrands={setSelectedBrands}
+                    minPrice={minPrice}
+                    setMinPrice={setMinPrice}
+                    maxPrice={maxPrice}
+                    setMaxPrice={setMaxPrice}
+                    inStock={inStock}
+                    setInStock={setInStock}
+                    categories={categories}
+                    clearAll={clearAll}
+                  />
+                </div>
+              </div>
             </div>
           </aside>
 
