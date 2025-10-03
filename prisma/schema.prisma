@@ -70,6 +70,7 @@ model User {
   wishlistItems    WishlistItem[]
   coupon           Coupon[]
   reviews          Review[]          @relation("UserReviews")
+  addresses        Address[]
 
   @@index([phoneNumber])
 }
@@ -356,4 +357,27 @@ model Review {
   user User @relation("UserReviews", fields: [userId], references: [id])
 
   @@index([entityType, entityId])
+}
+
+model Address {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  userId      Int
+  type        String   // "SHIPPING" or "BILLING"
+  fullName    String
+  addressLine1 String
+  addressLine2 String?
+  city        String
+  state       String
+  postalCode  String
+  country     String
+  phoneNumber String?
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
 }
