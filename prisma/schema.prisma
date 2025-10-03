@@ -72,6 +72,7 @@ model User {
   coupon                  Coupon[]
   reviews                 Review[]                @relation("UserReviews")
   loginSessions           LoginSession[]          @relation("UserLoginSessions")
+  addresses               Address[]
 
   @@index([phoneNumber])
 }
