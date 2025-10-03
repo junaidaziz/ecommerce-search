@@ -17,6 +17,7 @@ interface RichTextEditorProps<T extends FieldValues> {
   placeholder?: string;
   error?: string;
   rules?: RegisterOptions<T, Path<T>>;
+  required?: boolean;
 }
 
 const modules = {
@@ -30,7 +31,7 @@ const modules = {
 };
 
 const RichTextEditor = <T extends FieldValues>(props: RichTextEditorProps<T>) => {
-  const { name, control, label, placeholder, error, rules } = props;
+  const { name, control, label, placeholder, error, rules, required = false } = props;
   return (
     <Controller
       name={name}
@@ -39,19 +40,22 @@ const RichTextEditor = <T extends FieldValues>(props: RichTextEditorProps<T>) =>
       render={({ field }) => (
         <div className="mb-4 w-full">
           {label && (
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {label}
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              {label} {required && <span className="text-red-500">*</span>}
             </label>
           )}
-          <ReactQuill
-            theme="snow"
-            value={field.value || ''}
-            onChange={field.onChange}
-            onBlur={field.onBlur}
-            placeholder={placeholder}
-            modules={modules}
-          />
-          {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+          <div style={{ height: '200px' }}>
+            <ReactQuill
+              theme="snow"
+              value={field.value || ''}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              placeholder={placeholder}
+              modules={modules}
+              style={{ height: '150px' }}
+            />
+          </div>
+          {error && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{error}</p>}
         </div>
       )}
     />

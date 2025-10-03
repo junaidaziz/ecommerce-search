@@ -129,7 +129,7 @@ const BrandProductsPage: React.FC = () => {
     );
   }
   
-  if (user.role !== 'brand' && user.role !== 'SUPER_ADMIN') {
+  if (user.role !== 'BRAND' && user.role !== 'SUPER_ADMIN') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">

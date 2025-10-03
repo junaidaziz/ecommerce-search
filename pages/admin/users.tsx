@@ -240,7 +240,7 @@ export default function ManageUsers() {
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
                         user.role === USER_ROLES.SUPER_ADMIN 
                           ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300'
-                          : user.role === 'ADMIN'
+                          : user.role === USER_ROLES.SUPER_ADMIN
                           ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
                           : user.role === USER_ROLES.BRAND
                           ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
@@ -323,7 +323,7 @@ export default function ManageUsers() {
                     className="toggle toggle-success"
                     checked={!editModal.disabled}
                     onChange={(e) => setEditModal(prev => ({ ...prev, disabled: !e.target.checked }))}
-                    disabled={editModal.user.role === 'SUPER_ADMIN'}
+                    disabled={editModal.user.role === USER_ROLES.SUPER_ADMIN}
                   />
                 </label>
               </div>
@@ -370,7 +370,7 @@ export default function ManageUsers() {
                 const res = await fetch('/api/admin/users', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ email: newSuperAdmin.email, password: newSuperAdmin.password, role: 'SUPER_ADMIN' }),
+                  body: JSON.stringify({ email: newSuperAdmin.email, password: newSuperAdmin.password, role: USER_ROLES.SUPER_ADMIN }),
                 });
                 if (!res.ok) throw new Error((await res.json()).message || 'Failed to add super admin');
                 setNewSuperAdmin({ email: '', password: '', loading: false, error: '', success: 'Super admin added!' });

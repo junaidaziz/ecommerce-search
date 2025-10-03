@@ -42,7 +42,7 @@ const FileUpload = <T extends FieldValues>(props: FileUploadProps<T>) => {
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
         >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
@@ -55,11 +55,11 @@ const FileUpload = <T extends FieldValues>(props: FileUploadProps<T>) => {
         onBlur={onBlur}
         disabled={disabled}
         required={required}
-        className={`w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${className}`}
+        className={`w-full text-sm text-gray-700 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200 dark:hover:file:bg-gray-600 ${className}`}
         {...registration}
         {...rest}
       />
-      {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{error}</p>}
     </div>
   );
 };

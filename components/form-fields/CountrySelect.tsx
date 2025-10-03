@@ -25,6 +25,7 @@ export interface CountrySelectBase {
   label?: string;
   error?: string;
   className?: string;
+  required?: boolean;
 }
 
 type CountrySelectProps<T extends FieldValues> =
@@ -41,7 +42,7 @@ const formatOptionLabel = (option: CountryInfo) => (
 );
 
 const CountrySelect = <T extends FieldValues>(props: CountrySelectProps<T>) => {
-  const { label, error, className = '' } = props;
+  const { label, error, className = '', required = false } = props;
   const inputId =
     'name' in props && props.name ? String(props.name) : 'country-select';
 
@@ -52,6 +53,8 @@ const CountrySelect = <T extends FieldValues>(props: CountrySelectProps<T>) => {
       options={countries}
       placeholder="Select country"
       isSearchable
+      blurInputOnSelect={false}
+      openMenuOnFocus={true}
       className={`w-full ${className}`}
       classNamePrefix="react-select"
       formatOptionLabel={formatOptionLabel}
@@ -63,9 +66,9 @@ const CountrySelect = <T extends FieldValues>(props: CountrySelectProps<T>) => {
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
         >
-          {label}
+          {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
       {'control' in props ? (
@@ -89,7 +92,7 @@ const CountrySelect = <T extends FieldValues>(props: CountrySelectProps<T>) => {
             props.onChange(option ? option.value : ''),
         })
       )}
-      {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{error}</p>}
     </div>
   );
 };

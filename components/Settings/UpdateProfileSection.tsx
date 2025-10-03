@@ -86,12 +86,14 @@ const UpdateProfileSection: React.FC = () => {
               error={profileForm.formState.errors.email?.message}
             />
           </div>
-          <Link
-            href={{ pathname: '/settings', query: { tab: 'email' } }}
-            className="px-4 py-2.5 text-sm font-medium text-primary hover:text-white bg-primary/10 hover:bg-primary dark:bg-primary/20 dark:hover:bg-primary rounded-lg transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap"
-          >
-            Change Email
-          </Link>
+          <div className="pb-4">
+            <Link
+              href={{ pathname: '/settings', query: { tab: 'email' } }}
+              className="inline-flex items-center px-4 py-2.5 h-10 text-sm font-medium text-primary hover:text-white bg-primary/10 hover:bg-primary dark:bg-primary/20 dark:hover:bg-primary rounded-lg transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap"
+            >
+              Change Email
+            </Link>
+          </div>
         </div>
         <TextInput
           label="Phone Number"

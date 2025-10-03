@@ -48,7 +48,7 @@ const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
         return (
           <div className="mb-4 w-full">
             {label && (
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                 {label}
               </label>
             )}
@@ -57,17 +57,17 @@ const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="flex items-center gap-1 bg-gray-100 rounded-full px-3 py-1 text-sm"
+                    className="flex items-center gap-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full px-3 py-1 text-sm border border-blue-200 dark:border-blue-700"
                     title={tag}
                   >
                     <span className="truncate max-w-[10rem]">{tag}</span>
                     <button
                       type="button"
-                      className="ml-1"
+                      className="ml-1 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full w-4 h-4 flex items-center justify-center text-xs transition-colors"
                       onClick={() => removeTag(tag)}
                       aria-label="Remove tag"
                     >
-                      ✕
+                      ×
                     </button>
                   </span>
                 ))}
@@ -96,7 +96,7 @@ const TagInput = <T extends FieldValues>(props: TagInputProps<T>) => {
               classNamePrefix="react-select"
               components={{ MultiValue: () => null }}
             />
-            {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+            {error && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{error}</p>}
           </div>
         );
       }}

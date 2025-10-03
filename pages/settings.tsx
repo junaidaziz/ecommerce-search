@@ -16,6 +16,7 @@ import NotificationPreferencesSection from '@components/Settings/NotificationPre
 import AccountSecuritySection from '@components/Settings/AccountSecuritySection';
 import { AppContext } from '@contexts/AppContext';
 import type { User } from '@/types';
+import { USER_ROLES } from '@/types';
 
 const SettingsPage: React.FC = () => {
   const user = useRequireAuth();
@@ -39,8 +40,11 @@ const SettingsPage: React.FC = () => {
       tab === 'security'
     ) {
       setActive(tab);
+    } else if (!tab && contextUser?.role === USER_ROLES.BRAND) {
+      // Default to brand tab for brand users when no specific tab is set
+      setActive('brand');
     }
-  }, [router.query.tab]);
+  }, [router.query.tab, contextUser?.role]);
 
   const handleSelect = (tab: typeof active) => {
     setActive(tab);

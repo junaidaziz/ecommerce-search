@@ -1,4 +1,5 @@
 import { KeyIcon, HomeIcon, EnvelopeIcon, CreditCardIcon, TagIcon, UserIcon, BuildingStorefrontIcon, BellIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { USER_ROLES } from '@/types';
 
 interface SettingsSidebarProps {
   active: 'profile' | 'password' | 'address' | 'email' | 'payments' | 'coupons' | 'brand' | 'notifications' | 'security';
@@ -52,7 +53,11 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
       <ul className="flex md:flex-col flex-row flex-wrap gap-2 md:gap-2 bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-lg border border-gray-200 dark:border-gray-800">
         {tabOrder.map((tab) => {
           // Hide brand settings tab for non-brand users
-          if (tab === 'brand' && userRole !== 'BRAND') {
+          if (tab === 'brand' && userRole !== USER_ROLES.BRAND) {
+            return null;
+          }
+          // Hide profile tab for brand users - they should use brand settings instead
+          if (tab === 'profile' && userRole === USER_ROLES.BRAND) {
             return null;
           }
           

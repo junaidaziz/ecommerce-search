@@ -199,7 +199,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           htmlFor="vendor-select"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Vendor
+          Vendor <span className="text-red-500">*</span>
         </label>
         <Controller
           name="vendor"
@@ -229,6 +229,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
               }
               placeholder="Vendor"
               classNamePrefix="react-select"
+              blurInputOnSelect={false}
+              openMenuOnFocus={true}
               isDisabled={!!user?.brandName}
             />
           )}
@@ -243,6 +245,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         register={register}
         rules={{ required: 'Required' }}
         error={errors.title?.message}
+        required
       />
       <div>
         <RichTextEditor<ProductFormValues>
@@ -251,6 +254,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           control={control}
           rules={{ required: 'Required' }}
           error={errors.description?.message}
+          required
         />
       </div>
       <TextInput<ProductFormValues>
@@ -259,6 +263,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         register={register}
         rules={{ required: 'Required' }}
         error={errors.productType?.message}
+        required
       />
       <div>
         <TagInput<ProductFormValues>
@@ -274,7 +279,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           htmlFor="category-select"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Category
+          Category <span className="text-red-500">*</span>
         </label>
         <Controller
           name="categoryId"
@@ -304,6 +309,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
               }
               placeholder="Category"
               classNamePrefix="react-select"
+              blurInputOnSelect={false}
+              openMenuOnFocus={true}
             />
           )}
         />
@@ -342,6 +349,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             min: { value: 0, message: 'Must be >= 0' },
           }}
           error={errors.minPrice?.message}
+          required
         />
         <TextInput<ProductFormValues>
           label="Max Price"
@@ -355,19 +363,28 @@ const ProductForm: React.FC<ProductFormProps> = ({
             min: { value: 0, message: 'Must be >= 0' },
           }}
           error={errors.maxPrice?.message}
+          required
         />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <TextInput<ProductFormValues>
+          label="Currency"
+          name="currency"
+          register={register}
+          rules={{ required: 'Required' }}
+          error={errors.currency?.message}
+          required
+        />
         <div>
           <label
-            className="block text-sm font-medium mb-1"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
             htmlFor="discountType"
           >
             Discount Type
           </label>
           <select
             id="discountType"
-            className="select select-bordered w-full"
+            className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
             {...register('discountType')}
           >
             <option value="none">None</option>
@@ -375,38 +392,32 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <option value="fixed">Fixed</option>
           </select>
         </div>
-        {watch('discountType') !== 'none' && (
-          <TextInput<ProductFormValues>
-            label="Discount Value"
-            name="discountValue"
-            type="number"
-            step="0.01"
-            register={register}
-            rules={{
-              required: 'Required',
-              validate: (v) => {
-                const num = typeof v === 'number' ? v : Number(v);
-                if (watch('discountType') === 'percentage') {
-                  if (isNaN(num) || num <= 0 || num >= 100) return '1-99';
-                  return true;
-                } else {
-                  if (isNaN(num) || num >= watch('minPrice'))
-                    return 'Must be < price';
-                  return true;
-                }
-              },
-            }}
-            error={errors.discountValue?.message}
-          />
-        )}
       </div>
-      <TextInput<ProductFormValues>
-        label="Currency"
-        name="currency"
-        register={register}
-        rules={{ required: 'Required' }}
-        error={errors.currency?.message}
-      />
+      {watch('discountType') !== 'none' && (
+        <TextInput<ProductFormValues>
+          label="Discount Value"
+          name="discountValue"
+          type="number"
+          step="0.01"
+          register={register}
+          rules={{
+            required: 'Required',
+            validate: (v) => {
+              const num = typeof v === 'number' ? v : Number(v);
+              if (watch('discountType') === 'percentage') {
+                if (isNaN(num) || num <= 0 || num >= 100) return '1-99';
+                return true;
+              } else {
+                if (isNaN(num) || num >= watch('minPrice'))
+                  return 'Must be < price';
+                return true;
+              }
+            },
+          }}
+          error={errors.discountValue?.message}
+          required
+        />
+      )}
       <div>
         <FileUpload<ProductFormValues>
           label="Images"
@@ -428,13 +439,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
           ))}
         </div>
       )}
-      <div className="flex gap-2 mt-2">
+      <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-800 mt-8">
         {onCancel && (
-          <button type="button" className="btn" onClick={onCancel}>
+          <button 
+            type="button" 
+            className="px-6 py-3 text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
+            onClick={onCancel}
+          >
             Cancel
           </button>
         )}
-        <button type="submit" className="btn btn-primary" disabled={loading}>
+        <button 
+          type="submit" 
+          className="px-8 py-3 text-base font-semibold text-white bg-primary hover:bg-primary-dark dark:bg-primary dark:hover:bg-primary-light rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          disabled={loading}
+        >
           {loading ? 'Saving...' : submitLabel}
         </button>
       </div>

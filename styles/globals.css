@@ -52,7 +52,65 @@ body {
 
 /* React Select styling */
 .react-select__control {
-  @apply w-full rounded-lg shadow-none border border-gray-300 bg-white px-3 py-2 text-base dark:bg-gray-800 dark:border-gray-700 dark:text-white;
+  @apply w-full rounded-lg shadow-none border border-gray-300 bg-white px-3 text-base dark:bg-gray-800 dark:border-gray-700 dark:text-white;
+  min-height: 42px !important;
+  height: 42px;
+}
+.react-select__value-container {
+  @apply py-0;
+}
+.react-select__input-container {
+  @apply py-0 m-0;
+}
+.react-select__input {
+  color: #111827 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.dark .react-select__input {
+  color: #ffffff !important;
+}
+.react-select__input input {
+  color: #111827 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+.dark .react-select__input input {
+  color: #ffffff !important;
+}
+.react-select__input-container {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.react-select__input-container input {
+  color: #111827 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.dark .react-select__input-container input {
+  color: #ffffff !important;
+}
+.react-select__single-value {
+  color: #111827 !important;
+}
+.dark .react-select__single-value {
+  color: #ffffff !important;
+}
+.react-select__placeholder {
+  color: #6b7280 !important;
+}
+.dark .react-select__placeholder {
+  color: #9ca3af !important;
 }
 .react-select__control--is-focused {
   @apply ring-2 ring-blue-500 border-blue-500;

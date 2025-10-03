@@ -39,24 +39,31 @@ const Checkbox = <T extends FieldValues>(props: CheckboxProps<T>) => {
   const inputId = rest.id || name;
   const registration = register ? register(name, rules) : {};
   return (
-    <div className={`mb-2 last:mb-0 w-full ${disabled ? 'opacity-60' : ''}`}>
-      <label htmlFor={inputId} className="cursor-pointer flex items-center gap-2">
-        <input
-          type="checkbox"
-          id={inputId}
-          name={name}
-          checked={checked}
-          onChange={onChange}
-          onBlur={onBlur}
-          disabled={disabled}
-          required={required}
-          className={`h-4 w-4 rounded border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary dark:focus:ring-green-500 transition checked:bg-primary checked:border-primary dark:checked:bg-green-500 dark:checked:border-green-500 ${className}`}
-          {...registration}
-          {...rest}
-        />
-        {label && <span className="text-sm">{label}</span>}
-      </label>
-      {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+    <div className={`mb-4 w-full ${disabled ? 'opacity-60' : ''}`}>
+      {label && (
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+      )}
+      <div className="flex items-center h-11">
+        <label htmlFor={inputId} className="cursor-pointer flex items-center gap-3">
+          <input
+            type="checkbox"
+            id={inputId}
+            name={name}
+            checked={checked}
+            onChange={onChange}
+            onBlur={onBlur}
+            disabled={disabled}
+            required={required}
+            className={`h-5 w-5 rounded border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-500 transition checked:bg-blue-600 checked:border-blue-600 dark:checked:bg-blue-600 dark:checked:border-blue-600 ${className}`}
+            {...registration}
+            {...rest}
+          />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Available for sale</span>
+        </label>
+      </div>
+      {error && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{error}</p>}
     </div>
   );
 };

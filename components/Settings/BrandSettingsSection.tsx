@@ -5,8 +5,12 @@ import { TextInput, Textarea, CountrySelect } from '@components/form-fields';
 import { useContext } from 'react';
 import { NotificationContext } from '@contexts/NotificationContext';
 import ProfileAvatarUploader from '@components/ProfileAvatarUploader';
+import Link from 'next/link';
 
 interface BrandFormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
   brandName: string;
   phoneNumber: string;
   businessAddress: string;
@@ -29,6 +33,9 @@ const BrandSettingsSection: React.FC = () => {
       .then((data) => {
         if (!data) return;
         brandForm.reset({
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          email: data.email || '',
           brandName: data.brandName || '',
           phoneNumber: data.phoneNumber || '',
           businessAddress: data.businessAddress || '',
@@ -44,15 +51,41 @@ const BrandSettingsSection: React.FC = () => {
   }, [brandForm]);
 
   const submitBrand: SubmitHandler<BrandFormValues> = async (values) => {
-    const res = await apiFetch('/api/brand/profile', {
+    // Split the values into profile and brand data
+    const profileData = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      phoneNumber: values.phoneNumber,
+    };
+    
+    const brandData = {
+      brandName: values.brandName,
+      businessAddress: values.businessAddress,
+      city: values.city,
+      country: values.country,
+      website: values.website,
+      businessDescription: values.businessDescription,
+      taxId: values.taxId,
+    };
+
+    // Update profile data first
+    const profileRes = await apiFetch('/api/user/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values),
+      body: JSON.stringify(profileData),
     });
-    if (res.ok) {
-      addNotification('Brand profile updated successfully', 'success');
+
+    // Update brand data
+    const brandRes = await apiFetch('/api/brand/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(brandData),
+    });
+
+    if (profileRes.ok && brandRes.ok) {
+      addNotification('Brand settings updated successfully', 'success');
     } else {
-      addNotification('Failed to update brand profile', 'error');
+      addNotification('Failed to update brand settings', 'error');
     }
   };
 
@@ -72,8 +105,8 @@ const BrandSettingsSection: React.FC = () => {
       className="relative w-full max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 p-6 sm:p-8 flex flex-col gap-6"
     >
       <div className="mb-4">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Brand Information</h2>
-        <p className="text-gray-600 dark:text-gray-400">Manage your brand profile and business details</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Brand Settings</h2>
+        <p className="text-gray-600 dark:text-gray-400">Manage your brand profile, business information, and account details</p>
       </div>
 
       <div className="flex flex-col items-center gap-4 mb-6 pb-6 border-b border-gray-200 dark:border-gray-800">
@@ -85,6 +118,51 @@ const BrandSettingsSection: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
         <TextInput
+          label="First Name"
+          register={brandForm.register}
+          name="firstName"
+          rules={{ required: 'First name is required' }}
+          error={brandForm.formState.errors.firstName?.message}
+          placeholder="Enter your first name"
+          required
+        />
+        
+        <TextInput
+          label="Last Name"
+          register={brandForm.register}
+          name="lastName"
+          rules={{ required: 'Last name is required' }}
+          error={brandForm.formState.errors.lastName?.message}
+          placeholder="Enter your last name"
+          required
+        />
+
+        <div className="md:col-span-2">
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <TextInput
+                label="Email"
+                register={brandForm.register}
+                name="email"
+                rules={{ required: 'Email is required' }}
+                error={brandForm.formState.errors.email?.message}
+                placeholder="Enter your email address"
+                readOnly
+                required
+              />
+            </div>
+            <div className="pb-4">
+              <Link
+                href={{ pathname: '/settings', query: { tab: 'email' } }}
+                className="inline-flex items-center px-4 py-2.5 h-11 text-sm font-medium text-primary hover:text-white bg-primary/10 hover:bg-primary dark:bg-primary/20 dark:hover:bg-primary rounded-lg transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap"
+              >
+                Change Email
+              </Link>
+            </div>
+          </div>
+        </div>
+        
+        <TextInput
           label="Brand Name"
           register={brandForm.register}
           name="brandName"
@@ -92,6 +170,7 @@ const BrandSettingsSection: React.FC = () => {
           error={brandForm.formState.errors.brandName?.message}
           className="md:col-span-2"
           placeholder="Enter your brand name"
+          required
         />
         
         <TextInput
@@ -101,6 +180,7 @@ const BrandSettingsSection: React.FC = () => {
           rules={{ required: 'Phone number is required' }}
           error={brandForm.formState.errors.phoneNumber?.message}
           placeholder="Enter contact phone number"
+          required
         />
 
         <TextInput
@@ -119,6 +199,7 @@ const BrandSettingsSection: React.FC = () => {
           error={brandForm.formState.errors.businessAddress?.message}
           className="md:col-span-2"
           placeholder="Enter your business address"
+          required
         />
 
         <TextInput
@@ -128,6 +209,7 @@ const BrandSettingsSection: React.FC = () => {
           rules={{ required: 'City is required' }}
           error={brandForm.formState.errors.city?.message}
           placeholder="Enter city"
+          required
         />
 
         <CountrySelect
@@ -136,6 +218,7 @@ const BrandSettingsSection: React.FC = () => {
           name="country"
           rules={{ required: 'Country is required' }}
           error={brandForm.formState.errors.country?.message}
+          required
         />
 
         <TextInput
@@ -164,7 +247,7 @@ const BrandSettingsSection: React.FC = () => {
           type="submit"
           className="px-8 py-3 text-base font-semibold text-white bg-primary hover:bg-primary-dark dark:bg-primary dark:hover:bg-primary-light rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02]"
         >
-          Save Brand Settings
+          Save Settings
         </button>
       </div>
     </form>

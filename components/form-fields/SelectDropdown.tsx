@@ -89,7 +89,7 @@ const SelectDropdown = <T extends FieldValues>(
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
         >
           {label}
         </label>
@@ -161,7 +161,7 @@ const SelectDropdown = <T extends FieldValues>(
           />
         )}
       </div>
-      {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{error}</p>}
     </div>
   );
 };
