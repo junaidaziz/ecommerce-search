@@ -9,6 +9,11 @@ export async function addPaymentMethod(
     expMonth?: number;
     expYear?: number;
     paypalEmail?: string;
+    stripePaymentId?: string;
+    bankName?: string;
+    accountLast4?: string;
+    accountType?: string;
+    routingNumber?: string;
     token: string;
     isDefault?: boolean;
   }
@@ -29,6 +34,11 @@ export async function addPaymentMethod(
       expMonth: data.expMonth || null,
       expYear: data.expYear || null,
       paypalEmail: data.paypalEmail || null,
+      stripePaymentId: data.stripePaymentId || null,
+      bankName: data.bankName || null,
+      accountLast4: data.accountLast4 || null,
+      accountType: data.accountType || null,
+      routingNumber: data.routingNumber || null,
       token: data.token,
       isDefault: data.isDefault || false 
     },

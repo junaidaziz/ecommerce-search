@@ -21,6 +21,11 @@ export type PaymentMethodInput = Pick<
   expMonth?: number;
   expYear?: number;
   paypalEmail?: string;
+  stripePaymentId?: string;
+  bankName?: string;
+  accountLast4?: string;
+  accountType?: string;
+  routingNumber?: string;
 };
 
 // Payment method update type
@@ -39,4 +44,9 @@ export type PaymentMethodSummary = Pick<
   expMonth?: number;
   expYear?: number;
   paypalEmail?: string;
+  stripePaymentId?: string;
+  bankName?: string;
+  accountLast4?: string;
+  accountType?: string;
+  routingNumber?: string;
 };

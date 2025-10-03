@@ -11,6 +11,21 @@ export interface TokenizedPayPal {
   email: string;
 }
 
+export interface TokenizedStripe {
+  token: string;
+  stripePaymentId: string;
+  cardLast4: string;
+  cardBrand: string;
+}
+
+export interface TokenizedBankDetails {
+  token: string;
+  bankName: string;
+  accountLast4: string;
+  accountType: string;
+  routingNumber: string;
+}
+
 export interface PaymentCharge {
   transactionId: string;
   status: 'succeeded' | 'failed';
@@ -25,6 +40,20 @@ export interface PaymentProvider {
   }): Promise<TokenizedCard>;
 
   tokenizePayPal(paypal: { email: string }): Promise<TokenizedPayPal>;
+
+  tokenizeStripe(card: {
+    number: string;
+    expMonth: number;
+    expYear: number;
+    cvc: string;
+  }): Promise<TokenizedStripe>;
+
+  tokenizeBankDetails(bank: {
+    bankName: string;
+    accountNumber: string;
+    accountType: string;
+    routingNumber: string;
+  }): Promise<TokenizedBankDetails>;
 
   charge(token: string, amount: number): Promise<PaymentCharge>;
 }
@@ -52,6 +81,47 @@ export class MockPaymentProvider implements PaymentProvider {
       token: 'tok_paypal_' + Math.random().toString(36).substring(2),
       email: paypal.email,
     };
+  }
+
+  async tokenizeStripe(card: {
+    number: string;
+    expMonth: number;
+    expYear: number;
+    cvc: string;
+  }): Promise<TokenizedStripe> {
+    // In a real implementation, this would integrate with Stripe's API
+    // For now, we mock it similar to card tokenization
+    return {
+      token: 'tok_stripe_' + Math.random().toString(36).substring(2),
+      stripePaymentId: 'pm_' + Math.random().toString(36).substring(2),
+      cardLast4: card.number.slice(-4),
+      cardBrand: this.detectCardBrand(card.number),
+    };
+  }
+
+  async tokenizeBankDetails(bank: {
+    bankName: string;
+    accountNumber: string;
+    accountType: string;
+    routingNumber: string;
+  }): Promise<TokenizedBankDetails> {
+    // In a real implementation, this would validate and tokenize bank details
+    return {
+      token: 'tok_bank_' + Math.random().toString(36).substring(2),
+      bankName: bank.bankName,
+      accountLast4: bank.accountNumber.slice(-4),
+      accountType: bank.accountType,
+      routingNumber: bank.routingNumber,
+    };
+  }
+
+  private detectCardBrand(number: string): string {
+    const cleaned = number.replace(/\s+/g, '');
+    if (/^4/.test(cleaned)) return 'visa';
+    if (/^5[1-5]/.test(cleaned)) return 'mastercard';
+    if (/^3[47]/.test(cleaned)) return 'amex';
+    if (/^6(?:011|5)/.test(cleaned)) return 'discover';
+    return 'unknown';
   }
 
   async charge(token: string, amount: number): Promise<PaymentCharge> {
