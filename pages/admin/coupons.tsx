@@ -7,6 +7,7 @@ import { TextInput } from '@components/form-fields';
 import { Coupon, UserRole, USER_ROLES } from '@/types';
 import { getPageTitle } from '@lib/pageTitle';
 import PageHero from '@components/UI/PageHero';
+import { toast } from 'sonner';
 
 export default function AdminCoupons() {
   const { user } = useContext(AppContext)!;
@@ -18,7 +19,6 @@ export default function AdminCoupons() {
     minOrderValue: undefined,
   });
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [message, setMessage] = useState('');
 
   const fetchCoupons = () => {
     fetchJsonSafe<Coupon[]>('/api/admin/coupons', [])
@@ -33,23 +33,27 @@ export default function AdminCoupons() {
     e.preventDefault();
     const method = editingId ? 'PUT' : 'POST';
     const body = { ...form, id: editingId ?? undefined };
-    const res = await apiFetch('/api/admin/coupons', {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (res.ok) {
-      setMessage(editingId ? 'Coupon updated' : 'Coupon created');
-      setForm({
-        code: '',
-        discountType: 'percent',
-        discountValue: 0,
-        minOrderValue: undefined,
+    try {
+      const res = await apiFetch('/api/admin/coupons', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
       });
-      setEditingId(null);
-      fetchCoupons();
-    } else {
-      setMessage('Error saving coupon');
+      if (res.ok) {
+        toast.success(editingId ? 'Coupon updated successfully' : 'Coupon created successfully');
+        setForm({
+          code: '',
+          discountType: 'percent',
+          discountValue: 0,
+          minOrderValue: undefined,
+        });
+        setEditingId(null);
+        fetchCoupons();
+      } else {
+        toast.error('Failed to save coupon');
+      }
+    } catch (error) {
+      toast.error('Failed to save coupon');
     }
   };
 
@@ -64,8 +68,7 @@ export default function AdminCoupons() {
       </Head>
       <PageHero heading="Coupons" />
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        {message && <div className="mb-2 text-green-600">{message}</div>}
-        <form onSubmit={submit} className="space-y-2 max-w-md">
+        <form onSubmit={submit} className="space-y-2 max-w-md bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-800">
         <TextInput
           name="code"
           value={form.code}
@@ -75,7 +78,7 @@ export default function AdminCoupons() {
           placeholder="CODE"
         />
         <select
-          className="select select-bordered w-full"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-transparent"
           value={form.discountType}
           onChange={(e) =>
             setForm((f: Partial<Coupon>) => ({
@@ -133,7 +136,7 @@ export default function AdminCoupons() {
           {editingId && (
             <button
               type="button"
-              className="btn"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
               onClick={() => {
                 setEditingId(null);
                 setForm({
@@ -147,53 +150,55 @@ export default function AdminCoupons() {
               Cancel
             </button>
           )}
-          <button className="btn btn-primary" type="submit">
+          <button className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors" type="submit">
             {editingId ? 'Update' : 'Create'} Coupon
           </button>
         </div>
       </form>
-      <h2 className="text-xl font-semibold mt-6 mb-2">Existing Coupons</h2>
-      <table className="table w-full">
-        <thead>
-          <tr>
-            <th>Code</th>
-            <th>Type</th>
-            <th>Discount</th>
-            <th>Min Order</th>
-            <th>Used</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {coupons.map((c) => (
-            <tr key={c.id} className="hover">
-              <td>{c.code}</td>
-              <td>{c.discountType}</td>
-              <td>{c.discountValue}</td>
-              <td>{c.minOrderValue ?? '-'}</td>
-              <td>{c.usedCount}</td>
-              <td>
-                <button
-                  className="btn btn-sm mr-2"
-                  onClick={() => {
-                    setEditingId(Number(c.id));
-                    setForm({
-                      code: c.code,
-                      discountType: c.discountType,
-                      discountValue: c.discountValue,
-                      minOrderValue: c.minOrderValue,
-                      expiresAt: c.expiresAt,
-                      usageLimit: c.usageLimit,
-                    });
-                  }}
-                >
-                  Edit
-                </button>
-              </td>
+      <h2 className="text-xl font-semibold mt-6 mb-2 text-gray-900 dark:text-gray-100">Existing Coupons</h2>
+      <div className="overflow-x-auto bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+        <table className="w-full">
+          <thead className="bg-gray-50 dark:bg-gray-800">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Code</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Discount</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Min Order</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Used</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+            {coupons.map((c) => (
+              <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{c.code}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{c.discountType}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{c.discountValue}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{c.minOrderValue ?? '-'}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{c.usedCount}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <button
+                    className="px-3 py-1 text-sm font-medium text-primary hover:text-primary-dark dark:text-primary-light dark:hover:text-primary"
+                    onClick={() => {
+                      setEditingId(Number(c.id));
+                      setForm({
+                        code: c.code,
+                        discountType: c.discountType,
+                        discountValue: c.discountValue,
+                        minOrderValue: c.minOrderValue,
+                        expiresAt: c.expiresAt,
+                        usageLimit: c.usageLimit,
+                      });
+                    }}
+                  >
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
     </>
   );

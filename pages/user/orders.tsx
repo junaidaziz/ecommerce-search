@@ -115,161 +115,68 @@ const UserOrders: React.FC = () => {
   };
 
   if (!user) {
-    return <div className="p-4">Please log in to view orders.</div>;
+    return <div className="p-4 text-gray-700 dark:text-gray-300">Please log in to view orders.</div>;
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
+    <div className="max-w-2xl mx-auto px-4 py-6">
       <Head>
         <title>{getPageTitle('My Orders')}</title>
       </Head>
-      
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
-          My Orders
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          View and manage your order history
-        </p>
-      </div>
-
-      {error && (
-        <div className="alert alert-error mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-          <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
-        </div>
-      )}
-
-      {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-4 flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by order # or product name..."
-            className="w-full h-10 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 px-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400"
-          />
-        </div>
-        <div className="w-full md:w-48">
-          <select
-            value={statusFilter.value}
-            onChange={(e) => {
-              const selected = statusOptions.find(
-                (opt) => opt.value === e.target.value
-              );
-              if (selected) setStatusFilter(selected);
-            }}
-            className="w-full h-10 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 px-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-          >
-            {statusOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
+      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">My Orders</h1>
+      {error && <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-2 text-red-800 dark:text-red-200">{error}</div>}
       {loading && (
-        <div className="flex justify-center my-8">
-          <span className="loading loading-spinner loading-lg"></span>
+        <div className="flex justify-center my-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       )}
-
-      {!loading && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <TableHeader
-                columns={[
-                  { label: 'Order #' },
-                  { label: 'Product' },
-                  { label: 'Date' },
-                  { label: 'Status' },
-                  { label: 'Total' },
-                  { label: 'Actions' },
-                ]}
-              />
-              <TableBody
-                data={filteredOrders}
-                columns={[
-                  { label: 'Order #' },
-                  { label: 'Product' },
-                  { label: 'Date' },
-                  { label: 'Status' },
-                  { label: 'Total' },
-                  { label: 'Actions' },
-                ]}
-                emptyMessage="No orders found."
-                renderRow={(order) => [
-                  <td
-                    key="id"
-                    className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100"
-                  >
-                    #{order.id}
-                  </td>,
-                  <td
-                    key="product"
-                    className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100"
-                  >
-                    <div className="font-medium">{order.product?.title || 'N/A'}</div>
-                    <div className="text-gray-500 dark:text-gray-400 text-xs">
-                      Qty: {order.quantity}
-                    </div>
-                  </td>,
-                  <td
-                    key="date"
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
-                  >
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </td>,
-                  <td key="status" className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-col items-start">
-                      {getStatusBadge(order.status)}
-                      {['shipped', 'processing', 'confirmed'].includes(order.status) &&
-                        getOrderTracking(order)}
-                    </div>
-                  </td>,
-                  <td
-                    key="total"
-                    className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100"
-                  >
-                    £{order.total}
-                  </td>,
-                  <td
-                    key="actions"
-                    className="px-6 py-4 whitespace-nowrap text-sm space-x-2"
-                  >
-                    <a
-                      className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                      href={`/user/orders/${order.uuid}`}
-                    >
-                      View
-                    </a>
-                    <a
-                      className="inline-flex items-center px-3 py-1.5 text-blue-600 dark:text-blue-400 hover:underline"
-                      href={`/api/orders/${order.uuid}/invoice`}
-                      download
-                    >
-                      Invoice
-                    </a>
-                    <button
-                      className="inline-flex items-center px-3 py-1.5 border border-blue-300 dark:border-blue-600 rounded-lg text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
-                      onClick={() =>
-                        reorderOrder(order.uuid).then(() =>
-                          window.location.assign('/cart')
-                        )
-                      }
-                    >
-                      Reorder
-                    </button>
-                  </td>,
-                ]}
-              />
-            </table>
-          </div>
-        </div>
-      )}
+      <ul className="space-y-2">
+        {orders.map((o) => (
+          <li key={o.id} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
+            <p className="text-gray-900 dark:text-gray-100">
+              Order #{o.id} -
+              <span
+                className={`ml-2 px-2 py-1 text-xs font-semibold rounded ${
+                  o.status === 'processing'
+                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'
+                    : o.status === 'shipped'
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
+                      : o.status === 'delivered'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+                        : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+                }`}
+              >
+                {o.status}
+              </span>
+            </p>
+            <ul className="list-disc pl-4 text-sm mb-1 text-gray-700 dark:text-gray-300">
+              <li>
+                {o.product.title} x {o.quantity}
+              </li>
+            </ul>
+            <p className="text-gray-900 dark:text-gray-100">Total: £{o.total}</p>
+            <p className="space-x-2 mt-2">
+              <a className="px-3 py-1 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors inline-block" href={`/user/orders/${o.uuid}`}>
+                View
+              </a>
+              <a className="text-primary hover:text-primary-dark dark:text-primary-light dark:hover:text-primary" href={`/api/orders/${o.uuid}/invoice`}>
+                Invoice
+              </a>
+              <button
+                className="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                onClick={() =>
+                  reorderOrder(o.uuid).then(() =>
+                    window.location.assign('/cart')
+                  )
+                }
+              >
+                Reorder
+              </button>
+            </p>
+          </li>
+        ))}
+        {!loading && orders.length === 0 && <li className="text-gray-500 dark:text-gray-400">No orders found.</li>}
+      </ul>
     </div>
   );
 };
