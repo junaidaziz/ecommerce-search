@@ -36,7 +36,6 @@ const AuthInput: React.FC<AuthInputProps> = ({
     rules,
     error: undefined, // Don't pass error to underlying component to prevent duplicates
     className: baseClassName,
-    required,
   };
 
   return (

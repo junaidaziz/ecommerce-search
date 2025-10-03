@@ -1,10 +1,12 @@
 import { apiFetch } from '@lib/api';
 import { useContext, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { PasswordInput } from '@components/form-fields';
 import { NotificationContext } from '@contexts/NotificationContext';
 import { LockClosedIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { changePasswordSchema, type ChangePasswordFormData } from '@lib/validation';
 
 interface PasswordFormValues {
   current: string;
@@ -15,7 +17,10 @@ interface PasswordFormValues {
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
 const ChangePasswordSection: React.FC = () => {
-  const passwordForm = useForm<PasswordFormValues>();
+  const passwordForm = useForm<ChangePasswordFormData>({
+    resolver: zodResolver(changePasswordSchema),
+    mode: 'onBlur',
+  });
   const { addNotification } = useContext(NotificationContext);
   const [passwordStrength, setPasswordStrength] = useState(0);
 
@@ -43,7 +48,7 @@ const ChangePasswordSection: React.FC = () => {
     return 'Strong';
   };
 
-  const submitPassword: SubmitHandler<PasswordFormValues> = async ({
+  const submitPassword: SubmitHandler<ChangePasswordFormData> = async ({
     current,
     password,
   }) => {
@@ -86,7 +91,6 @@ const ChangePasswordSection: React.FC = () => {
             label="Current Password"
             register={passwordForm.register}
             name="current"
-            rules={{ required: 'Required' }}
             error={passwordForm.formState.errors.current?.message}
           />
           <div className="mt-2">
@@ -104,10 +108,6 @@ const ChangePasswordSection: React.FC = () => {
             label="New Password"
             register={passwordForm.register}
             name="password"
-            rules={{
-              required: 'Required',
-              pattern: { value: passwordRegex, message: 'Weak password' },
-            }}
             error={passwordForm.formState.errors.password?.message}
             onChange={(e) => setPasswordStrength(getPasswordStrength(e.target.value))}
           />
@@ -140,12 +140,6 @@ const ChangePasswordSection: React.FC = () => {
           label="Confirm Password"
           register={passwordForm.register}
           name="confirm"
-          rules={{
-            required: 'Required',
-            validate: (v) =>
-              v === passwordForm.getValues('password') ||
-              'Passwords do not match',
-          }}
           error={passwordForm.formState.errors.confirm?.message}
         />
       </div>

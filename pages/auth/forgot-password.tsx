@@ -2,27 +2,28 @@ import { apiFetch } from '@lib/api';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { EmailInput } from '@components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import PageContainer from '@components/Layout/PageContainer';
-
-interface ForgotPasswordForm {
-  email: string;
-}
+import { forgotPasswordSchema, type ForgotPasswordFormData } from '@lib/validation';
 
 const ForgotPasswordPage: React.FC = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ForgotPasswordForm>();
+  } = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordSchema),
+    mode: 'onBlur',
+  });
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const onSubmit: SubmitHandler<ForgotPasswordForm> = async ({ email }) => {
+  const onSubmit: SubmitHandler<ForgotPasswordFormData> = async ({ email }) => {
     setLoading(true);
     setMessage('');
     setError('');
@@ -94,14 +95,6 @@ const ForgotPasswordPage: React.FC = () => {
               name="email"
               placeholder="Enter your email address"
               register={register}
-              required
-              rules={{
-                required: 'Email is required',
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: 'Please enter a valid email address',
-                },
-              }}
               error={errors.email?.message as string}
               className="w-full"
             />

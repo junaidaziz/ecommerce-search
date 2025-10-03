@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { AppContext } from '@contexts/AppContext';
@@ -18,9 +19,8 @@ import {
   AUTH_LINKS,
   AUTH_INFO,
   PASSWORD_REGEX,
-  getEmailValidation,
-  getFirstNameValidation,
 } from '@/config/auth.config';
+import { userSignupSchema, type UserSignupFormData } from '@lib/validation';
 
 export default function UserSignup() {
   const router = useRouter();
@@ -33,12 +33,10 @@ export default function UserSignup() {
     setError,
     clearErrors,
     formState: { errors },
-  } = useForm<{
-    firstName: string;
-    email: string;
-    password: string;
-    confirm: string;
-  }>({ mode: 'onBlur' });
+  } = useForm<UserSignupFormData>({
+    resolver: zodResolver(userSignupSchema),
+    mode: 'onBlur',
+  });
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -73,10 +71,7 @@ export default function UserSignup() {
         type: 'manual',
         message: AUTH_ERRORS.passwordsNoMatch,
       });
-      return AUTH_ERRORS.passwordsNoMatch;
     }
-    clearErrors('confirm');
-    return true;
   };
 
   const submit = async (values: any) => {
@@ -128,7 +123,6 @@ export default function UserSignup() {
             name="firstName"
             placeholder={AUTH_PLACEHOLDERS.firstName}
             register={register}
-            rules={getFirstNameValidation()}
             error={errors.firstName?.message as string}
           />
           
@@ -138,7 +132,6 @@ export default function UserSignup() {
             placeholder={AUTH_PLACEHOLDERS.email}
             register={register}
             onBlur={handleEmailBlur}
-            rules={getEmailValidation()}
             error={errors.email?.message as string}
           />
           
@@ -148,15 +141,8 @@ export default function UserSignup() {
                 name="password"
                 placeholder={AUTH_PLACEHOLDERS.password}
                 register={register}
-                rules={{
-                  required: AUTH_ERRORS.passwordRequired,
-                  pattern: {
-                    value: PASSWORD_REGEX,
-                    message: AUTH_ERRORS.passwordInvalid,
-                  },
-                  onBlur: handlePasswordBlur,
-                }}
                 onFocus={handlePasswordFocus}
+                onBlur={handlePasswordBlur}
                 error={errors.password?.message as string}
                 className={`w-full text-base px-4 py-3 rounded-lg border ${errors.password ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
               />
@@ -167,7 +153,7 @@ export default function UserSignup() {
                 name="confirm"
                 placeholder={AUTH_PLACEHOLDERS.confirmPassword}
                 register={register}
-                rules={{ validate: handleConfirmBlur }}
+                onBlur={handleConfirmBlur}
                 error={errors.confirm?.message as string}
                 className={`w-full text-base px-4 py-3 rounded-lg border ${errors.confirm ? 'border-red-500 dark:border-red-400' : 'border-gray-200 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary`}
               />

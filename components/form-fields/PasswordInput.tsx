@@ -76,7 +76,6 @@ const PasswordInput = <T extends FieldValues>(props: PasswordInputProps<T>) => {
           onChange={onChange}
           onBlur={onBlur}
           disabled={disabled}
-          required={required}
           className={`flex-1 px-3 h-12 bg-transparent text-base rounded-l-md rounded-r-none shadow-none text-gray-900 dark:text-gray-100 outline-none border-none ${leftAddon ? 'rounded-l-none' : ''} ${className}`}
           {...registration}
           {...rest}

@@ -1,11 +1,13 @@
 import { apiFetch } from '@lib/api';
 import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { TextInput, Textarea, CountrySelect } from '@components/form-fields';
 import { useContext } from 'react';
 import { NotificationContext } from '@contexts/NotificationContext';
 import ProfileAvatarUploader from '@components/ProfileAvatarUploader';
 import Link from 'next/link';
+import { brandSettingsSchema, type BrandSettingsFormData } from '@lib/validation';
 
 interface BrandFormValues {
   firstName: string;
@@ -22,7 +24,10 @@ interface BrandFormValues {
 }
 
 const BrandSettingsSection: React.FC = () => {
-  const brandForm = useForm<BrandFormValues>();
+  const brandForm = useForm<BrandSettingsFormData>({
+    resolver: zodResolver(brandSettingsSchema),
+    mode: 'onBlur',
+  });
   const { addNotification } = useContext(NotificationContext);
   const [loading, setLoading] = useState(true);
 
@@ -50,7 +55,7 @@ const BrandSettingsSection: React.FC = () => {
       .finally(() => setLoading(false));
   }, [brandForm]);
 
-  const submitBrand: SubmitHandler<BrandFormValues> = async (values) => {
+  const submitBrand: SubmitHandler<BrandSettingsFormData> = async (values) => {
     // Split the values into profile and brand data
     const profileData = {
       firstName: values.firstName,
@@ -121,20 +126,16 @@ const BrandSettingsSection: React.FC = () => {
           label="First Name"
           register={brandForm.register}
           name="firstName"
-          rules={{ required: 'First name is required' }}
           error={brandForm.formState.errors.firstName?.message}
           placeholder="Enter your first name"
-          required
         />
         
         <TextInput
           label="Last Name"
           register={brandForm.register}
           name="lastName"
-          rules={{ required: 'Last name is required' }}
           error={brandForm.formState.errors.lastName?.message}
           placeholder="Enter your last name"
-          required
         />
 
         <div className="md:col-span-2">
@@ -144,11 +145,9 @@ const BrandSettingsSection: React.FC = () => {
                 label="Email"
                 register={brandForm.register}
                 name="email"
-                rules={{ required: 'Email is required' }}
                 error={brandForm.formState.errors.email?.message}
                 placeholder="Enter your email address"
                 readOnly
-                required
               />
             </div>
             <div className="pb-4">
@@ -166,21 +165,17 @@ const BrandSettingsSection: React.FC = () => {
           label="Brand Name"
           register={brandForm.register}
           name="brandName"
-          rules={{ required: 'Brand name is required' }}
           error={brandForm.formState.errors.brandName?.message}
           className="md:col-span-2"
           placeholder="Enter your brand name"
-          required
         />
         
         <TextInput
           label="Phone Number"
           register={brandForm.register}
           name="phoneNumber"
-          rules={{ required: 'Phone number is required' }}
           error={brandForm.formState.errors.phoneNumber?.message}
           placeholder="Enter contact phone number"
-          required
         />
 
         <TextInput
@@ -195,30 +190,24 @@ const BrandSettingsSection: React.FC = () => {
           label="Business Address"
           register={brandForm.register}
           name="businessAddress"
-          rules={{ required: 'Business address is required' }}
           error={brandForm.formState.errors.businessAddress?.message}
           className="md:col-span-2"
           placeholder="Enter your business address"
-          required
         />
 
         <TextInput
           label="City"
           register={brandForm.register}
           name="city"
-          rules={{ required: 'City is required' }}
           error={brandForm.formState.errors.city?.message}
           placeholder="Enter city"
-          required
         />
 
         <CountrySelect
           label="Country"
           control={brandForm.control}
           name="country"
-          rules={{ required: 'Country is required' }}
           error={brandForm.formState.errors.country?.message}
-          required
         />
 
         <TextInput
