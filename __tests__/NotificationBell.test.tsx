@@ -12,6 +12,16 @@ jest.mock('@lib/api', () => ({
   ),
 }));
 
+// Mock Next.js router
+jest.mock('next/router', () => ({
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+    pathname: '/test',
+    query: {},
+    asPath: '/test',
+  })),
+}));
+
 // Mock BellIcon
 jest.mock('@components/icons/BellIcon', () => ({
   __esModule: true,
