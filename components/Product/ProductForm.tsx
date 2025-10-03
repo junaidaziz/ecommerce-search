@@ -14,6 +14,7 @@ import { VendorsResponse } from '@/types';
 
 import { AppContext } from '@contexts/AppContext';
 import type { ProductFormValues } from '@/types';
+import { requiredMessage } from '@lib/validation/fieldLabels';
 
 interface ProductFormProps {
   initial?: Partial<ProductFormValues>;
@@ -151,14 +152,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const onFormSubmit = handleSubmit(
     async (values) => {
       const fd = new FormData();
-      fd.append('id', values.id);
-      fd.append('vendor', values.vendor);
-      fd.append('sku', values.sku);
-      fd.append('title', values.title);
-      fd.append('description', values.description);
-      fd.append('product_type', values.productType);
-      fd.append('tags', values.tags.join(','));
-      fd.append('category_id', values.categoryId);
+  if (values.id) fd.append('id', String(values.id));
+  if (values.vendor) fd.append('vendor', String(values.vendor));
+  fd.append('sku', String(values.sku));
+  fd.append('title', String(values.title));
+  fd.append('description', String(values.description));
+  fd.append('product_type', String(values.productType));
+  fd.append('tags', values.tags.join(','));
+  fd.append('category_id', String(values.categoryId));
       fd.append('quantity', values.available ? String(values.quantity) : '0');
       fd.append('min_price', String(values.minPrice));
       fd.append('max_price', String(values.maxPrice));
@@ -191,20 +192,20 @@ const ProductForm: React.FC<ProductFormProps> = ({
         label="SKU"
         name="sku"
         register={register}
-        rules={{ required: 'Required' }}
+  rules={{ required: requiredMessage('sku') }}
         error={errors.sku?.message}
       />
       <div className="mb-4">
         <label
           htmlFor="vendor-select"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
         >
           Vendor <span className="text-red-500">*</span>
         </label>
         <Controller
           name="vendor"
           control={control}
-          rules={{ required: 'Required' }}
+          rules={{ required: requiredMessage('vendor') }}
           render={({ field }) => (
             <AsyncCreatableSelect
               inputId="vendor-select"
@@ -243,7 +244,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         label="Title"
         name="title"
         register={register}
-        rules={{ required: 'Required' }}
+  rules={{ required: requiredMessage('title') }}
         error={errors.title?.message}
         required
       />
@@ -252,7 +253,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           label="Description"
           name="description"
           control={control}
-          rules={{ required: 'Required' }}
+          rules={{ required: requiredMessage('description') }}
           error={errors.description?.message}
           required
         />
@@ -261,7 +262,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         label="Product Type"
         name="productType"
         register={register}
-        rules={{ required: 'Required' }}
+  rules={{ required: requiredMessage('productType') }}
         error={errors.productType?.message}
         required
       />
@@ -277,14 +278,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
       <div className="mb-4">
         <label
           htmlFor="category-select"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
         >
           Category <span className="text-red-500">*</span>
         </label>
         <Controller
           name="categoryId"
           control={control}
-          rules={{ required: 'Required' }}
+          rules={{ required: requiredMessage('categoryId') }}
           render={({ field }) => (
             <AsyncCreatableSelect
               inputId="category-select"
@@ -345,7 +346,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           step="0.01"
           register={register}
           rules={{
-            required: 'Required',
+            required: requiredMessage('minPrice'),
             min: { value: 0, message: 'Must be >= 0' },
           }}
           error={errors.minPrice?.message}
@@ -359,7 +360,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           step="0.01"
           register={register}
           rules={{
-            required: 'Required',
+            required: requiredMessage('maxPrice'),
             min: { value: 0, message: 'Must be >= 0' },
           }}
           error={errors.maxPrice?.message}
@@ -371,7 +372,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           label="Currency"
           name="currency"
           register={register}
-          rules={{ required: 'Required' }}
+          rules={{ required: requiredMessage('currency') }}
           error={errors.currency?.message}
           required
         />
@@ -401,7 +402,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           step="0.01"
           register={register}
           rules={{
-            required: 'Required',
+            required: requiredMessage('discountValue'),
             validate: (v) => {
               const num = typeof v === 'number' ? v : Number(v);
               if (watch('discountType') === 'percentage') {

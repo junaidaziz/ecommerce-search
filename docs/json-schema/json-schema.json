@@ -199,6 +199,16 @@
             "$ref": "#/definitions/Notification"
           }
         },
+        "notificationPreferences": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/NotificationPreference"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "sentMessages": {
           "type": "array",
           "items": {
@@ -245,6 +255,18 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/Review"
+          }
+        },
+        "loginSessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LoginSession"
+          }
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Address"
           }
         }
       }
@@ -669,16 +691,64 @@
           "type": "string"
         },
         "cardLast4": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "cardBrand": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "expMonth": {
-          "type": "integer"
+          "type": [
+            "integer",
+            "null"
+          ]
         },
         "expYear": {
-          "type": "integer"
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "paypalEmail": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stripePaymentId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "bankName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "accountLast4": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "accountType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "routingNumber": {
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "token": {
           "type": "string"
@@ -745,6 +815,16 @@
         "message": {
           "type": "string"
         },
+        "type": {
+          "type": "string",
+          "default": "GENERAL",
+          "enum": [
+            "ORDER_UPDATE",
+            "PROMOTION",
+            "DISCOUNT",
+            "GENERAL"
+          ]
+        },
         "read": {
           "type": "boolean",
           "default": false
@@ -757,7 +837,53 @@
           "$ref": "#/definitions/User"
         },
         "order": {
-          "$ref": "#/definitions/Order"
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Order"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "NotificationPreference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "orderUpdates": {
+          "type": "boolean",
+          "default": true
+        },
+        "promotions": {
+          "type": "boolean",
+          "default": true
+        },
+        "discounts": {
+          "type": "boolean",
+          "default": true
+        },
+        "generalUpdates": {
+          "type": "boolean",
+          "default": true
+        },
+        "emailNotifications": {
+          "type": "boolean",
+          "default": true
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
         }
       }
     },
@@ -1021,6 +1147,112 @@
           "$ref": "#/definitions/User"
         }
       }
+    },
+    "Address": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "fullName": {
+          "type": "string"
+        },
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "isDefault": {
+          "type": "boolean",
+          "default": false
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "LoginSession": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "sessionToken": {
+          "type": "string"
+        },
+        "userAgent": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ipAddress": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "deviceInfo": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lastActivity": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
     }
   },
   "type": "object",
@@ -1061,6 +1293,9 @@
     "notification": {
       "$ref": "#/definitions/Notification"
     },
+    "notificationPreference": {
+      "$ref": "#/definitions/NotificationPreference"
+    },
     "message": {
       "$ref": "#/definitions/Message"
     },
@@ -1081,6 +1316,12 @@
     },
     "review": {
       "$ref": "#/definitions/Review"
+    },
+    "address": {
+      "$ref": "#/definitions/Address"
+    },
+    "loginSession": {
+      "$ref": "#/definitions/LoginSession"
     }
   }
 }

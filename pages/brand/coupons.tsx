@@ -7,6 +7,8 @@ import { TextInput } from '@components/form-fields';
 import { Coupon, UserRole, USER_ROLES } from '@/types';
 import { getPageTitle } from '@lib/pageTitle';
 import PageHero from '@components/UI/PageHero';
+import { validateCoupon } from '@lib/validation/couponSchema';
+import TableHeaderCell from '@components/common/TableHeaderCell';
 
 export default function BrandCoupons() {
   const { user } = useContext(AppContext)!;
@@ -21,6 +23,7 @@ export default function BrandCoupons() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const fetchCoupons = () => {
     fetchJsonSafe<Coupon[]>('/api/brand/coupons', [])
@@ -36,9 +39,22 @@ export default function BrandCoupons() {
     e.preventDefault();
     setError('');
     setMessage('');
+    setFieldErrors({});
+
+    const validation = validateCoupon(form);
+    if (!validation.success) {
+      const fe: Record<string, string> = {};
+      validation.error.issues.forEach((iss: any) => {
+        const key = iss.path[0];
+        if (typeof key === 'string' && !fe[key]) fe[key] = iss.message;
+      });
+      setFieldErrors(fe);
+      setError('Please fix the highlighted fields');
+      return;
+    }
     
     const method = editingId ? 'PUT' : 'POST';
-    const body = { ...form, id: editingId ?? undefined };
+    const body = { ...validation.data, id: editingId ?? undefined };
     
     try {
       const res = await apiFetch('/api/brand/coupons', {
@@ -118,28 +134,28 @@ export default function BrandCoupons() {
           <form onSubmit={submit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Coupon Code *
-                </label>
                 <TextInput
                   name="code"
+                  label="Coupon Code"
+                  showRequiredIndicator
                   value={form.code}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     setForm((f: Partial<Coupon>) => ({ ...f, code: e.target.value.toUpperCase() }))
                   }
                   placeholder="e.g., SAVE10"
-                  required
                   className="uppercase"
+                  error={fieldErrors.code}
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Letters and numbers only</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Discount Type *
+                <label htmlFor="discountType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Discount Type <span className="text-red-500">*</span>
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
+                  id="discountType"
+                  className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 border-gray-300 dark:border-gray-700 ${fieldErrors.discountType ? 'border-red-500 dark:border-red-500' : ''}`}
                   value={form.discountType}
                   onChange={(e) =>
                     setForm((f: Partial<Coupon>) => ({
@@ -147,23 +163,23 @@ export default function BrandCoupons() {
                       discountType: e.target.value as 'percent' | 'amount' | 'bogo',
                     }))
                   }
-                  required
                 >
                   <option value="percent">Percentage Off</option>
                   <option value="amount">Fixed Amount Off</option>
                   <option value="bogo">Buy One Get One</option>
                 </select>
+                {fieldErrors.discountType && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{fieldErrors.discountType}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Discount Value *
-                </label>
                 <TextInput
                   name="discountValue"
+                  label="Discount Value"
+                  showRequiredIndicator={form.discountType !== 'bogo'}
                   type="number"
                   step="0.01"
                   min="0"
+                  disabled={form.discountType === 'bogo'}
                   value={String(form.discountValue)}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     setForm((f: Partial<Coupon>) => ({
@@ -172,7 +188,7 @@ export default function BrandCoupons() {
                     }))
                   }
                   placeholder={form.discountType === 'percent' ? '10' : '5.00'}
-                  required
+                  error={fieldErrors.discountValue}
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {form.discountType === 'percent' ? 'Percentage (e.g., 10 for 10%)' : 'Amount in £'}
@@ -298,30 +314,14 @@ export default function BrandCoupons() {
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Code
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Discount
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Min Order
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Used / Limit
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Expires
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Actions
-                    </th>
+                    <TableHeaderCell title="Code" />
+                    <TableHeaderCell title="Type" />
+                    <TableHeaderCell title="Discount" />
+                    <TableHeaderCell title="Min Order" />
+                    <TableHeaderCell title="Used / Limit" />
+                    <TableHeaderCell title="Expires" />
+                    <TableHeaderCell title="Status" />
+                    <TableHeaderCell title="Actions" />
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">

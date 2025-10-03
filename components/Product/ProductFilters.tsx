@@ -44,7 +44,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   return (
     <form
       onSubmit={(e) => e.preventDefault()}
-      className="space-y-6 p-4 md:p-4"
+      className="space-y-5 p-4 md:p-4 bg-transparent"
     >
       {/* Search Keyword */}
       <SearchFilter keyword={keyword} setKeyword={setKeyword} />
@@ -74,18 +74,17 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       />
 
       {/* Quick Actions */}
-      <div className="pt-1">
+      <div className="pt-2">
         <Button
           type="button"
           onClick={clearAll}
-          variant="outline"
-          size="md"
+          size="sm"
           fullWidth
           rounded
-          className="font-semibold text-primary border-primary dark:text-primary-light dark:border-primary-light mt-2"
+          className="justify-center gap-2 font-medium bg-base-200/70 dark:bg-gray-900/60 hover:bg-base-200 dark:hover:bg-gray-800 text-base-content/80 hover:text-base-content border border-base-300 dark:border-gray-700 shadow-sm"
         >
-          <XMarkIcon className="w-4 h-4 mr-2" />
-          Clear All Filters
+          <XMarkIcon className="w-4 h-4" />
+          <span>Clear All</span>
         </Button>
       </div>
     </form>

@@ -16,6 +16,8 @@ export interface TextInputProps<T extends FieldValues>
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   error?: string;
   required?: boolean;
+  showLabel?: boolean; // control rendering of label element
+  showRequiredIndicator?: boolean; // show red * independent of native required attr
   disabled?: boolean;
   className?: string;
   leftAddon?: React.ReactNode;
@@ -35,6 +37,8 @@ const TextInput = <T extends FieldValues>(props: TextInputProps<T>) => {
     onBlur,
     error,
     required = false,
+    showLabel = true,
+    showRequiredIndicator,
     disabled = false,
     className = '',
     leftAddon,
@@ -49,12 +53,15 @@ const TextInput = <T extends FieldValues>(props: TextInputProps<T>) => {
 
   return (
     <div className={`mb-4 w-full ${wrapperClassName}`}>
-      {label && (
+      {label && showLabel && (
         <label
           htmlFor={inputId}
           className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
         >
-          {label} {required && <span className="text-red-500">*</span>}
+          {label}{' '}
+          {(showRequiredIndicator ?? required) && (
+            <span className="text-red-500">*</span>
+          )}
         </label>
       )}
       <div className="relative flex items-stretch w-full">

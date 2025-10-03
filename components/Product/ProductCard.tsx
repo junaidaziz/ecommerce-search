@@ -3,7 +3,7 @@ import type { Product } from '@/types';
 import { AppContext } from '@contexts/AppContext';
 import CartIcon from '../icons/CartIcon';
 import Button from '../UI/Button';
-import ProductImage from './ProductImage';
+import ProductImage from './ProductImage'; // Will simplify to single image (no slider) for listing
 import ProductBadges from './ProductBadges';
 import ProductInfo from './ProductInfo';
 import ProductPrice from './ProductPrice';
@@ -30,10 +30,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   // Use utility function to parse and get images with placeholders
   const imagesArr = parseProductImages(
-    product.images, 
+    product.images,
     product.id,
     product.productType || undefined
-  );
+  ).slice(0,1); // Only first image for card to reduce requests
 
   const tagsString = Array.isArray(product.tags)
     ? product.tags.join(',')
@@ -104,7 +104,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             size="md"
             fullWidth
             rounded
-            className="py-2 px-4 flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-shadow"
+            className="py-2.5 px-4 flex items-center justify-center gap-2 font-semibold tracking-wide shadow-sm hover:shadow-md bg-primary text-white hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 disabled:cursor-not-allowed"
             onClick={handleAddToCart}
           >
             <CartIcon className="w-4 h-4 flex-shrink-0" />
