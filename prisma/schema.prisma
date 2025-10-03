@@ -70,6 +70,7 @@ model User {
   wishlistItems    WishlistItem[]
   coupon           Coupon[]
   reviews          Review[]          @relation("UserReviews")
+  preferences      UserPreference?
 
   @@index([phoneNumber])
 }
@@ -356,4 +357,19 @@ model Review {
   user User @relation("UserReviews", fields: [userId], references: [id])
 
   @@index([entityType, entityId])
+}
+
+model UserPreference {
+  id                      Int      @id @default(autoincrement())
+  userId                  Int      @unique
+  language                String   @default("en")
+  currency                String   @default("USD")
+  receiveOrderUpdates     Boolean  @default(true)
+  receivePromotions       Boolean  @default(true)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

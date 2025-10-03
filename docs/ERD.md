@@ -80,11 +80,22 @@ erDiagram
       STRING query
       DATETIME createdAt
     }
+    UserPreference {
+      INT id PK
+      INT userId FK
+      STRING language
+      STRING currency
+      BOOLEAN receiveOrderUpdates
+      BOOLEAN receivePromotions
+      DATETIME createdAt
+      DATETIME updatedAt
+    }
 
     User ||--o{ Product : "has"
     User ||--o{ Order : "places"
     User ||--o{ DeletionRequest : "requests"
     User ||--o{ SearchLog : "logs"
+    User ||--|| UserPreference : "has preferences"
     Category ||--o{ Product : "contains"
     Category ||--o{ DeletionRequest : "records"
     Product }o--o{ Order : "ordered in"

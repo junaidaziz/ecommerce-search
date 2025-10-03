@@ -124,6 +124,51 @@ export function setUserDisabled(email: string, disabled: boolean) {
   return prisma.user.update({ where: { email }, data: { disabled } });
 }
 
+export async function getUserPreferences(userId: number) {
+  const preferences = await prisma.userPreference.findUnique({
+    where: { userId },
+  });
+
+  // Return default preferences if none exist
+  if (!preferences) {
+    return {
+      language: 'en',
+      currency: 'USD',
+      receiveOrderUpdates: true,
+      receivePromotions: true,
+    };
+  }
+
+  return {
+    language: preferences.language,
+    currency: preferences.currency,
+    receiveOrderUpdates: preferences.receiveOrderUpdates,
+    receivePromotions: preferences.receivePromotions,
+  };
+}
+
+export async function updateUserPreferences(
+  userId: number,
+  data: {
+    language?: string;
+    currency?: string;
+    receiveOrderUpdates?: boolean;
+    receivePromotions?: boolean;
+  }
+) {
+  return prisma.userPreference.upsert({
+    where: { userId },
+    update: data,
+    create: {
+      userId,
+      language: data.language ?? 'en',
+      currency: data.currency ?? 'USD',
+      receiveOrderUpdates: data.receiveOrderUpdates ?? true,
+      receivePromotions: data.receivePromotions ?? true,
+    },
+  });
+}
+
 export function setBrandActive(id: number, active: boolean) {
   return prisma.user.update({ where: { id }, data: { active } });
 }
