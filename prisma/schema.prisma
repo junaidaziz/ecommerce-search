@@ -70,6 +70,7 @@ model User {
   wishlistItems    WishlistItem[]
   coupon           Coupon[]
   reviews          Review[]          @relation("UserReviews")
+  loginSessions    LoginSession[]    @relation("UserLoginSessions")
 
   @@index([phoneNumber])
 }
@@ -356,4 +357,23 @@ model Review {
   user User @relation("UserReviews", fields: [userId], references: [id])
 
   @@index([entityType, entityId])
+}
+
+model LoginSession {
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(uuid())
+  userId       Int
+  sessionToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  deviceInfo   String?
+  lastActivity DateTime @default(now())
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+
+  user User @relation("UserLoginSessions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([expiresAt])
 }
