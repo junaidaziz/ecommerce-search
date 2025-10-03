@@ -163,6 +163,20 @@ const BrandHeader: FC<HeaderProps> = ({
                   <span className="pointer-events-none absolute inset-x-2 -bottom-1 h-0.5 bg-gradient-to-r from-primary/0 via-primary/80 to-primary/0 rounded-full" />
                 )}
               </Link>
+              <Link
+                href="/brand/coupons"
+                aria-current={pathname === '/brand/coupons' ? 'page' : undefined}
+                className={`relative px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-950
+                  ${pathname === '/brand/coupons'
+                    ? 'text-primary dark:text-primary font-semibold bg-primary/5 dark:bg-primary/10 shadow-sm'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-primary'}
+                `}
+              >
+                <span className="relative z-10">Coupons</span>
+                {pathname === '/brand/coupons' && (
+                  <span className="pointer-events-none absolute inset-x-2 -bottom-1 h-0.5 bg-gradient-to-r from-primary/0 via-primary/80 to-primary/0 rounded-full" />
+                )}
+              </Link>
             </>
           )}
         </nav>
