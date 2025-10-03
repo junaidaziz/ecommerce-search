@@ -3,24 +3,26 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { PasswordInput } from '@components/form-fields';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
 import PageContainer from '@components/Layout/PageContainer';
+import { resetPasswordSchema, type ResetPasswordFormData } from '@lib/validation';
 
 const ResetToken: React.FC = () => {
   const router = useRouter();
   const { token } = router.query as { token?: string };
-  type ResetForm = { password: string; confirmPassword: string };
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<ResetForm>();
+  const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema),
+    mode: 'onBlur',
+  });
   const [message, setMessage] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const password = watch('password');
-
-  const submit: SubmitHandler<ResetForm> = async ({ password }) => {
+  const submit: SubmitHandler<ResetPasswordFormData> = async ({ password }) => {
     setLoading(true);
     setError('');
     setMessage('');
@@ -122,17 +124,6 @@ const ResetToken: React.FC = () => {
               placeholder="New Password"
               register={register}
               name="password"
-              rules={{
-                required: 'Password is required',
-                minLength: {
-                  value: 8,
-                  message: 'Password must be at least 8 characters',
-                },
-                pattern: {
-                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                  message: 'Password must contain uppercase, lowercase, and number',
-                },
-              }}
               error={errors.password?.message as string}
             />
 
@@ -141,11 +132,6 @@ const ResetToken: React.FC = () => {
               placeholder="Confirm New Password"
               register={register}
               name="confirmPassword"
-              rules={{
-                required: 'Please confirm your password',
-                validate: (value) =>
-                  value === password || 'Passwords do not match',
-              }}
               error={errors.confirmPassword?.message as string}
             />
 

@@ -121,6 +121,26 @@ export const newsletterSchema = z.object({
 
 export type NewsletterFormData = z.infer<typeof newsletterSchema>;
 
+// Forgot password schema
+export const forgotPasswordSchema = z.object({
+  email: emailValidator,
+});
+
+export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+
+// Reset password schema
+export const resetPasswordSchema = z
+  .object({
+    password: passwordValidator,
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
+export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
+
 // Product form schema (for brand side)
 export const productFormSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
