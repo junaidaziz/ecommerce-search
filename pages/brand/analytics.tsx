@@ -165,14 +165,14 @@ const BrandAnalytics: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <TotalProductsCard />
-        <TotalSalesCard />
-        <OrdersThisMonthCard />
-        <InventoryAlertsCard />
-      </div>
+          <TotalProductsCard />
+          <TotalSalesCard />
+          <OrdersThisMonthCard />
+          <InventoryAlertsCard />
+        </div>
 
-      {/* Charts Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        {/* Charts Grid */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
         <DashboardCard title="Sales Over Time">
           <ChartContainer dataLength={salesData.length} height="16rem">
             <ResponsiveContainer width="100%" height="100%">
@@ -260,6 +260,7 @@ const BrandAnalytics: React.FC = () => {
             <p>No sales yet.</p>
           </div>
         )}
+      </div>
       </div>
     </div>
   );
