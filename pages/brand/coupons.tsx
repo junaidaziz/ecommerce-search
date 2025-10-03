@@ -98,19 +98,19 @@ export default function BrandCoupons() {
       <PageHero heading="Manage Coupons" />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Form Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
             {editingId ? 'Edit Coupon' : 'Create New Coupon'}
           </h2>
           
           {message && (
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md">
+            <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 rounded-md">
               {message}
             </div>
           )}
           
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-md">
               {error}
             </div>
           )}
@@ -118,7 +118,7 @@ export default function BrandCoupons() {
           <form onSubmit={submit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Coupon Code *
                 </label>
                 <TextInput
@@ -131,15 +131,15 @@ export default function BrandCoupons() {
                   required
                   className="uppercase"
                 />
-                <p className="text-xs text-gray-500 mt-1">Letters and numbers only</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Letters and numbers only</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Discount Type *
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
                   value={form.discountType}
                   onChange={(e) =>
                     setForm((f: Partial<Coupon>) => ({
@@ -156,7 +156,7 @@ export default function BrandCoupons() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Discount Value *
                 </label>
                 <TextInput
@@ -174,13 +174,13 @@ export default function BrandCoupons() {
                   placeholder={form.discountType === 'percent' ? '10' : '5.00'}
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {form.discountType === 'percent' ? 'Percentage (e.g., 10 for 10%)' : 'Amount in £'}
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Minimum Order Value
                 </label>
                 <TextInput
@@ -197,11 +197,11 @@ export default function BrandCoupons() {
                   }
                   placeholder="Optional (e.g., 20.00)"
                 />
-                <p className="text-xs text-gray-500 mt-1">Leave empty for no minimum</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave empty for no minimum</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Expiry Date
                 </label>
                 <TextInput
@@ -212,11 +212,11 @@ export default function BrandCoupons() {
                     setForm((f: Partial<Coupon>) => ({ ...f, expiresAt: e.target.value }))
                   }
                 />
-                <p className="text-xs text-gray-500 mt-1">Leave empty for no expiry</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave empty for no expiry</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Usage Limit
                 </label>
                 <TextInput
@@ -232,17 +232,17 @@ export default function BrandCoupons() {
                   }
                   placeholder="Optional (e.g., 100)"
                 />
-                <p className="text-xs text-gray-500 mt-1">Leave empty for unlimited uses</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave empty for unlimited uses</p>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Description
               </label>
               <textarea
                 name="description"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
                 rows={2}
                 value={form.description || ''}
                 onChange={(e) =>
@@ -256,7 +256,7 @@ export default function BrandCoupons() {
               {editingId && (
                 <button
                   type="button"
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                   onClick={() => {
                     setEditingId(null);
                     setForm({
@@ -273,7 +273,7 @@ export default function BrandCoupons() {
                 </button>
               )}
               <button
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-md transition-colors font-medium"
                 type="submit"
               >
                 {editingId ? 'Update Coupon' : 'Create Coupon'}
@@ -283,98 +283,98 @@ export default function BrandCoupons() {
         </div>
 
         {/* Coupons List */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold">Your Coupons</h2>
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Your Coupons</h2>
           </div>
           
           {coupons.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
               <p className="mb-2">No coupons created yet.</p>
               <p className="text-sm">Create your first coupon to offer discounts to customers!</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Code
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Type
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Discount
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Min Order
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Used / Limit
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Expires
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
                   {coupons.map((c) => {
                     const isExpired = c.expiresAt && new Date(c.expiresAt) < new Date();
                     const isLimitReached = c.usageLimit && c.usedCount >= c.usageLimit;
                     
                     return (
-                      <tr key={c.id} className="hover:bg-gray-50">
+                      <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex flex-col">
-                            <span className="font-semibold text-gray-900">{c.code}</span>
+                            <span className="font-semibold text-gray-900 dark:text-gray-100">{c.code}</span>
                             {c.description && (
-                              <span className="text-xs text-gray-500">{c.description}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">{c.description}</span>
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                           {c.discountType === 'percent' && 'Percentage'}
                           {c.discountType === 'amount' && 'Fixed Amount'}
                           {c.discountType === 'bogo' && 'BOGO'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">
                           {c.discountType === 'percent' && `${c.discountValue}%`}
                           {c.discountType === 'amount' && `£${c.discountValue.toFixed(2)}`}
                           {c.discountType === 'bogo' && 'BOGO'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                           {c.minOrderValue ? `£${c.minOrderValue.toFixed(2)}` : '-'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                           {c.usedCount} {c.usageLimit ? `/ ${c.usageLimit}` : '/ ∞'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                           {c.expiresAt
                             ? new Date(c.expiresAt).toLocaleDateString()
                             : 'Never'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {isExpired ? (
-                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400">
                               Expired
                             </span>
                           ) : isLimitReached ? (
-                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400">
                               Limit Reached
                             </span>
                           ) : c.isActive ? (
-                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
                               Active
                             </span>
                           ) : (
-                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-400">
                               Inactive
                             </span>
                           )}
@@ -382,7 +382,7 @@ export default function BrandCoupons() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <div className="flex gap-2">
                             <button
-                              className="text-blue-600 hover:text-blue-800 font-medium"
+                              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                               onClick={() => {
                                 setEditingId(Number(c.id));
                                 setForm({
@@ -402,8 +402,8 @@ export default function BrandCoupons() {
                             <button
                               className={`font-medium ${
                                 c.isActive
-                                  ? 'text-red-600 hover:text-red-800'
-                                  : 'text-green-600 hover:text-green-800'
+                                  ? 'text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300'
+                                  : 'text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300'
                               }`}
                               onClick={() => toggleActive(c.id, c.isActive)}
                             >
