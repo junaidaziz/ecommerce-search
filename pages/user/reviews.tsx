@@ -13,20 +13,20 @@ const UserReviews: React.FC = () => {
   }, []);
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto px-4 py-6">
       <Head>
         <title>{getPageTitle('Your Reviews')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Your Reviews</h1>
+      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">Your Reviews</h1>
       <ul className="space-y-2">
         {reviews.map((r, idx) => (
-          <li key={idx} className="border p-2">
-            <p className="font-semibold">Product: {r.productId}</p>
-            <p>Rating: {r.rating}</p>
-            <p className="text-sm text-gray-600">{r.comment}</p>
+          <li key={idx} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
+            <p className="font-semibold text-gray-900 dark:text-gray-100">Product: {r.productId}</p>
+            <p className="text-gray-700 dark:text-gray-300">Rating: {r.rating}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{r.comment}</p>
           </li>
         ))}
-        {reviews.length === 0 && <li>No reviews yet.</li>}
+        {reviews.length === 0 && <li className="text-gray-500 dark:text-gray-400">No reviews yet.</li>}
       </ul>
     </div>
   );

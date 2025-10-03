@@ -17,18 +17,18 @@ const BrowsingHistory: React.FC = () => {
   }, []);
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto px-4 py-6">
       <Head>
         <title>{getPageTitle('Browsing History')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Browsing History</h1>
+      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">Browsing History</h1>
       <ul className="space-y-2">
         {items.map((i) => (
-          <li key={i.id} className="border p-2">
+          <li key={i.id} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 text-gray-900 dark:text-gray-100">
             {i.title}
           </li>
         ))}
-        {items.length === 0 && <li>No history available.</li>}
+        {items.length === 0 && <li className="text-gray-500 dark:text-gray-400">No history available.</li>}
       </ul>
     </div>
   );

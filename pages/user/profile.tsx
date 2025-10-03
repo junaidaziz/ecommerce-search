@@ -61,30 +61,30 @@ export const UserProfile: React.FC = () => {
     }
   };
 
-  if (!user) return <div className="p-4">Please log in.</div>;
+  if (!user) return <div className="p-4 text-gray-700 dark:text-gray-300">Please log in.</div>;
   if (user.role !== USER_ROLES.USER)
-    return <div className="p-4">User access required.</div>;
+    return <div className="p-4 text-gray-700 dark:text-gray-300">User access required.</div>;
 
   return (
-    <div className="max-w-sm mx-auto">
+    <div className="max-w-sm mx-auto px-4 py-6">
       <Head>
         <title>{getPageTitle('My Profile')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">My Profile</h1>
+      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">My Profile</h1>
       {showComplete && (
-        <div className="alert alert-info mb-2">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-2 text-blue-800 dark:text-blue-200">
           Please complete your profile.
         </div>
       )}
-      {message && <div className="mb-2 text-green-600">{message}</div>}
+      {message && <div className="mb-2 text-green-600 dark:text-green-400">{message}</div>}
       <form onSubmit={handleSubmit(submit)} className="space-y-2">
         <input
-          className="input input-bordered w-full"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-transparent"
           placeholder="Last Name"
           {...register('lastName')}
         />
         <select
-          className="select select-bordered w-full"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-transparent"
           {...register('gender')}
         >
           <option value="male">Male</option>
@@ -92,22 +92,22 @@ export const UserProfile: React.FC = () => {
           <option value="other">Other</option>
         </select>
         <input
-          className="input input-bordered w-full"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-transparent"
           placeholder="Phone Number"
           {...register('phoneNumber')}
         />
         <input
-          className="input input-bordered w-full"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-transparent"
           placeholder="Address"
           {...register('address')}
         />
         <input
-          className="input input-bordered w-full"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-transparent"
           placeholder="City"
           {...register('city')}
         />
         <CountrySelect<ProfileForm> name="country" control={control} />
-        <button className="btn btn-primary w-full" type="submit">
+        <button className="w-full px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors" type="submit">
           Update
         </button>
       </form>
