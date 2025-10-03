@@ -7,7 +7,7 @@ import { useContext } from 'react';
 import { NotificationContext } from '@contexts/NotificationContext';
 import ProfileAvatarUploader from '@components/ProfileAvatarUploader';
 import Link from 'next/link';
-import { brandSettingsSchema, type BrandSettingsFormData } from '@/lib/validation';
+import { brandSettingsSchema, type BrandSettingsFormData } from '@lib/validation';
 
 interface BrandFormValues {
   firstName: string;

@@ -80,6 +80,30 @@ export const brandSettingsSchema = z.object({
 
 export type BrandSettingsFormData = z.infer<typeof brandSettingsSchema>;
 
+// User profile schema
+export const userProfileSchema = z.object({
+  firstName: z.string().min(1, 'Required'),
+  lastName: z.string().min(1, 'Required'),
+  email: emailValidator,
+  phoneNumber: z.string().optional(),
+});
+
+export type UserProfileFormData = z.infer<typeof userProfileSchema>;
+
+// Change password schema
+export const changePasswordSchema = z
+  .object({
+    current: z.string().min(1, 'Required'),
+    password: passwordValidator,
+    confirm: z.string().min(1, 'Required'),
+  })
+  .refine((data) => data.password === data.confirm, {
+    message: 'Passwords do not match',
+    path: ['confirm'],
+  });
+
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+
 // Checkout schema
 export const checkoutSchema = z.object({
   name: z.string().min(1, 'Name is required'),

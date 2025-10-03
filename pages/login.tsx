@@ -17,7 +17,7 @@ import {
   AUTH_BUTTONS, 
   AUTH_LINKS,
 } from '@/config/auth.config';
-import { loginSchema, type LoginFormData } from '@/lib/validation';
+import { loginSchema, type LoginFormData } from '@lib/validation';
 
 export interface LoginFormInputs {
   email: string;

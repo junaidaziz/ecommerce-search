@@ -21,7 +21,7 @@ import {
   AUTH_INFO,
   PASSWORD_REGEX,
 } from '@/config/auth.config';
-import { brandSignupSchema, type BrandSignupFormData } from '@/lib/validation';
+import { brandSignupSchema, type BrandSignupFormData } from '@lib/validation';
 
 export default function BrandSignup() {
   const router = useRouter();

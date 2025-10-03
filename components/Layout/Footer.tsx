@@ -8,7 +8,7 @@ import { NotificationContext } from '@contexts/NotificationContext';
 import VisaIcon from '../icons/VisaIcon';
 import MastercardIcon from '../icons/MastercardIcon';
 import PaypalIcon from '../icons/PaypalIcon';
-import { newsletterSchema, type NewsletterFormData } from '@/lib/validation';
+import { newsletterSchema, type NewsletterFormData } from '@lib/validation';
 
 const Footer: FC = () => {
   const {

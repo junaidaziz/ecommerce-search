@@ -2,9 +2,11 @@ import { apiFetch } from '@lib/api';
 import { useEffect, useContext, useState } from 'react';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { TextInput, EmailInput } from '@components/form-fields';
 import { NotificationContext } from '@contexts/NotificationContext';
 import ProfileAvatarUploader from '@components/ProfileAvatarUploader';
+import { userProfileSchema, type UserProfileFormData } from '@lib/validation';
 
 interface ProfileFormValues {
   firstName: string;
@@ -14,7 +16,10 @@ interface ProfileFormValues {
 }
 
 const UpdateProfileSection: React.FC = () => {
-  const profileForm = useForm<ProfileFormValues>();
+  const profileForm = useForm<UserProfileFormData>({
+    resolver: zodResolver(userProfileSchema),
+    mode: 'onBlur',
+  });
   const { addNotification } = useContext(NotificationContext);
   const [updatedAt, setUpdatedAt] = useState('');
 
@@ -36,7 +41,7 @@ const UpdateProfileSection: React.FC = () => {
       .catch(() => {});
   }, [profileForm]);
 
-  const submitProfile: SubmitHandler<ProfileFormValues> = async (values) => {
+  const submitProfile: SubmitHandler<UserProfileFormData> = async (values) => {
     const res = await apiFetch('/api/user/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -63,7 +68,6 @@ const UpdateProfileSection: React.FC = () => {
             register={profileForm.register}
             name="firstName"
             placeholder="John"
-            rules={{ required: 'Required' }}
             error={profileForm.formState.errors.firstName?.message}
           />
           <TextInput
@@ -71,7 +75,6 @@ const UpdateProfileSection: React.FC = () => {
             register={profileForm.register}
             name="lastName"
             placeholder="Doe"
-            rules={{ required: 'Required' }}
             error={profileForm.formState.errors.lastName?.message}
           />
         </div>
@@ -82,7 +85,6 @@ const UpdateProfileSection: React.FC = () => {
               register={profileForm.register}
               name="email"
               readOnly
-              rules={{ required: 'Required' }}
               error={profileForm.formState.errors.email?.message}
             />
           </div>

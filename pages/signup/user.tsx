@@ -20,7 +20,7 @@ import {
   AUTH_INFO,
   PASSWORD_REGEX,
 } from '@/config/auth.config';
-import { userSignupSchema, type UserSignupFormData } from '@/lib/validation';
+import { userSignupSchema, type UserSignupFormData } from '@lib/validation';
 
 export default function UserSignup() {
   const router = useRouter();
