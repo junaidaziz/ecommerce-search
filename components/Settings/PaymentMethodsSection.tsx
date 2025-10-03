@@ -9,9 +9,13 @@ import {
   isExpiryValid,
 } from '@utils/cardUtils';
 import { CreditCardIcon, TrashIcon, StarIcon } from '@heroicons/react/24/outline';
+import { FaPaypal } from 'react-icons/fa';
+
+type PaymentType = 'card' | 'paypal';
 
 const PaymentMethodsSection: React.FC = () => {
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
+  const [paymentType, setPaymentType] = useState<PaymentType>('card');
   const [cardNumber, setCardNumber] = useState('');
   const [cardError, setCardError] = useState('');
   const [expMonth, setExpMonth] = useState('');
@@ -19,7 +23,10 @@ const PaymentMethodsSection: React.FC = () => {
   const [cvc, setCvc] = useState('');
   const [expError, setExpError] = useState('');
   const [cvcError, setCvcError] = useState('');
+  const [paypalEmail, setPaypalEmail] = useState('');
+  const [paypalError, setPaypalError] = useState('');
   const [isCardValid, setIsCardValid] = useState(false);
+  const [isPayPalValid, setIsPayPalValid] = useState(false);
   const [loading, setLoading] = useState(false);
   const monthRef = useRef<HTMLInputElement>(null);
   const yearRef = useRef<HTMLInputElement>(null);
@@ -52,6 +59,14 @@ const PaymentMethodsSection: React.FC = () => {
     setCvcError(cvcValid || !cvc ? '' : 'Invalid CVC');
     setIsCardValid(validNumber && expValid && cvcValid);
   }, [cardNumber, expMonth, expYear, cvc]);
+
+  useEffect(() => {
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const validEmail = emailRegex.test(paypalEmail);
+    setPaypalError(validEmail || !paypalEmail ? '' : 'Invalid email address');
+    setIsPayPalValid(validEmail);
+  }, [paypalEmail]);
 
   const handleMakeDefault = async (methodId: string) => {
     setLoading(true);
@@ -90,14 +105,31 @@ const PaymentMethodsSection: React.FC = () => {
             {methods.map((m) => (
               <div key={m.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-5 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 gap-3">
                 <div className="flex items-center gap-3">
-                  <CreditCardIcon className="w-6 h-6 text-primary flex-shrink-0" />
+                  {m.provider === 'paypal' ? (
+                    <FaPaypal className="w-6 h-6 text-blue-600 flex-shrink-0" />
+                  ) : (
+                    <CreditCardIcon className="w-6 h-6 text-primary flex-shrink-0" />
+                  )}
                   <div>
-                    <div className="font-semibold text-gray-900 dark:text-white">
-                      {m.cardBrand} ****{m.cardLast4}
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      Expires {String(m.expMonth)}/{String(m.expYear)}
-                    </div>
+                    {m.provider === 'paypal' ? (
+                      <>
+                        <div className="font-semibold text-gray-900 dark:text-white">
+                          PayPal
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {m.paypalEmail}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="font-semibold text-gray-900 dark:text-white">
+                          {m.cardBrand} ****{m.cardLast4}
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Expires {String(m.expMonth)}/{String(m.expYear)}
+                        </div>
+                      </>
+                    )}
                   </div>
                   {m.isDefault && (
                     <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light text-xs rounded-full font-semibold">
@@ -131,26 +163,65 @@ const PaymentMethodsSection: React.FC = () => {
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             <CreditCardIcon className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
             <p className="text-lg font-medium">No payment methods added yet</p>
-            <p className="text-sm">Add a card below to get started</p>
+            <p className="text-sm">Add a card or PayPal account below to get started</p>
           </div>
         )}
       </div>
 
       {/* Add New Payment Method */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 p-6 sm:p-8">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Add New Card</h3>
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Add New Payment Method</h3>
+        
+        {/* Payment Type Selector */}
+        <div className="flex gap-3 mb-6">
+          <button
+            type="button"
+            onClick={() => setPaymentType('card')}
+            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+              paymentType === 'card'
+                ? 'bg-primary text-white shadow-lg'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            <CreditCardIcon className="w-5 h-5" />
+            Credit/Debit Card
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaymentType('paypal')}
+            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+              paymentType === 'paypal'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            <FaPaypal className="w-5 h-5" />
+            PayPal
+          </button>
+        </div>
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (!isCardValid) return;
             const form = e.currentTarget as HTMLFormElement;
-            const data = {
-              number: cardNumber.replace(/\s+/g, ''),
-              expMonth: expMonth.trim(),
-              expYear: expYear.trim(),
-              cvc: cvc.trim(),
+            
+            if (paymentType === 'card' && !isCardValid) return;
+            if (paymentType === 'paypal' && !isPayPalValid) return;
+            
+            const data: any = {
+              provider: paymentType,
               setDefault: (form.default as HTMLInputElement).checked,
             };
+            
+            if (paymentType === 'card') {
+              data.number = cardNumber.replace(/\s+/g, '');
+              data.expMonth = expMonth.trim();
+              data.expYear = expYear.trim();
+              data.cvc = cvc.trim();
+            } else {
+              data.paypalEmail = paypalEmail.trim();
+            }
+            
             apiFetch('/api/payment-methods', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -162,83 +233,107 @@ const PaymentMethodsSection: React.FC = () => {
                 setExpMonth('');
                 setExpYear('');
                 setCvc('');
+                setPaypalEmail('');
                 loadMethods();
               })
               .catch(() => {});
           }}
           className="space-y-5"
         >
-          <CardNumberInput
-            name="number"
-            value={cardNumber}
-            onChange={(e) => setCardNumber(e.target.value)}
-            error={cardError}
-          />
-          
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Month
-              </label>
-              <input
-                name="expMonth"
-                ref={monthRef}
-                value={expMonth}
-                onChange={(e) => {
-                  const v = e.target.value.replace(/\D/g, '').slice(0, 2);
-                  setExpMonth(v);
-                  if (v.length === 2) yearRef.current?.focus();
-                }}
-                className={`w-full px-4 py-2.5 rounded-lg border ${expError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
-                placeholder="MM"
-                maxLength={2}
-                inputMode="numeric"
+          {paymentType === 'card' ? (
+            <>
+              <CardNumberInput
+                name="number"
+                value={cardNumber}
+                onChange={(e) => setCardNumber(e.target.value)}
+                error={cardError}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Year
-              </label>
-              <input
-                name="expYear"
-                ref={yearRef}
-                value={expYear}
-                onChange={(e) => {
-                  const v = e.target.value.replace(/\D/g, '').slice(0, 4);
-                  setExpYear(v);
-                  if (v.length === 4) cvcRef.current?.focus();
-                }}
-                className={`w-full px-4 py-2.5 rounded-lg border ${expError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
-                placeholder="YYYY"
-                maxLength={4}
-                inputMode="numeric"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                CVC
-              </label>
-              <input
-                name="cvc"
-                ref={cvcRef}
-                value={cvc}
-                onChange={(e) => {
-                  const v = e.target.value.replace(/\D/g, '');
-                  setCvc(v.slice(0, 4));
-                }}
-                className={`w-full px-4 py-2.5 rounded-lg border ${cvcError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
-                placeholder="CVC"
-                maxLength={4}
-                inputMode="numeric"
-              />
-            </div>
-          </div>
-          
-          {(expError || cvcError) && (
-            <div className="text-sm text-red-600 dark:text-red-400">
-              {expError && <p>{expError}</p>}
-              {cvcError && <p>{cvcError}</p>}
-            </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Month
+                  </label>
+                  <input
+                    name="expMonth"
+                    ref={monthRef}
+                    value={expMonth}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, '').slice(0, 2);
+                      setExpMonth(v);
+                      if (v.length === 2) yearRef.current?.focus();
+                    }}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${expError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
+                    placeholder="MM"
+                    maxLength={2}
+                    inputMode="numeric"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Year
+                  </label>
+                  <input
+                    name="expYear"
+                    ref={yearRef}
+                    value={expYear}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, '').slice(0, 4);
+                      setExpYear(v);
+                      if (v.length === 4) cvcRef.current?.focus();
+                    }}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${expError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
+                    placeholder="YYYY"
+                    maxLength={4}
+                    inputMode="numeric"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    CVC
+                  </label>
+                  <input
+                    name="cvc"
+                    ref={cvcRef}
+                    value={cvc}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, '');
+                      setCvc(v.slice(0, 4));
+                    }}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${cvcError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
+                    placeholder="CVC"
+                    maxLength={4}
+                    inputMode="numeric"
+                  />
+                </div>
+              </div>
+              
+              {(expError || cvcError) && (
+                <div className="text-sm text-red-600 dark:text-red-400">
+                  {expError && <p>{expError}</p>}
+                  {cvcError && <p>{cvcError}</p>}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  PayPal Email Address
+                </label>
+                <input
+                  type="email"
+                  name="paypalEmail"
+                  value={paypalEmail}
+                  onChange={(e) => setPaypalEmail(e.target.value)}
+                  className={`w-full px-4 py-2.5 rounded-lg border ${paypalError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
+                  placeholder="your.email@example.com"
+                />
+                {paypalError && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">{paypalError}</p>
+                )}
+              </div>
+            </>
           )}
           
           <label className="flex items-center gap-3 cursor-pointer">
@@ -250,7 +345,7 @@ const PaymentMethodsSection: React.FC = () => {
             <button
               type="submit"
               className="px-8 py-3 text-base font-semibold text-white bg-success hover:bg-success-dark dark:bg-success dark:hover:bg-success-light rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={!isCardValid}
+              disabled={paymentType === 'card' ? !isCardValid : !isPayPalValid}
             >
               Add Payment Method
             </button>

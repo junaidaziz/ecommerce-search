@@ -14,6 +14,7 @@ const links = [
   { href: '/user/stores', label: 'Followed Stores' },
   { href: '/user/history', label: 'Browsing History' },
   { href: '/user/notifications', label: 'Notifications' },
+  { href: '/user/security', label: 'Security' },
   { href: '/user/permissions', label: 'Permissions' },
 ];
 
