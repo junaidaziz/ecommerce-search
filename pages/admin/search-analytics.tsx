@@ -31,28 +31,32 @@ export default function SearchAnalytics() {
       <PageHero heading="Search Analytics" />
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="mb-4 space-x-2">
-          <Link href="/admin/analytics" className="btn btn-sm">
+          <Link href="/admin/analytics" className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors inline-block">
             Back
           </Link>
         </div>
-      <h2 className="text-xl font-semibold mt-4 mb-2">Top Searches</h2>
-      <ul className="list-disc list-inside">
-        {data.topSearches.map((s) => (
-          <li key={s.query}>
-            {s.query} - {s.count}
-          </li>
-        ))}
-        {data.topSearches.length === 0 && <li>No searches yet.</li>}
-      </ul>
-      <h2 className="text-xl font-semibold mt-4 mb-2">No Result Searches</h2>
-      <ul className="list-disc list-inside">
-        {data.failedSearches.map((s) => (
-          <li key={s.query}>
-            {s.query} - {s.count}
-          </li>
-        ))}
-        {data.failedSearches.length === 0 && <li>None.</li>}
-      </ul>
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 mb-6">
+        <h2 className="text-xl font-semibold mt-4 mb-2 text-gray-900 dark:text-gray-100">Top Searches</h2>
+        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+          {data.topSearches.map((s) => (
+            <li key={s.query}>
+              {s.query} - {s.count}
+            </li>
+          ))}
+          {data.topSearches.length === 0 && <li className="text-gray-500 dark:text-gray-400">No searches yet.</li>}
+        </ul>
+      </div>
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
+        <h2 className="text-xl font-semibold mt-4 mb-2 text-gray-900 dark:text-gray-100">No Result Searches</h2>
+        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+          {data.failedSearches.map((s) => (
+            <li key={s.query}>
+              {s.query} - {s.count}
+            </li>
+          ))}
+          {data.failedSearches.length === 0 && <li className="text-gray-500 dark:text-gray-400">None.</li>}
+        </ul>
+      </div>
     </div>
     </>
   );
