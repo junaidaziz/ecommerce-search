@@ -4,6 +4,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { PasswordInput } from '@components/form-fields';
 import { NotificationContext } from '@contexts/NotificationContext';
 import { LockClosedIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 interface PasswordFormValues {
   current: string;
@@ -80,13 +81,23 @@ const ChangePasswordSection: React.FC = () => {
       </div>
       
       <div className="space-y-5">
-        <PasswordInput
-          label="Current Password"
-          register={passwordForm.register}
-          name="current"
-          rules={{ required: 'Required' }}
-          error={passwordForm.formState.errors.current?.message}
-        />
+        <div>
+          <PasswordInput
+            label="Current Password"
+            register={passwordForm.register}
+            name="current"
+            rules={{ required: 'Required' }}
+            error={passwordForm.formState.errors.current?.message}
+          />
+          <div className="mt-2">
+            <Link 
+              href="/reset" 
+              className="text-sm text-primary hover:text-primary-dark dark:hover:text-primary-light transition-colors"
+            >
+              Forgot your password?
+            </Link>
+          </div>
+        </div>
         
         <div>
           <PasswordInput
