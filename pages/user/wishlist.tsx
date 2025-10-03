@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import Link from 'next/link';
 import { AppContext } from '@contexts/AppContext';
-import type { AppContextValue, WishlistItem } from '@/types';
+import type { AppContextValue } from '@/types';
 import Head from 'next/head';
 import { getPageTitle } from '@lib/pageTitle';
+import ProductCard from '@components/Product/ProductCard';
 
 const UserWishlist: React.FC = () => {
   const context = useContext<AppContextValue | undefined>(AppContext);
@@ -12,59 +12,33 @@ const UserWishlist: React.FC = () => {
     return <div className="p-4">Please log in to view wishlist.</div>;
   }
 
-  const { wishlist, addToCart, removeFromWishlist, addToWishlist } = context;
+  const { wishlist, addToWishlist, removeFromWishlist } = context;
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="container mx-auto px-4 py-8">
       <Head>
         <title>{getPageTitle('My Wishlist')}</title>
       </Head>
-      <h1 className="text-2xl font-bold mb-4">My Wishlist</h1>
-      <ul className="space-y-2">
-        {wishlist.map((item: WishlistItem) => (
-          <li
-            key={item.id}
-            className="border p-2 flex justify-between items-center"
-          >
-            <div>
-              <Link
-                href={`/product/${item.product.slug}`}
-                className="font-semibold"
-              >
-                {item.product.title}
-              </Link>
-              <div className="text-sm">
-                {item.product.quantity > 0 ? 'In Stock' : 'Out of Stock'}
-              </div>
-              <label className="flex items-center gap-1 mt-1 text-sm">
-                <input
-                  type="checkbox"
-                  checked={item.notifyOnStock}
-                  onChange={() =>
-                    addToWishlist(item.product, !item.notifyOnStock)
-                  }
-                />
-                Notify when in stock
-              </label>
-            </div>
-            <div className="flex gap-2">
-              <button
-                className="btn btn-sm"
-                onClick={() => addToCart(item.product)}
-              >
-                Add to Cart
-              </button>
-              <button
-                className="btn btn-sm"
-                onClick={() => removeFromWishlist(item.product.id)}
-              >
-                Remove
-              </button>
-            </div>
-          </li>
-        ))}
-        {wishlist.length === 0 && <li>No items in wishlist.</li>}
-      </ul>
+      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">My Wishlist</h1>
+      
+      {wishlist.length === 0 ? (
+        <div className="text-center py-16">
+          <p className="text-lg text-gray-600 dark:text-gray-400">No items in wishlist.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5 lg:gap-6">
+          {wishlist.map((item) => (
+            <ProductCard
+              key={item.id}
+              product={item.product}
+              className="w-full h-full transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl"
+              inWishlist={true}
+              addToWish={addToWishlist}
+              removeFromWish={(id) => removeFromWishlist(Number(id))}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
