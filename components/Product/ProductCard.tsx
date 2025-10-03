@@ -70,13 +70,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <div
       className={`group relative flex flex-col h-full rounded-2xl overflow-hidden p-4 gap-4
-        bg-gradient-to-br from-base-100 via-base-100 to-base-200 dark:from-gray-800 dark:via-gray-800 dark:to-gray-850
-        border border-base-200/80 dark:border-gray-700/70
-        shadow-sm hover:shadow-xl transition-all duration-400
-        hover:-translate-y-1 hover:border-primary/60 dark:hover:border-primary/60
-        focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-base-100
-        before:absolute before:inset-0 before:pointer-events-none before:rounded-2xl before:border before:border-transparent before:transition-[border-color,opacity] before:duration-300
-        hover:before:border-primary/30
+        bg-white dark:bg-gray-800/90
+        border border-gray-200/70 dark:border-gray-700/50
+        shadow-sm hover:shadow-xl dark:hover:shadow-2xl dark:hover:shadow-primary/5 transition-all duration-300
+        hover:-translate-y-1 hover:border-primary/40 dark:hover:border-primary/50
+        focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-base-100 dark:focus-within:ring-offset-gray-900
+        hover:bg-gray-50/50 dark:hover:bg-gray-800
         ${className}`}
       tabIndex={0}
       aria-label={product.title}
@@ -101,11 +100,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* Quick Add to Cart */}
           <Button
             type="button"
-            variant="success"
+            variant="primary"
             size="md"
             fullWidth
             rounded
-            className="py-2 px-4 flex items-center justify-center gap-2"
+            className="py-2 px-4 flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-shadow"
             onClick={handleAddToCart}
           >
             <CartIcon className="w-4 h-4 flex-shrink-0" />

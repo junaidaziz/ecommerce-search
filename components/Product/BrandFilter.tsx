@@ -38,9 +38,9 @@ const BrandFilter: React.FC<BrandFilterProps> = ({
     return (
       <FilterSection 
         label="Brands" 
-        icon={<BuildingIcon className="w-4 h-4 text-purple-500" />}
+        icon={<BuildingIcon className="w-4 h-4 text-purple-500 dark:text-purple-400" />}
       >
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+        <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200/50 dark:border-gray-700/50">
           <p className="text-sm text-gray-500 dark:text-gray-400">Loading brands...</p>
         </div>
       </FilterSection>
@@ -54,9 +54,9 @@ const BrandFilter: React.FC<BrandFilterProps> = ({
   return (
     <FilterSection 
       label="Brands" 
-      icon={<BuildingIcon className="w-4 h-4 text-purple-500" />}
+      icon={<BuildingIcon className="w-4 h-4 text-purple-500 dark:text-purple-400" />}
     >
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 max-h-64 overflow-y-auto">
+      <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-4 max-h-64 overflow-y-auto border border-gray-200/50 dark:border-gray-700/50">
         <div className="space-y-2">
           {brands.map((brand) => (
             <Checkbox
@@ -71,7 +71,7 @@ const BrandFilter: React.FC<BrandFilterProps> = ({
                     : prev.filter((id) => id !== brand.id)
                 );
               }}
-              className="text-base font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-primary transition-colors duration-200 hover:bg-primary/10 dark:hover:bg-primary/20 hover:border-primary dark:hover:border-primary rounded"
+              className="text-base font-medium text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary transition-colors duration-200 hover:bg-primary/5 dark:hover:bg-primary/10 rounded px-2 py-1"
             />
           ))}
         </div>

@@ -12,8 +12,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ keyword, setKeyword }) => {
   return (
     <FilterSection 
       label="Search Products" 
-      icon={<SearchIcon className="w-4 h-4 text-primary" />}
-      className="pb-3 border-b border-gray-200 dark:border-gray-700"
+      icon={<SearchIcon className="w-4 h-4 text-primary dark:text-primary-light" />}
+      className="pb-4 border-b border-gray-200/70 dark:border-gray-700/50"
       noBorder
     >
       <InputField
@@ -22,7 +22,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ keyword, setKeyword }) => {
         name="keyword"
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
-        className="w-full text-base px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary transition-all duration-300 shadow-sm focus:shadow-lg"
+        className="w-full text-sm px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary/50 focus:border-primary dark:focus:border-primary transition-all duration-200"
       />
     </FilterSection>
   );
